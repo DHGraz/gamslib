@@ -1,0 +1,15 @@
+
+<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title xml:lang="en">Person description 1</dc:title>
+  <dc:title xml:lang="de">Personenbeschreibung 1</dc:title>
+  <dc:creator>Foo, Bar</dc:creator>
+  <dc:publisher xml:lang="de">Person 1, Karl-Franzens-Universität Graz</dc:publisher>
+  <dc:date>2015</dc:date>
+  <dc:format>text/xml</dc:format>
+  <dc:identifier>o:hsa.person.2037</dc:identifier>
+  <dc:language>de</dc:language>
+  <dc:relation>Hugo Schuchardt Archiv</dc:relation>
+  <dc:relation>http://schuchardt.uni-graz.at</dc:relation>
+  <dc:rights>Creative Commons BY-NC 4.0</dc:rights>
+  <dc:rights>https://creativecommons.org/licenses/by-nc/4.0</dc:rights>
+</oai_dc:dc>
