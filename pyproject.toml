@@ -3,13 +3,14 @@ name = "gamslib"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
-    { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
+    { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
+    { name = "Fabio Tosques", email = "fabio.tosques@uni-graz.at" }
 ]
 dependencies = [
     "pydantic>=2.9.2",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.11"
 
 [build-system]
 requires = ["hatchling"]
