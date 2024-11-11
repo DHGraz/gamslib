@@ -177,7 +177,7 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     # now save the datastream.csv file to a new file and compare the content
     csv_file = dscsvfile.parent / "datastreams2.csv"
     dcf.to_csv(csv_file)
-    assert dscsvfile.read_text() == csv_file.read_text()
+    assert dscsvfile.read_text(encoding="utf-8") == csv_file.read_text(encoding="utf-8")
 
 
 def test_object_csv(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:DSData):
@@ -198,8 +198,8 @@ def test_object_csv(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:
     oc.write(new_dir)
     assert (new_dir / "object.csv").exists()
     assert (new_dir / "datastreams.csv").exists()
-    assert (new_dir / "object.csv").read_text() == objcsvfile.read_text()
-    assert (new_dir / "datastreams.csv").read_text() == dscsvfile.read_text()
+    assert (new_dir / "object.csv").read_text(encoding="utf-8") == objcsvfile.read_text(encoding="utf-8")
+    assert (new_dir / "datastreams.csv").read_text(encoding="utf-8") == dscsvfile.read_text(encoding="utf-8")
 
     # test clear()
     oc.clear()

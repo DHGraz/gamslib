@@ -156,7 +156,7 @@ class DatastreamsCSVFile:
     def to_csv(self, csv_file: Path):
         "Save the datastream data to a csv file."
         self._datastreams.sort(key=lambda x: x.dspath)
-        with csv_file.open("w") as f:
+        with csv_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(
                 f, fieldnames=[field.name for field in fields(DSData)]
             )

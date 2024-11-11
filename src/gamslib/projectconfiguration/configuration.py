@@ -69,7 +69,7 @@ class Configuration(BaseModel):
             if error["type"] == "missing":
                 raise ValueError(
                     f"Error in project TOML file '{toml_file}': "
-                    f"missing required field '{".".join([str(e) for e in error['loc']])}"
+                    f"missing required field '{'.'.join([str(e) for e in error['loc']])}'"
                 ) from e
 
             raise ValueError(
