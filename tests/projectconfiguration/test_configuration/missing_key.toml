@@ -3,3 +3,6 @@
 creator = "XXX Test Project"
 publisher = "XXX"
 rights = "XXX License"
+
+[objectcsv]
+dsid_keep_extension = true

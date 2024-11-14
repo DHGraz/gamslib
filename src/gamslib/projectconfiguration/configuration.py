@@ -35,6 +35,9 @@ class ProjectMetadata(BaseModel):
     rights: str = ""
 
 
+class ObjectCSV(BaseModel):
+    dsid_keep_extension: bool             
+
 class Project(BaseModel):
     """A project object.
     
@@ -42,6 +45,7 @@ class Project(BaseModel):
     used as aggregation of the Configuration project.
     """
     metadata: ProjectMetadata
+    
 
 
 class Configuration(BaseModel):
@@ -49,6 +53,7 @@ class Configuration(BaseModel):
 
     toml_file: Path
     project: Project
+    objectcsv: ObjectCSV
 
     @classmethod
     def from_toml(cls, toml_file: Path):
