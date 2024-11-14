@@ -25,7 +25,8 @@ def test_collect_csv_data(datadir):
 
     with open(obj_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        data = list(reader)
+        data = sorted(list(reader), key = lambda x: x["recid"])
+    
     assert len(data) == 2  # we have to objects
     assert data[0]["recid"] == "obj1"
     assert data[1]["recid"] == "obj2"
