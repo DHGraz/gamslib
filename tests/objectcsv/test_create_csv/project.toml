@@ -1,0 +1,9 @@
+[project.metadata]
+projectname = "Test Project"
+creator = "GAMS Test Project"
+publisher = "GAMS"
+rights = "Rights from project.toml"
+
+
+[objectcsv]
+dsid_keep_extension = true

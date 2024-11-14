@@ -3,9 +3,9 @@
 import logging
 from pathlib import Path
 
-from gamspreprocessor.objectcsv import ObjectCSV
+from gamslib.objectcsv import ObjectCSV
 
-from ..utils import find_object_folders
+from .utils import find_object_folders
 
 logger = logging.getLogger()
 
@@ -28,49 +28,40 @@ logger = logging.getLogger()
 
 def collect_csv_data(
     object_root_dir: Path,
-    collected_csv_dir: Path | None = None,
-    # objects_file: Path = Path.cwd() / "all_objcts.csv",
-    # datastreams_file: Path = Path.cwd() / "all_datastreams.csv",
-) -> tuple[Path, Path]:
-    """Collect data from all csv files in all object folders.
+    output_dir: Path | None = None,
+    object_filename: str | None = None,
+    datastream_filename: str | None = None,
+) -> ObjectCSV:
+    """Collect csv data from all object folders below object_root_dir.
 
     This function collects all data from all object.csv and all datastream.csv files
     below root_dir.
-    The collected data is stored in two files: objects_file and ds_file.
+    The collected data is stored in two files: object.csv_file and ds_file. These files
+    are created in object_root_dir if no other output directory is se
+    via output_dir.
 
     Returns the Path to all_objects.csv and all_datastreams.csv as tuple of Path objects.
     """
     # This is were we put all collected data
-    all_objects_csv = ObjectCSV(collected_csv_dir or object_root_dir)
-    # object_rows:list[dict[str, str]] = []
-    # ds_rows = DatastreamsCSVFile(datastreams_file)
+    all_objects_csv = ObjectCSV(output_dir or object_root_dir)
     for objectfolder in find_object_folders(object_root_dir):
         obj_csv = ObjectCSV(objectfolder)
 
-        all_objects_csv.add_objectdata(obj_csv.object_data)
-        all_objects_csv.add_datastreamscsvfile(obj_csv.datastream_data)
+        for objmeta in obj_csv.get_objectdata():
+            all_objects_csv.add_objectdata(objmeta)
+        for dsmeta in obj_csv.get_datastreamdata():
+            all_objects_csv.add_datastream(dsmeta)
 
-        for obj_data in obj_csv.get_objectdata():
-            all_objects_csv.add_objectdata(obj_data)
-        for ds_data in obj_csv.get_datastreamdata():
-            all_objects_csv.add_datastream(ds_data)
-        obj_csv.write()
-
-    all_objects_csv.write()
+    if object_filename is None:
+        object_filename = "all_objects.csv"
+    if datastream_filename is None:
+        datastream_filename = "all_datastreams.csv"
+    all_objects_csv.write(
+        all_objects_csv.object_dir, object_filename, datastream_filename
+    )
     return all_objects_csv
 
 
-#    ds_rows.to_csv(datastreams_file)
-
-# with open(objects_file, "w", encoding="utf-8") as f:
-#     writer = csv.writer(f)
-#     writer.writerows(object_rows)
-# with open(datastreams_file, "w", encoding="utf-8", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerows(ds_rows)
-# return objects_file, datastreams_file
-
-# # TODO
 # def group_datastreams(ds_data: List[Dict[str, str]]) -> Dict[str, List[Dict[str, str]]]:
 #     """Group datastreams by object."""
 #     grouped = {}
@@ -148,8 +139,8 @@ def collect_csv_data(
 def update_csv_files(
     object_root_dir: Path,
     collected_csv_dir: Path | None = None,
-    # object_csv: Path = Path.cwd() / "all_objects.csv",
-    # dc_csv: Path = Path.cwd() / "all_datastreams.csv",
+    object_csv: str = "all_objects.csv",
+    ds_csv: str = "all_datastreams.csv",
 ) -> tuple[int, int]:
     """Update csv metadata files with data from the combined csv data.
 
@@ -165,22 +156,20 @@ def update_csv_files(
     num_of_changed_objects = 0
     num_of_changed_datastreams = 0
 
-    all_objects_csv = ObjectCSV(collected_csv_dir or object_root_dir)
+    if collected_csv_dir is None:
+        collected_csv_dir = object_root_dir
+    all_objects_csv = ObjectCSV(collected_csv_dir, object_csv, ds_csv)
 
     for objectfolder in find_object_folders(object_root_dir):
         obj_csv = ObjectCSV(objectfolder)
         obj_csv.clear()
         for obj_data in all_objects_csv.get_objectdata(obj_csv.object_id):
-            num_of_changed_objects += 1
             obj_csv.add_objectdata(obj_data)
-        for ds_data in obj_csv.get_datastreamdata(obj_csv.object_id):
-            num_of_changed_datastreams += 1
+            num_of_changed_objects += 1
+
+        for ds_data in all_objects_csv.get_datastreamdata(obj_csv.object_id):
             obj_csv.add_datastream(ds_data)
+            num_of_changed_datastreams += 1
         obj_csv.write()
-        # all_objects_csv.add_objectdata(objdata)
-        # all_objects_csv.add_objectdata(obj_csv.object_data)
-        # all_objects_csv.add_datastreamscsvfile(obj_csv.datastream_data)
-    # object_data = read_csv_dict(object_csv)
-    # grouped_ds_data = group_datastreams(read_csv_dict(dc_csv))
 
     return num_of_changed_objects, num_of_changed_datastreams

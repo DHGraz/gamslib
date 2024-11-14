@@ -1,12 +1,23 @@
-from gamslib.objectcsv.objectcsv import DatastreamsCSVFile, ObjectCSV, ObjectCSVFile, ObjectData, DSData
-import pytest
-from pathlib import Path
+"""Tests for the objectcsv.objectcsv module."""
+
+import copy
 import csv
 from dataclasses import asdict
-import copy
+from pathlib import Path
 
-@pytest.fixture
-def objdata() -> ObjectData:
+import pytest
+
+from gamslib.objectcsv.objectcsv import (
+    DatastreamsCSVFile,
+    DSData,
+    ObjectCSV,
+    ObjectCSVFile,
+    ObjectData,
+)
+
+
+@pytest.fixture(name="objdata")
+def objdata_fixture() -> ObjectData:
     "Return a ObjectData object."
     return ObjectData(
         recid="obj1",
@@ -20,8 +31,9 @@ def objdata() -> ObjectData:
         objectType="The objectType",
     )
 
-@pytest.fixture
-def dsdata() -> DSData:
+
+@pytest.fixture(name="dsdata")
+def dsdata_fixture() -> DSData:
     "Return a DSData object."
     return DSData(
         dspath="obj1/TEI.xml",
@@ -33,8 +45,9 @@ def dsdata() -> DSData:
         rights="GPLv3",
     )
 
-@pytest.fixture
-def objcsvfile(objdata:ObjectData, tmp_path: Path) -> Path:
+
+@pytest.fixture(name="objcsvfile")
+def objcsvfile_fixture(objdata: ObjectData, tmp_path: Path) -> Path:
     "Return path to an object.csv file from objdata"
     data = asdict(objdata)
     col_names = list(data.keys())
@@ -46,10 +59,11 @@ def objcsvfile(objdata:ObjectData, tmp_path: Path) -> Path:
         writer.writerow(data)
     return csv_file
 
-@pytest.fixture
-def dscsvfile(dsdata: DSData, tmp_path:Path) -> Path:
-    """Return path to a datastreams.csv file. 
-    
+
+@pytest.fixture(name="dscsvfile")
+def dscsvfile_fixture(dsdata: DSData, tmp_path: Path) -> Path:
+    """Return path to a datastreams.csv file.
+
     Contains data from dsdata as first element and a copy of dsdata,
     where object id, dspath and dsid are different.
     """
@@ -69,6 +83,7 @@ def dscsvfile(dsdata: DSData, tmp_path:Path) -> Path:
         writer.writerow(ds2)
     return csv_file
 
+
 def test_objectdata_creation(objdata):
     "Should create an ObjectData object."
     assert objdata.recid == "obj1"
@@ -80,6 +95,7 @@ def test_objectdata_creation(objdata):
     assert objdata.publisher == "The publisher"
     assert objdata.source == "The source"
     assert objdata.objectType == "The objectType"
+
 
 def test_objectdata_validate(objdata):
     "Should raise an exception if required fields are missing."
@@ -103,6 +119,7 @@ def test_objectdata_validate(objdata):
     with pytest.raises(ValueError):
         objdata.validate()
 
+
 def test_dsdata_creation(dsdata):
     "Should create a DSData object."
     assert dsdata.dspath == "obj1/TEI.xml"
@@ -114,7 +131,8 @@ def test_dsdata_creation(dsdata):
     assert dsdata.rights == "GPLv3"
 
     # this is a @property
-    assert dsdata.object_id == "obj1"        
+    assert dsdata.object_id == "obj1"
+
 
 def test_dsdata_validate(dsdata):
     "Should raise an exception if required fields are missing."
@@ -132,9 +150,10 @@ def test_dsdata_validate(dsdata):
     dsdata.mimetype = "application/xml"
     dsdata.rights = ""
     with pytest.raises(ValueError):
-        dsdata.validate()    
+        dsdata.validate()
 
-def test_objectcsvfile(objcsvfile:Path, objdata:ObjectData):
+
+def test_objectcsvfile(objcsvfile: Path, objdata: ObjectData):
     "Should create an ObjectCSVFile object from a csv file."
     ocf = ObjectCSVFile.from_csv(objcsvfile)
     result = list(ocf.get_data())
@@ -157,8 +176,9 @@ def test_objectcsvfile(objcsvfile:Path, objdata:ObjectData):
 
 
 def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
+    "Test the DatastreamsCSVFile object."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
-    result = list(dcf.get_data())    
+    result = list(dcf.get_data())
     assert len(result) == 2
     assert result[0].dspath == "obj1/TEI.xml"
     assert result[1].dspath == "obj2/TEI2.xml"
@@ -180,7 +200,8 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     assert dscsvfile.read_text(encoding="utf-8") == csv_file.read_text(encoding="utf-8")
 
 
-def test_object_csv(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:DSData):
+def test_object_csv(
+    objcsvfile: Path, dscsvfile: Path):
     "Should create an ObjectCSV object."
 
     oc = ObjectCSV(objcsvfile.parent)
@@ -198,8 +219,18 @@ def test_object_csv(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:
     oc.write(new_dir)
     assert (new_dir / "object.csv").exists()
     assert (new_dir / "datastreams.csv").exists()
-    assert (new_dir / "object.csv").read_text(encoding="utf-8") == objcsvfile.read_text(encoding="utf-8")
-    assert (new_dir / "datastreams.csv").read_text(encoding="utf-8") == dscsvfile.read_text(encoding="utf-8")
+    assert (new_dir / "object.csv").read_text(encoding="utf-8") == objcsvfile.read_text(
+        encoding="utf-8"
+    )
+    assert (new_dir / "datastreams.csv").read_text(
+        encoding="utf-8"
+    ) == dscsvfile.read_text(encoding="utf-8")
+
+    # test write with explicit filenames
+    new_dir = objcsvfile.parent
+    oc.write(new_dir, "all_objects.csv", "all_datastreams.csv")
+    assert (new_dir / "all_objects.csv").exists()
+    assert (new_dir / "all_datastreams.csv").exists()
 
     # test clear()
     oc.clear()
@@ -207,7 +238,9 @@ def test_object_csv(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:
     assert oc.count_datastreams() == 0
 
 
-def test_object_csv_modify_get_set_data(objcsvfile:Path, dscsvfile:Path, objdata:ObjectData, dsdata:DSData):
+def test_object_csv_modify_get_set_data(
+    objcsvfile: Path, dscsvfile: Path, objdata: ObjectData, dsdata: DSData
+):
     "Test if adding and retrieving object and datastream data works."
     # test add_datastream() and get_datastreamdata()
     oc = ObjectCSV(objcsvfile.parent)
@@ -242,7 +275,8 @@ def test_object_csv_empty_dir(tmp_path):
     empty_oc = ObjectCSV(tmp_path)
     assert empty_oc.is_new()
 
+
 def test_object_csv_missing_dir():
     "Should raise an exception if the directory does not exist."
     with pytest.raises(FileNotFoundError):
-        ObjectCSV(Path("does_not_exist"))    
+        ObjectCSV(Path("does_not_exist"))

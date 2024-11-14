@@ -8,6 +8,7 @@ authors = [
 ]
 dependencies = [
     "pydantic>=2.9.2",
+    "pylightxl>=1.61",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

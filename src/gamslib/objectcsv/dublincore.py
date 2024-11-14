@@ -163,6 +163,9 @@ class DublinCore:
                         lang,
                     )
                     break
+        # rv = self._data[name][preferred_lang]
+        # if isinstance(rv, str):
+        #    rv = [rv]
         return self._data[name][preferred_lang]
 
     def get_element_as_str(

@@ -1,11 +1,21 @@
-import mimetypes
-from pathlib import Path
+"""Create object.csv and datastreams.csv files.
+
+This module creates the object.csv and datastreams.csv files for one or many given
+object folder. It uses data from the DC.xml file and the project configuration 
+to fill in the metadata. When not enough information is available, some fields 
+will be left blank or filled with default values.
+"""
+
 import logging
+import mimetypes
 import re
-from gamspreprocessor.configuration import Configuration
+from pathlib import Path
+
+from gamslib.projectconfiguration import Configuration
+
 from . import DSData, ObjectCSV, ObjectData
-from ..utils import find_object_folders 
 from .dublincore import DublinCore
+from .utils import find_object_folders
 
 logger = logging.getLogger()
 
@@ -31,7 +41,7 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
       3. Use a default value.
     """
     rights = dc.get_element_as_str("rights", default=None)
-    if rights is None:
+    if not rights:  # empty string is a valid value
         if config.project.metadata.rights:
             rights = config.project.metadata.rights
         else:
@@ -39,7 +49,7 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
     return rights
 
 
-def extract_dsid(datastream: Path | str, remove_extension=False) -> str:
+def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
     """Extract and validate the datastream id from a datastream path.
 
     If remove_extension is True, the file extension is removed from the PID.
@@ -49,10 +59,13 @@ def extract_dsid(datastream: Path | str, remove_extension=False) -> str:
 
     pid = datastream.name
 
-    if remove_extension:
+    if not keep_extension:
         # not everything after the last dot is an extension :-(
         mtype = mimetypes.guess_type(datastream)[0]
-        known_extensions = mimetypes.extensions.get(mtype, [])
+        if mtype is None:
+            known_extensions = []
+        else:
+            known_extensions = mimetypes.guess_all_extensions(mtype)
         if datastream.suffix in known_extensions:
             pid = pid.removesuffix(datastream.suffix)
             logger.debug("Removed extension '%s' for ID: %s", datastream.suffix, pid)
@@ -70,10 +83,7 @@ def extract_dsid(datastream: Path | str, remove_extension=False) -> str:
         raise ValueError(f"Invalid PID: '{pid}'")
 
     logger.debug(
-        "Extracted PID: %s from %s (remove_extension=%s)",
-        pid,
-        datastream,
-        remove_extension,
+        "Extracted PID: %s from %s (keep_extension=%s)", pid, datastream, keep_extension
     )
     return pid
 
@@ -90,9 +100,9 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
     return ObjectData(
         recid=pid,
         title=title,
-        project=config.project,
+        project=config.project.metadata.projectname,
         description=description,
-        creator=config.creator,
+        creator=config.project.metadata.creator,
         rights=get_rights(config, dc),
         source=DEFAULT_SOURCE,
         objectType=DEFAULT_OBJECT_TYPE,
@@ -100,61 +110,60 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
 
 
 def collect_datastream_data(
-    ds_file: Path, object_pid: str, config: Configuration, dc: DublinCore,
-    remove_extension_for_id=False
+    ds_file: Path, config: Configuration, dc: DublinCore
 ) -> DSData:
-    """Create a DSData object for a datastream file.
+    """Collect data for a single datastream."""
+    dsid = extract_dsid(ds_file, config.objectcsv.dsid_keep_extension)
 
-    This is the place to change the resolving order for data from other sources.
-    """
-
-    # maybe there are more files which always have the same metadata title / description?
-    if ds_file.name == "DC.xml":
-        title = "Dublin Core Metadata"
-        description = "DC Metadata describing the data stream"
-    else:
-        title = ""
-        description = ""
+    # I think it's not possible to derive a ds title or description from the DC file
+    # title = "; ".join(dc.get_element("title", default=dsid)) # ??
+    # description = "; ".join(dc.get_element("description", default="")) #??
 
     return DSData(
-        dspath=object_pid + "/" + ds_file.name,
-        dsid=extract_dsid(ds_file, remove_extension_for_id),
-        title=title,
-        description=description,
-        # there should be a more reliable way to get the mimetype
-        mimetype=mimetypes.guess_type(ds_file)[0],  
-        creator=config.metadata.creator,
-        rights=get_rights(config, dc)
+        dspath=ds_file.relative_to(ds_file.parents[1]),  # objectsdir
+        dsid=dsid,
+        title="",
+        description="",
+        mimetype=mimetypes.guess_type(ds_file)[0],
+        creator=config.project.metadata.creator,
+        rights=get_rights(config, dc),
     )
 
 
-def create_csv(object_directory: Path, configuration: Configuration) -> None:
+def create_csv(
+    object_directory: Path, configuration: Configuration
+) -> ObjectCSV | None:
     """Generate the csv file containing the preliminary metadata for a single object."""
     objectcsv = ObjectCSV(object_directory)
-    object_pid = object_directory.name
+
     # Avoid that existing (and potentially already edited) metadata is replaced
-    if objectcsv.is_new():
+    if not objectcsv.is_new():
         logger.info(
-            "CSV files for object '%s' already exist. Will not be re-created.", object_pid
+            "CSV files for object '%s' already exist. Will not be re-created.",
+            objectcsv.object_id,
         )
-        return
+        return None
 
     dc = DublinCore(object_directory / "DC.xml")
-
-    objectcsv.add_objectdata(collect_object_data(object_pid, configuration, dc))
+    objectcsv.add_objectdata(
+        collect_object_data(objectcsv.object_id, configuration, dc)
+    )
     for ds_file in object_directory.glob("*"):
         if ds_file.is_file() and ds_file.name not in ("object.csv", "datastreams.csv"):
             objectcsv.add_datastream(
-                collect_datastream_data(ds_file, object_pid, configuration, dc)
+                # collect_datastream_data(ds_file, objectcsv.object_id, configuration, dc)
+                collect_datastream_data(ds_file, configuration, dc)
             )
     objectcsv.write()
+    return objectcsv
 
 
-def create_csv_files(root_folder: Path, config: Configuration) -> list[Path]:
-    """Create the CSV files for all objects below root_folder.
-    """
-    processed_folders = []
+def create_csv_files(root_folder: Path, config: Configuration) -> list[ObjectCSV]:
+    """Create the CSV files for all objects below root_folder."""
+    extended_objects: list[ObjectCSV] = []
     for path in find_object_folders(root_folder):
-        create_csv(path, config)
-        processed_folders.append(path.relative_to(root_folder))
-    return processed_folders
+        extended_obj = create_csv(path, config)
+
+        if extended_obj is not None:
+            extended_objects.append(extended_obj)
+    return extended_objects

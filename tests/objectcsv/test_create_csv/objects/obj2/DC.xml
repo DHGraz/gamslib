@@ -1,0 +1,14 @@
+
+<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title xml:lang="en">Object 2</dc:title>
+  <dc:title xml:lang="de">Description 2</dc:title>
+  <dc:creator>Bar, Foo</dc:creator>
+  <dc:publisher xml:lang="de">Person 2</dc:publisher>
+  <dc:date>2015</dc:date>
+  <dc:format>text/xml</dc:format>
+  <dc:identifier>object.2</dc:identifier>
+  <dc:language>de</dc:language>
+  <dc:relation>Foo Bar Archive</dc:relation>
+  <dc:relation>http://example.com</dc:relation>
+  <dc:rights>Rights from DC.xml</dc:rights>
+</oai_dc:dc>

@@ -1,11 +1,19 @@
-"""Module to convert csv to xlsx files.
-"""
+"""Module to convert csv to xlsx files."""
 
 import csv
 from pathlib import Path
 
-from .manage_csv import read_csv
 import pylightxl as xl
+
+
+def read_csv(csvfile: Path, skip_header: bool = True) -> list[list[str]]:
+    """Read a csv file and return a list of rows."""
+    with open(csvfile, "r", encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        if skip_header:
+            next(reader)
+        return list(reader)
+
 
 def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path):
     """Convert csv files to xlsx files.
@@ -19,17 +27,18 @@ def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path):
     db.add_ws("Object Metadata")
     for row_id, row in enumerate(object_data, start=1):
         for col_id, value in enumerate(row, start=1):
-            db.ws(ws="Object Metadata").update_index(row=row_id, col=col_id, val=value) 
+            db.ws(ws="Object Metadata").update_index(row=row_id, col=col_id, val=value)
     db.add_ws("Datastream Metadata")
     for row_id, row_data in enumerate(ds_data, start=1):
         for col_id, value in enumerate(row_data, start=1):
-            db.ws(ws="Datastream Metadata").update_index(row=row_id, col=col_id, val=value)
+            db.ws(ws="Datastream Metadata").update_index(
+                row=row_id, col=col_id, val=value
+            )
     xl.writexl(fn=output_file, db=db)
 
 
 def xlsx_to_csv(xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path):
-    """Convert a xlsx metadata file to 2 csv files: object.csv and datastreams.csv.
-    """
+    """Convert a xlsx metadata file to 2 csv files: object.csv and datastreams.csv."""
     db = xl.readxl(xlsx_path)
 
     object_data = list(db.ws(ws="Object Metadata").rows)

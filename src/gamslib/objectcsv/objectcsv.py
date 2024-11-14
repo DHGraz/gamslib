@@ -171,12 +171,19 @@ class DatastreamsCSVFile:
 
 @dataclass
 class ObjectCSV:
-    "Represents the object and datastream data for a single object."
+    """Represents the object and datastream data for a single object.
+
+    The constructor expects the Path to the object directory.
+    If the csv files are not set, we assume the default filenames:
+    object.csv and datastreams.csv.
+    """
 
     OBJECT_CSV_FILENAME = "object.csv"
     DATASTREAM_CSV_FILENAME = "datastreams.csv"
 
     object_dir: Path
+    object_file: str = OBJECT_CSV_FILENAME
+    datastream_file: str = DATASTREAM_CSV_FILENAME
 
     def __post_init__(self):
         "Check if the object directory exists and load the object and datastream data."
@@ -185,23 +192,24 @@ class ObjectCSV:
                 f"Object directory '{self.object_dir}' does not exist."
             )
 
-        obj_csv_file = self.object_dir / self.OBJECT_CSV_FILENAME
-        ds_csv_file = self.object_dir / self.DATASTREAM_CSV_FILENAME
+        obj_csv_file = self.object_dir / self.object_file
+        ds_csv_file = self.object_dir / self.datastream_file
 
         if obj_csv_file.is_file():
             self.object_data = ObjectCSVFile.from_csv(obj_csv_file)
         else:
             self.object_data = ObjectCSVFile()
+
         if ds_csv_file.is_file():
             self.datastream_data = DatastreamsCSVFile.from_csv(ds_csv_file)
         else:
             self.datastream_data = DatastreamsCSVFile()
 
     def is_new(self):
-        "Return True if none of the csv files exist."
+        "Return True if at least one of the csv files exist."
         obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
         ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
-        return not (obj_csv.exists() and ds_csv.exists())
+        return not (obj_csv.exists() or ds_csv.exists())
 
     def add_datastream(self, dsdata: DSData):
         "Add a datastream to the object."
@@ -229,13 +237,27 @@ class ObjectCSV:
         """
         return self.datastream_data.get_data(pid)
 
-    def write(self, target_dir: Path | None = None):
-        "Save the object and datastream data to csv files."
+    def write(
+        self,
+        target_dir: Path | None = None,
+        object_filename=None,
+        datastream_filename=None,
+    ):
+        """Save the object and datastream data to csv files.
+
+        If target_dir is not set, the object_dir is used.
+        If object_filename is not set, the default object filename (object.csv) is used.
+        If datastream_filename is not set, the default datastream filename (datastreams.csv) is used.
+        """
         if target_dir is None:
             target_dir = self.object_dir
+        if object_filename is None:
+            object_filename = self.OBJECT_CSV_FILENAME
+        if datastream_filename is None:
+            datastream_filename = self.DATASTREAM_CSV_FILENAME
 
-        self.object_data.to_csv(target_dir / self.OBJECT_CSV_FILENAME)
-        self.datastream_data.to_csv(target_dir / self.DATASTREAM_CSV_FILENAME)
+        self.object_data.to_csv(target_dir / object_filename)
+        self.datastream_data.to_csv(target_dir / datastream_filename)
 
     def count_objects(self) -> int:
         "Return the number of object data objects."

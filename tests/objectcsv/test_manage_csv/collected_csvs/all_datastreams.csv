@@ -1,0 +1,7 @@
+dspath,dsid,title,description,mimetype,creator,rights
+obj1/DC.xml,DC.xml,DCTitle new,DCDescription äÜß,application.xml,Creator 1,Rights 1
+obj1/foo.xml,foo.xml,FooTitle 1 new,FooDescription 1 äÜß,application.xml,Creator 1,Rights 1
+obj1/foo.jpg,foo.jpg,FooTitle 2 new,FooDescription 2,image/jpeg,Creator 2,Rights 2
+obj2/DC.xml,DC.xml,DCTitle new,DCDescription äÜß,application.xml,Creator 1,Rights 1
+obj2/bar.xml,bar.xml,BarTitle 1 new,BarDescription 1 äÜß,application.xml,Creator 1,Rights 1
+obj2/bar.jpg,bar.jpg,BarTitle 2 new,BarDescription 2,image/jpeg,Creator 2,Rights 2

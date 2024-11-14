@@ -29,5 +29,5 @@ The objectcsv package provides tools to handle this metadata.
 """
 
 # make ObjectCSV available in the objectcsv package
-from .objectcsv import ObjectCSV
-__all__ = ["ObjectCSV"]
+from .objectcsv import ObjectCSV, ObjectData, DSData
+__all__ = ["ObjectCSV", "ObjectData", "DSData"]
