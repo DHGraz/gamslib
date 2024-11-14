@@ -1,5 +1,5 @@
 variables:
-    RYE_VERSION: "0.39"
+    RYE_VERSION: "0.42"
     RYE_IMAGE: "jfxs/rye"
 
 stages:
@@ -33,6 +33,7 @@ test-py_3.12:
   extends: .test-template
   variables:
     PYTHON_VERSION: "3.12"
+
 test-py_3.13:
   extends: .test-template
   variables:
