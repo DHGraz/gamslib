@@ -1,0 +1,49 @@
+variables:
+    RYE_VERSION: "0.42"
+    RYE_IMAGE: "jfxs/rye"
+
+stages:
+  - test
+  - lint
+
+# The Docker image (always latest or use the variables?)
+image: jfxs/rye
+
+# A hidden job template that can be used by different Python versions
+.test-template:
+  stage: test
+  script:
+    - echo "Rye environment version"
+    - rye --version
+    - echo "Pinning ${PYTHON_VERSION}"
+    - rye pin ${PYTHON_VERSION}
+    - rye sync
+    - echo "Using python version:"
+    - python --version
+    - echo "Running tests with Rye"
+    - rye test
+
+# Specific jobs for Python versions
+test-py_3.11:
+  extends: .test-template
+  variables:
+    PYTHON_VERSION: "3.11"
+
+test-py_3.12:
+  extends: .test-template
+  variables:
+    PYTHON_VERSION: "3.12"
+test-py_3.13:
+  extends: .test-template
+  variables:
+    PYTHON_VERSION: "3.13"
+
+lint:
+  stage: lint
+  script:
+    - echo "Rye environment version"
+    - rye --version
+    - echo "Using python version:"
+    - python --version
+    - echo "Running rye lint"
+    - rye lint
