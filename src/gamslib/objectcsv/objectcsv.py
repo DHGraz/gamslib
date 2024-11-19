@@ -4,11 +4,13 @@ The central class is ObjectCSV, which represents the object and datastream data.
 
 ObjectCSV is directly accessible from the objectcsv package.
 """
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=invalid-name
 
 import csv
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
-from typing import Generator, Self
+from typing import Generator
 
 
 @dataclass
@@ -94,18 +96,16 @@ class ObjectCSVFile:
                     yield objdata
 
     @classmethod
-    def from_csv(cls, csv_file: Path) -> Self:
+    def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":
         "Load the object data from a csv file."
         obj_csv_file = ObjectCSVFile()
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 obj_csv_file.add_objectdata(ObjectData(**row))
-        #    objects = [ObjectData(**row) for row in reader]
-        # return ObjectCSVFile(objects)
         return obj_csv_file
 
-    def to_csv(self, csv_file: Path):
+    def to_csv(self, csv_file: Path) -> None:
         "Save the object data to a csv file."
         with csv_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(
@@ -144,7 +144,7 @@ class DatastreamsCSVFile:
                     yield dsdata
 
     @classmethod
-    def from_csv(cls, csv_file: Path) -> Self:
+    def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":
         "Load the datastream container data from a csv file."
         ds_csv_file = DatastreamsCSVFile()
         with csv_file.open(encoding="utf-8", newline="") as f:
@@ -246,8 +246,10 @@ class ObjectCSV:
         """Save the object and datastream data to csv files.
 
         If target_dir is not set, the object_dir is used.
-        If object_filename is not set, the default object filename (object.csv) is used.
-        If datastream_filename is not set, the default datastream filename (datastreams.csv) is used.
+        If object_filename is not set, the default object filename (object.csv)
+           is used.
+        If datastream_filename is not set, the default datastream filename 
+           (datastreams.csv) is used.
         """
         if target_dir is None:
             target_dir = self.object_dir

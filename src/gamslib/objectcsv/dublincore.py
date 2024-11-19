@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import Any
 from xml.etree import ElementTree as ET
 
 logger = logging.getLogger(__name__)
@@ -104,8 +104,8 @@ class DublinCore:
         self, path: Path, lookup_order: tuple = ("en", "de", "fr", "es", "it")
     ):
         self.path: Path = path
-        self.lookup_order: List[str] = list(lookup_order)
-        self._data: Dict[str, Dict[str, str]] = {}  # [element][lang] = text
+        self.lookup_order: list[str] = list(lookup_order)
+        self._data: dict[str, Any] = {}  # [element][lang] = text
         self._parse(path)
 
     def _parse(self, path: Path):
@@ -124,7 +124,7 @@ class DublinCore:
 
     def get_element(
         self, name: str, preferred_lang: str = "en", default: str = ""
-    ) -> List[str]:
+    ) -> list[str]:
         """Return the value of a Dublin Core element as list of strings.
 
         This method is able to deal with multiple values of the same element in different languages.

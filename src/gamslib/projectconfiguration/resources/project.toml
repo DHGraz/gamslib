@@ -1,12 +1,12 @@
-[projectmetadata]
-# the sigle of the project (eg.: hsa)
-project = ""
-# The project creator (like in Dublin Core)
-creator = ""
-# This should normally be "Gams"
-publisher = "Gams"
+[project]
+project_id = "the id of the project (eg.: hsa)"  # CHANGE THIS!
+creator = "The project creator (like in Dublin Core)"  # CHANGE THIS!
+
+# You might want to keep this value ("GAMS")
+publisher = "Gams"  
+
+# Set the default license for the project. Can be overriden in project.csv and datastream.csv
 rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
 
-[objectcsv]
 # Normally dsid it the full filename (with extension). Set to false to strip extension for dsid.
 dsid_keep_extension = true

@@ -1,0 +1,38 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "project": {
+            "type": "object",
+            "properties": {
+                "project_id": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "creator": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "publisher": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "rights": {
+                    "type": "string"
+                },
+                "dsid_keep_extension": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "project_id",
+                "creator",
+                "publisher",
+                "dsid_keep_extension"
+            ]
+        }
+    },
+    "required": [
+        "project"
+    ]
+}

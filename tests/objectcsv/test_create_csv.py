@@ -25,7 +25,7 @@ from gamslib.projectconfiguration.configuration import Configuration
 @fixture(name="test_config")
 def config_fixture(datadir):
     "Return a conguration object."
-    return Configuration.from_toml(datadir / "project.toml")
+    return Configuration(datadir / "project.toml")
 
 
 @fixture(name="test_dc")
@@ -44,7 +44,7 @@ def test_get_rights(test_config, test_dc):
     assert get_rights(test_config, test_dc) == "Rights from project.toml"
 
     # if not set in configuration either, use the default value
-    test_config.project.metadata.rights = ""
+    test_config.project._rights = ""
     assert get_rights(test_config, test_dc) == DEFAULT_RIGHTS
 
 
