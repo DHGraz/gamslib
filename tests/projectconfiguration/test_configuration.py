@@ -15,7 +15,8 @@ import tomllib
 from gamslib.projectconfiguration import load_configuration
 from gamslib.projectconfiguration.configuration import (
     Configuration,
-    Project,
+    General,
+    Metadata,
     find_project_toml,
 )
 
@@ -73,22 +74,27 @@ def test_template_matches_schema():
     jsonschema.validate(instance=template, schema=schema)
 
 
-def test_project_class():
+def test_metadata_class():
     "Test the Project class."
 
-    project = Project(
+    metadata = Metadata(
         project_id="Test Project",
         creator="GAMS Test Project",
         publisher="GAMS",
         rights="commons",
-        dsid_keep_extension=True,
     )
 
-    assert project.project_id == "Test Project"
-    assert project.creator == "GAMS Test Project"
-    assert project.publisher == "GAMS"
-    assert project.rights == "commons"
-    assert project.dsid_keep_extension
+    assert metadata.project_id == "Test Project"
+    assert metadata.creator == "GAMS Test Project"
+    assert metadata.publisher == "GAMS"
+    assert metadata.rights == "commons"
+
+def test_general_class():
+    "Test cleation of a General object."
+
+    general = General(loglevel="error", dsid_keep_extension=False)    
+    assert general.dsid_keep_extension is False
+    assert general.loglevel == "error"
 
 
 def test_configuration_init(datadir):
@@ -98,12 +104,16 @@ def test_configuration_init(datadir):
     """
     toml_file = datadir / "project.toml"
     cfg = Configuration(toml_file)
-    assert cfg.project.project_id == "Test Project"
-    assert cfg.project.creator == "GAMS Test Project"
-    assert cfg.project.publisher == "GAMS"
-    assert "commons" in cfg.project.rights
-    assert cfg.project.dsid_keep_extension
+
     assert cfg.toml_file == toml_file
+
+    assert cfg.metadata.project_id == "Test Project"
+    assert cfg.metadata.creator == "GAMS Test Project"
+    assert cfg.metadata.publisher == "GAMS"
+    assert "commons" in cfg.metadata.rights
+    
+    assert cfg.general.loglevel == "info"
+    assert cfg.general.dsid_keep_extension
 
 
 def test_configuration_missing_required_keys(datadir):
@@ -159,22 +169,29 @@ def test_configuration_invalid_values(datadir):
 
     test_toml = datadir / "test.toml"
 
-    set_value("project", "project_id", "")
-    with pytest.raises(ValueError, match=r"'' is too short at \[project.project_id\]"):
+    set_value("metadata", "project_id", "")
+    with pytest.raises(ValueError, match=r"'' is too short at \[metadata.project_id\]"):
         Configuration(test_toml)
 
-    set_value("project", "creator", "c")
-    with pytest.raises(ValueError, match=r"'c' is too short at \[project.creator\]"):
+    set_value("metadata", "creator", "c")
+    with pytest.raises(ValueError, match=r"'c' is too short at \[metadata.creator\]"):
         Configuration(test_toml)
 
-    set_value("project", "publisher", "pu")
-    with pytest.raises(ValueError, match=r"'pu' is too short at \[project.publisher\]"):
+    set_value("metadata", "publisher", "pu")
+    with pytest.raises(ValueError, match=r"'pu' is too short at \[metadata.publisher\]"):
         Configuration(test_toml)
 
-    set_value("project", "dsid_keep_extension", "true")
+    set_value("general", "dsid_keep_extension", "true") # # this is a string, not boolean
     with pytest.raises(
         ValueError,
-        match=r"'true' is not of type 'boolean' at \[project.dsid_keep_extension\]",
+        match=r"'true' is not of type 'boolean' at \[general.dsid_keep_extension\]",
+    ):
+        Configuration(test_toml)
+
+    set_value("general", "loglevel", "foo")
+    with pytest.raises(
+        ValueError,
+        match=r"'foo' is not one of \['debug', 'info', 'warning', 'error', 'critical'\] at \[general.loglevel\]",
     ):
         Configuration(test_toml)
 
@@ -182,20 +199,20 @@ def test_configuration_invalid_values(datadir):
 def test_load_configuration(datadir):
     "Loadconfig should return a Configuration object."
     cfg = load_configuration(datadir)
-    assert cfg.project.project_id == "Test Project"
-    assert cfg.project.creator == "GAMS Test Project"
-    assert cfg.project.publisher == "GAMS"
-    assert "commons" in cfg.project.rights
+    assert cfg.metadata.project_id == "Test Project"
+    assert cfg.metadata.creator == "GAMS Test Project"
+    assert cfg.metadata.publisher == "GAMS"
+    assert "commons" in cfg.metadata.rights
     assert cfg.toml_file == datadir / "project.toml"
 
     # now with an explict toml file (Path)
     cfg_file = datadir / "project.toml"
     cfg = load_configuration(datadir, cfg_file)
-    assert cfg.project.project_id == "Test Project"
+    assert cfg.metadata.project_id == "Test Project"
 
     # now with an explict toml file (str)
     cfg = load_configuration(datadir, cfg_file)
-    assert cfg.project.project_id == "Test Project"
+    assert cfg.metadata.project_id == "Test Project"
 
 
 def tests_load_config_with_explicit_toml(datadir, tmp_path):
@@ -205,14 +222,15 @@ def tests_load_config_with_explicit_toml(datadir, tmp_path):
     shutil.move(old_toml, new_toml)
 
     cfg = load_configuration(datadir, new_toml)
-    assert cfg.project.project_id == "Test Project"
-    assert cfg.project.creator == "GAMS Test Project"
-    assert cfg.project.publisher == "GAMS"
+    assert cfg.metadata.project_id == "Test Project"
+    assert cfg.metadata.creator == "GAMS Test Project"
+    assert cfg.metadata.publisher == "GAMS"
     assert (
-        cfg.project.rights
+        cfg.metadata.rights
         == "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
     )
-    assert cfg.project.dsid_keep_extension
+    assert cfg.general.dsid_keep_extension
+    assert cfg.general.loglevel == "info"
     assert cfg.toml_file == new_toml
 
 def test_load_config_toml_as_str(datadir, tmp_path):
@@ -220,14 +238,14 @@ def test_load_config_toml_as_str(datadir, tmp_path):
     toml_path = datadir / "project.toml"
 
     cfg = load_configuration(datadir, str(toml_path))
-    assert cfg.project.project_id == "Test Project"
-    assert cfg.project.creator == "GAMS Test Project"
-    assert cfg.project.publisher == "GAMS"
+    assert cfg.metadata.project_id == "Test Project"
+    assert cfg.metadata.creator == "GAMS Test Project"
+    assert cfg.metadata.publisher == "GAMS"
     assert (
-        cfg.project.rights
+        cfg.metadata.rights
         == "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
     )
-    assert cfg.project.dsid_keep_extension
+    assert cfg.general.dsid_keep_extension
     assert cfg.toml_file == toml_path
     
 

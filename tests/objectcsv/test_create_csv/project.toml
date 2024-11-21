@@ -1,6 +1,9 @@
-[project]
+[metadata]
 project_id = "Test Project"
 creator = "GAMS Test Project"
 publisher = "GAMS"
 rights = "Rights from project.toml"
+
+[general]
 dsid_keep_extension = true
+loglevel = "info"

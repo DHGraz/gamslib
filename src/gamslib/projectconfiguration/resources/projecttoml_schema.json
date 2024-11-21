@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
-        "project": {
+        "metadata": {
             "type": "object",
             "properties": {
                 "project_id": {
@@ -19,20 +19,34 @@
                 },
                 "rights": {
                     "type": "string"
-                },
-                "dsid_keep_extension": {
-                    "type": "boolean"
                 }
             },
             "required": [
                 "project_id",
                 "creator",
-                "publisher",
-                "dsid_keep_extension"
+                "publisher"
+            ]
+        },
+        "general": {
+            "type": "object",
+            "properties": {
+                "dsid_keep_extension": {
+                    "type": "boolean"
+                },
+                "loglevel": {
+                    "type": "string",
+                    "enum": ["debug", "info", "warning", "error", "critical"]
+                }
+            },
+            "required": [
+                "dsid_keep_extension",
+                "loglevel"
             ]
         }
+
     },
     "required": [
-        "project"
+        "metadata",
+        "general"
     ]
 }

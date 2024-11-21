@@ -42,8 +42,8 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
     """
     rights = dc.get_element_as_str("rights", default="")
     if not rights:  # empty string is a valid value
-        if config.project.rights:
-            rights = config.project.rights
+        if config.metadata.rights:
+            rights = config.metadata.rights
         else:
             rights = DEFAULT_RIGHTS
     return rights
@@ -100,9 +100,9 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
     return ObjectData(
         recid=pid,
         title=title,
-        project=config.project.project_id,
+        project=config.metadata.project_id,
         description=description,
-        creator=config.project.creator,
+        creator=config.metadata.creator,
         rights=get_rights(config, dc),
         source=DEFAULT_SOURCE,
         objectType=DEFAULT_OBJECT_TYPE,
@@ -113,7 +113,7 @@ def collect_datastream_data(
     ds_file: Path, config: Configuration, dc: DublinCore
 ) -> DSData:
     """Collect data for a single datastream."""
-    dsid = extract_dsid(ds_file, config.project.dsid_keep_extension)
+    dsid = extract_dsid(ds_file, config.general.dsid_keep_extension)
 
     # I think it's not possible to derive a ds title or description from the DC file
     # title = "; ".join(dc.get_element("title", default=dsid)) # ??
@@ -125,7 +125,7 @@ def collect_datastream_data(
         title="",
         description="",
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
-        creator=config.project.creator,
+        creator=config.metadata.creator,
         rights=get_rights(config, dc),
     )
 

@@ -44,7 +44,7 @@ def test_get_rights(test_config, test_dc):
     assert get_rights(test_config, test_dc) == "Rights from project.toml"
 
     # if not set in configuration either, use the default value
-    test_config.project._rights = ""
+    test_config.metadata.rights = ""
     assert get_rights(test_config, test_dc) == DEFAULT_RIGHTS
 
 

@@ -32,57 +32,83 @@ def find_project_toml(start_dir: Path) -> Path:
         return project_toml
     raise FileNotFoundError("No project.toml file found in or above the start_dir.")
 
+@dataclass
+class Metadata:
+    """Represent the 'metadata' section of the configuration file."""
+
+    project_id: str
+    creator: str
+    rights: str
+    publisher: str
+    
+
+
+# class Metadata:
+#     """Represent the 'metadata' section of the configuration file."""
+
+#     def __init__(
+#         self,
+#         project_id: str,
+#         creator: str,
+#         publisher: str,
+#         rights: str,
+#     ):
+#         self._project_id = project_id
+#         self._creator = creator
+#         self._publisher = publisher
+#         self._rights = rights
+
+#     @property
+#     def project_id(self):
+#         """Return the project id."""
+#         return self._project_id
+
+#     @property
+#     def creator(self):
+#         """Return the creator."""
+#         return self._creator
+
+#     @property
+#     def publisher(self):
+#         """Return the publisher."""
+#         return self._publisher
+
+#     @property
+#     def rights(self):
+#         """Return the rights."""
+#         return self._rights
 
 @dataclass
-class Project:
-    """Represent the 'project' section of the configuration file."""
+class General:
+    """Represent the 'general' section of the configuration file."""
 
-    def __init__(
-        self,
-        project_id: str,
-        creator: str,
-        publisher: str,
-        rights: str,
-        dsid_keep_extension: bool,
-    ):
-        self._project_id = project_id
-        self._creator = creator
-        self._publisher = publisher
-        self._rights = rights
-        self._dsid_keep_extension = dsid_keep_extension
+    dsid_keep_extension: bool = True
+    loglevel: str = "info"
 
-    @property
-    def project_id(self):
-        """Return the project id."""
-        return self._project_id
+# class General:
+#     """Represent the 'general' section of the configuration file."""
 
-    @property
-    def creator(self):
-        """Return the creator."""
-        return self._creator
+#     def __init__(self, dsid_keep_extension: bool, loglevel: str):
 
-    @property
-    def publisher(self):
-        """Return the publisher."""
-        return self._publisher
+#         self._dsid_keep_extension: bool = dsid_keep_extension
+#         self._loglevel: str = loglevel
 
-    @property
-    def rights(self):
-        """Return the rights."""
-        return self._rights
-
-    @property
-    def dsid_keep_extension(self):
-        """Return the dsid_keep_extension."""
-        return self._dsid_keep_extension
-
-
+    
+#     @property
+#     def dsid_keep_extension(self):
+#         """Return the dsid_keep_extension."""
+#         return self._dsid_keep_extension
+    
+#     @property
+#     def loglevel(self):
+#         """Return the loglevel."""
+#         return self._loglevel.lower()
+    
 class Configuration:
-    """Represent the configuration from tge project toml file.
+    """Represent the configuration from the project toml file.
 
-    The only reason, to use this class and not a dictionary is,
-    that we expect changes to the tomls file. Using a class
-    allows to keep the interface stable or provide a legacy interface.
+    Properties can be accessed as attributes of the object and sub object:
+        eg.: metadata.rights
     """
 
     def __init__(self, toml_file: Path):
@@ -95,7 +121,9 @@ class Configuration:
             path = ".".join([str(x) for x in e.absolute_path])
             msg = f"Error in project TOML file '{toml_file}': {e.message} at [{path}]"
             raise ValueError(msg) from e
-        self.project = Project(**cfg_dict["project"])
+        
+        self.metadata = Metadata(**cfg_dict["metadata"])
+        self.general = General(**cfg_dict["general"])
 
     @staticmethod
     def _load_config(toml_file: Path) -> dict:
