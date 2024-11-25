@@ -9,8 +9,11 @@ from dataclasses import dataclass
 from importlib import resources as impresources
 from pathlib import Path
 import tomllib
+from abc import ABC
 
 import jsonschema
+
+#from pydantic import BaseModel
 
 
 def find_project_toml(start_dir: Path) -> Path:
@@ -32,8 +35,61 @@ def find_project_toml(start_dir: Path) -> Path:
         return project_toml
     raise FileNotFoundError("No project.toml file found in or above the start_dir.")
 
+
 @dataclass
-class Metadata:
+def AbstractConfigSection(ABC):
+    """An abstract class for the configuration sections."""
+
+    def __new__(cls, *args, **kwargs):
+        if cls == AbstractConfigSection or cls.__bases__[0] == AbstractConfigSection: 
+            raise TypeError("Cannot instantiate abstract class.") 
+        return super().__new__(cls)        
+
+    def validate(self, value: str):
+        """Validate the value before setting it."""
+        raise NotImplementedError("Method not implemented.")
+
+    def set_value(self, name:str, value: str):
+        """Set a value in the configuration object.
+        
+        name is a string with the format 'section.key'.
+        """
+        parts = name.split(".")
+        key = parts.pop()
+        if len(parts) == 1:  # so more subsections
+            self.validate(parts[0], value)
+            setattr(self, key, value)
+        else:
+            section_name = ".".join(parts)
+            section_object = getattr(self, section_name, None)
+            if section_object is None or isinstance(section_object, AbstractConfigSection):
+                raise ValueError(f"Unknown section '{section_name}'")
+            else:
+                child_section = ".".join(parts.pop(0))
+                setattr(section_object, child_section, value)
+
+
+
+        # parts = name.split(".")
+        # key = parts.pop()
+        # for section_name in parts:
+        #     section_object = getattr(self, section_name, None)
+        #     if section_object is None or isinstance:
+        #         raise ValueError(f"Unknown section '{section_name}'")
+        #     else:
+                
+        #     if section == "metadata":
+        #         setattr(self.metadata, key, value)
+        #     elif section == "general":
+        #         setattr(self.general, key, value)
+        #     else:
+        #         raise ValueError(f"Unknown section '{section}'")
+        # if '.' in name:
+            
+
+
+@dataclass
+class Metadata(AbstractConfigSection):
     """Represent the 'metadata' section of the configuration file."""
 
     project_id: str
@@ -41,6 +97,10 @@ class Metadata:
     rights: str
     publisher: str
     
+    def validate(self, key: str, value: str):
+        if key in ["project_id", "creator", "rights", "publisher"]:
+            if not value.strip():
+                raise ValueError(f"{key} must not be empty")
 
 
 # class Metadata:
@@ -79,11 +139,19 @@ class Metadata:
 #         return self._rights
 
 @dataclass
-class General:
+class General(AbstractConfigSection):
     """Represent the 'general' section of the configuration file."""
 
     dsid_keep_extension: bool = True
     loglevel: str = "info"
+
+    def validate(self, key: str, value: str):
+        if key == "dsid_keep_extension":
+            if type(value) != bool:
+                raise ValueError("dsid_keep_extension must be a boolean")
+        elif key == "loglevel":
+            if value.lower() not in ["debug", "info", "warning", "error"]:
+                raise ValueError("loglevel must be 'debug', 'info', 'warning' or 'error'")
 
 # class General:
 #     """Represent the 'general' section of the configuration file."""
@@ -125,6 +193,42 @@ class Configuration:
         self.metadata = Metadata(**cfg_dict["metadata"])
         self.general = General(**cfg_dict["general"])
 
+    def set_value(self, name:str, value: str):
+        """Set a value in the configuration object.
+        
+        name is a string with the format 'section.key'. Is also capable to deal with more
+        than one level of sections as long as the sublevel implement AbstractConfigSection.
+        """
+        parts = name.split(".")
+        key = parts.pop()
+        section_name = ".".join(parts)
+        section_object = getattr(self, section_name, None)
+        if section_object is None or isinstance(section_object, AbstractConfigSection):
+            raise ValueError(f"Unknown section '{section_name}'")
+        else:
+            child_section = ".".join(parts.pop(0))
+            setattr(section_object, child_section, value)
+                
+        #     if section == "metadata":
+        #         setattr(self.metadata, key, value)
+        #     elif section == "general":
+        #         setattr(self.general, key, value)
+        #     else:
+        #         raise ValueError(f"Unknown section '{section}'")
+        # if '.' in name:
+            
+            sections = parts[:-1]
+            key = parts[-1]
+        else:
+            sections = []
+            key = name
+        if section == "metadata":
+            setattr(self.metadata, key, value)
+        elif section == "general":
+            setattr(self.general, key, value)
+        else:
+            raise ValueError(f"Unknown section '{section}'")
+        
     @staticmethod
     def _load_config(toml_file: Path) -> dict:
         """Read the configuration file and return toml as dict."""
