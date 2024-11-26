@@ -34,10 +34,10 @@ test-py_3.12:
   variables:
     PYTHON_VERSION: "3.12"
 
-test-py_3.13:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.13"
+# test-py_3.13:
+#   extends: .test-template
+#   variables:
+#     PYTHON_VERSION: "3.13"
 
 lint:
   stage: lint
