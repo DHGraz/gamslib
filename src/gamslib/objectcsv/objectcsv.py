@@ -192,24 +192,24 @@ class ObjectCSV:
                 f"Object directory '{self.object_dir}' does not exist."
             )
 
-        obj_csv_file = self.object_dir / self.object_file
-        ds_csv_file = self.object_dir / self.datastream_file
+        self.obj_csv_file = self.object_dir / self.object_file
+        self.ds_csv_file = self.object_dir / self.datastream_file
 
-        if obj_csv_file.is_file():
-            self.object_data = ObjectCSVFile.from_csv(obj_csv_file)
+        if self.obj_csv_file.is_file():
+            self.object_data = ObjectCSVFile.from_csv(self.obj_csv_file)
         else:
             self.object_data = ObjectCSVFile()
 
-        if ds_csv_file.is_file():
-            self.datastream_data = DatastreamsCSVFile.from_csv(ds_csv_file)
+        if self.ds_csv_file.is_file():
+            self.datastream_data = DatastreamsCSVFile.from_csv(self.ds_csv_file)
         else:
             self.datastream_data = DatastreamsCSVFile()
 
     def is_new(self):
         "Return True if at least one of the csv files exist."
-        obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
-        ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
-        return not (obj_csv.exists() or ds_csv.exists())
+        #obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
+        #ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
+        return not (self.obj_csv_file.exists() or self.ds_csv_file.exists())
 
     def add_datastream(self, dsdata: DSData):
         "Add a datastream to the object."
@@ -278,3 +278,4 @@ class ObjectCSV:
     def object_id(self):
         "Return the object id."
         return self.object_dir.name
+    

@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.2.0"
+version = "0.2.2"
 description = "Add your description here"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
