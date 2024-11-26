@@ -11,9 +11,9 @@ from pathlib import Path
 from importlib import resources as impresources
 import shutil
 import logging
-from .configuration import Configuration, load_configuration
+from .configuration import Configuration, find_project_toml
 
-__all__ = ["Configuration", "load_configuration"]
+__all__ = ["Configuration"]
 
 logger = logging.getLogger()
 
@@ -38,3 +38,12 @@ def create_configuration(objects_dir: Path) -> Path | None:
     )
     shutil.copy(toml_template_file, toml_file)
     return objects_dir / "project.toml"
+
+def load_configuration(object_root: Path, config_file: Path | str | None = None):
+    """Read the configuration file and return a configuration object."""
+    if config_file is None:
+        config_file = find_project_toml(object_root)
+    if isinstance(config_file, str):
+        config_file = Path(config_file)
+
+    return Configuration.from_toml(config_file)

@@ -61,7 +61,7 @@ class Configuration(BaseModel):
     general: General
 
     @classmethod
-    def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -> str|None:
+    def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -> str | None:
         """Return a readable error message or None.
 
         Helper function which creates a readable error messages.
@@ -103,18 +103,6 @@ class Configuration(BaseModel):
             )
             if msg is not None:
                 raise ValueError(msg) from e
-            raise ValueError(
-                f"Error in project TOML file '{toml_file}': {e}"
-            ) from e
+            raise ValueError(f"Error in project TOML file '{toml_file}': {e}") from e
         except ValueError as e:
             raise ValueError(f"Error in project TOML file '{toml_file}': {e}") from e
-
-
-def load_configuration(object_root: Path, config_file: Path | str | None = None):
-    """Read the configuration file and return a configuration object."""
-    if config_file is None:
-        config_file = find_project_toml(object_root)
-    if isinstance(config_file, str):
-        config_file = Path(config_file)
-
-    return Configuration.from_toml(config_file)
