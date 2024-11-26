@@ -4,16 +4,13 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-positional-arguments
 
-import json
-from dataclasses import dataclass
-from importlib import resources as impresources
 from pathlib import Path
 import tomllib
-from abc import ABC
 
-import jsonschema
+from typing import Annotated, Literal
 
-#from pydantic import BaseModel
+
+from pydantic import BaseModel, ValidationError, StringConstraints
 
 
 def find_project_toml(start_dir: Path) -> Path:
@@ -36,218 +33,81 @@ def find_project_toml(start_dir: Path) -> Path:
     raise FileNotFoundError("No project.toml file found in or above the start_dir.")
 
 
-@dataclass
-def AbstractConfigSection(ABC):
-    """An abstract class for the configuration sections."""
-
-    def __new__(cls, *args, **kwargs):
-        if cls == AbstractConfigSection or cls.__bases__[0] == AbstractConfigSection: 
-            raise TypeError("Cannot instantiate abstract class.") 
-        return super().__new__(cls)        
-
-    def validate(self, value: str):
-        """Validate the value before setting it."""
-        raise NotImplementedError("Method not implemented.")
-
-    def set_value(self, name:str, value: str):
-        """Set a value in the configuration object.
-        
-        name is a string with the format 'section.key'.
-        """
-        parts = name.split(".")
-        key = parts.pop()
-        if len(parts) == 1:  # so more subsections
-            self.validate(parts[0], value)
-            setattr(self, key, value)
-        else:
-            section_name = ".".join(parts)
-            section_object = getattr(self, section_name, None)
-            if section_object is None or isinstance(section_object, AbstractConfigSection):
-                raise ValueError(f"Unknown section '{section_name}'")
-            else:
-                child_section = ".".join(parts.pop(0))
-                setattr(section_object, child_section, value)
-
-
-
-        # parts = name.split(".")
-        # key = parts.pop()
-        # for section_name in parts:
-        #     section_object = getattr(self, section_name, None)
-        #     if section_object is None or isinstance:
-        #         raise ValueError(f"Unknown section '{section_name}'")
-        #     else:
-                
-        #     if section == "metadata":
-        #         setattr(self.metadata, key, value)
-        #     elif section == "general":
-        #         setattr(self.general, key, value)
-        #     else:
-        #         raise ValueError(f"Unknown section '{section}'")
-        # if '.' in name:
-            
-
-
-@dataclass
-class Metadata(AbstractConfigSection):
+class Metadata(BaseModel, validate_assignment=True):
     """Represent the 'metadata' section of the configuration file."""
 
-    project_id: str
-    creator: str
-    rights: str
-    publisher: str
-    
-    def validate(self, key: str, value: str):
-        if key in ["project_id", "creator", "rights", "publisher"]:
-            if not value.strip():
-                raise ValueError(f"{key} must not be empty")
+    project_id: Annotated[str, StringConstraints(min_length=2)]
+    creator: Annotated[str, StringConstraints(min_length=3)]
+    publisher: Annotated[str, StringConstraints(min_length=3)]
+    rights: str = ""
 
 
-# class Metadata:
-#     """Represent the 'metadata' section of the configuration file."""
-
-#     def __init__(
-#         self,
-#         project_id: str,
-#         creator: str,
-#         publisher: str,
-#         rights: str,
-#     ):
-#         self._project_id = project_id
-#         self._creator = creator
-#         self._publisher = publisher
-#         self._rights = rights
-
-#     @property
-#     def project_id(self):
-#         """Return the project id."""
-#         return self._project_id
-
-#     @property
-#     def creator(self):
-#         """Return the creator."""
-#         return self._creator
-
-#     @property
-#     def publisher(self):
-#         """Return the publisher."""
-#         return self._publisher
-
-#     @property
-#     def rights(self):
-#         """Return the rights."""
-#         return self._rights
-
-@dataclass
-class General(AbstractConfigSection):
+class General(BaseModel, validate_assignment=True):
     """Represent the 'general' section of the configuration file."""
 
     dsid_keep_extension: bool = True
-    loglevel: str = "info"
+    loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
 
-    def validate(self, key: str, value: str):
-        if key == "dsid_keep_extension":
-            if type(value) != bool:
-                raise ValueError("dsid_keep_extension must be a boolean")
-        elif key == "loglevel":
-            if value.lower() not in ["debug", "info", "warning", "error"]:
-                raise ValueError("loglevel must be 'debug', 'info', 'warning' or 'error'")
 
-# class General:
-#     """Represent the 'general' section of the configuration file."""
-
-#     def __init__(self, dsid_keep_extension: bool, loglevel: str):
-
-#         self._dsid_keep_extension: bool = dsid_keep_extension
-#         self._loglevel: str = loglevel
-
-    
-#     @property
-#     def dsid_keep_extension(self):
-#         """Return the dsid_keep_extension."""
-#         return self._dsid_keep_extension
-    
-#     @property
-#     def loglevel(self):
-#         """Return the loglevel."""
-#         return self._loglevel.lower()
-    
-class Configuration:
+class Configuration(BaseModel):
     """Represent the configuration from the project toml file.
 
     Properties can be accessed as attributes of the object and sub object:
         eg.: metadata.rights
     """
 
-    def __init__(self, toml_file: Path):
-        cfg_dict = self._load_config(toml_file)
-        self.toml_file = toml_file
+    toml_file: Path
+    metadata: Metadata
+    general: General
 
-        try:
-            jsonschema.validate(cfg_dict, self._load_schema())
-        except jsonschema.ValidationError as e:
-            path = ".".join([str(x) for x in e.absolute_path])
-            msg = f"Error in project TOML file '{toml_file}': {e.message} at [{path}]"
-            raise ValueError(msg) from e
-        
-        self.metadata = Metadata(**cfg_dict["metadata"])
-        self.general = General(**cfg_dict["general"])
+    @classmethod
+    def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -> str|None:
+        """Return a readable error message or None.
 
-    def set_value(self, name:str, value: str):
-        """Set a value in the configuration object.
-        
-        name is a string with the format 'section.key'. Is also capable to deal with more
-        than one level of sections as long as the sublevel implement AbstractConfigSection.
+        Helper function which creates a readable error messages.
+
+        Returns a readable error message or None if 'type' is not known by function.
         """
-        parts = name.split(".")
-        key = parts.pop()
-        section_name = ".".join(parts)
-        section_object = getattr(self, section_name, None)
-        if section_object is None or isinstance(section_object, AbstractConfigSection):
-            raise ValueError(f"Unknown section '{section_name}'")
-        else:
-            child_section = ".".join(parts.pop(0))
-            setattr(section_object, child_section, value)
-                
-        #     if section == "metadata":
-        #         setattr(self.metadata, key, value)
-        #     elif section == "general":
-        #         setattr(self.general, key, value)
-        #     else:
-        #         raise ValueError(f"Unknown section '{section}'")
-        # if '.' in name:
-            
-            sections = parts[:-1]
-            key = parts[-1]
-        else:
-            sections = []
-            key = name
-        if section == "metadata":
-            setattr(self.metadata, key, value)
-        elif section == "general":
-            setattr(self.general, key, value)
-        else:
-            raise ValueError(f"Unknown section '{section}'")
-        
-    @staticmethod
-    def _load_config(toml_file: Path) -> dict:
-        """Read the configuration file and return toml as dict."""
-        with toml_file.open("rb") as config_file:
-            cfg_dict = tomllib.load(config_file)
-        return cfg_dict
+        # There are many more types which could be handled, but are not needed yet.
+        # See: https://docs.pydantic.dev/latest/errors/validation_errors/
+        reasons = {
+            "missing": "missing required field",
+            "string_too_short": "value is too short",
+            "bool_type": "value is not a boolean",
+            "bool_parsing": "value is not a boolean",
+            "literal_error": "value is not allowed here",
+        }
 
-    @staticmethod
-    def _load_schema() -> dict:
-        """Load the schema for the configuration file."""
-        schema_file = (
-            impresources.files("gamslib")
-            / "projectconfiguration"
-            / "resources"
-            / "projecttoml_schema.json"
-        )
-        with schema_file.open("r", encoding="utf-8") as f:
-            cfg_schema = json.load(f)
-        return cfg_schema
+        loc_str = ".".join([str(e) for e in loc])
+        reason = reasons.get(error_type)
+        if reason is None:
+            return None
+        return f"Error in project TOML file '{cfgfile}'. {reason}: '{loc_str}'"
+
+    @classmethod
+    def from_toml(cls, toml_file: Path) -> "Configuration":
+        """Create a configuration object from a toml file."""
+        try:
+            with toml_file.open("r", encoding="utf-8", newline="") as tf:
+                data = tomllib.loads(tf.read())
+                data["toml_file"] = toml_file
+            return cls(**data)
+
+        except tomllib.TOMLDecodeError as e:
+            raise tomllib.TOMLDecodeError(
+                f"Error in project TOML file '{toml_file}': {e}"
+            ) from e
+        except ValidationError as e:
+            msg = cls._make_readable_message(
+                toml_file, e.errors()[0]["type"], e.errors()[0]["loc"]
+            )
+            if msg is not None:
+                raise ValueError(msg) from e
+            raise ValueError(
+                f"Error in project TOML file '{toml_file}': {e}"
+            ) from e
+        except ValueError as e:
+            raise ValueError(f"Error in project TOML file '{toml_file}': {e}") from e
 
 
 def load_configuration(object_root: Path, config_file: Path | str | None = None):
@@ -257,4 +117,4 @@ def load_configuration(object_root: Path, config_file: Path | str | None = None)
     if isinstance(config_file, str):
         config_file = Path(config_file)
 
-    return Configuration(config_file)
+    return Configuration.from_toml(config_file)

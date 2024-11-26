@@ -1,16 +1,16 @@
 """Tests for the configuration package."""
 
+# pylint: disable=protected-access
+
 import copy
-import json
 import re
 import shutil
-from importlib import resources as impresources
+import tomllib
 from pathlib import Path
 
-import jsonschema
 import pytest
 import toml
-import tomllib
+
 
 from gamslib.projectconfiguration import load_configuration
 from gamslib.projectconfiguration.configuration import (
@@ -52,28 +52,6 @@ def test_find_project_toml_not_found(tmp_path):
         find_project_toml(tmp_path / "foo" / "bar" / "baz")
 
 
-def test_template_matches_schema():
-    "Test if the template matches the schema."
-    schema_file = (
-        impresources.files("gamslib")
-        / "projectconfiguration"
-        / "resources"
-        / "projecttoml_schema.json"
-    )
-    template_file = (
-        impresources.files("gamslib")
-        / "projectconfiguration"
-        / "resources"
-        / "project.toml"
-    )
-    with schema_file.open(encoding="utf-8", newline="") as schema_file:
-        schema = json.load(schema_file)
-    with template_file.open("rb") as template_file:
-        template = tomllib.load(template_file)
-
-    jsonschema.validate(instance=template, schema=schema)
-
-
 def test_metadata_class():
     "Test the Project class."
 
@@ -89,21 +67,22 @@ def test_metadata_class():
     assert metadata.publisher == "GAMS"
     assert metadata.rights == "commons"
 
+
 def test_general_class():
     "Test cleation of a General object."
 
-    general = General(loglevel="error", dsid_keep_extension=False)    
+    general = General(loglevel="error", dsid_keep_extension=False)
     assert general.dsid_keep_extension is False
     assert general.loglevel == "error"
 
 
-def test_configuration_init(datadir):
+def test_configuration_from_toml(datadir):
     """Test if the creation of a Configuration object works.
 
     Here the configuration is loaded from a valid TOML file.
     """
     toml_file = datadir / "project.toml"
-    cfg = Configuration(toml_file)
+    cfg = Configuration.from_toml(toml_file)
 
     assert cfg.toml_file == toml_file
 
@@ -111,7 +90,7 @@ def test_configuration_init(datadir):
     assert cfg.metadata.creator == "GAMS Test Project"
     assert cfg.metadata.publisher == "GAMS"
     assert "commons" in cfg.metadata.rights
-    
+
     assert cfg.general.loglevel == "info"
     assert cfg.general.dsid_keep_extension
 
@@ -136,22 +115,20 @@ def test_configuration_missing_required_keys(datadir):
     toml_file = datadir / "project.toml"
 
     comment_key(toml_file, "project_id")
-    with pytest.raises(ValueError, match=r"'project_id' is a required property"):
-        Configuration(toml_file)
+    with pytest.raises(
+        ValueError, match=r"missing required field: 'metadata.project_id'"
+    ):
+        Configuration.from_toml(toml_file)
 
     comment_key(toml_file, "creator")
-    with pytest.raises(ValueError, match=r"'creator' is a required property"):
-        Configuration(toml_file)
+    with pytest.raises(ValueError, match=r"missing required field: 'metadata.creator'"):
+        Configuration.from_toml(toml_file)
 
     comment_key(toml_file, "publisher")
-    with pytest.raises(ValueError, match=r"'publisher' is a required property"):
-        Configuration(toml_file)
-
-    comment_key(toml_file, "dsid_keep_extension")
     with pytest.raises(
-        ValueError, match=r"'dsid_keep_extension' is a required property"
+        ValueError, match=r"missing required field: 'metadata.publisher'"
     ):
-        Configuration(toml_file)
+        Configuration.from_toml(toml_file)
 
 
 def test_configuration_invalid_values(datadir):
@@ -170,30 +147,74 @@ def test_configuration_invalid_values(datadir):
     test_toml = datadir / "test.toml"
 
     set_value("metadata", "project_id", "")
-    with pytest.raises(ValueError, match=r"'' is too short at \[metadata.project_id\]"):
-        Configuration(test_toml)
+    with pytest.raises(ValueError, match=r"value is too short: 'metadata.project_id'"):
+        Configuration.from_toml(test_toml)
 
     set_value("metadata", "creator", "c")
-    with pytest.raises(ValueError, match=r"'c' is too short at \[metadata.creator\]"):
-        Configuration(test_toml)
+    with pytest.raises(ValueError, match=r"value is too short: 'metadata.creator'"):
+        Configuration.from_toml(test_toml)
 
     set_value("metadata", "publisher", "pu")
-    with pytest.raises(ValueError, match=r"'pu' is too short at \[metadata.publisher\]"):
-        Configuration(test_toml)
+    with pytest.raises(ValueError, match=r"value is too short: 'metadata.publisher'"):
+        Configuration.from_toml(test_toml)
 
-    set_value("general", "dsid_keep_extension", "true") # # this is a string, not boolean
+    set_value("general", "dsid_keep_extension", 123)
     with pytest.raises(
-        ValueError,
-        match=r"'true' is not of type 'boolean' at \[general.dsid_keep_extension\]",
+        ValueError, match=r"value is not a boolean: 'general.dsid_keep_extension'"
     ):
-        Configuration(test_toml)
+        Configuration.from_toml(test_toml)
 
     set_value("general", "loglevel", "foo")
+
     with pytest.raises(
         ValueError,
-        match=r"'foo' is not one of \['debug', 'info', 'warning', 'error', 'critical'\] at \[general.loglevel\]",
+        match=r"value is not allowed here: 'general.loglevel'",
     ):
-        Configuration(test_toml)
+        Configuration.from_toml(test_toml)
+
+
+def test_configuration_make_readable_message():
+    "Test the _make_readable_message function."
+
+    cfgfile = Path("test.toml")
+
+    assert Configuration._make_readable_message(
+        cfgfile, "missing", ("metadata", "project_id")
+    ) == (
+        "Error in project TOML file 'test.toml'. missing required field: 'metadata.project_id'"
+    )
+
+    assert Configuration._make_readable_message(
+        cfgfile, "string_too_short", ("metadata", "creator")
+    ) == (
+        "Error in project TOML file 'test.toml'. value is too short: 'metadata.creator'"
+    )
+
+    assert Configuration._make_readable_message(
+        cfgfile, "bool_type", ("general", "dsid_keep_extension")
+    ) == (
+        "Error in project TOML file 'test.toml'. value is "
+        "not a boolean: 'general.dsid_keep_extension'"
+    )
+
+    assert Configuration._make_readable_message(
+        cfgfile, "bool_parsing", ("general", "dsid_keep_extension")
+    ) == (
+        "Error in project TOML file 'test.toml'. value is "
+        "not a boolean: 'general.dsid_keep_extension'"
+    )
+
+    assert Configuration._make_readable_message(
+        cfgfile, "literal_error", ("general", "loglevel")
+    ) == (
+        "Error in project TOML file 'test.toml'. value is "
+        "not allowed here: 'general.loglevel'"
+    )
+
+    assert (
+        Configuration._make_readable_message(cfgfile, "foo", ("general", "loglevel"))
+        is None
+    )
 
 
 def test_load_configuration(datadir):
@@ -225,15 +246,16 @@ def tests_load_config_with_explicit_toml(datadir, tmp_path):
     assert cfg.metadata.project_id == "Test Project"
     assert cfg.metadata.creator == "GAMS Test Project"
     assert cfg.metadata.publisher == "GAMS"
-    assert (
-        cfg.metadata.rights
-        == "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+    assert cfg.metadata.rights == (
+        "Creative Commons Attribution-NonCommercial 4.0 "
+        "(https://creativecommons.org/licenses/by-nc/4.0/)"
     )
     assert cfg.general.dsid_keep_extension
     assert cfg.general.loglevel == "info"
     assert cfg.toml_file == new_toml
 
-def test_load_config_toml_as_str(datadir, tmp_path):
+
+def test_load_config_toml_as_str(datadir):
     "Test load_config where TOML file is a string."
     toml_path = datadir / "project.toml"
 
@@ -241,15 +263,29 @@ def test_load_config_toml_as_str(datadir, tmp_path):
     assert cfg.metadata.project_id == "Test Project"
     assert cfg.metadata.creator == "GAMS Test Project"
     assert cfg.metadata.publisher == "GAMS"
-    assert (
-        cfg.metadata.rights
-        == "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+    assert cfg.metadata.rights == (
+        "Creative Commons Attribution-NonCommercial 4.0 "
+        "(https://creativecommons.org/licenses/by-nc/4.0/)"
     )
     assert cfg.general.dsid_keep_extension
     assert cfg.toml_file == toml_path
-    
+
 
 def test_load_config_toml_invalid_toml(datadir):
     "An invalid TOML file should raise an error."
     with pytest.raises(tomllib.TOMLDecodeError):
         load_configuration(datadir, datadir / "invalid.toml")
+
+
+def test_changin_values(datadir):
+    """Can we assign values to the configuration object?
+
+    Does validation work for those values?
+    """
+    cfg = Configuration.from_toml(datadir / "project.toml")
+    cfg.general.loglevel = "error"
+    assert cfg.general.loglevel == "error"
+
+    # now an invalid value
+    with pytest.raises(ValueError):
+        cfg.general.loglevel = "foo"

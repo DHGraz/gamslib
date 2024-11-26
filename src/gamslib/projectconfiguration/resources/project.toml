@@ -1,10 +1,11 @@
 
+# [metadata] contains general metadata for the GAMS project
 [metadata]
-# CHANGE THIS!
-project_id = "the id of the project (eg.: hsa)"  
+# the id of the project (eg.: hsa)
+project_id = ""  
 
-# CHANGE THIS!
-creator = "The project creator (like in Dublin Core)" 
+# The project creator (like in Dublin Core)
+creator = "" 
 
 # You might want to keep this value ("GAMS")
 publisher = "GAMS"  
@@ -14,9 +15,9 @@ publisher = "GAMS"
 rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
 
 [general]
-# Normally dsid it the full filename (with extension). Set to false to strip extension for dsid.
+# Normally dsid is the full filename (with extension). Set to false to strip extension for dsid.
 dsid_keep_extension = true
 
-# debug, info, warning, error, critical
+# debug, info, warning, error or critical
 loglevel = "info"
 
