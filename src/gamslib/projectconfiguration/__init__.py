@@ -39,7 +39,7 @@ def create_configuration(objects_dir: Path) -> Path | None:
     shutil.copy(toml_template_file, toml_file)
     return objects_dir / "project.toml"
 
-def load_configuration(object_root: Path, config_file: Path | str | None = None):
+def load_configuration(object_root: Path, config_file: Path | str | None = None) -> Configuration:
     """Read the configuration file and return a configuration object."""
     if config_file is None:
         config_file = find_project_toml(object_root)

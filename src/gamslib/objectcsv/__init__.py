@@ -26,8 +26,32 @@ The objectcsv package provides tools to handle this metadata.
     and vice versa. This is useful for editing the data in a spreadsheet
     without the hassles of importing and exporting the csv files, which
     led to encoding problems in the past.
+
+The "public" functions and classes from the submodules are directly
+available in the objectcsv:
+
+  * ObjectCSV
+  * ObjectData
+  * DSData
+  * create_csv_files
+  * collect_csv_data
+  * update_csv_files
+  * csv_to_xlsx
+  * xlsx_to_csv
 """
 
-# make ObjectCSV available in the objectcsv package
 from .objectcsv import ObjectCSV, ObjectData, DSData
-__all__ = ["ObjectCSV", "ObjectData", "DSData"]
+from .create_csv import create_csv_files
+from .manage_csv import collect_csv_data, update_csv_files
+from .xlsx import csv_to_xlsx, xlsx_to_csv
+
+__all__ = [
+    "ObjectCSV",
+    "ObjectData",
+    "DSData",
+    "create_csv_files",
+    "collect_csv_data",
+    "update_csv_files",
+    "csv_to_xlsx",
+    "xlsx_to_csv",
+]
