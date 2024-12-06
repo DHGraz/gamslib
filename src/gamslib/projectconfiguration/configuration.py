@@ -92,7 +92,10 @@ class Configuration(BaseModel):
                 data = tomllib.loads(tf.read())
                 data["toml_file"] = toml_file
             return cls(**data)
-
+        except FileNotFoundError as e:
+            raise FileNotFoundError(
+                f"Configuration file '{toml_file.parent}' not found."
+            ) from e
         except tomllib.TOMLDecodeError as e:
             raise tomllib.TOMLDecodeError(
                 f"Error in project TOML file '{toml_file}': {e}"
@@ -101,8 +104,5 @@ class Configuration(BaseModel):
             msg = cls._make_readable_message(
                 toml_file, e.errors()[0]["type"], e.errors()[0]["loc"]
             )
-            if msg is not None:
-                raise ValueError(msg) from e
-            raise ValueError(f"Error in project TOML file '{toml_file}': {e}") from e
-        except ValueError as e:
-            raise ValueError(f"Error in project TOML file '{toml_file}': {e}") from e
+            raise ValueError(msg) from e
+

@@ -1,4 +1,5 @@
 """Tests for the Dublin Core module."""
+
 # pylint: disable=W0212 # access to ._data
 import pytest
 from gamslib.objectcsv.dublincore import DublinCore

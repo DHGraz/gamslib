@@ -94,6 +94,16 @@ def test_configuration_from_toml(datadir):
     assert cfg.general.loglevel == "info"
     assert cfg.general.dsid_keep_extension
 
+def test_configuration_from_toml_cfg_file_not_found(tmp_path):
+    "Customized FileNotFoundError is raised if TOML file does not exist."
+    toml_file = tmp_path / "project.toml"
+    with pytest.raises(FileNotFoundError, match=r"Configuration file .* not found"):
+        Configuration.from_toml(toml_file)
+
+# def test_configuration_from_toml_invalid_toml(datadir):
+#     "An invalid TOML file should raise an error."
+#     with pytest.raises(ValueError, match=r"Error in project TOML file .*"):
+#         Configuration.from_toml(datadir / "invalid_value.toml")        
 
 def test_configuration_missing_required_keys(datadir):
     "Check if missing required keys are detected."

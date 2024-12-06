@@ -13,7 +13,7 @@ from pathlib import Path
 
 from gamslib.projectconfiguration import Configuration
 
-from . import DSData, ObjectCSV, ObjectData
+from .objectcsv import DSData, ObjectCSV, ObjectData
 from .dublincore import DublinCore
 from .utils import find_object_folders
 

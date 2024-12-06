@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.2.4"
+version = "0.2.5"
 description = "Add your description here"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -24,7 +24,7 @@ dev-dependencies = [
     "pytest>=8.3.3",
     "pytest-datadir>=1.5.0",
     "pytest-cov>=6.0.0",
-    "pyright>=1.1.389",
+    "pyright>=1.1.390",
     "toml>=0.10.2",
 ]
 

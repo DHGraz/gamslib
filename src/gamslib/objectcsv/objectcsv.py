@@ -207,8 +207,8 @@ class ObjectCSV:
 
     def is_new(self):
         "Return True if at least one of the csv files exist."
-        #obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
-        #ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
+        # obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
+        # ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
         return not (self.obj_csv_file.exists() or self.ds_csv_file.exists())
 
     def add_datastream(self, dsdata: DSData):
@@ -248,7 +248,7 @@ class ObjectCSV:
         If target_dir is not set, the object_dir is used.
         If object_filename is not set, the default object filename (object.csv)
            is used.
-        If datastream_filename is not set, the default datastream filename 
+        If datastream_filename is not set, the default datastream filename
            (datastreams.csv) is used.
         """
         if target_dir is None:
@@ -278,4 +278,3 @@ class ObjectCSV:
     def object_id(self):
         "Return the object id."
         return self.object_dir.name
-    

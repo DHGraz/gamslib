@@ -1,0 +1,9 @@
+[metadata]
+project_id = ""
+creator = "GAMS Test Project"
+publisher = "GAMS"
+rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+
+[general]
+dsid_keep_extension = true
+loglevel = "info"
