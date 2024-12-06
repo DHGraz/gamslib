@@ -1,6 +1,23 @@
 # gamslib
 
-gamslib is a collection of GAMS related modules and packages, which are used in multiple other packages.
+Gamslib is a collection of GAMS related modules and packages, which are used in multiple other packages.
+
+## Installation
+
+gamslib is available on pypi.org and can be installed via pip:
+
+```
+pip install gamslib
+```
+
+## Usage
+
+As gamslib is a library, it can only we used with other code. 
+
+The main purpose is to make code reusable in other GAMS5 projects and to have a unique way of doing things. If you are not working on GAMS5 reated code (which is very likely),
+this library will be useless for you.
+
+Currently these subpackages are available (more to come):
 
 ## objectcsv
 
@@ -38,3 +55,13 @@ These sub-objects are currently:
   * metadata
 
 A basic configuration file can be generated via the `create_condiguration()` function.
+
+
+## Contributing
+
+The Github repository is ment to be a read only mirror of the work repository hosted on our institutional private Github server. You can use the bug tracker on Github, but everything else should happen in the zimlab Github repo.
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
