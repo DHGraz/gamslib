@@ -12,22 +12,24 @@ logger = logging.getLogger()
 
 def collect_csv_data(
     object_root_dir: Path,
-    output_dir: Path | None = None,
-    object_filename: str | None = None,
-    datastream_filename: str | None = None,
+    output_dir: Path,
+    object_filename: str  = "all_objects.csv",
+    datastream_filename: str = "all_datastreams.csv",
 ) -> ObjectCSV:
     """Collect csv data from all object folders below object_root_dir.
 
     This function collects all data from all object.csv and all datastream.csv files
     below root_dir.
-    The collected data is stored in two files: object.csv_file and ds_file. These files
-    are created in object_root_dir if no other output directory is se
-    via output_dir.
+    The collected data is stored in two files in the current working directory: 
+    `all_object.csv` and `all_datastreams.csv`. The directory where the files are stored
+    can be set via output_dir.
 
-    Returns the Path to all_objects.csv and all_datastreams.csv as tuple of Path objects.
+    Returns a ObjectCSV object containing all object and datastream metadata.
     """
     # This is were we put all collected data
-    all_objects_csv = ObjectCSV(output_dir or object_root_dir)
+
+    all_objects_csv = ObjectCSV(object_root_dir)
+    
     for objectfolder in find_object_folders(object_root_dir):
         obj_csv = ObjectCSV(objectfolder)
 
@@ -36,12 +38,8 @@ def collect_csv_data(
         for dsmeta in obj_csv.get_datastreamdata():
             all_objects_csv.add_datastream(dsmeta)
 
-    if object_filename is None:
-        object_filename = "all_objects.csv"
-    if datastream_filename is None:
-        datastream_filename = "all_datastreams.csv"
     all_objects_csv.write(
-        all_objects_csv.object_dir, object_filename, datastream_filename
+        output_dir, object_filename, datastream_filename
     )
     return all_objects_csv
 

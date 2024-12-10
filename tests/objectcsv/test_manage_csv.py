@@ -10,16 +10,18 @@ from gamslib.objectcsv.manage_csv import (
 )
 
 
-def test_collect_csv_data(datadir):
+def test_collect_csv_data(datadir, tmp_path):
     "Collect data from all csv files in all object folders."
     root_dir = datadir / "objects"
-    all_obj_csv = collect_csv_data(root_dir)
+    
+   
+    all_obj_csv = collect_csv_data(root_dir, tmp_path)
 
     assert all_obj_csv.object_dir == root_dir
     assert isinstance(all_obj_csv, ObjectCSV)
 
-    obj_file = root_dir / "all_objects.csv"
-    ds_file = root_dir / "all_datastreams.csv"
+    obj_file = tmp_path / "all_objects.csv"
+    ds_file = tmp_path / "all_datastreams.csv"
     assert obj_file.exists()
     assert ds_file.exists()
 
@@ -27,7 +29,7 @@ def test_collect_csv_data(datadir):
         reader = csv.DictReader(f)
         data = sorted(list(reader), key = lambda x: x["recid"])
     
-    assert len(data) == 2  # we have to objects
+    assert len(data) == 2  # we have two objects
     assert data[0]["recid"] == "obj1"
     assert data[1]["recid"] == "obj2"
 
