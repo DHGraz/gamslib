@@ -83,17 +83,13 @@ def test_update_csv_files(datadir):
         assert ds_data[2]["title"] == "BarTitle 1 new"
 
 
-def test_update_csv_files_no_collect_dir(datadir):
-    "What happends if we do not set an explicit collected_csv dir?"
+def test_update_csv_files_no_collect_dir(datadir, monkeypatch):
+    "What happends if we do not set an explicit input_dir?"
 
-    # cove the all_xxx csv files over to the objects directory
-    collected_dir = datadir / "collected_csvs"
+    input_dir = datadir / "collected_csvs"
     objects_dir = datadir / "objects"
-    shutil.move(collected_dir / "all_objects.csv", objects_dir / "all_objects.csv")
-    shutil.move(
-        collected_dir / "all_datastreams.csv", objects_dir / "all_datastreams.csv"
-    )
-
+    
+    monkeypatch.chdir(input_dir)
     num_objects, num_ds = update_csv_files(objects_dir)
     assert num_objects == 2
     assert num_ds == 6

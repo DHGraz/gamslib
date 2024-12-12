@@ -43,15 +43,18 @@ def collect_csv_data(
 
 def update_csv_files(
     object_root_dir: Path,
-    collected_csv_dir: Path | None = None,
-    object_csv: str = "all_objects.csv",
-    ds_csv: str = "all_datastreams.csv",
+    input_dir: Path | None = None,
+    object_csv_filename: str = "all_objects.csv",
+    ds_csv_filename: str = "all_datastreams.csv",
 ) -> tuple[int, int]:
     """Update csv metadata files with data from the combined csv data.
 
     If collected_csv_dir is None, we assume that the directory
-    containing the combined csv data is object_root. This is
+    containing the combined csv data is the local working directory. This is
     where collect_csv_data() stores the data by default.
+
+    `object_csv_filename` and `ds_csv_filename` are the names of the csv files.
+    The must only be set, if the names are different from the default names.
 
     In other words: this function updates all object and datatstream
     metadata with data changed in the central csv files.
@@ -62,10 +65,9 @@ def update_csv_files(
     num_of_changed_objects = 0
     num_of_changed_datastreams = 0
 
-    if collected_csv_dir is None:
-        collected_csv_dir = object_root_dir
-    all_objects_csv = ObjectCSV(collected_csv_dir, object_csv, ds_csv)
-
+    if input_dir is None:
+        input_dir = Path.cwd()
+    all_objects_csv = ObjectCSV(input_dir, object_csv_filename, ds_csv_filename)
     for objectfolder in find_object_folders(object_root_dir):
         obj_csv = ObjectCSV(objectfolder)
         obj_csv.clear()
