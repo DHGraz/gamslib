@@ -11,6 +11,7 @@ import csv
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Generator
+from . import defaultvalues
 
 
 @dataclass
@@ -54,9 +55,15 @@ class DSData:
     creator: str = ""
     rights: str = ""
 
+    def __post_init__(self):
+        "Add missing values if applicable and validate."
+        self._guess_missing_values()
+        
+        
+
     @property
     def object_id(self):
-        "Return the object id."
+        "Return the object id of the object the datastream is part of."
         return Path(self.dspath).parts[0]
 
     def validate(self):
@@ -70,6 +77,25 @@ class DSData:
         if not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
 
+    def _guess_mimetype(self): # pylint: disable=no-self-use
+        "Guess the mimetype if it is empty."
+        if not self.mimetype:
+            self.mimetype = defaultvalues.DEFAULT_MIMETYPE
+
+    def _guess_missing_values(self):
+        "Guess missing values."
+        filename = Path(self.dspath).name
+        if not self.title:
+            if filename in defaultvalues.FILENAME_MAP:
+                self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
+        if not self.description:
+            if filename in defaultvalues.FILENAME_MAP:
+                self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
+        if not self.rights:
+            self.rights = defaultvalues.DEFAULT_RIGHTS
+        if not self.creator:
+            self.creator = defaultvalues.DEFAULT_CREATOR
+        self._guess_mimetype()        
 
 @dataclass
 class ObjectCSVFile:
@@ -237,29 +263,26 @@ class ObjectCSV:
         """
         return self.datastream_data.get_data(pid)
 
+    def sort(self):
+        "Sort the object and datastream data."
+        self.object_data._objectdata.sort(key=lambda x: x.recid)
+        self.datastream_data._datastreams.sort(key=lambda x: x.dspath)
+
     def write(
         self,
-        target_dir: Path | None = None,
-        object_filename=None,
-        datastream_filename=None,
+        object_csv_path: Path | None = None,
+        datastream_csv_path: Path | None = None
     ):
         """Save the object and datastream data to csv files.
 
-        If target_dir is not set, the object_dir is used.
-        If object_filename is not set, the default object filename (object.csv)
-           is used.
-        If datastream_filename is not set, the default datastream filename
-           (datastreams.csv) is used.
+        If no explicit output files are set, we use the default filenames and write to object_dir.
         """
-        if target_dir is None:
-            target_dir = self.object_dir
-        if object_filename is None:
-            object_filename = self.OBJECT_CSV_FILENAME
-        if datastream_filename is None:
-            datastream_filename = self.DATASTREAM_CSV_FILENAME
-
-        self.object_data.to_csv(target_dir / object_filename)
-        self.datastream_data.to_csv(target_dir / datastream_filename)
+        if object_csv_path is None:
+            object_csv_path = self.obj_csv_file
+        if datastream_csv_path is None:
+            datastream_csv_path = self.ds_csv_file
+        self.object_data.to_csv(object_csv_path)
+        self.datastream_data.to_csv(datastream_csv_path)
 
     def count_objects(self) -> int:
         "Return the number of object data objects."

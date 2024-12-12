@@ -11,7 +11,6 @@ from pytest import fixture
 
 from gamslib.objectcsv import ObjectData
 from gamslib.objectcsv.create_csv import (
-    DEFAULT_RIGHTS,
     create_csv,
     create_csv_files,
     extract_dsid,
@@ -20,6 +19,7 @@ from gamslib.objectcsv.create_csv import (
 from gamslib.objectcsv.dublincore import DublinCore
 from gamslib.objectcsv.objectcsv import DSData
 from gamslib.projectconfiguration.configuration import Configuration
+from gamslib.objectcsv import defaultvalues
 
 
 
@@ -46,7 +46,7 @@ def test_get_rights(test_config, test_dc):
 
     # if not set in configuration either, use the default value
     test_config.metadata.rights = ""
-    assert get_rights(test_config, test_dc) == DEFAULT_RIGHTS
+    assert get_rights(test_config, test_dc) == defaultvalues.DEFAULT_RIGHTS
 
 
 def test_create_csv(datadir, test_config):
@@ -71,9 +71,35 @@ def test_create_csv(datadir, test_config):
         assert data[0]["dsid"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
 
+def test_create_csv_force_overwrite(datadir, test_config):
+    """Test the create_csv function with force_overwrite=True."""
+    def read_csv(file: Path) -> list[dict[str, str]]:
+        with file.open(encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            return list(reader)
+        
+    object_dir = datadir / "objects" / "obj1"
+    obj_csv = object_dir / "object.csv"
+    ds_csv = object_dir / "datastreams.csv"
+
+    # create the csv files for the first time
+    create_csv(object_dir, test_config)
+    assert len(read_csv(obj_csv)) == 1
+    assert len(read_csv(ds_csv)) == 2
+
+    # recreate the csv files with force_overwrite=True
+    create_csv(object_dir, test_config, force_overwrite=True)
+    assert len(read_csv(obj_csv)) == 1
+    assert len(read_csv(ds_csv)) == 2
+
+
+
+
 
 def test_create_csv_files_existing_csvs(datadir, test_config):
-    """If the csv files already exist, they should not be overwritten."""
+    """Test the create_csv_files function.
+    If the csv files already exist, they should not be overwritten.
+    """
     object_dir = datadir / "objects"
     (object_dir / "obj1" / "object.csv").touch()
     (object_dir / "obj2" / "datastreams.csv").touch()
@@ -92,6 +118,8 @@ def test_create_csv_files(datadir, test_config):
     assert (objects_root_dir / "obj1" / "datastreams.csv").exists()
     assert (objects_root_dir / "obj2" / "object.csv").exists()
     assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
+
+
 
 
 def test_extract_dsid():

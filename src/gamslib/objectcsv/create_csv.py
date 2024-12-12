@@ -1,8 +1,8 @@
 """Create object.csv and datastreams.csv files.
 
 This module creates the object.csv and datastreams.csv files for one or many given
-object folder. It uses data from the DC.xml file and the project configuration 
-to fill in the metadata. When not enough information is available, some fields 
+object folder. It uses data from the DC.xml file and the project configuration
+to fill in the metadata. When not enough information is available, some fields
 will be left blank or filled with default values.
 """
 
@@ -16,15 +16,10 @@ from gamslib.projectconfiguration import Configuration
 from .objectcsv import DSData, ObjectCSV, ObjectData
 from .dublincore import DublinCore
 from .utils import find_object_folders
+from . import defaultvalues
 
 logger = logging.getLogger()
 
-DEFAULT_RIGHTS = (
-    "Creative Commons Attribution-NonCommercial 4.0 "
-    "(https://creativecommons.org/licenses/by-nc/4.0/)"
-)
-DEFAULT_SOURCE = "local"
-DEFAULT_OBJECT_TYPE = "text"
 
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
@@ -45,7 +40,7 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
         if config.metadata.rights:
             rights = config.metadata.rights
         else:
-            rights = DEFAULT_RIGHTS
+            rights = defaultvalues.DEFAULT_RIGHTS
     return rights
 
 
@@ -104,8 +99,8 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
         description=description,
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
-        source=DEFAULT_SOURCE,
-        objectType=DEFAULT_OBJECT_TYPE,
+        source=defaultvalues.DEFAULT_SOURCE,
+        objectType=defaultvalues.DEFAULT_OBJECT_TYPE,
     )
 
 
@@ -131,12 +126,19 @@ def collect_datastream_data(
 
 
 def create_csv(
-    object_directory: Path, configuration: Configuration
+    object_directory: Path, configuration: Configuration, force_overwrite: bool = False
 ) -> ObjectCSV | None:
-    """Generate the csv file containing the preliminary metadata for a single object."""
+    """Generate the csv file containing the preliminary metadata for a single object.
+
+    Existing csv files will not be touched unless 'force_overwrite' is True.
+    """
     objectcsv = ObjectCSV(object_directory)
 
     # Avoid that existing (and potentially already edited) metadata is replaced
+    if force_overwrite and not objectcsv.is_new():
+        objectcsv.clear()
+        objectcsv.obj_csv_file.unlink()
+        objectcsv.ds_csv_file.unlink()
     if not objectcsv.is_new():
         logger.info(
             "CSV files for object '%s' already exist. Will not be re-created.",
@@ -158,11 +160,13 @@ def create_csv(
     return objectcsv
 
 
-def create_csv_files(root_folder: Path, config: Configuration) -> list[ObjectCSV]:
+def create_csv_files(
+    root_folder: Path, config: Configuration, force_overwrite:bool=False
+) -> list[ObjectCSV]:
     """Create the CSV files for all objects below root_folder."""
     extended_objects: list[ObjectCSV] = []
     for path in find_object_folders(root_folder):
-        extended_obj = create_csv(path, config)
+        extended_obj = create_csv(path, config, force_overwrite)
 
         if extended_obj is not None:
             extended_objects.append(extended_obj)
