@@ -15,10 +15,12 @@ def read_csv(csvfile: Path, skip_header: bool = True) -> list[list[str]]:
         return list(reader)
 
 
-def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path):
+def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path) -> Path:
     """Convert csv files to xlsx files.
 
     Convert the csv files object_csv and ds_csv to xlsx files in the output_dir.
+
+    Returns Path to output file.
     """
     object_data = read_csv(object_csv, skip_header=False)
     ds_data = read_csv(ds_csv, skip_header=False)
@@ -35,10 +37,14 @@ def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path):
                 row=row_id, col=col_id, val=value
             )
     xl.writexl(fn=output_file, db=db)
+    return output_file
 
 
-def xlsx_to_csv(xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path):
-    """Convert a xlsx metadata file to 2 csv files: object.csv and datastreams.csv."""
+def xlsx_to_csv(xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path)-> tuple[Path, Path]:
+    """Convert a xlsx metadata file to 2 csv files: object.csv and datastreams.csv.
+    
+    Return Paths to the csv files as tuple (obj_csv_path, ds_csv_path).
+    """
     db = xl.readxl(xlsx_path)
 
     object_data = list(db.ws(ws="Object Metadata").rows)
@@ -51,3 +57,4 @@ def xlsx_to_csv(xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path):
     with open(ds_csv_path, "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(ds_data)
+    return obj_csv_path, ds_csv_path

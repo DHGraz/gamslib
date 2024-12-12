@@ -117,7 +117,8 @@ class DublinCore:
                 lang = child.attrib.get(f"{{{NAMESPACES['xml']}}}lang", "unspecified")
                 element = self._data.get(elem, {})
                 values = element.get(lang, [])
-                values.append(child.text)
+                if child.text is not None:
+                    values.append(child.text)
                 element[lang] = values
                 self._data[elem] = element
         # TODO: Add DC_TERMS and DCMI_TYPES?
@@ -144,6 +145,7 @@ class DublinCore:
         """
         if name not in DC_ELEMENTS:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
+        # element not in DC.xml
         if name not in self._data:
             logger.debug(
                 "Element %s not found in %s. Returning default value: [%s]",
@@ -152,6 +154,7 @@ class DublinCore:
                 default,
             )
             return [default]
+
         if preferred_lang not in self._data[name]:
             for lang in self.lookup_order + ["unspecified"]:
                 if lang in self._data[name]:
@@ -163,9 +166,6 @@ class DublinCore:
                         lang,
                     )
                     break
-        # rv = self._data[name][preferred_lang]
-        # if isinstance(rv, str):
-        #    rv = [rv]
         return self._data[name][preferred_lang]
 
     def get_element_as_str(

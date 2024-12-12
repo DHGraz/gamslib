@@ -13,15 +13,16 @@ from gamslib.objectcsv.manage_csv import (
 def test_collect_csv_data(datadir, tmp_path):
     "Collect data from all csv files in all object folders."
     root_dir = datadir / "objects"
-    
+
+    obj_file = tmp_path / "all_objects.csv"
+    ds_file = tmp_path / "all_datastreams.csv"
+
    
-    all_obj_csv = collect_csv_data(root_dir, tmp_path)
+    all_obj_csv = collect_csv_data(root_dir, obj_file, ds_file)
 
     assert all_obj_csv.object_dir == root_dir
     assert isinstance(all_obj_csv, ObjectCSV)
 
-    obj_file = tmp_path / "all_objects.csv"
-    ds_file = tmp_path / "all_datastreams.csv"
     assert obj_file.exists()
     assert ds_file.exists()
 
@@ -46,29 +47,10 @@ def test_collect_csv_data(datadir, tmp_path):
     assert "obj2/DC.xml" in dspaths
 
 
-def test_collect_csv_data_different_output_dir(datadir, tmp_path):
-    "Write collection data to a different output directory."
-
-    # we set an output directory but do not change filename
-    root_dir = datadir / "objects"
-    output_dir = tmp_path / "foo"
-    output_dir.mkdir()
-
-    collect_csv_data(root_dir, output_dir)
-    assert (output_dir / "all_objects.csv").exists()
-    assert (output_dir / "all_datastreams.csv").exists()
-
-    # we set both output directory and filenames
-    output_dir = tmp_path / "bar"
-    output_dir.mkdir()
-
-    collect_csv_data(root_dir, output_dir, "foo.csv", "bar.csv")
-    assert (output_dir / "foo.csv").exists()
-    assert (output_dir / "bar.csv").exists()
-
 
 def test_update_csv_files(datadir):
     "Update a single object csv file with data from csv_data."
+    
     collected_dir = datadir / "collected_csvs"
     objects_dir = datadir / "objects"
 

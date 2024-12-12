@@ -12,17 +12,14 @@ logger = logging.getLogger()
 
 def collect_csv_data(
     object_root_dir: Path,
-    output_dir: Path,
-    object_filename: str  = "all_objects.csv",
-    datastream_filename: str = "all_datastreams.csv",
+    object_csv_path: Path,
+    datastream_csv_path: Path,
 ) -> ObjectCSV:
     """Collect csv data from all object folders below object_root_dir.
 
     This function collects all data from all object.csv and all datastream.csv files
     below root_dir.
-    The collected data is stored in two files in the current working directory: 
-    `all_object.csv` and `all_datastreams.csv`. The directory where the files are stored
-    can be set via output_dir.
+    The collected data is stored in two files 'object_csv_path'  and 'datastream_csv_path'.
 
     Returns a ObjectCSV object containing all object and datastream metadata.
     """
@@ -37,9 +34,9 @@ def collect_csv_data(
             all_objects_csv.add_objectdata(objmeta)
         for dsmeta in obj_csv.get_datastreamdata():
             all_objects_csv.add_datastream(dsmeta)
-
+    all_objects_csv.sort()
     all_objects_csv.write(
-        output_dir, object_filename, datastream_filename
+        object_csv_path, datastream_csv_path
     )
     return all_objects_csv
 
@@ -61,6 +58,7 @@ def update_csv_files(
 
     Returns a a tuple of ints: number of updated objects and number of updated datastreams.
     """
+    
     num_of_changed_objects = 0
     num_of_changed_datastreams = 0
 
@@ -78,6 +76,7 @@ def update_csv_files(
         for ds_data in all_objects_csv.get_datastreamdata(obj_csv.object_id):
             obj_csv.add_datastream(ds_data)
             num_of_changed_datastreams += 1
+        
         obj_csv.write()
 
     return num_of_changed_objects, num_of_changed_datastreams
