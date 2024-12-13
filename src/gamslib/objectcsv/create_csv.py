@@ -10,6 +10,7 @@ import logging
 import mimetypes
 import re
 from pathlib import Path
+import warnings
 
 from gamslib.projectconfiguration import Configuration
 
@@ -70,9 +71,8 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
                 pid = ".".join(parts[:-1])
                 logger.debug("Removed extension for ID: %s", parts[0])
             else:
-                logger.warning(
-                    "'%s' does not look like an extension. Keeping it in PID.", pid[-1]
-                )
+                warnings.warn(f"'{pid[-1]}' does not look like an extension. Keeping it in PID.", 
+                        UserWarning)
 
     if re.match(r"^[a-zA-Z0-9]+[-.%_a-zA-Z0-9]+[a-zA-Z0-9]+$", pid) is None:
         raise ValueError(f"Invalid PID: '{pid}'")

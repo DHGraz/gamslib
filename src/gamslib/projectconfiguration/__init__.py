@@ -11,6 +11,7 @@ from pathlib import Path
 from importlib import resources as impresources
 import shutil
 import logging
+import warnings
 from .configuration import Configuration, find_project_toml
 
 __all__ = ["Configuration"]
@@ -28,7 +29,7 @@ def create_configuration(objects_dir: Path) -> Path | None:
     """
     toml_file = objects_dir / "project.toml"
     if toml_file.exists():
-        logger.warning("'%s' already exists. Will not be re-created.", toml_file)
+        warnings.warn(f"'{toml_file}' already exists. Will not be re-created.", UserWarning)
         return None
     toml_template_file = str(
         impresources.files("gamslib")

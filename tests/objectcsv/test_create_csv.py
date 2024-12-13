@@ -140,5 +140,7 @@ def test_extract_dsid():
     assert extract_dsid(Path("test.unknown"), False) == "test"
 
     # if it does not seem to be an extension, keep it
-    assert extract_dsid(Path("test.1234"), False) == "test.1234"
-    assert extract_dsid(Path("test.a1234"), False) == "test.a1234"
+    with pytest.warns(UserWarning):
+        assert extract_dsid(Path("test.1234"), False) == "test.1234"
+    with pytest.warns(UserWarning):
+        assert extract_dsid(Path("test.a1234"), False) == "test.a1234"

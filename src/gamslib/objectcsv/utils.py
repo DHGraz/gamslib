@@ -3,6 +3,7 @@
 import logging
 from pathlib import Path
 from typing import Generator
+import warnings
 
 logger = logging.getLogger()
 
@@ -14,8 +15,7 @@ def find_object_folders(root_directory: Path) -> Generator[Path, None, None]:
             if "DC.xml" in [f.name for f in directory.iterdir()]:
                 yield directory
             else:
-                #    if not directory == root_directory:
-                logger.warning(
-                    "Skipping folder %s as it does not contain a DC.xml file.",
-                    directory,
+                warnings.warn(
+                    f"Skipping '{directory}' as folder does not contain a DC.xml file.",
+                    UserWarning
                 )

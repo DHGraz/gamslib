@@ -1,7 +1,6 @@
 "Unit tests for the manage_csv module."
 
 import csv
-import shutil
 
 from gamslib.objectcsv import ObjectCSV
 from gamslib.objectcsv.manage_csv import (

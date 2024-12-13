@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.3.0] - 2024-12-13
+
+### Changed
+
+- manage_csv.py: The collected csv files are now by default created 
+   and expected in the current working directory and no longer in object_root
+  - collect_csv_data() output_dir ist now a required parameter: 
+- Refactored code
+
 ## [0.2.6] - 2024-12-06
 
 ### Added
