@@ -44,6 +44,7 @@ def dsdata_fixture() -> DSData:
         mimetype="application/xml",
         creator="Foo Bar",
         rights="GPLv3",
+        languages = "en de"
     )
 
 
@@ -96,6 +97,7 @@ def test_objectdata_creation(objdata):
     assert objdata.publisher == "The publisher"
     assert objdata.source == "The source"
     assert objdata.objectType == "The objectType"
+    
 
 
 def test_objectdata_validate(objdata):
@@ -130,6 +132,7 @@ def test_dsdata_creation(dsdata):
     assert dsdata.mimetype == "application/xml"
     assert dsdata.creator == "Foo Bar"
     assert dsdata.rights == "GPLv3"
+    assert dsdata.languages == "en de"
 
     # this is a @property
 

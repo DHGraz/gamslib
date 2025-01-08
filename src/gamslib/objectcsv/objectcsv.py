@@ -27,6 +27,7 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
+    
 
     def validate(self):
         "Validate the object data."
@@ -54,6 +55,7 @@ class DSData:
     mimetype: str = ""
     creator: str = ""
     rights: str = ""
+    languages: str = ""
 
     def __post_init__(self):
         "Add missing values if applicable and validate."
@@ -165,7 +167,7 @@ class DatastreamsCSVFile:
         for dsdata in self._datastreams:
             if pid is None:
                 yield dsdata
-            else:  # DOTO: this is not object_id!
+            else:  # TODO: this is not object_id!
                 if dsdata.object_id == pid:
                     yield dsdata
 
