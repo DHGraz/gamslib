@@ -148,7 +148,48 @@ def test_ds_data_creation_with_missing_values():
     assert dsdata.mimetype == defaultvalues.DEFAULT_MIMETYPE
     assert dsdata.creator == defaultvalues.DEFAULT_CREATOR
     assert dsdata.rights == defaultvalues.DEFAULT_RIGHTS
+
+    dsdata =  DSData(
+        dspath="object1/TEI.xml",
+        dsid="TEI.xml"
+    )
+    assert dsdata.title == defaultvalues.FILENAME_MAP["TEI.xml"]["title"]
+    assert dsdata.description == defaultvalues.FILENAME_MAP["TEI.xml"]["description"]
     
+    dsdata =  DSData(
+        dspath="object1/LIDO.xml",
+        dsid="LIDO.xml"
+    )
+    assert dsdata.title == defaultvalues.FILENAME_MAP["LIDO.xml"]["title"]
+    assert dsdata.description == defaultvalues.FILENAME_MAP["LIDO.xml"]["description"]
+
+    dsdata =  DSData(
+        dspath="object1/RDF.xml",
+        dsid="RDF.xml"
+    )
+    assert dsdata.title == defaultvalues.FILENAME_MAP["RDF.xml"]["title"]
+    assert dsdata.description == defaultvalues.FILENAME_MAP["RDF.xml"]["description"]
+
+    dsdata = DSData(
+        dspath="object1/xy.png",
+        dsid="xy.png",
+        mimetype="image/png"
+    )
+    assert dsdata.title == "Image: xy.png" 
+
+    dsdata = DSData(
+        dspath="object1/xy.mp4",
+        dsid="xy.mp4",
+        mimetype="video/mp4"
+    )
+    assert dsdata.title == "Video: xy.mp4" 
+
+    dsdata = DSData(
+        dspath="object1/xy.mp3",
+        dsid="xy.mp3",
+        mimetype="audio/mpeg"
+    )
+    assert dsdata.title == "Audio: xy.mp3"
 
 
 def test_dsdata_validate(dsdata):

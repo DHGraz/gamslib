@@ -12,5 +12,17 @@ FILENAME_MAP = {
     "DC.xml": {
         "title": "Dublin Core Metadata",
         "description": "Dublin Core Metadata in XML format for this content file.",
+    },
+    "TEI.xml": {
+        "title": "Main TEI file",
+        "description": "The central TEI File for this object"
+    },
+    "LIDO.xml": {
+        "title": "Main LIDO file",
+        "description": "The central LIDO file of this object"
+    },
+    "RDF.xml": {
+        "title": "RDF Statements",
+        "description": ""
     }
 }

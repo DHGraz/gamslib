@@ -59,6 +59,7 @@ class DSData:
 
     def __post_init__(self):
         "Add missing values if applicable and validate."
+        self._guess_mimetype()  
         self._guess_missing_values()
         
         
@@ -81,6 +82,7 @@ class DSData:
 
     def _guess_mimetype(self): # pylint: disable=no-self-use
         "Guess the mimetype if it is empty."
+        # TODO!
         if not self.mimetype:
             self.mimetype = defaultvalues.DEFAULT_MIMETYPE
 
@@ -90,6 +92,13 @@ class DSData:
         if not self.title:
             if filename in defaultvalues.FILENAME_MAP:
                 self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
+            elif self.mimetype.startswith('image/'):
+                self.title = f"Image: {self.dsid}"
+            elif self.mimetype.startswith('audio/'):
+                self.title = f"Audio: {self.dsid}"
+            elif self.mimetype.startswith('video/'):
+                self.title = f"Video: {self.dsid}"
+        
         if not self.description:
             if filename in defaultvalues.FILENAME_MAP:
                 self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
@@ -97,7 +106,8 @@ class DSData:
             self.rights = defaultvalues.DEFAULT_RIGHTS
         if not self.creator:
             self.creator = defaultvalues.DEFAULT_CREATOR
-        self._guess_mimetype()        
+        
+              
 
 @dataclass
 class ObjectCSVFile:
