@@ -55,7 +55,7 @@ class DSData:
     mimetype: str = ""
     creator: str = ""
     rights: str = ""
-    languages: str = ""
+    lang: str = ""
 
     def __post_init__(self):
         "Add missing values if applicable and validate."
