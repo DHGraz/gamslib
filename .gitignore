@@ -17,3 +17,4 @@ requirements.lock
 
 
 foo.py
+uv.lock

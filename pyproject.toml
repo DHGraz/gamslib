@@ -35,15 +35,15 @@ Changelog = "https://github.com/DHGraz/gamslib/blob/main/CHANGELOG.md"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = [
-    "pylint>=3.3.1",
+[dependency-groups]
+dev = [
     "pytest>=8.3.3",
     "pytest-datadir>=1.5.0",
     "pytest-cov>=6.0.0",
-    "pyright>=1.1.390",
     "toml>=0.10.2",
+    "ruff>=0.9.0",
+    "pylint>=3.3.1",
+    "pyright>=1.1.390",
 ]
 
 [tool.hatch.metadata]
