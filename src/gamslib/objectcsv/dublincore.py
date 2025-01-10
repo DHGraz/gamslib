@@ -156,7 +156,7 @@ class DublinCore:
             return [default]
 
         if preferred_lang not in self._data[name]:
-            for lang in self.lookup_order + ["unspecified"]:
+            for lang in [*self.lookup_order, "unspecified"]:
                 if lang in self._data[name]:
                     preferred_lang = lang
                     logger.debug(
@@ -180,9 +180,9 @@ class DublinCore:
         (eg. rights is handled differently than title).
         """
         values = self.get_element(name, preferred_lang, default)
-        if len(values) == 1:
-            return values[0]
-        if name == "rights" and len(values) == 2:
-            # we expect the licence name first, followed by the url
-            return f"{values[0]} ({values[1]})"
-        return "; ".join(values)
+        if name == 'rights':
+            # we expect the licence name first, followed by the url in brackets
+            str_value = values[0] if len(values) == 1 else f"{values[0]} ({values[1]})"
+        else:
+            str_value = "; ".join(values)
+        return str_value

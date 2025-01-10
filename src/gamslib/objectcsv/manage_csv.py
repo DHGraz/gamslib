@@ -59,7 +59,6 @@ def update_csv_files(
 
     Returns a a tuple of ints: number of updated objects and number of updated datastreams.
     """
-
     num_of_changed_objects = 0
     num_of_changed_datastreams = 0
 

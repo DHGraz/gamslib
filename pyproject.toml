@@ -51,3 +51,7 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gamslib"]
+
+[tool.ruff.lint]
+select = ["PL", "RUF", "SIM"]
+

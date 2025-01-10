@@ -16,7 +16,7 @@ from . import defaultvalues
 
 @dataclass
 class ObjectData:
-    "Represents csv data for a single object."
+    """Represents csv data for a single object."""
 
     recid: str
     title: str = ""
@@ -29,7 +29,7 @@ class ObjectData:
     objectType: str = ""
 
     def validate(self):
-        "Validate the object data."
+        """Validate the object data."""
         # TODO: Needs discussion
         if not self.recid:
             raise ValueError("recid must not be empty")
@@ -45,7 +45,7 @@ class ObjectData:
 
 @dataclass
 class DSData:
-    "Represents csv data for a single datastream of a single object."
+    """Represents csv data for a single datastream of a single object."""
 
     dspath: str
     dsid: str = ""
@@ -57,18 +57,18 @@ class DSData:
     lang: str = ""
 
     def __post_init__(self):
-        "Add missing values if applicable and validate."
+        """Add missing values if applicable and validate."""
         self._guess_mimetype()
         self._guess_missing_values()
 
 
     @property
     def object_id(self):
-        "Return the object id of the object the datastream is part of."
+        """Return the object id of the object the datastream is part of."""
         return Path(self.dspath).parts[0]
 
     def validate(self):
-        "Validate the datastream data."
+        """Validate the datastream data."""
         if not self.dspath.strip():
             raise ValueError(f"{self.dsid}: dspath must not be empty")
         if not self.dsid.strip():
@@ -79,13 +79,13 @@ class DSData:
             raise ValueError(f"{self.dspath}: rights must not be empty")
 
     def _guess_mimetype(self):
-        "Guess the mimetype if it is empty."
+        """Guess the mimetype if it is empty."""
         # TODO!
         if not self.mimetype:
             self.mimetype = defaultvalues.DEFAULT_MIMETYPE
 
     def _guess_missing_values(self):
-        "Guess missing values."
+        """Guess missing values."""
         filename = Path(self.dspath).name
         if not self.title:
             if filename in defaultvalues.FILENAME_MAP:
@@ -97,9 +97,8 @@ class DSData:
             elif self.mimetype.startswith("video/"):
                 self.title = f"Video: {self.dsid}"
 
-        if not self.description:
-            if filename in defaultvalues.FILENAME_MAP:
-                self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
+        if not self.description and filename in defaultvalues.FILENAME_MAP:
+            self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
         if not self.rights:
             self.rights = defaultvalues.DEFAULT_RIGHTS
         if not self.creator:
@@ -108,13 +107,13 @@ class DSData:
 
 @dataclass
 class ObjectCSVFile:
-    "Represents csv data for a single object."
+    """Represents csv data for a single object."""
 
     def __init__(self):
         self._objectdata: list[ObjectData] = []
 
     def add_objectdata(self, objectdata: ObjectData):
-        "Add a ObjectData objects."
+        """Add a ObjectData objects."""
         self._objectdata.append(objectdata)
 
     def get_data(self, pid: str | None = None) -> Generator[ObjectData, None, None]:
@@ -124,15 +123,12 @@ class ObjectCSVFile:
         Filtering by pid is only needed if we have data from multiple objects.
         """
         for objdata in self._objectdata:
-            if pid is None:
+            if pid is None or objdata.recid == pid:
                 yield objdata
-            else:
-                if objdata.recid == pid:
-                    yield objdata
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":
-        "Load the object data from a csv file."
+        """Load the object data from a csv file."""
         obj_csv_file = ObjectCSVFile()
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
@@ -141,7 +137,7 @@ class ObjectCSVFile:
         return obj_csv_file
 
     def to_csv(self, csv_file: Path) -> None:
-        "Save the object data to a csv file."
+        """Save the object data to a csv file."""
         with csv_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(
                 f, fieldnames=[field.name for field in fields(ObjectData)]
@@ -151,40 +147,37 @@ class ObjectCSVFile:
                 writer.writerow(asdict(objdata))
 
     def sort(self):
-        "Sort collected object data by recid value."
+        """Sort collected object data by recid value."""
         self._objectdata.sort(key=lambda x: x.recid)
 
     def __len__(self):
-        "Return the number of objectdata objects."
+        """Return the number of objectdata objects."""
         return len(self._objectdata)
 
 
 class DatastreamsCSVFile:
-    "Represents csv data for all datastreams of a single datastream."
+    """Represents csv data for all datastreams of a single datastream."""
 
     def __init__(self):
         self._datastreams: list[DSData] = []
 
     def add_datastream(self, dsdata: DSData):
-        "Add a datastream to the datastreams."
+        """Add a datastream to the datastreams."""
         self._datastreams.append(dsdata)
 
     def get_data(self, pid: str | None = None) -> Generator[DSData, None, None]:
         """Return the datastream objects for a given object pid.
 
-        If pid is None, return all datastream objects.
+        If pid is None, yield all datastream objects.
         Filtering by pid is only needed if we have data from multiple objects.
         """
         for dsdata in self._datastreams:
-            if pid is None:
+            if pid is None or dsdata.object_id == pid:
                 yield dsdata
-            else:  # TODO: this is not object_id!
-                if dsdata.object_id == pid:
-                    yield dsdata
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":
-        "Load the datastream container data from a csv file."
+        """Load the datastream container data from a csv file."""
         ds_csv_file = DatastreamsCSVFile()
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
@@ -193,7 +186,7 @@ class DatastreamsCSVFile:
         return ds_csv_file
 
     def to_csv(self, csv_file: Path):
-        "Save the datastream data to a csv file."
+        """Save the datastream data to a csv file."""
         self._datastreams.sort(key=lambda x: x.dspath)
         with csv_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(
@@ -204,11 +197,11 @@ class DatastreamsCSVFile:
                 writer.writerow(asdict(dsdata))
 
     def sort(self):
-        "Sort collected datastream data by dspath value."
+        """Sort collected datastream data by dspath value."""
         self._datastreams.sort(key=lambda x: x.dspath)
 
     def __len__(self):
-        "Return the number of datastreams."
+        """Return the number of datastreams."""
         return len(self._datastreams)
 
 
@@ -229,7 +222,7 @@ class ObjectCSV:
     datastream_file: str = DATASTREAM_CSV_FILENAME
 
     def __post_init__(self):
-        "Check if the object directory exists and load the object and datastream data."
+        """Check if the object directory exists and load the object and datastream data."""
         if not self.object_dir.is_dir():
             raise FileNotFoundError(
                 f"Object directory '{self.object_dir}' does not exist."
@@ -249,17 +242,17 @@ class ObjectCSV:
             self.datastream_data = DatastreamsCSVFile()
 
     def is_new(self):
-        "Return True if at least one of the csv files exist."
+        """Return True if at least one of the csv files exist."""
         # obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
         # ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
         return not (self.obj_csv_file.exists() or self.ds_csv_file.exists())
 
     def add_datastream(self, dsdata: DSData):
-        "Add a datastream to the object."
+        """Add a datastream to the object."""
         self.datastream_data.add_datastream(dsdata)
 
     def add_objectdata(self, objectdata: ObjectData):
-        "Add a object to the object."
+        """Add a object to the object."""
         self.object_data.add_objectdata(objectdata)
 
     def get_objectdata(
@@ -281,7 +274,7 @@ class ObjectCSV:
         return self.datastream_data.get_data(pid)
 
     def sort(self):
-        "Sort the object and datastream data."
+        """Sort the object and datastream data."""
         self.object_data.sort()
         self.datastream_data.sort()
 
@@ -302,19 +295,19 @@ class ObjectCSV:
         self.datastream_data.to_csv(datastream_csv_path)
 
     def count_objects(self) -> int:
-        "Return the number of object data objects."
+        """Return the number of object data objects."""
         return len(self.object_data)
 
     def count_datastreams(self) -> int:
-        "Return the number of datastream data objects."
+        """Return the number of datastream data objects."""
         return len(self.datastream_data)
 
     def clear(self):
-        "Clear the object and datastream data."
+        """Clear the object and datastream data."""
         self.object_data = ObjectCSVFile()
         self.datastream_data = DatastreamsCSVFile()
 
     @property
     def object_id(self):
-        "Return the object id."
+        """Return the object id."""
         return self.object_dir.name

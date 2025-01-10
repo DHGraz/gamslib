@@ -90,7 +90,6 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
 
     This is the place to change the resolving order for data from other sources.
     """
-
     title = "; ".join(dc.get_element("title", default=pid))
     description = "; ".join(dc.get_element("description", default=""))
 
