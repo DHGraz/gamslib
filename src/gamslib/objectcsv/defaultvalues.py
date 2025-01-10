@@ -3,7 +3,8 @@
 DEFAULT_CREATOR = "Unknown"
 DEFAULT_MIMETYPE = "application/octet-stream"
 DEFAULT_OBJECT_TYPE = "text"
-DEFAULT_RIGHTS = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+DEFAULT_RIGHTS = ("Creative Commons Attribution-NonCommercial 4.0 "
+                  "(https://creativecommons.org/licenses/by-nc/4.0/)")
 DEFAULT_SOURCE = "local"
 
 # This is a mapping of filenames to default metadata values.
@@ -15,14 +16,11 @@ FILENAME_MAP = {
     },
     "TEI.xml": {
         "title": "Main TEI file",
-        "description": "The central TEI File for this object"
+        "description": "The central TEI File for this object",
     },
     "LIDO.xml": {
         "title": "Main LIDO file",
-        "description": "The central LIDO file of this object"
+        "description": "The central LIDO file of this object",
     },
-    "RDF.xml": {
-        "title": "RDF Statements",
-        "description": ""
-    }
+    "RDF.xml": {"title": "RDF Statements", "description": ""},
 }

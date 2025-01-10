@@ -71,8 +71,10 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
                 pid = ".".join(parts[:-1])
                 logger.debug("Removed extension for ID: %s", parts[0])
             else:
-                warnings.warn(f"'{pid[-1]}' does not look like an extension. Keeping it in PID.", 
-                        UserWarning)
+                warnings.warn(
+                    f"'{pid[-1]}' does not look like an extension. Keeping it in PID.",
+                    UserWarning,
+                )
 
     if re.match(r"^[a-zA-Z0-9]+[-.%_a-zA-Z0-9]+[a-zA-Z0-9]+$", pid) is None:
         raise ValueError(f"Invalid PID: '{pid}'")
@@ -161,7 +163,7 @@ def create_csv(
 
 
 def create_csv_files(
-    root_folder: Path, config: Configuration, force_overwrite:bool=False
+    root_folder: Path, config: Configuration, force_overwrite: bool = False
 ) -> list[ObjectCSV]:
     """Create the CSV files for all objects below root_folder."""
     extended_objects: list[ObjectCSV] = []

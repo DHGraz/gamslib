@@ -40,9 +40,11 @@ def csv_to_xlsx(object_csv: Path, ds_csv: Path, output_file: Path) -> Path:
     return output_file
 
 
-def xlsx_to_csv(xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path)-> tuple[Path, Path]:
+def xlsx_to_csv(
+    xlsx_path: Path, obj_csv_path: Path, ds_csv_path: Path
+) -> tuple[Path, Path]:
     """Convert a xlsx metadata file to 2 csv files: object.csv and datastreams.csv.
-    
+
     Return Paths to the csv files as tuple (obj_csv_path, ds_csv_path).
     """
     db = xl.readxl(xlsx_path)

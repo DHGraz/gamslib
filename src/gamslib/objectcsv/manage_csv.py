@@ -26,7 +26,7 @@ def collect_csv_data(
     # This is were we put all collected data
 
     all_objects_csv = ObjectCSV(object_root_dir)
-    
+
     for objectfolder in find_object_folders(object_root_dir):
         obj_csv = ObjectCSV(objectfolder)
 
@@ -35,9 +35,7 @@ def collect_csv_data(
         for dsmeta in obj_csv.get_datastreamdata():
             all_objects_csv.add_datastream(dsmeta)
     all_objects_csv.sort()
-    all_objects_csv.write(
-        object_csv_path, datastream_csv_path
-    )
+    all_objects_csv.write(object_csv_path, datastream_csv_path)
     return all_objects_csv
 
 
@@ -61,7 +59,7 @@ def update_csv_files(
 
     Returns a a tuple of ints: number of updated objects and number of updated datastreams.
     """
-    
+
     num_of_changed_objects = 0
     num_of_changed_datastreams = 0
 
@@ -78,7 +76,7 @@ def update_csv_files(
         for ds_data in all_objects_csv.get_datastreamdata(obj_csv.object_id):
             obj_csv.add_datastream(ds_data)
             num_of_changed_datastreams += 1
-        
+
         obj_csv.write()
 
     return num_of_changed_objects, num_of_changed_datastreams

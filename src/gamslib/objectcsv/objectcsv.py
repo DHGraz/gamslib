@@ -27,7 +27,6 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
-    
 
     def validate(self):
         "Validate the object data."
@@ -59,10 +58,9 @@ class DSData:
 
     def __post_init__(self):
         "Add missing values if applicable and validate."
-        self._guess_mimetype()  
+        self._guess_mimetype()
         self._guess_missing_values()
-        
-        
+
 
     @property
     def object_id(self):
@@ -80,7 +78,7 @@ class DSData:
         if not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
 
-    def _guess_mimetype(self): # pylint: disable=no-self-use
+    def _guess_mimetype(self):
         "Guess the mimetype if it is empty."
         # TODO!
         if not self.mimetype:
@@ -92,13 +90,13 @@ class DSData:
         if not self.title:
             if filename in defaultvalues.FILENAME_MAP:
                 self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
-            elif self.mimetype.startswith('image/'):
+            elif self.mimetype.startswith("image/"):
                 self.title = f"Image: {self.dsid}"
-            elif self.mimetype.startswith('audio/'):
+            elif self.mimetype.startswith("audio/"):
                 self.title = f"Audio: {self.dsid}"
-            elif self.mimetype.startswith('video/'):
+            elif self.mimetype.startswith("video/"):
                 self.title = f"Video: {self.dsid}"
-        
+
         if not self.description:
             if filename in defaultvalues.FILENAME_MAP:
                 self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
@@ -106,8 +104,7 @@ class DSData:
             self.rights = defaultvalues.DEFAULT_RIGHTS
         if not self.creator:
             self.creator = defaultvalues.DEFAULT_CREATOR
-        
-              
+
 
 @dataclass
 class ObjectCSVFile:
@@ -152,6 +149,10 @@ class ObjectCSVFile:
             writer.writeheader()
             for objdata in self._objectdata:
                 writer.writerow(asdict(objdata))
+
+    def sort(self):
+        "Sort collected object data by recid value."
+        self._objectdata.sort(key=lambda x: x.recid)
 
     def __len__(self):
         "Return the number of objectdata objects."
@@ -201,6 +202,10 @@ class DatastreamsCSVFile:
             writer.writeheader()
             for dsdata in self._datastreams:
                 writer.writerow(asdict(dsdata))
+
+    def sort(self):
+        "Sort collected datastream data by dspath value."
+        self._datastreams.sort(key=lambda x: x.dspath)
 
     def __len__(self):
         "Return the number of datastreams."
@@ -277,13 +282,13 @@ class ObjectCSV:
 
     def sort(self):
         "Sort the object and datastream data."
-        self.object_data._objectdata.sort(key=lambda x: x.recid)
-        self.datastream_data._datastreams.sort(key=lambda x: x.dspath)
+        self.object_data.sort()
+        self.datastream_data.sort()
 
     def write(
         self,
         object_csv_path: Path | None = None,
-        datastream_csv_path: Path | None = None
+        datastream_csv_path: Path | None = None,
     ):
         """Save the object and datastream data to csv files.
 

@@ -2,14 +2,12 @@
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
-# pylint: disable=too-many-positional-arguments
+
 
 from pathlib import Path
-import tomllib
-
 from typing import Annotated, Literal
 
-
+import tomllib
 from pydantic import BaseModel, ValidationError, StringConstraints
 
 
@@ -88,21 +86,20 @@ class Configuration(BaseModel):
     def from_toml(cls, toml_file: Path) -> "Configuration":
         """Create a configuration object from a toml file."""
         try:
-            with toml_file.open("r", encoding="utf-8", newline="") as tf:
-                data = tomllib.loads(tf.read())
+            with toml_file.open("r", encoding="utf-8", newline="") as tfile:
+                data = tomllib.loads(tfile.read())
                 data["toml_file"] = toml_file
             return cls(**data)
-        except FileNotFoundError as e:
+        except FileNotFoundError as exc:
             raise FileNotFoundError(
                 f"Configuration file '{toml_file.parent}' not found."
-            ) from e
-        except tomllib.TOMLDecodeError as e:
+            ) from exc
+        except tomllib.TOMLDecodeError as exc:
             raise tomllib.TOMLDecodeError(
-                f"Error in project TOML file '{toml_file}': {e}"
-            ) from e
-        except ValidationError as e:
+                f"Error in project TOML file '{toml_file}': {exc}"
+            ) from exc
+        except ValidationError as exc:
             msg = cls._make_readable_message(
-                toml_file, e.errors()[0]["type"], e.errors()[0]["loc"]
+                toml_file, exc.errors()[0]["type"], exc.errors()[0]["loc"]
             )
-            raise ValueError(msg) from e
-
+            raise ValueError(msg) from exc
