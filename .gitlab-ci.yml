@@ -1,29 +1,33 @@
 variables:
-    RYE_VERSION: "0.42"
-    RYE_IMAGE: "jfxs/rye"
+  UV_VERSION: 0.5
+  PYTHON_BASE_VERSION: 3.12
+  BASE_LAYER: bookworm-slim
 
 stages:
   - test
-  - lint
 
-# The Docker image (always latest or use the variables?)
-image: jfxs/rye
+uv:
+  stage: test
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  script:
+    # your `uv` commands
+
 
 # A hidden job template that can be used by different Python versions
 .test-template:
   stage: test
   script:
-    - echo "Rye environment version"
-    - rye --version
+    - echo "uv environment version"
+    - uv --version
     - echo "Pinning ${PYTHON_VERSION}"
-    - rye pin ${PYTHON_VERSION}
-    - rye sync
+    - uv python pin ${PYTHON_VERSION}
+    - uv sync
     - echo "Using python version:"
     - python --version
-    - echo "Running tests with Rye"
-    - rye test
+    - echo "Running tests with uv"
+    - uv run pytest tests
 
-# Specific jobs for Python versions
+
 test-py_3.11:
   extends: .test-template
   variables:
@@ -32,19 +36,15 @@ test-py_3.11:
 test-py_3.12:
   extends: .test-template
   variables:
-    PYTHON_VERSION: "3.12"
+    PYTHON_VERSION: "3.12"    
 
-# test-py_3.13:
-#   extends: .test-template
-#   variables:
-#     PYTHON_VERSION: "3.13"
 
 lint:
   stage: lint
   script:
-    - echo "Rye environment version"
-    - rye --version
+    - echo "uv environment version"
+    - uv --version
     - echo "Using python version:"
     - python --version
-    - echo "Running rye lint"
-    - rye lint
+    - echo "Running uv check with ruff"
+    - uv run ruff check src
