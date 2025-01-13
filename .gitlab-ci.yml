@@ -5,10 +5,11 @@ variables:
 
 stages:
   - test
+  - lint
 
 uv:
   stage: test
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  
   script:
     # your `uv` commands
 
@@ -16,6 +17,7 @@ uv:
 # A hidden job template that can be used by different Python versions
 .test-template:
   stage: test
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
   script:
     - echo "uv environment version"
     - uv --version
@@ -41,6 +43,7 @@ test-py_3.12:
 
 lint:
   stage: lint
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER  
   script:
     - echo "uv environment version"
     - uv --version
