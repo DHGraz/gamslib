@@ -27,6 +27,9 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
+    #rectype:str = ""  # useless!!! typ; optional
+    mainresource:str = "" # main datastream
+
 
     def validate(self):
         """Validate the object data."""
