@@ -7,13 +7,6 @@ stages:
   - test
   - lint
 
-uv:
-  stage: test
-  
-  script:
-    # your `uv` commands
-
-
 # A hidden job template that can be used by different Python versions
 .test-template:
   stage: test
