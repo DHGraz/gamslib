@@ -46,7 +46,6 @@ def dsdata_fixture() -> DSData:
         creator="Foo Bar",
         rights="GPLv3",
         lang = "en de",
-        mainresource = "TEI.xml"
     )
 
 
@@ -75,6 +74,7 @@ def dscsvfile_fixture(dsdata: DSData, tmp_path: Path) -> Path:
     ds2 = copy.deepcopy(ds1)
     ds2["dspath"] = "obj2/TEI2.xml"
     ds2["dsid"] = "TEI2.xml"
+    ds2["lang"] = "nl it"
 
     col_names = list(ds1.keys())
 
@@ -136,7 +136,7 @@ def test_dsdata_creation(dsdata):
     assert dsdata.rights == "GPLv3"
     assert dsdata.lang == "en de"
 
-    # this is a @property
+    
 
 def test_ds_data_creation_with_missing_values():
     "Missing values should be added automatically."
@@ -162,8 +162,8 @@ def test_ds_data_creation_with_missing_values():
         dspath="object1/LIDO.xml",
         dsid="LIDO.xml"
     )
-    assert dsdata.title == defaultvalues.FILENAME_MAP["LIDO.xml"]["title"]
-    assert dsdata.description == defaultvalues.FILENAME_MAP["LIDO.xml"]["description"]
+    assert dsdata.title == defaultvalues.FILENAME_MAP["lido.xml"]["title"]
+    assert dsdata.description == defaultvalues.FILENAME_MAP["lido.xml"]["description"]
 
     dsdata =  DSData(
         dspath="object1/RDF.xml",
@@ -259,6 +259,23 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     dcf.to_csv(csv_file)
     assert dscsvfile.read_text(encoding="utf-8") == csv_file.read_text(encoding="utf-8")
 
+def test_dccsvfile_get_languages(dscsvfile: Path):
+    "Test the get_languages method."
+    dcf = DatastreamsCSVFile.from_csv(dscsvfile)
+    assert dcf.get_languages() == ["en", "de", "nl", "it"]
+
+    # missing lang field: we set lang of last ds to ""
+    with dscsvfile.open("r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        data = list(reader)
+        data[-1]["lang"] = ""  
+    with dscsvfile.open("w", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=reader.fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+    dcf = DatastreamsCSVFile.from_csv(dscsvfile)
+    assert dcf.get_languages() == ["en", "de"]
+    
 
 def test_object_csv(
     objcsvfile: Path, dscsvfile: Path, tmp_path: Path):
@@ -298,6 +315,23 @@ def test_object_csv(
     assert oc.count_objects() == 0
     assert oc.count_datastreams() == 0
 
+
+def test_objectcsv_get_languages(objcsvfile: Path, dscsvfile: Path):
+    "Test the get_languages method."
+    oc = ObjectCSV(objcsvfile.parent)
+    assert oc.get_languages() == ["en", "de", "nl", "it"]
+
+    # we add a second de, which should move de to first position
+    with dscsvfile.open("r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        data = list(reader)
+        data[-1]["lang"] = "de fr"  
+    with dscsvfile.open("w", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=reader.fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+    oc = ObjectCSV(objcsvfile.parent)
+    assert oc.get_languages() == ["de", "en", "fr"]
 
 def test_object_csv_modify_get_set_data(
     objcsvfile: Path, dscsvfile: Path, objdata: ObjectData, dsdata: DSData

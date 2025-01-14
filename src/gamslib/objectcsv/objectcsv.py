@@ -8,6 +8,7 @@ ObjectCSV is directly accessible from the objectcsv package.
 # pylint: disable=invalid-name
 
 import csv
+from collections import Counter
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Generator
@@ -27,9 +28,8 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
-    #rectype:str = ""  # useless!!! typ; optional
-    mainresource:str = "" # main datastream
-
+    # rectype:str = ""  # useless!!! typ; optional
+    mainresource: str = ""  # main datastream
 
     def validate(self):
         """Validate the object data."""
@@ -64,7 +64,6 @@ class DSData:
         self._guess_mimetype()
         self._guess_missing_values()
 
-
     @property
     def object_id(self):
         """Return the object id of the object the datastream is part of."""
@@ -93,6 +92,7 @@ class DSData:
         if not self.title:
             if filename in defaultvalues.FILENAME_MAP:
                 self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
+            # TODO: call extract_title_from_tei or extract_title_from_lido. Required info about type?
             elif self.mimetype.startswith("image/"):
                 self.title = f"Image: {self.dsid}"
             elif self.mimetype.startswith("audio/"):
@@ -159,7 +159,7 @@ class ObjectCSVFile:
 
 
 class DatastreamsCSVFile:
-    """Represents csv data for all datastreams of a single datastream."""
+    """Represents csv data for all datastreams of a single object."""
 
     def __init__(self):
         self._datastreams: list[DSData] = []
@@ -202,6 +202,18 @@ class DatastreamsCSVFile:
     def sort(self):
         """Sort collected datastream data by dspath value."""
         self._datastreams.sort(key=lambda x: x.dspath)
+
+    def get_languages(self) -> list[str]:
+        """Return the languages of all datastreams.
+
+        Extract and combine all entries from the 'lang' field of all datastreams.
+        Returns list of all language codes as strings. The list can contain duplicates,
+        which allows us to rank languaes by their frequency.
+        """
+        languages = []
+        for ds in self._datastreams:
+            languages.extend(ds.lang.split())
+        return languages
 
     def __len__(self):
         """Return the number of datastreams."""
@@ -314,3 +326,8 @@ class ObjectCSV:
     def object_id(self):
         """Return the object id."""
         return self.object_dir.name
+
+    def get_languages(self):
+        """Return the languages of the datastreams ordered by frequency."""
+        langcounter = Counter(self.datastream_data.get_languages())
+        return [entry[0] for entry in langcounter.most_common()]
