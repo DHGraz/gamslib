@@ -3,6 +3,7 @@
 # pylint: disable=protected-access
 
 import copy
+import os
 import re
 import shutil
 import tomllib
@@ -20,6 +21,19 @@ from gamslib.projectconfiguration.configuration import (
     find_project_toml,
 )
 
+@pytest.fixture(name="configobj")
+def fixture_configobj(datadir):
+    "Return a Configuration object."
+    toml_path = datadir / "project.toml"
+    general = General(loglevel="error", dsid_keep_extension=False)
+    metadata = Metadata(
+        project_id="Test Project",
+        creator="GAMS Test Project",
+        publisher="GAMS",
+        rights="commons",
+    )
+    return Configuration(toml_file=toml_path, metadata=metadata, general=general)
+    
 
 def test_find_project_toml(datadir):
     "Test finding the project.toml file."
@@ -74,7 +88,37 @@ def test_general_class():
     general = General(loglevel="error", dsid_keep_extension=False)
     assert general.dsid_keep_extension is False
     assert general.loglevel == "error"
+    assert general.format_detector == "base"
+    assert general.format_detector_url == ""
 
+
+def test_configuration_class_creation(configobj, datadir):
+    "Test creation of a Configuration object."
+    assert configobj.toml_file == datadir / "project.toml"        
+
+def test_configclass_update_from_dotenv(configobj, tmp_path):
+    "Test updating the configuration from an .env file."
+    dotenv_file = tmp_path / ".env"
+    dotenv_file.write_text("general.loglevel = 'debug'\nmetadata.project_id = 'foo'\n")
+
+    configobj.update_from_dotenv(dotenv_file)
+    assert configobj.general.loglevel == "debug"
+    assert configobj.metadata.project_id == "foo"
+
+def test_configclass_update_from_env(configobj):
+    "Test updating the configuration from environment variables."
+    os.environ["GAMSCFG_GENERAL_LOGLEVEL"] = "info"
+    os.environ["GAMSCFG_METADATA_PROJECT_ID"] = "bar"
+    configobj.update_from_env()    
+    assert configobj.general.loglevel == "info"   
+    assert configobj.metadata.project_id == "bar"
+
+def test_configobject_update_value(configobj, tmp_path):
+    "Make sure we cannot circumvent the pydantic validation"
+    dotenv_file = tmp_path / ".env"
+    dotenv_file.write_text("general.loglevel = 'foo'\nmetadata.project_id = ''\n")
+    with pytest.raises(ValueError):
+        configobj.update_from_dotenv(dotenv_file)
 
 def test_configuration_from_toml(datadir):
     """Test if the creation of a Configuration object works.

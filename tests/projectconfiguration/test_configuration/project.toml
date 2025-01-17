@@ -7,4 +7,6 @@ rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommon
 [general]
 dsid_keep_extension = true
 loglevel = "info"
+format_detector = ""
+format_detector_url = ""
 

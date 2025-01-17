@@ -21,3 +21,9 @@ dsid_keep_extension = true
 # debug, info, warning, error or critical
 loglevel = "info"
 
+# fits, magika, base (pythons built in mimetypes) 
+format_detector = ""
+# If you want to use a detector service like a FITS Server, set this to the URL
+format_detector_url = ""
+
+

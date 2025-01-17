@@ -1,17 +1,16 @@
-"""Provides a configuration class.
-
-The configuration class represents the configuration from the project toml file.
-"""
+"Provides a configuration class"
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 
-
+import logging
+import os
+import tomllib
 from pathlib import Path
 from typing import Annotated, Literal
 
-import tomllib
-from pydantic import BaseModel, ValidationError, StringConstraints
+from dotenv import dotenv_values
+from pydantic import BaseModel, StringConstraints, ValidationError
 
 
 def find_project_toml(start_dir: Path) -> Path:
@@ -48,6 +47,9 @@ class General(BaseModel, validate_assignment=True):
 
     dsid_keep_extension: bool = True
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
+    # TODO: extend this and set a more useful default
+    format_detector: Literal["magika", "base", ""] = "base"
+    format_detector_url: str = ""
 
 
 class Configuration(BaseModel):
@@ -106,3 +108,25 @@ class Configuration(BaseModel):
                 toml_file, exc.errors()[0]["type"], exc.errors()[0]["loc"]
             )
             raise ValueError(msg) from exc
+
+    def update_from_dotenv(self, dotenv_file: Path):
+        """Update the configuration object from the '.env' file."""
+        for key, value in dotenv_values(dotenv_file).items():
+            if "." in key:  # global fields are ignored
+                table, field = key.lower().split(".")
+                if table == "metadata":
+                    setattr(self.metadata, field, value)
+                elif table == "general":
+                    setattr(self.general, field, value)
+
+    def update_from_env(self):
+        """Update the configuration object from environment variables."""
+        for key, value in os.environ.items():
+            if key.startswith("GAMSCFG_") and key != "GAMSCFG_PROJECT_TOML":
+                new_key = key[8:].lower()
+                if "_" in new_key:
+                    table, field = new_key.split("_", 1)
+                    if table == "metadata":
+                        setattr(self.metadata, field, value)
+                    elif table == "general":
+                        setattr(self.general, field, value)
