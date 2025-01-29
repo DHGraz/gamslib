@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pytest
 
+from gamslib import formatdetect
+from gamslib.formatdetect.formatinfo import FormatInfo
+from gamslib.formatdetect.magikadetector import MagikaDetector
+from gamslib.formatdetect.minimaldetector import MinimalDetector
 from gamslib.objectcsv.objectcsv import (
     DatastreamsCSVFile,
     DSData,
@@ -137,62 +141,59 @@ def test_dsdata_creation(dsdata):
     assert dsdata.lang == "en de"
 
     
-
-def test_ds_data_creation_with_missing_values():
+@pytest.mark.parametrize("detector", [MinimalDetector(), MagikaDetector()])
+def test_ds_data_guess_missing_values(detector, datadir, monkeypatch):
     "Missing values should be added automatically."
-    dsdata = DSData(
-        dspath="obj1/DC.xml",
-        dsid="DC.xml",
-    )
 
+    def fake_detect_format(filepath: Path) -> FormatInfo:
+        "This fake function allows us to use any format detector."
+        nonlocal detector
+        return detector.guess_file_type(filepath)
+    
+    monkeypatch.setattr(formatdetect, "detect_format", fake_detect_format)
+    dsdata = DSData(dspath="obj1/DC.xml", dsid="DC.xml")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "application/xml"
     assert dsdata.title == defaultvalues.FILENAME_MAP["DC.xml"]["title"]
     assert dsdata.description == defaultvalues.FILENAME_MAP["DC.xml"]["description"]
-    assert dsdata.mimetype == defaultvalues.DEFAULT_MIMETYPE
-    assert dsdata.creator == defaultvalues.DEFAULT_CREATOR
-    assert dsdata.rights == defaultvalues.DEFAULT_RIGHTS
 
-    dsdata =  DSData(
-        dspath="object1/TEI.xml",
-        dsid="TEI.xml"
-    )
-    assert dsdata.title == defaultvalues.FILENAME_MAP["TEI.xml"]["title"]
-    assert dsdata.description == defaultvalues.FILENAME_MAP["TEI.xml"]["description"]
+    dsdata = DSData(dspath="obj1/image.jpeg", dsid="image.jpeg")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "image/jpeg"
+    assert dsdata.title == "Image: image.jpeg"
     
-    dsdata =  DSData(
-        dspath="object1/LIDO.xml",
-        dsid="LIDO.xml"
-    )
-    assert dsdata.title == defaultvalues.FILENAME_MAP["lido.xml"]["title"]
-    assert dsdata.description == defaultvalues.FILENAME_MAP["lido.xml"]["description"]
+    dsdata = DSData(dspath="obj1/json.json", dsid="json.json")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "application/json"
+    assert dsdata.title == ""
 
-    dsdata =  DSData(
-        dspath="object1/RDF.xml",
-        dsid="RDF.xml"
-    )
-    assert dsdata.title == defaultvalues.FILENAME_MAP["RDF.xml"]["title"]
-    assert dsdata.description == defaultvalues.FILENAME_MAP["RDF.xml"]["description"]
+    dsdata = DSData(dspath="obj1/xml_tei.xml", dsid="xml_tei.xml")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "application/tei+xml"
+    assert "Georg Hönel" in dsdata.title
 
-    dsdata = DSData(
-        dspath="object1/xy.png",
-        dsid="xy.png",
-        mimetype="image/png"
-    )
-    assert dsdata.title == "Image: xy.png" 
+    dsdata = DSData(dspath="obj1/xml_lido.xml", dsid="xml_lido.xml")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "application/xml"
+    assert dsdata.title == "Bratspieß"
 
-    dsdata = DSData(
-        dspath="object1/xy.mp4",
-        dsid="xy.mp4",
-        mimetype="video/mp4"
-    )
-    assert dsdata.title == "Video: xy.mp4" 
+    dsdata = DSData(dspath="obj1/sound.mp3", dsid="sound.mp3")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "audio/mpeg"
+    assert dsdata.title == "Audio: sound.mp3"
 
-    dsdata = DSData(
-        dspath="object1/xy.mp3",
-        dsid="xy.mp3",
-        mimetype="audio/mpeg"
-    )
-    assert dsdata.title == "Audio: xy.mp3"
+    dsdata = DSData(dspath="obj1/video.mp4", dsid="video.mp4")
+    dsdata.guess_missing_values(datadir / "obj1")
+    assert dsdata.mimetype == "video/mp4"
+    assert dsdata.title == "Video: video.mp4"
 
+    dsdata = DSData(dspath="obj1/empty", dsid="empty")
+    with pytest.warns(UserWarning):
+        dsdata.guess_missing_values(datadir / "obj1")
+        dsdata.guess_missing_values(datadir / "obj1")
+        assert dsdata.mimetype == "application/octet-stream"
+        assert dsdata.title == ""
+    
 
 def test_dsdata_validate(dsdata):
     "Should raise an exception if required fields are missing."
@@ -375,3 +376,5 @@ def test_object_csv_missing_dir():
     "Should raise an exception if the directory does not exist."
     with pytest.raises(FileNotFoundError):
         ObjectCSV(Path("does_not_exist"))
+
+

@@ -1,13 +1,45 @@
 import pytest
-from gamslib.projectconfiguration import create_configuration
+from gamslib.projectconfiguration import MissingConfigurationException, get_configuration
+import os
 
 
-def test_create_configuraton_skeleton(tmp_path):
-    create_configuration(tmp_path)
-    assert (tmp_path / "project.toml").exists()
-    assert "publisher" in (tmp_path / "project.toml").read_text(encoding="utf-8") 
+def test_get_configuration_no_toml():
+    "Calling get_configuration without a TOML file should raise an error."
+    get_configuration.cache_clear()  # otherwise w might have side effects from other tests
+    with pytest.raises(MissingConfigurationException):
+        get_configuration()
 
-    # A we have created the toml file before, we should get None
-    with pytest.warns(UserWarning):
-        result = create_configuration(tmp_path) 
-        assert result is None
+
+def test_get_configuration(datadir):
+    "Now we set the toml file via parameter."
+    config = get_configuration(datadir / "project.toml")
+    assert config.metadata.project_id == "Test Project"
+    assert config.general.dsid_keep_extension
+
+
+def test_get_configuration_env(datadir, monkeypatch):
+    "Now we set the toml file via environment variable."
+    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(datadir / "project.toml"))
+    get_configuration.cache_clear()  # otherwise w might have side effects from other tests
+    config = get_configuration()
+    assert config.metadata.project_id == "Test Project"
+    assert config.general.dsid_keep_extension
+
+
+def test_get_configuration_dotenv(datadir, tmp_path, monkeypatch):
+    "Now we set the path to project.toml file via .env value."
+    dotenv_file = tmp_path / ".env"
+    toml_file = str(datadir / "project.toml")
+    dotenv_file.write_text(f'project_toml = "{toml_file}"\n')
+    monkeypatch.chdir(tmp_path)
+    get_configuration.cache_clear()  # otherwise w might have side effects from other tests
+    config = get_configuration()
+    assert config.metadata.project_id == "Test Project"
+    assert config.general.dsid_keep_extension
+
+
+def test_get_configuration_is_cached(datadir):
+    "Check if multiple calls to get_configuration return the same object."
+    config1 = get_configuration(datadir / "project.toml")
+    config2 = get_configuration(datadir / "project.toml")
+    assert config1 is config2

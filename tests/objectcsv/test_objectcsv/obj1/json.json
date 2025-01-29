@@ -1,0 +1,15 @@
+{
+    "type": "foo",
+    "label": {"en": ["a", "b"]},
+    "items": [
+        {
+            "id": 1,
+            "type": "foo"
+        },
+        {
+            "id": 2,
+            "type": "bar"
+        }
+    ],
+    "id": "foobar"
+}

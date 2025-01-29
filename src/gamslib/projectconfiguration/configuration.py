@@ -1,4 +1,4 @@
-"Provides a configuration class"
+"A Configuration class for gams projects."
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
@@ -7,31 +7,12 @@ import logging
 import os
 import tomllib
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from dotenv import dotenv_values
 from pydantic import BaseModel, StringConstraints, ValidationError
 
-
-def find_project_toml(start_dir: Path) -> Path:
-    """Find the project.toml file in the start_dir or above.
-
-    Return a path object to the project.toml file.
-    If no project.toml file is found, raise a FileNotFoundError.
-    """
-    for folder in (start_dir / "a_non_existing_folder_to_include_start_dir").parents:
-        project_toml = folder / "project.toml"
-        if project_toml.exists():
-            return project_toml
-
-    # if we read this point, no project.toml has been found in object_root or above
-    # So we check if there's a project.toml in the current working directory
-    project_toml = Path.cwd() / "project.toml"
-
-    if project_toml.exists():
-        return project_toml
-    raise FileNotFoundError("No project.toml file found in or above the start_dir.")
-
+logger = logging.getLogger(__name__)
 
 class Metadata(BaseModel, validate_assignment=True):
     """Represent the 'metadata' section of the configuration file."""
@@ -63,6 +44,10 @@ class Configuration(BaseModel):
     metadata: Metadata
     general: General
 
+    def model_post_init(self, __context: Any) -> None:
+        self._update_from_dotenv()
+        self._update_from_env()
+        
     @classmethod
     def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -> str | None:
         """Return a readable error message or None.
@@ -109,23 +94,27 @@ class Configuration(BaseModel):
             )
             raise ValueError(msg) from exc
 
-    def update_from_dotenv(self, dotenv_file: Path):
+    def _update_from_dotenv(self, dotenv_file: Path|None=None):
         """Update the configuration object from the '.env' file."""
+        if dotenv_file is None:
+            dotenv_file = Path.cwd() / ".env"
         for key, value in dotenv_values(dotenv_file).items():
             if "." in key:  # global fields are ignored
                 table, field = key.lower().split(".")
+                logger.debug(f"Setting {key} to {value} (from .env file.)")
                 if table == "metadata":
                     setattr(self.metadata, field, value)
                 elif table == "general":
                     setattr(self.general, field, value)
 
-    def update_from_env(self):
+    def _update_from_env(self):
         """Update the configuration object from environment variables."""
         for key, value in os.environ.items():
             if key.startswith("GAMSCFG_") and key != "GAMSCFG_PROJECT_TOML":
                 new_key = key[8:].lower()
                 if "_" in new_key:
                     table, field = new_key.split("_", 1)
+                    logger.debug(f"Setting {key} to {value} (from environment variable.)")
                     if table == "metadata":
                         setattr(self.metadata, field, value)
                     elif table == "general":

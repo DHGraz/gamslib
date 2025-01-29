@@ -12,14 +12,8 @@ from pathlib import Path
 import pytest
 import toml
 
+from gamslib.projectconfiguration.configuration import Configuration, General, Metadata
 
-from gamslib.projectconfiguration import load_configuration
-from gamslib.projectconfiguration.configuration import (
-    Configuration,
-    General,
-    Metadata,
-    find_project_toml,
-)
 
 @pytest.fixture(name="configobj")
 def fixture_configobj(datadir):
@@ -33,37 +27,6 @@ def fixture_configobj(datadir):
         rights="commons",
     )
     return Configuration(toml_file=toml_path, metadata=metadata, general=general)
-    
-
-def test_find_project_toml(datadir):
-    "Test finding the project.toml file."
-
-    # toml is in datadir
-    project_toml = datadir / "project.toml"
-    assert find_project_toml(project_toml.parent) == project_toml
-
-    # toml is in a child folder
-    assert find_project_toml(datadir / "foo") == project_toml
-
-    # toml is in a child folder of the child folder
-    assert find_project_toml(datadir / "foo" / "bar") == project_toml
-
-
-def test_find_project_toml_current_folder(datadir, tmp_path, monkeypatch):
-    "Test finding the project.toml file in the current folder."
-
-    # we switch to datadir, where a project.toml file is located
-    monkeypatch.chdir(datadir)
-    # there in no project.toml in tmp_path, so the funtion should return the project.toml in datadir
-    assert find_project_toml(tmp_path) == datadir / "project.toml"
-
-
-def test_find_project_toml_not_found(tmp_path):
-    "Test finding the project.toml file when it is not found."
-
-    # toml is not in the parent folder
-    with pytest.raises(FileNotFoundError):
-        find_project_toml(tmp_path / "foo" / "bar" / "baz")
 
 
 def test_metadata_class():
@@ -94,31 +57,46 @@ def test_general_class():
 
 def test_configuration_class_creation(configobj, datadir):
     "Test creation of a Configuration object."
-    assert configobj.toml_file == datadir / "project.toml"        
+    assert configobj.toml_file == datadir / "project.toml"
 
-def test_configclass_update_from_dotenv(configobj, tmp_path):
-    "Test updating the configuration from an .env file."
+
+def test_configclass_update_from_dotenv(datadir, tmp_path, monkeypatch):
+    "Test creation of a Configuration object with existing dotenv file."
     dotenv_file = tmp_path / ".env"
     dotenv_file.write_text("general.loglevel = 'debug'\nmetadata.project_id = 'foo'\n")
+    monkeypatch.chdir(tmp_path)
+    configobj = Configuration.from_toml(datadir / "project.toml")
 
-    configobj.update_from_dotenv(dotenv_file)
     assert configobj.general.loglevel == "debug"
     assert configobj.metadata.project_id == "foo"
 
-def test_configclass_update_from_env(configobj):
-    "Test updating the configuration from environment variables."
-    os.environ["GAMSCFG_GENERAL_LOGLEVEL"] = "info"
-    os.environ["GAMSCFG_METADATA_PROJECT_ID"] = "bar"
-    configobj.update_from_env()    
-    assert configobj.general.loglevel == "info"   
+
+def test_configclass_update_from_env(datadir, tmp_path, monkeypatch):
+    """Test creation of a Configuration object using environment variables.
+
+    We also check if ENV values override .env values
+    """
+    monkeypatch.setenv("GAMSCFG_GENERAL_LOGLEVEL", "info")
+    monkeypatch.setenv("GAMSCFG_METADATA_PROJECT_ID", "bar")
+
+    dotenv_file = tmp_path / ".env"
+    dotenv_file.write_text("general.loglevel = 'debug'\nmetadata.project_id = 'foo'\n")
+    monkeypatch.chdir(tmp_path)
+
+    configobj = Configuration.from_toml(datadir / "project.toml")
+
+    assert configobj.general.loglevel == "info"
     assert configobj.metadata.project_id == "bar"
 
-def test_configobject_update_value(configobj, tmp_path):
+
+def test_configobject_update_value(datadir, tmp_path, monkeypatch):
     "Make sure we cannot circumvent the pydantic validation"
     dotenv_file = tmp_path / ".env"
     dotenv_file.write_text("general.loglevel = 'foo'\nmetadata.project_id = ''\n")
+    monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError):
-        configobj.update_from_dotenv(dotenv_file)
+        configobj = Configuration.from_toml(datadir / "project.toml")
+
 
 def test_configuration_from_toml(datadir):
     """Test if the creation of a Configuration object works.
@@ -138,16 +116,24 @@ def test_configuration_from_toml(datadir):
     assert cfg.general.loglevel == "info"
     assert cfg.general.dsid_keep_extension
 
+
 def test_configuration_from_toml_cfg_file_not_found(tmp_path):
     "Customized FileNotFoundError is raised if TOML file does not exist."
     toml_file = tmp_path / "project.toml"
     with pytest.raises(FileNotFoundError, match=r"Configuration file .* not found"):
         Configuration.from_toml(toml_file)
 
-# def test_configuration_from_toml_invalid_toml(datadir):
-#     "An invalid TOML file should raise an error."
-#     with pytest.raises(ValueError, match=r"Error in project TOML file .*"):
-#         Configuration.from_toml(datadir / "invalid_value.toml")        
+
+def test_configuration_from_toml_invalid_toml_value(datadir):
+    "An invalid TOML file value should raise an ValueError."
+    with pytest.raises(ValueError, match=r"Error in project TOML file .*"):
+        Configuration.from_toml(datadir / "invalid_value.toml")
+
+
+def test_configuration_from_toml_invalid_toml(datadir):
+    "An invalid TOML file should raise an error."
+    with pytest.raises(tomllib.TOMLDecodeError, match=r"Error in project TOML file .*"):
+        Configuration.from_toml(datadir / "invalid.toml")
 
 def test_configuration_missing_required_keys(datadir):
     "Check if missing required keys are detected."
@@ -158,11 +144,11 @@ def test_configuration_missing_required_keys(datadir):
         with toml_file.open("r", encoding="utf-8", newline="") as f:
             for line in f:
                 # remove existing comment
-                line = re.sub(r"^#\s*", "", line)
+                clean_line = re.sub(r"^#\s*", "", line)
                 # add comment if key matches
-                if re.match(r"^" + key + r"\s*=", line):
-                    line = "#" + line
-                new_lines.append(line)
+                if re.match(r"^" + key + r"\s*=", clean_line):
+                    clean_line = "#" + line
+                new_lines.append(clean_line)
         with toml_file.open("w", encoding="utf-8", newline="") as f:
             f.writelines(new_lines)
 
@@ -271,67 +257,7 @@ def test_configuration_make_readable_message():
     )
 
 
-def test_load_configuration(datadir):
-    "Loadconfig should return a Configuration object."
-    cfg = load_configuration(datadir)
-    assert cfg.metadata.project_id == "Test Project"
-    assert cfg.metadata.creator == "GAMS Test Project"
-    assert cfg.metadata.publisher == "GAMS"
-    assert "commons" in cfg.metadata.rights
-    assert cfg.toml_file == datadir / "project.toml"
-
-    # now with an explict toml file (Path)
-    cfg_file = datadir / "project.toml"
-    cfg = load_configuration(datadir, cfg_file)
-    assert cfg.metadata.project_id == "Test Project"
-
-    # now with an explict toml file (str)
-    cfg = load_configuration(datadir, cfg_file)
-    assert cfg.metadata.project_id == "Test Project"
-
-
-def tests_load_config_with_explicit_toml(datadir, tmp_path):
-    "Test load_config with an explicit TOML file."
-    old_toml = datadir / "project.toml"
-    new_toml = tmp_path / "new.toml"
-    shutil.move(old_toml, new_toml)
-
-    cfg = load_configuration(datadir, new_toml)
-    assert cfg.metadata.project_id == "Test Project"
-    assert cfg.metadata.creator == "GAMS Test Project"
-    assert cfg.metadata.publisher == "GAMS"
-    assert cfg.metadata.rights == (
-        "Creative Commons Attribution-NonCommercial 4.0 "
-        "(https://creativecommons.org/licenses/by-nc/4.0/)"
-    )
-    assert cfg.general.dsid_keep_extension
-    assert cfg.general.loglevel == "info"
-    assert cfg.toml_file == new_toml
-
-
-def test_load_config_toml_as_str(datadir):
-    "Test load_config where TOML file is a string."
-    toml_path = datadir / "project.toml"
-
-    cfg = load_configuration(datadir, str(toml_path))
-    assert cfg.metadata.project_id == "Test Project"
-    assert cfg.metadata.creator == "GAMS Test Project"
-    assert cfg.metadata.publisher == "GAMS"
-    assert cfg.metadata.rights == (
-        "Creative Commons Attribution-NonCommercial 4.0 "
-        "(https://creativecommons.org/licenses/by-nc/4.0/)"
-    )
-    assert cfg.general.dsid_keep_extension
-    assert cfg.toml_file == toml_path
-
-
-def test_load_config_toml_invalid_toml(datadir):
-    "An invalid TOML file should raise an error."
-    with pytest.raises(tomllib.TOMLDecodeError):
-        load_configuration(datadir, datadir / "invalid.toml")
-
-
-def test_changin_values(datadir):
+def test_changing_values(datadir):
     """Can we assign values to the configuration object?
 
     Does validation work for those values?

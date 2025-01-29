@@ -1,0 +1,3 @@
+{"type": "foo", "labels": {"en": ["a", "b"]}, "items": ["A", "B", "C"]}
+{"type": "bar", "labels": {"en": ["c", "d"]}, "items": ["D", "E", "F"]}
+{"type": "bas", "labels": {"en": ["e", "f"]}, "items": ["G", "H", "I"]}

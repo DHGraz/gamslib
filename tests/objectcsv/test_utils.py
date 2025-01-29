@@ -1,7 +1,11 @@
 """Tests for the objectcsv.utils module."""
 
+from xml.etree import ElementTree as ET
+
 import pytest
-from gamslib.objectcsv.utils import find_object_folders
+
+from gamslib.objectcsv import defaultvalues
+from gamslib.objectcsv import utils
 
 
 def test_find_object_objects(tmp_path):
@@ -20,7 +24,7 @@ def test_find_object_objects(tmp_path):
 
     # Test the function
     with pytest.warns(UserWarning):
-        result = list(find_object_folders(tmp_path))
+        result = list(utils.find_object_folders(tmp_path))
     assert len(result) == 2
     assert "object2" not in [p.name for p in result]
     assert tmp_path / "object1" in result
@@ -41,8 +45,39 @@ def test_find_object_objects_nested_dirs(tmp_path):
 
     # Test the function
     with pytest.warns(UserWarning):
-        result = list(find_object_folders(tmp_path))
+        result = list(utils.find_object_folders(tmp_path))
     assert len(result) == 2
     assert "object2" not in [p.name for p in result]
     assert tmp_path / "foo" / "object1" in result
     assert tmp_path / "bar" / "object3" in result
+
+
+
+
+def test_extract_title_from_tei(datadir):
+    "Ensure that the function returns the title"
+    tei_file = datadir / "tei.xml"
+    assert utils.extract_title_from_tei(tei_file) == "The TEI Title"
+
+    # remove the title element and ensure that function return an empty string
+    tei = ET.parse(tei_file)
+    root = tei.getroot()
+    title = root.find('tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title', namespaces=defaultvalues.NAMESPACES)
+    root.find('tei:teiHeader/tei:fileDesc/tei:titleStmt', namespaces=defaultvalues.NAMESPACES).remove(title)
+    tei.write(tei_file)
+    assert utils.extract_title_from_tei(tei_file) == ""
+
+
+def test_extract_title_from_lido(datadir):
+    "Ensure that the function returns the title"
+    lido_file = datadir / "lido.xml"   
+    assert utils.extract_title_from_lido(lido_file) == "Bratspieß" 
+
+
+    # remove the titleSet element and ensure that function return an empty string
+    tei = ET.parse(lido_file)
+    root = tei.getroot()
+    title = root.find('lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet', namespaces=defaultvalues.NAMESPACES)
+    root.find('lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap', namespaces=defaultvalues.NAMESPACES).remove(title)
+    tei.write(lido_file)
+    assert utils.extract_title_from_tei(lido_file) == ""

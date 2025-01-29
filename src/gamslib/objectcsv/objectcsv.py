@@ -12,7 +12,10 @@ from collections import Counter
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Generator
-from . import defaultvalues
+
+from gamslib import formatdetect
+from gamslib.objectcsv import utils
+from . import defaultvalues, utils
 
 
 @dataclass
@@ -30,6 +33,7 @@ class ObjectData:
     objectType: str = ""
     # rectype:str = ""  # useless!!! typ; optional
     mainresource: str = ""  # main datastream
+    tags: str = ""
 
     def validate(self):
         """Validate the object data."""
@@ -59,10 +63,6 @@ class DSData:
     rights: str = ""
     lang: str = ""
 
-    def __post_init__(self):
-        """Add missing values if applicable and validate."""
-        self._guess_mimetype()
-        self._guess_missing_values()
 
     @property
     def object_id(self):
@@ -80,27 +80,43 @@ class DSData:
         if not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
 
-    def _guess_mimetype(self):
-        """Guess the mimetype if it is empty."""
-        # TODO!
-        if not self.mimetype:
-            self.mimetype = defaultvalues.DEFAULT_MIMETYPE
+    def guess_missing_values(self, object_path: Path):
+        """Guess missing values by analyzing the datastream file."""
+        ds_file = object_path / Path(self.dspath).name
+        self._guess_mimetype(ds_file)
+        self._guess_missing_values(ds_file)
 
-    def _guess_missing_values(self):
+    def _guess_mimetype(self, file_path: Path):
+        """Guess the mimetype if it is empty."""
+        if not self.mimetype:
+            format_info = formatdetect.detect_format(file_path)  
+            if format_info is not None:
+                self.mimetype = format_info.mimetype
+            #else:
+            #    self.mimetype = defaultvalues.DEFAULT_MIMETYPE
+
+    def _guess_missing_values(self, file_path: Path):
         """Guess missing values."""
-        filename = Path(self.dspath).name
         if not self.title:
-            if filename in defaultvalues.FILENAME_MAP:
+            if file_path.name in defaultvalues.FILENAME_MAP:
                 self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
-            # TODO: call extract_title_from_tei or extract_title_from_lido. Required info about type?
             elif self.mimetype.startswith("image/"):
                 self.title = f"Image: {self.dsid}"
             elif self.mimetype.startswith("audio/"):
                 self.title = f"Audio: {self.dsid}"
             elif self.mimetype.startswith("video/"):
                 self.title = f"Video: {self.dsid}"
+            elif self.mimetype == "application/tei+xml":
+                self.title = utils.extract_title_from_tei(file_path)
+            elif self.mimetype == "application/xml":
+                # try lido first
+                self.title = utils.extract_title_from_lido(file_path)
+                # in case mimetxype was set to application/xml bye hand, try tei
+                if self.title == "":
+                    self.title = utils.extract_title_from_tei(file_path)
+            
 
-        if not self.description and filename in defaultvalues.FILENAME_MAP:
+        if not self.description and file_path.name in defaultvalues.FILENAME_MAP:
             self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
         if not self.rights:
             self.rights = defaultvalues.DEFAULT_RIGHTS
@@ -116,7 +132,7 @@ class ObjectCSVFile:
         self._objectdata: list[ObjectData] = []
 
     def add_objectdata(self, objectdata: ObjectData):
-        """Add a ObjectData objects."""
+        """Add a ObjectData object."""
         self._objectdata.append(objectdata)
 
     def get_data(self, pid: str | None = None) -> Generator[ObjectData, None, None]:
@@ -161,11 +177,13 @@ class ObjectCSVFile:
 class DatastreamsCSVFile:
     """Represents csv data for all datastreams of a single object."""
 
-    def __init__(self):
+    def __init__(self, object_dir: Path):
         self._datastreams: list[DSData] = []
+        self._object_dir = object_dir
 
     def add_datastream(self, dsdata: DSData):
         """Add a datastream to the datastreams."""
+        dsdata.guess_missing_values(self._object_dir)
         self._datastreams.append(dsdata)
 
     def get_data(self, pid: str | None = None) -> Generator[DSData, None, None]:
@@ -181,7 +199,7 @@ class DatastreamsCSVFile:
     @classmethod
     def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":
         """Load the datastream container data from a csv file."""
-        ds_csv_file = DatastreamsCSVFile()
+        ds_csv_file = DatastreamsCSVFile(csv_file.parent)
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -254,7 +272,7 @@ class ObjectCSV:
         if self.ds_csv_file.is_file():
             self.datastream_data = DatastreamsCSVFile.from_csv(self.ds_csv_file)
         else:
-            self.datastream_data = DatastreamsCSVFile()
+            self.datastream_data = DatastreamsCSVFile(self.object_dir)
 
     def is_new(self):
         """Return True if at least one of the csv files exist."""
@@ -320,7 +338,7 @@ class ObjectCSV:
     def clear(self):
         """Clear the object and datastream data."""
         self.object_data = ObjectCSVFile()
-        self.datastream_data = DatastreamsCSVFile()
+        self.datastream_data = DatastreamsCSVFile(self.object_dir)
 
     @property
     def object_id(self):
