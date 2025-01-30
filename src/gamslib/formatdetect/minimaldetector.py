@@ -22,6 +22,7 @@ class MinimalDetector(FormatDetector):
         mimetypes.add_type('application/ld+json', '.jsonld')
         mimetypes.add_type('text/markdown', '.md')
         mimetypes.add_type('application/xml', '.xml')
+        mimetypes.add_type('text/csv', '.csv')
         super().__init__()
 
 
