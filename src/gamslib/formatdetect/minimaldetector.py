@@ -1,7 +1,7 @@
 # move to __init__.py?
 
 from pathlib import Path
-from mimetypes import guess_type
+import mimetypes 
 import warnings
 from . import xmltypes
 from . import jsontypes
@@ -16,9 +16,17 @@ class MinimalDetector(FormatDetector):
     As this module heavily relies on file extensions, it is not very reliable.
     """
 
+    def __init__(self):
+        mimetypes.add_type('image/jp2', '.jp2')
+        mimetypes.add_type('image/webp', '.webp')
+        mimetypes.add_type('application/ld+json', '.jsonld')
+        mimetypes.add_type('text/markdown', '.md')
+        mimetypes.add_type('application/xml', '.xml')
+        super().__init__()
+
 
     def guess_file_type(self, filepath:Path) -> FormatInfo:
-        mime_type, _ = guess_type(filepath)
+        mime_type, _ = mimetypes.guess_type(filepath)
         detector_name = str(self)#)#self.__class__.__name__
         subtype = ""
 
