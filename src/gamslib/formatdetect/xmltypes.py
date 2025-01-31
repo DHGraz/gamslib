@@ -1,17 +1,21 @@
-from pathlib import Path
-from lxml import etree as ET
-from enum import StrEnum
+"""This module contains data and functions to detect XML types and subtypes.
+"""
 import warnings
+from enum import StrEnum
+from pathlib import Path
 
-from gamslib.formatdetect.formatinfo import FormatInfo
+from lxml import etree as ET
 
-# These are additional MIME Types not contained in MIMETYPES (as returned be a detection tool are handled as XML files.)
+# pylint: disable=c-extension-no-member
+
+# These are additional MIME Types not contained in MIMETYPES (as returned
+# by a detection tool are handled as XML files.)
 XML_MIME_TYPES = [
     "application/xml",
     "text/xml",
-]  
+]
 
-
+# pylint: disable=invalid-name
 class XMLTypes(StrEnum):
     """Enum for defined XML types"""
 
@@ -106,12 +110,13 @@ MIMETYPES = {
     XMLTypes.DocBook: "application/docbook+xml",
     XMLTypes.EAD: "application/ead+xml",
     XMLTypes.Schematron: "application/schematron+xml",
-    #XMLTypes.DCMI: "application/dcmitype+xml",
+    # XMLTypes.DCMI: "application/dcmitype+xml",
     XMLTypes.RSS: "application/rss+xml",
     XMLTypes.RelaxNG: "application/relax-ng+xml",
     XMLTypes.PresentationML: "application/vnd.openxmlformats-officedocument.presentationml",
     XMLTypes.SpreadsheetML: "application/vnd.openxmlformats-officedocument.spreadsheetml",
-    XMLTypes.WordprocessingML: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    XMLTypes.WordprocessingML:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     XMLTypes.SOAP: "application/soap+xml",
     XMLTypes.WSDL: "application/wsdl+xml",
     XMLTypes.Collada: "application/vnd.collada+xml",
@@ -143,6 +148,7 @@ MIMETYPES = {
     XMLTypes.ODF: "application/vnd.oasis.opendocument.text",
 }
 
+
 def is_xml_type(mimetype: str) -> bool:
     "Return True if mimetype is a known XML type."
     return mimetype in MIMETYPES.values() or mimetype in XML_MIME_TYPES
@@ -159,7 +165,7 @@ def guess_xml_subtype(filepath: Path) -> str:
     so this function might be especially useful for simpler detectors or
     exotic formats.
     """
-    for event, elem in ET.iterparse(filepath, events=["start-ns"]):
+    for _, elem in ET.iterparse(filepath, events=["start-ns"]):
         # the second item of the tuple is the qualified namespace
         namespace = elem[1]
         try:
@@ -184,10 +190,8 @@ def get_format_info(filepath: Path, mime_type: str) -> tuple[str, str]:
     xmltype = guess_xml_subtype(filepath)
     if xmltype is None:  # cannot detect a subtype
         subtype = ""
-#        format_info = FormatInfo(mimetype=mime_type, subtype="")
+    #        format_info = FormatInfo(mimetype=mime_type, subtype="")
     else:
         subtype = xmltype.name
-        if xmltype in MIMETYPES:
-            mime_type = MIMETYPES[xmltype]
-    #    format_info = FormatInfo(mimetype=mime_type, subtype=subtype)
+        mime_type = MIMETYPES.get(xmltype, mime_type)
     return mime_type, subtype

@@ -4,11 +4,10 @@ import json
 from enum import StrEnum
 from pathlib import Path
 
-from gamslib.formatdetect.formatinfo import FormatInfo
 
 # These MIME Types (als returned be a detection tool are handled as JSON files.)
-# This is an extension to the MIMETYPES dict, as some mime types listed here,m are not yet registered,
-# but might be used by some format detection tools. Feel free to add more.
+# This is an extension to the MIMETYPES dict, as some mime types listed here, are not
+# yet registered, but might be used by some format detection tools. Feel free to add more.
 JSON_MIME_TYPES = [
     "application/json",
     "application/ld+json",
@@ -30,9 +29,11 @@ class JSONType(StrEnum):
 MIMETYPES = {
     JSONType.JSON: "application/json",
     JSONType.JSONLD: "application/ld+json",
-    # JSONTypes.JSONSCHEMA: "application/schema+json", # The suggest mime type is application/schema+json, but it is not registered yet
+    # The suggest mime type is application/schema+json, but it is not registered yet
+    # JSONTypes.JSONSCHEMA: "application/schema+json",
     JSONType.JSONSCHEMA: "application/json",
-    # JSONTypes.JSONL: "application/jsonl"  # The suggest mime type is application/jsonl, but it is not registered yet
+    # The suggest mime type is application/jsonl, but it is not registered yet
+    # JSONTypes.JSONL: "application/jsonl"
     JSONType.JSONL: "application/json",
 }
 
@@ -93,10 +94,9 @@ def guess_json_format(file_to_validate: Path) -> JSONType:
 
 def get_format_info(filepath: Path, mime_type: str) -> tuple[str, str]:
     """Return a tuple with (possibly fixed) mimetype and subtype."""
+    subtype = ""
     json_type = guess_json_format(filepath)
     if json_type in MIMETYPES:
-        mime_type=MIMETYPES[json_type]
-        subtype=json_type.value
-    #else:
-    #    subtype = ""
-    return mime_type, subtype 
+        mime_type = MIMETYPES[json_type]
+        subtype = json_type.value
+    return mime_type, subtype

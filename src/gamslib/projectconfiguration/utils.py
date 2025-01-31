@@ -1,3 +1,4 @@
+"""Utility function for the projectconfiguration sub module."""
 import shutil
 import warnings
 from importlib import resources as impresources

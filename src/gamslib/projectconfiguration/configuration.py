@@ -14,6 +14,7 @@ from pydantic import BaseModel, StringConstraints, ValidationError
 
 logger = logging.getLogger(__name__)
 
+
 class Metadata(BaseModel, validate_assignment=True):
     """Represent the 'metadata' section of the configuration file."""
 
@@ -28,8 +29,7 @@ class General(BaseModel, validate_assignment=True):
 
     dsid_keep_extension: bool = True
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
-    # TODO: extend this and set a more useful default
-    format_detector: Literal["magika", "base", ""] = "base"
+    format_detector: Literal["magika", "base", ""] = "magika"
     format_detector_url: str = ""
 
 
@@ -47,7 +47,7 @@ class Configuration(BaseModel):
     def model_post_init(self, __context: Any) -> None:
         self._update_from_dotenv()
         self._update_from_env()
-        
+
     @classmethod
     def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -> str | None:
         """Return a readable error message or None.
@@ -94,14 +94,14 @@ class Configuration(BaseModel):
             )
             raise ValueError(msg) from exc
 
-    def _update_from_dotenv(self, dotenv_file: Path|None=None):
+    def _update_from_dotenv(self, dotenv_file: Path | None = None):
         """Update the configuration object from the '.env' file."""
         if dotenv_file is None:
             dotenv_file = Path.cwd() / ".env"
         for key, value in dotenv_values(dotenv_file).items():
             if "." in key:  # global fields are ignored
                 table, field = key.lower().split(".")
-                logger.debug(f"Setting {key} to {value} (from .env file.)")
+                logger.debug("Setting %s to %s (from .env file.)", key, value)
                 if table == "metadata":
                     setattr(self.metadata, field, value)
                 elif table == "general":
@@ -114,7 +114,9 @@ class Configuration(BaseModel):
                 new_key = key[8:].lower()
                 if "_" in new_key:
                     table, field = new_key.split("_", 1)
-                    logger.debug(f"Setting {key} to {value} (from environment variable.)")
+                    logger.debug(
+                        "Setting %s to %s (from environment variable.)", key, value
+                    )
                     if table == "metadata":
                         setattr(self.metadata, field, value)
                     elif table == "general":

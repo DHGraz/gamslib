@@ -15,6 +15,7 @@ from typing import Generator
 
 from gamslib import formatdetect
 from gamslib.objectcsv import utils
+
 from . import defaultvalues, utils
 
 
@@ -37,7 +38,6 @@ class ObjectData:
 
     def validate(self):
         """Validate the object data."""
-        # TODO: Needs discussion
         if not self.recid:
             raise ValueError("recid must not be empty")
         if not self.title:
@@ -62,7 +62,6 @@ class DSData:
     creator: str = ""
     rights: str = ""
     lang: str = ""
-
 
     @property
     def object_id(self):
@@ -89,10 +88,10 @@ class DSData:
     def _guess_mimetype(self, file_path: Path):
         """Guess the mimetype if it is empty."""
         if not self.mimetype:
-            format_info = formatdetect.detect_format(file_path)  
+            format_info = formatdetect.detect_format(file_path)
             if format_info is not None:
                 self.mimetype = format_info.mimetype
-            #else:
+            # else:
             #    self.mimetype = defaultvalues.DEFAULT_MIMETYPE
 
     def _guess_missing_values(self, file_path: Path):
@@ -114,7 +113,6 @@ class DSData:
                 # in case mimetxype was set to application/xml bye hand, try tei
                 if self.title == "":
                     self.title = utils.extract_title_from_tei(file_path)
-            
 
         if not self.description and file_path.name in defaultvalues.FILENAME_MAP:
             self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]

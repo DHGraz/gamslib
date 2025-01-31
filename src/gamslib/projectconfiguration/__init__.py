@@ -16,8 +16,8 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from .configuration import Configuration
 from . import utils
+from .configuration import Configuration
 
 
 class MissingConfigurationException(Exception):
@@ -25,13 +25,14 @@ class MissingConfigurationException(Exception):
 
     def __init__(
         self,
-        message=("You must provide a configuration file. Set it when calling the " 
-                 "get_configuration() function, use the 'GAMSCFG_PROJECT_TOML' environment "
-                 "variable or set 'project_toml' in the .env file."),
+        message=(
+            "You must provide a configuration file. Set it when calling the "
+            "get_configuration() function, use the 'GAMSCFG_PROJECT_TOML' environment "
+            "variable or set 'project_toml' in the .env file."
+        ),
     ):
         self.message = message
         super().__init__(self.message)
-
 
 
 @lru_cache
@@ -61,7 +62,7 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
         config_path = Path(os.environ["GAMSCFG_PROJECT_TOML"])
     else:
         dotenv_file = Path.cwd() / ".env"
-        #read_config_path_from_dotenv(dotenv_file)
+        # read_config_path_from_dotenv(dotenv_file)
         if dotenv_file.is_file():
             config_path = utils.read_path_from_dotenv(dotenv_file, "project_toml")
         else:

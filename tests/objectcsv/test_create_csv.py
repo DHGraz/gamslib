@@ -52,6 +52,7 @@ def test_get_rights(test_config, test_dc):
 def test_create_csv(datadir, test_config):
     """Test the create_csv function."""
     object_dir = datadir / "objects" / "obj1"
+    test_config.general.format_detector = "base"
     create_csv(object_dir, test_config)
 
     # check contents of the newly created object.csv file
@@ -59,15 +60,16 @@ def test_create_csv(datadir, test_config):
     with open(obj_csv, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         assert reader.fieldnames == [field.name for field in fields(ObjectData)]
-        assert list(reader)[0]["project"] == "Test Project"
+        assert next(iter(reader))["project"] == "Test Project"
 
     # check contents of the newly datastreams.csv file
     ds_csv = object_dir / "datastreams.csv"
     with open(ds_csv, encoding="utf-8", newline="") as f:
+        EXPECTED_NUM_OF_DATASTREAMS = 2
         reader = csv.DictReader(f)
         assert reader.fieldnames == [field.name for field in fields(DSData)]
         data = list(reader)
-        assert len(data) == 2
+        assert len(data) == EXPECTED_NUM_OF_DATASTREAMS
         assert data[0]["dsid"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
 
