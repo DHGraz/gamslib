@@ -29,10 +29,10 @@ def test_get_configuration_env(datadir, monkeypatch):
 def test_get_configuration_dotenv(datadir, tmp_path, monkeypatch):
     "Now we set the path to project.toml file via .env value."
     dotenv_file = tmp_path / ".env"
-    toml_file = str(datadir / "project.toml")
+    toml_file = (datadir / "project.toml")
     dotenv_file.write_text(f'project_toml = "{toml_file}"\n')
     monkeypatch.chdir(tmp_path)
-    get_configuration.cache_clear()  # otherwise w might have side effects from other tests
+    get_configuration.cache_clear()  # otherwise we might have side effects from other tests
     config = get_configuration()
     assert config.metadata.project_id == "Test Project"
     assert config.general.dsid_keep_extension
@@ -43,3 +43,4 @@ def test_get_configuration_is_cached(datadir):
     config1 = get_configuration(datadir / "project.toml")
     config2 = get_configuration(datadir / "project.toml")
     assert config1 is config2
+

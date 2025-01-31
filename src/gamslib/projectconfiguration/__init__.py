@@ -16,9 +16,8 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from dotenv import dotenv_values
-
 from .configuration import Configuration
+from . import utils
 
 
 class MissingConfigurationException(Exception):
@@ -32,6 +31,7 @@ class MissingConfigurationException(Exception):
     ):
         self.message = message
         super().__init__(self.message)
+
 
 
 @lru_cache
@@ -61,8 +61,9 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
         config_path = Path(os.environ["GAMSCFG_PROJECT_TOML"])
     else:
         dotenv_file = Path.cwd() / ".env"
-        if dotenv_file.is_file() and "project_toml" in dotenv_values(dotenv_file):
-            config_path = Path(dotenv_values(dotenv_file)["project_toml"])
+        #read_config_path_from_dotenv(dotenv_file)
+        if dotenv_file.is_file():
+            config_path = utils.read_path_from_dotenv(dotenv_file, "project_toml")
         else:
             raise MissingConfigurationException()
     return Configuration.from_toml(config_path)

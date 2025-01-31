@@ -1,0 +1,4 @@
+posix_win_path = 'c:/foo/bar/project.toml'
+win_path = 'c:\foo\bar\project.toml'
+posix_path = '/foo/bar/project.toml'
+escaped_win_path = 'c:\\foo\\bar\\project.toml'
