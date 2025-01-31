@@ -20,7 +20,7 @@ from .magikadetector import MagikaDetector
 from .minimaldetector import MinimalDetector
 from functools import lru_cache
 
-DEFAULT_DETECTOR_NAME = "base"
+DEFAULT_DETECTOR_NAME = "magika"
 
 @lru_cache
 def make_detector(detector_name: str, detecttor_url: str = "") -> FormatDetector:

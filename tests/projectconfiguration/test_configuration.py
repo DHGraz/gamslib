@@ -51,7 +51,7 @@ def test_general_class():
     general = General(loglevel="error", dsid_keep_extension=False)
     assert general.dsid_keep_extension is False
     assert general.loglevel == "error"
-    assert general.format_detector == "base"
+    assert general.format_detector == "magika"
     assert general.format_detector_url == ""
 
 

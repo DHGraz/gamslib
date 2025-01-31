@@ -37,7 +37,7 @@ def test_make_detector():
     "Test if the correct detector is created based on the name."
     # create the default detector
     detector = make_detector("")
-    assert isinstance(detector, MinimalDetector)
+    assert isinstance(detector, MagikaDetector)
 
     detector = make_detector("base")
     assert isinstance(detector, MinimalDetector)
@@ -64,7 +64,7 @@ def test_detect_format_without_config(formatdatadir, monkeypatch):
     monkeypatch.setattr(projectconfiguration, "get_configuration", mock_get_config)
     
     formatinfo = formatdetect.detect_format(formatdatadir / "image.jpg")
-    assert formatinfo.detector == "MinimalDetector"
+    assert formatinfo.detector == "MagikaDetector"
 
 
 def test_detect_format_with_config(formatdatadir, tmp_path, monkeypatch):
