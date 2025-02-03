@@ -1,4 +1,5 @@
 """Utility function for the projectconfiguration sub module."""
+
 import shutil
 import warnings
 from importlib import resources as impresources
@@ -28,7 +29,24 @@ def find_project_toml(start_dir: Path) -> Path:
     raise FileNotFoundError("No project.toml file found in or above the start_dir.")
 
 
-def create_configuration(project_dir: Path) -> Path | None:
+def create_gitignore(project_dir: Path) -> None:
+    """Create a .gitignore file in the project_dir directory."""
+    gitignore_target = project_dir / ".gitignore"
+    if gitignore_target.exists():
+        warnings.warn(
+            f"'{gitignore_target}' already exists. Will not be re-created.", UserWarning
+        )
+    else:
+        gitignore_src = (
+            impresources.files("gamslib")
+            / "projectconfiguration"
+            / "resources"
+            / "gitignore"
+        )
+        shutil.copy(gitignore_src, gitignore_target)
+
+
+def create_project_toml(project_dir: Path) -> None:
     """Create a project.toml template file in the project_dir directory.
 
     It is assumed that the project_dir is the root directory of a GAMS project
@@ -42,15 +60,32 @@ def create_configuration(project_dir: Path) -> Path | None:
         warnings.warn(
             f"'{toml_file}' already exists. Will not be re-created.", UserWarning
         )
-        return None
-    toml_template_file = str(
-        impresources.files("gamslib")
-        / "projectconfiguration"
-        / "resources"
-        / "project.toml"
-    )
-    shutil.copy(toml_template_file, toml_file)
-    return project_dir / "project.toml"
+    else:
+        toml_template_file = str(
+            impresources.files("gamslib")
+            / "projectconfiguration"
+            / "resources"
+            / "project.toml"
+        )
+        shutil.copy(toml_template_file, toml_file)
+
+
+def initialize_project_dir(project_dir: Path) -> None:
+    """Initialize a GAMS project directory.
+
+    Create a skeleton project.toml file and a .gitignore file in the project_dir directory.
+    Also creates a directory 'objects' in the project_dir directory.
+    """
+    create_project_toml(project_dir)
+    create_gitignore(project_dir)
+
+    obj_dir = project_dir / "objects"
+    if not obj_dir.exists():
+        obj_dir.mkdir()
+    else:
+        warnings.warn(
+            f"'{obj_dir}' already exists. Will not be re-created.", UserWarning
+        )
 
 
 def read_path_from_dotenv(dotenv_file: Path, fieldname: str) -> Path | None:
