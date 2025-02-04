@@ -58,13 +58,10 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
     """
     if config_file is not None:
         config_path = Path(config_file)
-    elif "GAMSCFG_PROJECT_TOML" in os.environ:
-        config_path = Path(os.environ["GAMSCFG_PROJECT_TOML"])
     else:
-        dotenv_file = Path.cwd() / ".env"
-        # read_config_path_from_dotenv(dotenv_file)
-        if dotenv_file.is_file():
-            config_path = utils.read_path_from_dotenv(dotenv_file, "project_toml")
-        else:
-            raise MissingConfigurationException()
+        config_path = utils.get_config_file_from_env()
+    
+    if config_path is None:
+        raise MissingConfigurationException
     return Configuration.from_toml(config_path)
+    

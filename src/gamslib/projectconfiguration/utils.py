@@ -1,5 +1,6 @@
 """Utility function for the projectconfiguration sub module."""
 
+import os
 import shutil
 import warnings
 from importlib import resources as impresources
@@ -102,3 +103,22 @@ def read_path_from_dotenv(dotenv_file: Path, fieldname: str) -> Path | None:
                 fixed_lines.append(line.replace("\\", "/").replace("//", "/"))
     envdata = dotenv_values(stream=StringIO("\n".join(fixed_lines)))
     return Path(envdata[fieldname]) if fieldname in envdata else None
+
+
+def get_config_file_from_env():
+    """Tries to extract the path to the config file from the environment.
+
+    The path can either be set in the environment variable 'GAMSCFG_PROJECT_TOML'
+    or in the .env file in the current directory ('project_toml =').
+    """
+    if "GAMSCFG_PROJECT_TOML" in os.environ:
+        config_path = Path(os.environ["GAMSCFG_PROJECT_TOML"])
+    else:
+        dotenv_file = Path.cwd() / ".env"
+        # read_config_path_from_dotenv(dotenv_file)
+        if dotenv_file.is_file():
+            config_path = read_path_from_dotenv(dotenv_file, "project_toml")
+        else:
+            config_path = None
+    return config_path
+            

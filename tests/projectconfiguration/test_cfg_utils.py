@@ -5,6 +5,7 @@ import pytest
 from gamslib.projectconfiguration.utils import (
     create_project_toml,
     find_project_toml,
+    get_config_file_from_env,
     initialize_project_dir,
     read_path_from_dotenv,
 )
@@ -105,3 +106,17 @@ def test_initialize_project_dir_existing_objects_folder(tmp_path):
     (tmp_path / "objects").mkdir()
     with pytest.warns(UserWarning, match="objects"):
         initialize_project_dir(tmp_path)
+
+
+def test_get_config_file_from_env_environ(monkeypatch, tmp_path):
+    "Test the get_config_file_from_env function with path specified in environment."
+    config_path = tmp_path / "project.toml"
+    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", f"{config_path!s}")
+    assert get_config_file_from_env() == config_path
+
+def test_get_config_file_from_env_dotenv(monkeypatch, tmp_path):
+    "Test the get_config_file_from_env function with path specified in .env."
+    project_path = tmp_path / "project.toml"
+    (tmp_path / ".env").write_text(f'project_toml = "{project_path!s}"')
+    monkeypatch.chdir(tmp_path)
+    assert get_config_file_from_env() == project_path
