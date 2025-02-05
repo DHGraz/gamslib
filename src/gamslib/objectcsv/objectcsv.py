@@ -34,7 +34,7 @@ class ObjectData:
     objectType: str = ""
     # rectype:str = ""  # useless!!! typ; optional
     mainresource: str = ""  # main datastream
-    tags: str = ""
+    
 
     def validate(self):
         """Validate the object data."""
@@ -62,6 +62,7 @@ class DSData:
     creator: str = ""
     rights: str = ""
     lang: str = ""
+    tags: str = ""
 
     @property
     def object_id(self):
@@ -249,7 +250,7 @@ class ObjectCSV:
     DATASTREAM_CSV_FILENAME = "datastreams.csv"
 
     object_dir: Path
-    object_file: str = OBJECT_CSV_FILENAME
+    object_file: str = OBJECT_CSV_FILENAME 
     datastream_file: str = DATASTREAM_CSV_FILENAME
 
     def __post_init__(self):
