@@ -37,12 +37,14 @@ def test_metadata_class():
         creator="GAMS Test Project",
         publisher="GAMS",
         rights="commons",
+        funder="FUNDER"
     )
 
     assert metadata.project_id == "Test Project"
     assert metadata.creator == "GAMS Test Project"
     assert metadata.publisher == "GAMS"
     assert metadata.rights == "commons"
+    assert metadata.funder == "FUNDER"
 
 
 def test_general_class():
@@ -111,6 +113,7 @@ def test_configuration_from_toml(datadir):
     assert cfg.metadata.project_id == "Test Project"
     assert cfg.metadata.creator == "GAMS Test Project"
     assert cfg.metadata.publisher == "GAMS"
+    assert cfg.metadata.funder == "DFG"
     assert "commons" in cfg.metadata.rights
 
     assert cfg.general.loglevel == "info"

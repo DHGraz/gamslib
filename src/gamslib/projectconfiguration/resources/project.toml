@@ -7,12 +7,17 @@ project_id = ""
 # The project creator (like in Dublin Core)
 creator = "" 
 
+# Set this to the funder of the project. Will be added to each object metadata
+funder = ""
+
 # You might want to keep this value ("GAMS")
 publisher = "GAMS"  
 
 # Set the default license for the project. 
 # Can be overriden in project.csv and datastream.csv for single objects/data streams
 rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+
+
 
 [general]
 # Normally dsid is the full filename (with extension). Set to false to strip extension for dsid.

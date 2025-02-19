@@ -22,6 +22,7 @@ class Metadata(BaseModel, validate_assignment=True):
     creator: Annotated[str, StringConstraints(min_length=3)]
     publisher: Annotated[str, StringConstraints(min_length=3)]
     rights: str = ""
+    funder:str = ""
 
 
 class General(BaseModel, validate_assignment=True):
