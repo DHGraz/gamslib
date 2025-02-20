@@ -25,7 +25,7 @@ def test_find_object_objects(tmp_path):
     # Test the function
     with pytest.warns(UserWarning):
         result = list(utils.find_object_folders(tmp_path))
-    assert len(result) == 2
+    assert len(result) == len("object1", "object3")
     assert "object2" not in [p.name for p in result]
     assert tmp_path / "object1" in result
 
@@ -46,7 +46,7 @@ def test_find_object_objects_nested_dirs(tmp_path):
     # Test the function
     with pytest.warns(UserWarning):
         result = list(utils.find_object_folders(tmp_path))
-    assert len(result) == 2
+    assert len(result) == len("object1", "object3")
     assert "object2" not in [p.name for p in result]
     assert tmp_path / "foo" / "object1" in result
     assert tmp_path / "bar" / "object3" in result

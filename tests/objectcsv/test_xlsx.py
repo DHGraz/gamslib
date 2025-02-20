@@ -7,13 +7,13 @@ from gamslib.objectcsv.xlsx import csv_to_xlsx, xlsx_to_csv, read_csv
 def test_read_csv(datadir):
     "Test the read_csv function."
     result = read_csv(datadir / "simple.csv", skip_header=False)
-    assert len(result) == 3
+    assert len(result) == len("foo", "foo1", "foo2")
     assert result[0] == ["foo", "bar", "foobar"]
     assert result[1] == ["foo1", "bar1", "foobar1"]
     assert result[2] == ["foo2", "bar2", "foobar2"]
 
     result = read_csv(datadir / "simple.csv", skip_header=True)
-    assert len(result) == 2
+    assert len(result) == len("foo1", "foo2")
     assert result[0] == ["foo1", "bar1", "foobar1"]
     assert result[1] == ["foo2", "bar2", "foobar2"]
 

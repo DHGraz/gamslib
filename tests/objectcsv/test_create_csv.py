@@ -95,12 +95,12 @@ def test_create_csv_force_overwrite(datadir, test_config):
     # create the csv files for the first time
     create_csv(object_dir, test_config)
     assert len(read_csv(obj_csv)) == 1
-    assert len(read_csv(ds_csv)) == 2
+    assert len(read_csv(ds_csv)) == len('DC.xml', 'SOURCE.xml')
 
     # recreate the csv files with force_overwrite=True
     create_csv(object_dir, test_config, force_overwrite=True)
     assert len(read_csv(obj_csv)) == 1
-    assert len(read_csv(ds_csv)) == 2
+    assert len(read_csv(ds_csv)) == len('DC.xml', 'SOURCE.xml')
 
 
 
@@ -121,7 +121,7 @@ def test_create_csv_files(datadir, test_config):
     """The create_csv_files function should create the csv files for all objects."""
     objects_root_dir = datadir / "objects"
     processed_folders = create_csv_files(objects_root_dir, test_config)
-    assert len(processed_folders) == 2
+    assert len(processed_folders) == len('obj1', 'obj2')
 
     # Check if all csv files have been created
     assert (objects_root_dir / "obj1" / "object.csv").exists()
