@@ -32,8 +32,8 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
-    # rectype:str = ""  # useless!!! typ; optional
     mainresource: str = ""  # main datastream
+    funder: str = ""
     
 
     def validate(self):
@@ -63,6 +63,7 @@ class DSData:
     rights: str = ""
     lang: str = ""
     tags: str = ""
+    funder: str = ""
 
     @property
     def object_id(self):
@@ -79,6 +80,8 @@ class DSData:
             raise ValueError(f"{self.dspath}: mimetype must not be empty")
         if not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
+        #if not self.funder.strip():
+        #    raise ValueError(f"{self.dspath}: funder must not be empty")
 
     def guess_missing_values(self, object_path: Path):
         """Guess missing values by analyzing the datastream file."""

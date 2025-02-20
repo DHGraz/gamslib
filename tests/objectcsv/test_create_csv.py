@@ -60,7 +60,13 @@ def test_create_csv(datadir, test_config):
     with open(obj_csv, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         assert reader.fieldnames == [field.name for field in fields(ObjectData)]
-        assert next(iter(reader))["project"] == "Test Project"
+        first_object = next(iter(reader))
+        assert first_object["project"] == "Test Project"
+        assert first_object["creator"] == "GAMS Test Project"
+        assert first_object["publisher"] == "GAMS"
+        assert first_object["rights"] == "Rights from DC.xml"
+        assert first_object["funder"] == "The funder"
+
 
     # check contents of the newly datastreams.csv file
     ds_csv = object_dir / "datastreams.csv"
@@ -72,6 +78,8 @@ def test_create_csv(datadir, test_config):
         assert len(data) == EXPECTED_NUM_OF_DATASTREAMS
         assert data[0]["dsid"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
+        assert data[0]["mimetype"] == "application/xml"
+        assert data[0]["funder"] == "The funder"
 
 def test_create_csv_force_overwrite(datadir, test_config):
     """Test the create_csv function with force_overwrite=True."""

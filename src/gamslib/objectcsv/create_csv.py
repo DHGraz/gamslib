@@ -102,6 +102,8 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
         rights=get_rights(config, dc),
         source=defaultvalues.DEFAULT_SOURCE,
         objectType=defaultvalues.DEFAULT_OBJECT_TYPE,
+        publisher=config.metadata.publisher,
+        funder=config.metadata.funder,
     )
 
 
@@ -123,6 +125,7 @@ def collect_datastream_data(
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
+        funder=config.metadata.funder,
     )
 
 

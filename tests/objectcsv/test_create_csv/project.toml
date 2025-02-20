@@ -3,6 +3,7 @@ project_id = "Test Project"
 creator = "GAMS Test Project"
 publisher = "GAMS"
 rights = "Rights from project.toml"
+funder = "The funder"
 
 [general]
 dsid_keep_extension = true
