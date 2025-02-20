@@ -152,32 +152,13 @@ def test_extract_dsid():
         assert extract_dsid(Path("test.a1234"), False) == "test.a1234"
 
 
-def test_detect_languages_from_dublincore(test_dc, datadir):
-    """Test the detect_languages function using data from dc.
-    """
-    dsfile = datadir / "objects" / "obj1" / "SOURCE.xml"
-    # test_dc has a lang entry 'de'
-    assert detect_languages(dsfile, test_dc) == "de"
 
-    # test_dc has no lang entry
-    orig_lang = test_dc._data.pop("language")
-    assert detect_languages(dsfile, test_dc) == ""
-
-    # test_dc has a lang entry 'de' and 'en'
-    orig_lang['unspecified'] = ["de", "en"]
-    test_dc._data["language"] = orig_lang
-    assert detect_languages(dsfile, test_dc) == "de en"
-
-    # and now with an explicit delimiter
-    assert detect_languages(dsfile, test_dc, ';') == "de;en"
-
-
-def test_detect_languages_from_contents(test_dc, datadir):
+def test_detect_languages(datadir):
     """We assume that dc does not contain language information.
     
     So we have to detect the language from the contents of the file.
     """    
-    # TODO: Change assertion after the detection is implemented
+    
     dsfile = datadir / "objects" / "obj1" / "SOURCE.xml"
-    dc_lang = test_dc._data.pop("language")
-    assert detect_languages(dsfile, test_dc) == ""    
+    # TODO: Change assertion after the detection is implemented
+    assert detect_languages(dsfile) == "" 

@@ -84,16 +84,13 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
     )
     return pid
 
-def detect_languages(ds_file: Path, dc: DublinCore, delimiter:str=" ") -> str:
-    
-    # initially we check if the dc file defines language
-    # note that get_element returns [""], if no language was found
-    languages = dc.get_element("language")
-    
-    # if not, we try to detect the language from the file itself
-    if not languages or languages == [""]:
-        # TODO: language detection has to be implemented here
-        languages = []
+def detect_languages(ds_file: Path, delimiter:str=" ") -> str:
+    """Detect the language(s) of a file.
+
+    Return detected language(s) as a string separated by the given delimiter.
+    """
+    languages = []
+    #TODO: Implement language detection
     return delimiter.join(languages) if languages else ""
 
 def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> ObjectData:
@@ -136,7 +133,7 @@ def collect_datastream_data(
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
-        lang=detect_languages(ds_file, dc, delimiter=";"),
+        lang=detect_languages(ds_file, delimiter=";"),
         # funder=config.metadata.funder, # removed, because we possibly do not need funder here
     )
 
