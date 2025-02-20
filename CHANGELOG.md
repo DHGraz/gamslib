@@ -5,8 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-02-20
+
+### Added
+
+* Add a detect_languages to create_csv.py
+  * Currently language(s) are taken from DC.xml
+  * NLP based detection can be added later
+
+## Removed
+
+* Remove the 'funder' field from datastreams.csv, which was introduced 
+  in 0.4.1, because it was highly redundant. 'funder' now is only
+  supported in object.csv
+
+
 ## [0.4.1] - 2025-02-20
 
+### Changed
 * Add a 'funder' field to object.csv and datastreams.csv
 
 ## [0.4.0] - 2025-01-30
