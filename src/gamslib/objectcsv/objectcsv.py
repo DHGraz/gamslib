@@ -63,7 +63,7 @@ class DSData:
     rights: str = ""
     lang: str = ""
     tags: str = ""
-    funder: str = ""
+    #funder: str = ""  # removed, because we possibly do not need funder here
 
     @property
     def object_id(self):

@@ -125,7 +125,7 @@ def collect_datastream_data(
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
-        funder=config.metadata.funder,
+        # funder=config.metadata.funder, # removed, because we possibly do not need funder here
     )
 
 
