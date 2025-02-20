@@ -28,21 +28,21 @@ def test_collect_csv_data(datadir, tmp_path):
         reader = csv.DictReader(f)
         data = sorted(list(reader), key=lambda x: x["recid"])
 
-    assert len(data) == len("obj1", "obj2")
+    assert len(data) == len(["obj1", "obj2"])
     assert data[0]["recid"] == "obj1"
     assert data[1]["recid"] == "obj2"
 
     with open(ds_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         data = list(reader)
-    assert len(data) == len(
+    assert len(data) == len([
         "obj1/foo.xml",
         "obj1/foo.jpg",
         "obj1/DC.xml",
         "obj2/bar.xml",
         "obj2/bar.jpg",
         "obj2/DC.xml",
-    )
+    ])
     dspaths = [row["dspath"] for row in data]
     assert "obj1/foo.xml" in dspaths
     assert "obj1/foo.jpg" in dspaths
@@ -59,15 +59,15 @@ def test_update_csv_files(datadir):
     objects_dir = datadir / "objects"
 
     num_objects, num_ds = update_csv_files(objects_dir, collected_dir)
-    assert num_objects == len("obj1", "obj2")
-    assert num_ds == len(
+    assert num_objects == len(["obj1", "obj2"])
+    assert num_ds == len([
         "obj1/foo.xml",
         "obj1/foo.jpg",
         "obj1/DC.xml",
         "obj2/bar.xml",
         "obj2/bar.jpg",
         "obj2/DC.xml",
-    )
+    ])
 
     # Check if the object.csv files have been updated
     with open(objects_dir / "obj1" / "object.csv", encoding="utf-8") as f:
@@ -102,12 +102,12 @@ def test_update_csv_files_no_collect_dir(datadir, monkeypatch):
 
     monkeypatch.chdir(input_dir)
     num_objects, num_ds = update_csv_files(objects_dir)
-    assert num_objects == len("obj1", "obj2")
-    assert num_ds == len(
+    assert num_objects == len(["obj1", "obj2"])
+    assert num_ds == len([
         "obj1/foo.xml",
         "obj1/foo.jpg",
         "obj1/DC.xml",
         "obj2/bar.xml",
         "obj2/bar.jpg",
         "obj2/DC.xml",
-    )
+    ])

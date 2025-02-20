@@ -240,7 +240,7 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     "Test the DatastreamsCSVFile object."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
     result = list(dcf.get_data())
-    assert len(result) == len("obj1/TEI.xml", "obj2/TEI2.xml")
+    assert len(result) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
     assert result[0].dspath == "obj1/TEI.xml"
     assert result[1].dspath == "obj2/TEI2.xml"
 
@@ -253,7 +253,7 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     assert len(result) == 1
 
     # test the __len__ method
-    assert len(dcf) == len("obj1/TEI.xml", "obj2/TEI2.xml")
+    assert len(dcf) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
 
     # now save the datastream.csv file to a new file and compare the content
     csv_file = dscsvfile.parent / "datastreams2.csv"
@@ -284,12 +284,12 @@ def test_object_csv(objcsvfile: Path, dscsvfile: Path, tmp_path: Path):
 
     oc = ObjectCSV(objcsvfile.parent)
     assert len(oc.object_data) == 1
-    assert len(oc.datastream_data) == len("obj1/TEI.xml", "obj2/TEI2.xml")
+    assert len(oc.datastream_data) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
     assert oc.is_new() is False
     assert oc.object_id == "obj1"
 
     assert oc.count_objects() == 1
-    assert oc.count_datastreams() == len("obj1/TEI.xml", "obj2/TEI2.xml")
+    assert oc.count_datastreams() == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
 
     # test write
     objcsvfile.unlink()
@@ -343,18 +343,18 @@ def test_object_csv_modify_get_set_data(
     new_ds.dspath = "obj1/TEI3.xml"
     oc.add_datastream(new_ds)
     assert oc.count_datastreams() == len(
-        "obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"
+        ["obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"]
     )
-    assert len(list(oc.get_datastreamdata())) == len(
+    assert len(list(oc.get_datastreamdata())) == len([
         "obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"
-    )
+    ])
     assert list(oc.get_datastreamdata("obj1"))[-1] == new_ds
 
     # test add_objectdata() and get_objectdata()
     new_obj = copy.deepcopy(objdata)
     new_obj.recid = "obj2"
     oc.add_objectdata(new_obj)
-    assert len(list(oc.get_objectdata())) == len("obj1", "obj2")
+    assert len(list(oc.get_objectdata())) == len(["obj1", "obj2"])
     assert list(oc.get_objectdata("obj2"))[-1] == new_obj
 
     # test write() with overwriting the original csv files

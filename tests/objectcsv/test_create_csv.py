@@ -1,5 +1,5 @@
-"""Test the objectcsv.create_csv module.
-"""
+"""Test the objectcsv.create_csv module."""
+
 # pylint: disable=W0212 # access to ._data
 import csv
 from dataclasses import fields
@@ -20,7 +20,6 @@ from gamslib.objectcsv.dublincore import DublinCore
 from gamslib.objectcsv.objectcsv import DSData
 from gamslib.projectconfiguration.configuration import Configuration
 from gamslib.objectcsv import defaultvalues
-
 
 
 @fixture(name="test_config")
@@ -67,7 +66,6 @@ def test_create_csv(datadir, test_config):
         assert first_object["rights"] == "Rights from DC.xml"
         assert first_object["funder"] == "The funder"
 
-
     # check contents of the newly datastreams.csv file
     ds_csv = object_dir / "datastreams.csv"
     with open(ds_csv, encoding="utf-8", newline="") as f:
@@ -81,13 +79,15 @@ def test_create_csv(datadir, test_config):
         assert data[0]["mimetype"] == "application/xml"
         assert data[0]["funder"] == "The funder"
 
+
 def test_create_csv_force_overwrite(datadir, test_config):
     """Test the create_csv function with force_overwrite=True."""
+
     def read_csv(file: Path) -> list[dict[str, str]]:
         with file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             return list(reader)
-        
+
     object_dir = datadir / "objects" / "obj1"
     obj_csv = object_dir / "object.csv"
     ds_csv = object_dir / "datastreams.csv"
@@ -95,15 +95,12 @@ def test_create_csv_force_overwrite(datadir, test_config):
     # create the csv files for the first time
     create_csv(object_dir, test_config)
     assert len(read_csv(obj_csv)) == 1
-    assert len(read_csv(ds_csv)) == len('DC.xml', 'SOURCE.xml')
+    assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
     # recreate the csv files with force_overwrite=True
     create_csv(object_dir, test_config, force_overwrite=True)
     assert len(read_csv(obj_csv)) == 1
-    assert len(read_csv(ds_csv)) == len('DC.xml', 'SOURCE.xml')
-
-
-
+    assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
 
 def test_create_csv_files_existing_csvs(datadir, test_config):
@@ -121,15 +118,13 @@ def test_create_csv_files(datadir, test_config):
     """The create_csv_files function should create the csv files for all objects."""
     objects_root_dir = datadir / "objects"
     processed_folders = create_csv_files(objects_root_dir, test_config)
-    assert len(processed_folders) == len('obj1', 'obj2')
+    assert len(processed_folders) == len(["obj1", "obj2"])
 
     # Check if all csv files have been created
     assert (objects_root_dir / "obj1" / "object.csv").exists()
     assert (objects_root_dir / "obj1" / "datastreams.csv").exists()
     assert (objects_root_dir / "obj2" / "object.csv").exists()
     assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
-
-
 
 
 def test_extract_dsid():
