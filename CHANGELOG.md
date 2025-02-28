@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-02-28
+
+### Changed
+
+   * Breaking change: The subtype property of FormatInfo classes 
+     is no longer a string, but a formatinfo.SubType enum value.
+     This gives more control about supported subtypes and avoids
+     mistakes.
+
+
 ## [0.4.3] - 2025-02-20
 
 ### Changed

@@ -43,7 +43,7 @@ class MagikaDetector(FormatDetector):
             filepath, result.dl.ct_label, result.dl.mime_type
         )
         detector_name = self.__class__.__name__
-        subtype = ""
+        subtype = None
 
         if mime_type is None:
             # if we cannot determine the mime type, we return the DEFAULT_TYPE

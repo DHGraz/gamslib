@@ -32,7 +32,7 @@ class MinimalDetector(FormatDetector):
     def guess_file_type(self, filepath: Path) -> FormatInfo:
         mime_type, _ = mimetypes.guess_type(filepath)
         detector_name = str(self)  # )#self.__class__.__name__
-        subtype = ""
+        subtype = None
 
         if mime_type is None:
             # if we cannot determine the mime type, we return the DEFAULT_TYPE

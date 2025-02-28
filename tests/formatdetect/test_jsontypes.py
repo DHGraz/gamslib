@@ -3,9 +3,10 @@ import pytest
 from gamslib.formatdetect.jsontypes import is_json_type
 from gamslib.formatdetect.jsontypes import is_jsonl
 from pathlib import Path
-from gamslib.formatdetect.jsontypes import guess_json_format, JSONType
+from gamslib.formatdetect.jsontypes import guess_json_format
 from gamslib.formatdetect.jsontypes import get_format_info
 from gamslib.formatdetect.formatinfo import FormatInfo
+from gamslib.formatdetect.formatinfo import SubType
 
 
 def test_is_json_type_with_known_json_mime_types():
@@ -73,7 +74,7 @@ def test_guess_json_format_with_jsonld_extension(tmp_path):
     """Test if a file with .jsonld extension is recognized as JSON-LD."""
     file = tmp_path / "test.jsonld"
     file.write_text('{"@context": "http://schema.org"}', encoding="utf-8")
-    assert guess_json_format(file) == JSONType.JSONLD
+    assert guess_json_format(file) == SubType.JSONLD
 
 
 def test_guess_json_format_with_json_schema(tmp_path):
@@ -82,28 +83,28 @@ def test_guess_json_format_with_json_schema(tmp_path):
     file.write_text(
         '{"$schema": "https://json-schema.org/draft/2020-12/schema"}', encoding="utf-8"
     )
-    assert guess_json_format(file) == JSONType.JSONSCHEMA
+    assert guess_json_format(file) == SubType.JSONSCHEMA
 
 
 def test_guess_json_format_with_jsonld_content(tmp_path):
     """Test if a file with JSON-LD content is recognized as JSON-LD."""
     file = tmp_path / "test.json"
     file.write_text('{"@context": "http://schema.org"}', encoding="utf-8")
-    assert guess_json_format(file) == JSONType.JSONLD
+    assert guess_json_format(file) == SubType.JSONLD
 
 
 def test_guess_json_format_with_jsonl_content(tmp_path):
     """Test if a file with JSON Lines content is recognized as JSON Lines."""
     file = tmp_path / "test.json"
     file.write_text('{"name": "John"}\n{"name": "Jane"}', encoding="utf-8")
-    assert guess_json_format(file) == JSONType.JSONL
+    assert guess_json_format(file) == SubType.JSONL
 
 
 def test_guess_json_format_with_plain_json(tmp_path):
     """Test if a plain JSON file is recognized as JSON."""
     file = tmp_path / "test.json"
     file.write_text('{"name": "John"}', encoding="utf-8")
-    assert guess_json_format(file) == JSONType.JSON
+    assert guess_json_format(file) == SubType.JSON
 
 
 def test_guess_json_format_with_invalid_json(tmp_path):

@@ -42,7 +42,7 @@ def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
         assert result.mimetype == DEFAULT_TYPE, (
             f"{detector}: Expected '{DEFAULT_TYPE}', got '{result.mimetype}' for file {testfile.filepath.name}"
         )
-        assert result.subtype == "", (
+        assert result.subtype is None, (
             f"{detector}: Expected '"
             "', got '{result.subtype}' for file {testfile.filepath.name}"
         )
@@ -69,7 +69,7 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
         assert result.mimetype == expected_wrong_type, (
             f"{detector}: Expected '{DEFAULT_TYPE}', got '{result.mimetype}' for file {testfile.filepath.name}"
         )
-        assert result.subtype == "", (
+        assert result.subtype is None, (
             f"{detector}: Expected '"
             "', got '{result.subtype}' for file {testfile.filepath.name}"
         )
