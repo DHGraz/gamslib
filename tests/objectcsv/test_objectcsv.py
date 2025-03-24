@@ -187,9 +187,8 @@ def test_ds_data_guess_missing_values(detector, datadir, monkeypatch):
     assert dsdata.mimetype == "video/mp4"
     assert dsdata.title == "Video: video.mp4"
 
-    dsdata = DSData(dspath="obj1/empty", dsid="empty")
+    dsdata = DSData(dspath="obj1/empty.foo", dsid="empty")
     with pytest.warns(UserWarning):
-        dsdata.guess_missing_values(datadir / "obj1")
         dsdata.guess_missing_values(datadir / "obj1")
         assert dsdata.mimetype == "application/octet-stream"
         assert dsdata.title == ""

@@ -38,14 +38,18 @@ class MagikaDetector(FormatDetector):
         return label, mime_type
 
     def guess_file_type(self, filepath: Path) -> FormatInfo:
-        result = self._magika_object.identify_path(filepath)
-        _, mime_type = self._fix_result(
-            filepath, result.dl.ct_label, result.dl.mime_type
-        )
         detector_name = self.__class__.__name__
-        subtype = None
-
-        if mime_type is None:
+        subtype = None       
+        try:
+            result = self._magika_object.identify_path(filepath)
+            _, mime_type = self._fix_result(
+                filepath, result.dl.label, result.dl.mime_type
+            )
+        # for some reason magika 0.6 sometimes raises a ValueError
+        except ValueError:
+            mime_type = None
+        # magika 0.6 changed this from None to application/unknown
+        if mime_type is None or mime_type == "application/undefined":
             # if we cannot determine the mime type, we return the DEFAULT_TYPE
             mime_type = DEFAULT_TYPE
             warnings.warn(
