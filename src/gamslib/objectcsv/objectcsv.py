@@ -154,6 +154,9 @@ class ObjectCSVFile:
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                # mainresource was renamed to mainResource. Just in case we have existing data
+                if "mainresource" in row:
+                    row["mainResource"] = row.pop("mainresource")
                 obj_csv_file.add_objectdata(ObjectData(**row))
         return obj_csv_file
 
