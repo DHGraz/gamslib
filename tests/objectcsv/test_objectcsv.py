@@ -34,7 +34,7 @@ def objdata_fixture() -> ObjectData:
         publisher="The publisher",
         source="The source",
         objectType="The objectType",
-        mainresource="TEI.xml",
+        mainResource="TEI.xml",
     )
 
 
@@ -103,7 +103,7 @@ def test_objectdata_creation(objdata):
     assert objdata.publisher == "The publisher"
     assert objdata.source == "The source"
     assert objdata.objectType == "The objectType"
-    assert objdata.mainresource == "TEI.xml"
+    assert objdata.mainResource == "TEI.xml"
 
 
 def test_objectdata_validate(objdata):

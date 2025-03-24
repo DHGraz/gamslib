@@ -32,7 +32,7 @@ class ObjectData:
     publisher: str = ""
     source: str = ""
     objectType: str = ""
-    mainresource: str = ""  # main datastream
+    mainResource: str = ""  # main datastream
     funder: str = ""
     
 
