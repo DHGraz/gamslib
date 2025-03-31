@@ -71,6 +71,17 @@ def test_get_non_dc_element(datadir):
         dc.get_element("foo")
 
 
+def test_get_element_with_linebreaks(datadir, tmp_path):
+    "Test get_element with linebreaks in the text: all linebreaks should be removed."
+    path = datadir / "DC.xml"
+    xml = path.read_text(encoding="utf-8")
+    xml = xml.replace("Foo, Bar", "Foo,\nBar\r\nFoobar")
+    new_path = tmp_path / "DC.xml"
+    new_path.write_text(xml, encoding="utf-8")
+    dc = DublinCore(new_path)
+    assert dc.get_element("creator") == ["Foo, Bar Foobar"]
+
+
 def test_get_missing_element(datadir):
     "Try to access an element that is not set. Should return a list with an empty string."
     path = datadir / "DC.xml"
@@ -164,3 +175,54 @@ def test_get_element_as_str_single_values(datadir):
     assert dc.get_element_as_str("subject") == "subject 1"
     assert dc.get_element_as_str("title") == "title 1"
     assert dc.get_element_as_str("type") == "type 1"
+
+
+def test_get_en_element(datadir):
+    "Test get_en_element"
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    # we have an english title and a german title
+    assert dc.get_en_element("title") == ["Person description 1"]
+    # we have a date, but no date with lang='en'
+    assert dc.get_en_element("date") == []
+    with pytest.raises(ValueError):
+        dc.get_en_element("foo")
+
+    # test with a non empty default value
+    assert dc.get_en_element("publisher", default="foo") == ["foo"]
+
+
+def test_get_en_element_with_linebreaks(datadir, tmp_path):
+    "Test get_en_element with linebreaks in the text: all linebreaks should be removed."
+    path = datadir / "DC.xml"
+    xml = path.read_text(encoding="utf-8")
+    xml = xml.replace("<dc:creator>Foo, Bar</dc:creator>", "<dc:creator xml:lang=\"en\">Foo,\nBar\r\nFoobar</dc:creator>")
+    new_path = tmp_path / "DC.xml"
+    new_path.write_text(xml, encoding="utf-8")
+    dc = DublinCore(new_path)
+    assert dc.get_en_element("creator") == ["Foo, Bar Foobar"]
+
+
+
+def test_get_en_element_as_str(datadir, tmp_path):
+    "Test get_en_element"
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    # we have an english title and a german title
+    assert dc.get_en_element_as_str("title") == "Person description 1"
+    # we have a date, but no date with lang='en'
+    assert dc.get_en_element_as_str("date") == ""
+    with pytest.raises(ValueError):
+        dc.get_en_element_as_str("foo")
+    assert dc.get_en_element_as_str("publisher", default="foo") == "foo"
+
+
+    # Let's add a second title in english
+    dc_lines = path.read_text(encoding="utf-8").splitlines()
+    dc_lines.insert(3, '<dc:title xml:lang="en">pd2</dc:title>')
+    new_dcpath = tmp_path / "DC.xml"
+    new_dcpath.write_text("\n".join(dc_lines))
+    dc = DublinCore(new_dcpath)
+    # we have 2 english titles and a german title
+    assert dc.get_en_element_as_str("title") == "Person description 1; pd2"
+

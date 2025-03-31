@@ -36,7 +36,7 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
       2. Check if set in the configuration
       3. Use a default value.
     """
-    rights = dc.get_element_as_str("rights", default="")
+    rights = dc.get_element_as_str("rights", preferred_lang="en", default="")
     if not rights:  # empty string is a valid value
         if config.metadata.rights:
             rights = config.metadata.rights
@@ -98,14 +98,14 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
 
     This is the place to change the resolving order for data from other sources.
     """
-    title = "; ".join(dc.get_element("title", default=pid))
-    description = "; ".join(dc.get_element("description", default=""))
+    title = "; ".join(dc.get_en_element("title", default=pid))
+    #description = "; ".join(dc.get_element("description", default=""))
 
     return ObjectData(
         recid=pid,
         title=title,
         project=config.metadata.project_id,
-        description=description,
+        description="",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
         source=defaultvalues.DEFAULT_SOURCE,

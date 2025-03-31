@@ -123,6 +123,42 @@ class DublinCore:
                 self._data[elem] = element
         # TODO: Add DC_TERMS and DCMI_TYPES?
 
+    def remove_linebreaks(cls, text: str) -> str:
+        """Remove linebreaks from a string.
+
+        :param str text: The string to remove linebreaks from.
+        :return: The string without linebreaks.
+        """
+        return text.replace("\n", " ").replace("\r", "").strip()
+
+
+    def get_en_element(self, name: str, default="") -> list[str]:
+        """Return the value of a Dublin Core element in English.
+
+        It always returns a list of strings, even if only one value or no element is available. 
+
+        :param str name: The name of the element without namespace (e.g. "title").
+        :return: The value(s) of the element as list of strings.
+        :raises ValueError: If the element name is not a valid Dublin Core element.
+        """
+        if name not in DC_ELEMENTS:
+            raise ValueError(f"Element {name} is not a Dublin Core element.")
+        
+        values = self._data[name].get("en", [])
+        if not values and default != "":
+            values = [default]
+        return [self.remove_linebreaks(value) for value in values]
+    
+    def get_en_element_as_str(self, name: str, default="") -> str:
+        """Return the joint values of a Dublin Core element in English.
+
+        :param str name: The name of the element without namespace (e.g. "title").
+        :return: The joint value(s) of the element as string. Multiple values are separated by ';'.
+        :raises ValueError: If the element name is not a valid Dublin Core element.
+        """
+
+        return "; ".join(self.get_en_element(name, default=default))
+    
     def get_element(
         self, name: str, preferred_lang: str = "en", default: str = ""
     ) -> list[str]:
@@ -142,10 +178,12 @@ class DublinCore:
         :param str default: The default value to return if no value is found. Be aware, that this
             value will be returned as list element, even if it is a string.
         :return: The value(s) of the element as list of strings.
+        :raises ValueError: If the element name is not a valid Dublin Core element.
         """
         if name not in DC_ELEMENTS:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
         # element not in DC.xml
+        # TODO: possible this should better be a warning?
         if name not in self._data:
             logger.debug(
                 "Element %s not found in %s. Returning default value: [%s]",
@@ -155,10 +193,12 @@ class DublinCore:
             )
             return [default]
 
+
         if preferred_lang not in self._data[name]:
             for lang in [*self.lookup_order, "unspecified"]:
                 if lang in self._data[name]:
                     preferred_lang = lang
+                    # TODO: this should be a warning, not a debug message
                     logger.debug(
                         "Preferred language %s not found in %s. Using %s instead.",
                         preferred_lang,
@@ -166,7 +206,7 @@ class DublinCore:
                         lang,
                     )
                     break
-        return self._data[name][preferred_lang]
+        return [self.remove_linebreaks(value) for value in self._data[name][preferred_lang]]
 
     def get_element_as_str(
         self, name: str, preferred_lang: str = "en", default: str = ""
