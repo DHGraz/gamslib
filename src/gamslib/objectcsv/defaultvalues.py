@@ -18,7 +18,7 @@ DEFAULT_SOURCE = "local"
 FILENAME_MAP = {
     "DC.xml": {
         "title": "Dublin Core Metadata",
-        "description": "Dublin Core Metadata in XML format for this content file.",
+        "description": "Dublin Core Metadata in XML format for this object.",
     },
     "RDF.xml": {"title": "RDF Statements", "description": ""},
 }
