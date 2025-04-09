@@ -18,3 +18,9 @@ requirements.lock
 
 foo.py
 uv.lock
+src/gamslib/validate/xml/X_dtdvalidator.py
+src/gamslib/validate/xml/X_genericxmlvalidator.py
+src/gamslib/validate/xml/X_lidovalidator.py
+src/gamslib/validate/xml/X_teivalidator.py
+tests/validate/xml/X_test_dtdvalidator.py
+tests/validate/xml/data/Xminimal_non_existing_schema_reference.xml

@@ -9,16 +9,18 @@ import pytest
 
 from pytest import fixture
 
-from gamslib.objectcsv import ObjectData
+from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.objectcsv.create_csv import (
     create_csv,
     create_csv_files,
     detect_languages,
     extract_dsid,
     get_rights,
+    is_datastream_file,
+    update_csv,
 )
 from gamslib.objectcsv.dublincore import DublinCore
-from gamslib.objectcsv.objectcsv import DSData
+from gamslib.objectcsv.dsdata import DSData
 from gamslib.projectconfiguration.configuration import Configuration
 from gamslib.objectcsv import defaultvalues
 
@@ -35,6 +37,21 @@ def dc_fixture(datadir):
     return DublinCore(datadir / "objects" / "obj1" / "DC.xml")
 
 
+
+def test_is_datastream_file(datadir):
+    """Test the is_datastream_file function."""
+    # Create a test file
+    obj_csv = datadir / "objects" / "obj1" / "object.csv"
+    ds_csv = datadir / "objects" / "obj1" / "datastreams.csv"
+    dc_file = datadir / "objects" / "obj1" / "DC.xml"
+    no_file = datadir / "objects" / "obj1"
+    
+    assert not is_datastream_file(obj_csv)
+    assert not is_datastream_file(ds_csv)
+    assert is_datastream_file(dc_file)
+    assert not is_datastream_file(no_file)
+
+
 def test_get_rights(test_config, test_dc):
     """Test the get_rights function."""
     # If set in dc file, this value should be returned.
@@ -48,6 +65,11 @@ def test_get_rights(test_config, test_dc):
     test_config.metadata.rights = ""
     assert get_rights(test_config, test_dc) == defaultvalues.DEFAULT_RIGHTS
 
+
+def test_create_csv_missing_object(tmp_path, test_config):
+    """Test the create_csv function with a missing object directory."""
+    obj_dir = tmp_path / "missing"
+    assert create_csv(obj_dir, test_config) is None
 
 def test_create_csv(datadir, test_config):
     """Test the create_csv function."""
@@ -127,6 +149,33 @@ def test_create_csv_files(datadir, test_config):
     assert (objects_root_dir / "obj2" / "object.csv").exists()
     assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
 
+@pytest.mark.skip
+def test_update_csv(datadir, tmp_path, test_config):
+    """Test the update_csv function."""
+    object_dir = datadir / "objects" / "obj1"
+    obj_csv = object_dir / "object.csv"
+    ds_csv = object_dir / "datastreams.csv"
+    # create the first version of the csv files
+    create_csv(object_dir, test_config)
+    assert obj_csv.exists()
+    assert ds_csv.exists()
+
+    # change the existing csv files and call update_csv: result should be the same as before
+    # change the title in the object.csv file
+    obj_txt = obj_csv.read_text(encoding="utf-8").replace(",Object 1,", ",Object 2,")
+    # remove the last line (datastream) from the datastreams.csv file
+    ds_lines = ds_csv.read_text(encoding="utf-8").splitlines()
+    removed_line = ds_lines.pop()
+    obj_csv.write_text(obj_txt, encoding="utf-8")
+    ds_csv.write_text("\n".join(ds_lines), encoding="utf-8")
+    
+    update_csv(object_dir, test_config)
+    obj_txt = obj_csv.read_text(encoding="utf-8")
+    assert ',Object 1,' in obj_txt
+    ds_lines = ds_csv.read_text(encoding="utf-8").splitlines()
+    assert removed_line in ds_lines
+
+    
 
 def test_extract_dsid():
     """Test the extract_dsid function."""

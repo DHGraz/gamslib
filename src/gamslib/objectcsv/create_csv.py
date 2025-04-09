@@ -12,12 +12,16 @@ import re
 from pathlib import Path
 import warnings
 
+from .dsdata import DSData
+
+from .objectdata import ObjectData
 from gamslib.projectconfiguration import Configuration
 
-from .objectcsv import DSData, ObjectCSV, ObjectData
+from .objectcsv import ObjectCSV
 from .dublincore import DublinCore
 from .utils import find_object_folders
 from . import defaultvalues
+
 
 logger = logging.getLogger()
 
@@ -25,6 +29,14 @@ logger = logging.getLogger()
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
 }
+
+
+def is_datastream_file(ds_file: Path) -> bool:
+    """Check if the file should be used as datastream file."""
+    return ds_file.is_file() and ds_file.name not in (
+        ObjectCSV.OBJECT_CSV_FILENAME,
+        ObjectCSV.DATASTREAM_CSV_FILENAME
+    )
 
 
 def get_rights(config: Configuration, dc: DublinCore) -> str:
@@ -84,14 +96,16 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
     )
     return pid
 
-def detect_languages(ds_file: Path, delimiter:str=" ") -> str:
+
+def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
     """Detect the language(s) of a file.
 
     Return detected language(s) as a string separated by the given delimiter.
     """
     languages = []
-    #TODO: Implement language detection
+    # TODO: Implement language detection
     return delimiter.join(languages) if languages else ""
+
 
 def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> ObjectData:
     """Find data for the object.csv by examining dc file and configuration.
@@ -99,7 +113,7 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
     This is the place to change the resolving order for data from other sources.
     """
     title = "; ".join(dc.get_en_element("title", default=pid))
-    #description = "; ".join(dc.get_element("description", default=""))
+    # description = "; ".join(dc.get_element("description", default=""))
 
     return ObjectData(
         recid=pid,
@@ -145,6 +159,10 @@ def create_csv(
 
     Existing csv files will not be touched unless 'force_overwrite' is True.
     """
+    if not object_directory.is_dir():
+        logger.warning("Object directory '%s' does not exist.", object_directory)
+        return None
+
     objectcsv = ObjectCSV(object_directory)
 
     # Avoid that existing (and potentially already edited) metadata is replaced
@@ -164,11 +182,46 @@ def create_csv(
         collect_object_data(objectcsv.object_id, configuration, dc)
     )
     for ds_file in object_directory.glob("*"):
-        if ds_file.is_file() and ds_file.name not in ("object.csv", "datastreams.csv"):
+        if is_datastream_file(ds_file):
             objectcsv.add_datastream(
-                # collect_datastream_data(ds_file, objectcsv.object_id, configuration, dc)
                 collect_datastream_data(ds_file, configuration, dc)
             )
+    objectcsv.write()
+    return objectcsv
+
+
+def update_csv(
+    object_directory: Path, configuration: Configuration
+) -> ObjectCSV | None:
+    """Update an existing CSV file for a given object directory.
+
+    This function is used to update the metadata for an existing object directory with existing CSV files.
+    """
+    # The is a new use case: It happens, that eg. datastreams are added to an object after a csv has been created.
+    # In this case, we need to update the csv files, but not overwrite them.
+    if not object_directory.is_dir():
+        logger.warning("Object directory '%s' does not exist.", object_directory)
+        return None
+
+    objectcsv = ObjectCSV(object_directory)
+    if objectcsv.is_new():
+        logger.warning(
+            "Object directory '%s' has no existing CSV files. Will be created.",
+            object_directory,
+        )
+    dc = DublinCore(object_directory / "DC.xml")
+
+    objectcsv.update_objectdata(
+        collect_object_data(objectcsv.object_id, configuration, dc)
+    )
+    datastreams = []
+    for ds_file in object_directory.glob("*"):
+        if is_datastream_file(ds_file):
+            datastreams.append(collect_datastream_data(ds_file, configuration, dc)
+            #objectcsv.update_datastream(
+            #    collect_datastream_data(ds_file, configuration, dc)
+            )
+    objectcsv.update_datastreams(datastreams)
     objectcsv.write()
     return objectcsv
 

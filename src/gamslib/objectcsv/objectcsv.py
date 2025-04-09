@@ -7,240 +7,15 @@ ObjectCSV is directly accessible from the objectcsv package.
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=invalid-name
 
-import csv
 from collections import Counter
-from dataclasses import asdict, dataclass, fields
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
 
-from gamslib import formatdetect
-from gamslib.objectcsv import utils
-
-from . import defaultvalues, utils
-
-
-@dataclass
-class ObjectData:
-    """Represents csv data for a single object."""
-
-    recid: str
-    title: str = ""
-    project: str = ""
-    description: str = ""
-    creator: str = ""
-    rights: str = ""
-    publisher: str = ""
-    source: str = ""
-    objectType: str = ""
-    mainResource: str = ""  # main datastream
-    funder: str = ""
-    
-
-    def validate(self):
-        """Validate the object data."""
-        if not self.recid:
-            raise ValueError("recid must not be empty")
-        if not self.title:
-            raise ValueError(f"{self.recid}: title must not be empty")
-        if not self.rights:
-            raise ValueError(f"{self.recid}: rights must not be empty")
-        if not self.source:
-            raise ValueError(f"{self.recid}: source must not be empty")
-        if not self.objectType:
-            raise ValueError(f"{self.recid}: objectType must not be empty")
-
-
-@dataclass
-class DSData:
-    """Represents csv data for a single datastream of a single object."""
-
-    dspath: str
-    dsid: str = ""
-    title: str = ""
-    description: str = ""
-    mimetype: str = ""
-    creator: str = ""
-    rights: str = ""
-    lang: str = ""
-    tags: str = ""
-    #funder: str = ""  # removed, because we possibly do not need funder here
-
-    @property
-    def object_id(self):
-        """Return the object id of the object the datastream is part of."""
-        return Path(self.dspath).parts[0]
-
-    def validate(self):
-        """Validate the datastream data."""
-        if not self.dspath.strip():
-            raise ValueError(f"{self.dsid}: dspath must not be empty")
-        if not self.dsid.strip():
-            raise ValueError(f"{self.dspath}: dsid must not be empty")
-        if not self.mimetype.strip():
-            raise ValueError(f"{self.dspath}: mimetype must not be empty")
-        if not self.rights.strip():
-            raise ValueError(f"{self.dspath}: rights must not be empty")
-        #if not self.funder.strip():
-        #    raise ValueError(f"{self.dspath}: funder must not be empty")
-
-    def guess_missing_values(self, object_path: Path):
-        """Guess missing values by analyzing the datastream file."""
-        ds_file = object_path / Path(self.dspath).name
-        self._guess_mimetype(ds_file)
-        self._guess_missing_values(ds_file)
-
-    def _guess_mimetype(self, file_path: Path):
-        """Guess the mimetype if it is empty."""
-        if not self.mimetype:
-            format_info = formatdetect.detect_format(file_path)
-            if format_info is not None:
-                self.mimetype = format_info.mimetype
-            # else:
-            #    self.mimetype = defaultvalues.DEFAULT_MIMETYPE
-
-    def _guess_missing_values(self, file_path: Path):
-        """Guess missing values."""
-        if not self.title:
-            if file_path.name in defaultvalues.FILENAME_MAP:
-                self.title = defaultvalues.FILENAME_MAP[self.dsid]["title"]
-            elif self.mimetype.startswith("image/"):
-                self.title = f"Image: {self.dsid}"
-            elif self.mimetype.startswith("audio/"):
-                self.title = f"Audio: {self.dsid}"
-            elif self.mimetype.startswith("video/"):
-                self.title = f"Video: {self.dsid}"
-            elif self.mimetype == "application/tei+xml":
-                self.title = utils.extract_title_from_tei(file_path)
-            elif self.mimetype == "application/xml":
-                # try lido first
-                self.title = utils.extract_title_from_lido(file_path)
-                # in case mimetxype was set to application/xml bye hand, try tei
-                if self.title == "":
-                    self.title = utils.extract_title_from_tei(file_path)
-
-        if not self.description and file_path.name in defaultvalues.FILENAME_MAP:
-            self.description = defaultvalues.FILENAME_MAP[self.dsid]["description"]
-        if not self.rights:
-            self.rights = defaultvalues.DEFAULT_RIGHTS
-        if not self.creator:
-            self.creator = defaultvalues.DEFAULT_CREATOR
-
-
-@dataclass
-class ObjectCSVFile:
-    """Represents csv data for a single object."""
-
-    def __init__(self):
-        self._objectdata: list[ObjectData] = []
-
-    def add_objectdata(self, objectdata: ObjectData):
-        """Add a ObjectData object."""
-        self._objectdata.append(objectdata)
-
-    def get_data(self, pid: str | None = None) -> Generator[ObjectData, None, None]:
-        """Return the objectdata objects for a given object pid.
-
-        If pid is None, return all objectdata objects.
-        Filtering by pid is only needed if we have data from multiple objects.
-        """
-        for objdata in self._objectdata:
-            if pid is None or objdata.recid == pid:
-                yield objdata
-
-    @classmethod
-    def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":
-        """Load the object data from a csv file."""
-        obj_csv_file = ObjectCSVFile()
-        with csv_file.open(encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                # mainresource was renamed to mainResource. Just in case we have existing data
-                if "mainresource" in row:
-                    row["mainResource"] = row.pop("mainresource")
-                obj_csv_file.add_objectdata(ObjectData(**row))
-        return obj_csv_file
-
-    def to_csv(self, csv_file: Path) -> None:
-        """Save the object data to a csv file."""
-        with csv_file.open("w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=[field.name for field in fields(ObjectData)]
-            )
-            writer.writeheader()
-            for objdata in self._objectdata:
-                writer.writerow(asdict(objdata))
-
-    def sort(self):
-        """Sort collected object data by recid value."""
-        self._objectdata.sort(key=lambda x: x.recid)
-
-    def __len__(self):
-        """Return the number of objectdata objects."""
-        return len(self._objectdata)
-
-
-class DatastreamsCSVFile:
-    """Represents csv data for all datastreams of a single object."""
-
-    def __init__(self, object_dir: Path):
-        self._datastreams: list[DSData] = []
-        self._object_dir = object_dir
-
-    def add_datastream(self, dsdata: DSData):
-        """Add a datastream to the datastreams."""
-        dsdata.guess_missing_values(self._object_dir)
-        self._datastreams.append(dsdata)
-
-    def get_data(self, pid: str | None = None) -> Generator[DSData, None, None]:
-        """Return the datastream objects for a given object pid.
-
-        If pid is None, yield all datastream objects.
-        Filtering by pid is only needed if we have data from multiple objects.
-        """
-        for dsdata in self._datastreams:
-            if pid is None or dsdata.object_id == pid:
-                yield dsdata
-
-    @classmethod
-    def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":
-        """Load the datastream container data from a csv file."""
-        ds_csv_file = DatastreamsCSVFile(csv_file.parent)
-        with csv_file.open(encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                ds_csv_file.add_datastream(DSData(**row))
-        return ds_csv_file
-
-    def to_csv(self, csv_file: Path):
-        """Save the datastream data to a csv file."""
-        self._datastreams.sort(key=lambda x: x.dspath)
-        with csv_file.open("w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=[field.name for field in fields(DSData)]
-            )
-            writer.writeheader()
-            for dsdata in self._datastreams:
-                writer.writerow(asdict(dsdata))
-
-    def sort(self):
-        """Sort collected datastream data by dspath value."""
-        self._datastreams.sort(key=lambda x: x.dspath)
-
-    def get_languages(self) -> list[str]:
-        """Return the languages of all datastreams.
-
-        Extract and combine all entries from the 'lang' field of all datastreams.
-        Returns list of all language codes as strings. The list can contain duplicates,
-        which allows us to rank languaes by their frequency.
-        """
-        languages = []
-        for ds in self._datastreams:
-            languages.extend(ds.lang.split())
-        return languages
-
-    def __len__(self):
-        """Return the number of datastreams."""
-        return len(self._datastreams)
+from gamslib.objectcsv.datastreamscsvfile import DatastreamsCSVFile
+from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
+from gamslib.objectcsv.dsdata import DSData
+from gamslib.objectcsv.objectdata import ObjectData
 
 
 @dataclass
@@ -289,10 +64,33 @@ class ObjectCSV:
         """Add a datastream to the object."""
         self.datastream_data.add_datastream(dsdata)
 
+    def update_datastreams(self, datastreams: list[DSData]):
+        """Update the datastream data."""
+        # step 1: remove all datastreams, which are no longer in object
+        new_datastream_ids = [(ds.dspath, ds.dsid) for ds in datastreams]
+        for dsdata in self.get_datastreamdata():
+            if (dsdata.dspath, dsdata.dsid) not in new_datastream_ids:
+                self.datastream_data.remove(dsdata.dspath, dsdata.dsid)
+        
+        # step 2: merge all existing datastreams
+        unmerged_datastreams = []
+        for datastream in datastreams:
+            if self.datastream_data.merge_datastream(datastream) is None:
+                unmerged_datastreams.append(datastream)
+
+        # step 3: add all new datastreams
+        for dsdata in unmerged_datastreams:
+            self.datastream_data.add_datastream(dsdata)
+
+
     def add_objectdata(self, objectdata: ObjectData):
         """Add a object to the object."""
         self.object_data.add_objectdata(objectdata)
 
+    def update_objectdata(self, objectdata: ObjectData):
+        """Update the object data."""
+        self.object_data.merge_object(objectdata)
+        
     def get_objectdata(
         self, pid: str | None = None
     ) -> Generator[ObjectData, None, None]:

@@ -40,18 +40,21 @@ available in the objectcsv:
   * xlsx_to_csv
 """
 
-from .objectcsv import ObjectCSV, ObjectData, DSData
+from .dsdata import DSData
+from .objectdata import ObjectData
+from .objectcsv import ObjectCSV
 from .create_csv import create_csv_files
 from .manage_csv import collect_csv_data, update_csv_files
 from .xlsx import csv_to_xlsx, xlsx_to_csv
 
 __all__ = [
-    "DSData",
+    "dsdata",
     "ObjectCSV",
-    "ObjectData",
+    "objectdata",
     "collect_csv_data",
     "create_csv_files",
     "csv_to_xlsx",
     "update_csv_files",
     "xlsx_to_csv",
 ]
+
