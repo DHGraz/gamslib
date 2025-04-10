@@ -26,29 +26,37 @@ class DatastreamsCSVFile:
                 self._datastreams.remove(dsdata)
                 break
 
-    def merge_datastream(self, dsdata: DSData):
-        """Merge a datastream with an existing datastream."""
-        old_ds = self.get_data(dsdata.ds_id)
-        if old_ds is None:
-            return None
-        for ds in self._datastreams:
-            if ds.dspath == dsdata.dspath and ds.dsid == dsdata.dsid:
-                # merge the datastream
-                #ds.__dict__.update(dsdata.__dict__)
-                ds.merge(dsdata)
-                return
-        # if not found, add the new datastream
-        self.add_datastream(dsdata)
+    def merge_datastream(self, new_dsdata: DSData) -> DSData:
+        """Merge a single datastream with an existing datastream."""
 
-    def get_data(self, pid: str | None = None) -> Generator[DSData, None, None]:
-        """Return the datastream objects for a given object pid.
+        old_dsdata = self.get_datastream(new_dsdata.dspath)
+        if old_dsdata is None:
+            self.add_datastream(new_dsdata)
+            return new_dsdata
+            #return self._datastreams[-1]
+        else:        
+            old_dsdata.merge(new_dsdata)
+            return old_dsdata
+        
+
+
+    def get_datastreams(self, recid: str = 'all') -> Generator[DSData, None, None]:
+        """Return the datastream objects for all objects or a given object.
 
         If pid is None, yield all datastream objects.
         Filtering by pid is only needed if we have data from multiple objects.
         """
         for dsdata in self._datastreams:
-            if pid is None or dsdata.object_id == pid:
+            if recid is 'all' or dsdata.object_id == recid:
                 yield dsdata
+
+    def get_datastream(self, dspath: str) -> DSData | None:
+        """Return the datastream object with the specified dspath or None."""
+        for dsdata in self._datastreams:
+            if dsdata.dspath == dspath:
+                return dsdata
+        return None
+        
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":

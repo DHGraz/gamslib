@@ -1,3 +1,4 @@
+import copy
 import csv
 from pathlib import Path
 
@@ -8,17 +9,17 @@ from gamslib.objectcsv.dsdata import DSData
 def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     "Test the DatastreamsCSVFile object."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
-    result = list(dcf.get_data())
+    result = list(dcf.get_datastreams())
     assert len(result) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
     assert result[0].dspath == "obj1/TEI.xml"
     assert result[1].dspath == "obj2/TEI2.xml"
 
     # test the get_data method with pid parameter
-    result = list(dcf.get_data("obj1"))
+    result = list(dcf.get_datastreams("obj1"))
     assert len(result) == 1
     assert result[0] == dsdata
 
-    result = list(dcf.get_data("obj2"))
+    result = list(dcf.get_datastreams("obj2"))
     assert len(result) == 1
 
     # test the __len__ method
@@ -47,3 +48,67 @@ def test_dccsvfile_get_languages(dscsvfile: Path):
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
     assert dcf.get_languages() == ["en", "de"]
 
+
+def test_merge_existingdatastream(dscsvfile: Path):
+    "Test the merge_datastream method."
+    dcf = DatastreamsCSVFile.from_csv(dscsvfile)
+
+    new_dsdata = DSData(
+        dspath="obj1/TEI.xml",
+        dsid="TEI.xml",
+        title="Updated TEI file with üßÄ",
+        description="Updated TEI",
+        mimetype="application/json",
+        creator="Updated Foo Bar",
+        rights="Updated GPLv3"
+    )
+    dsdata_to_be_merged = dcf.get_datastream(new_dsdata.dspath)
+    orig_dsdata = copy.deepcopy(dsdata_to_be_merged)
+
+    merged_dsdata = dcf.merge_datastream(new_dsdata)
+  
+    assert merged_dsdata is dsdata_to_be_merged
+    # check if the datastream has been updated
+    assert merged_dsdata == dcf.get_datastream(new_dsdata.dspath)
+    assert merged_dsdata.title == new_dsdata.title
+    assert merged_dsdata.mimetype == new_dsdata.mimetype
+    assert merged_dsdata.creator == new_dsdata.creator
+    assert merged_dsdata.rights == new_dsdata.rights
+
+    assert merged_dsdata.description == orig_dsdata.description    
+    assert merged_dsdata.lang == orig_dsdata.lang
+    assert merged_dsdata.tags == orig_dsdata.tags
+
+
+
+def test_merge_newdatastream(dscsvfile: Path, dsdata: DSData):
+    """"Test the merge_datastream method is a ds did not exist."
+
+    Testing this totally makes sense, because adding new datastreams is a required functionality.
+    """
+    dcf = DatastreamsCSVFile.from_csv(dscsvfile)
+    new_dsdata = DSData(
+        dspath="obj1/TEIx.xml",
+        dsid="TEIx.xml",
+        title="Updated TEI file with üßÄ",
+        description="Updated TEI",
+        mimetype="application/json",
+        creator="Updated Foo Bar",
+        rights="Updated GPLv3",
+        lang="en de",
+        tags="tag1 tag2",
+    )
+
+    merged_dsdata = dcf.merge_datastream(new_dsdata)
+  
+    assert merged_dsdata is new_dsdata
+    # check if the datastream has been updated
+    assert merged_dsdata == dcf.get_datastream(new_dsdata.dspath)
+    assert merged_dsdata.title == new_dsdata.title
+    assert merged_dsdata.mimetype == new_dsdata.mimetype
+    assert merged_dsdata.creator == new_dsdata.creator
+    assert merged_dsdata.rights == new_dsdata.rights
+
+    assert merged_dsdata.description == new_dsdata.description    
+    assert merged_dsdata.lang == new_dsdata.lang
+    assert merged_dsdata.tags == new_dsdata.tags

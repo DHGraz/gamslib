@@ -18,30 +18,29 @@ class ObjectCSVFile:
         """Add a ObjectData object."""
         self._objectdata.append(objectdata)
 
-    def get_data(self, pid: str | None = None) -> Generator[ObjectData, None, None]:
+    def get_data(self, recid: str | None = None) -> Generator[ObjectData, None, None]:
         """Return the objectdata objects for a given object pid.
 
         If pid is None, return all objectdata objects.
         Filtering by pid is only needed if we have data from multiple objects.
         """
         for objdata in self._objectdata:
-            if pid is None or objdata.recid == pid:
+            if recid is None or objdata.recid == recid:
                 yield objdata
 
 
-    def merge_object(self, objectdata: ObjectData):
-        """Merge the object data with another ObjectData object."""
-        old_object = self.get_data(objectdata.recid)
-        if old_object is None:
-            return None
-        old_object.merge(objectdata)
-        # for obj in self._objectdata:
-        #     if obj.recid == objectdata.recid:
-        #         # merge the object
-        #         obj.__dict__.update(objectdata.__dict__)
-        #         return
-        # # if not found, add the new object
-        # self.add_objectdata(objectdata)
+    def merge_object(self, other: ObjectData) -> ObjectData:
+        """Merge the object data with dara from other.
+        
+        Returns the merged ObjectData object.
+        """
+        old_objectdata = next(self.get_data(other.recid), None)
+        if old_objectdata is None:
+            self.add_objectdata(other)
+            return other
+        else:
+            old_objectdata.merge(other)
+            return old_objectdata
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":

@@ -105,9 +105,9 @@ class ObjectCSV:
     ) -> Generator[DSData, None, None]:
         """Return the datastream data for a given object pid.
 
-        If pid is None, return all datastream data.
+        If pid is None, return all datastream data (not just for a single object).
         """
-        return self.datastream_data.get_data(pid)
+        return self.datastream_data.get_datastreams(pid)
 
     def sort(self):
         """Sort the object and datastream data."""

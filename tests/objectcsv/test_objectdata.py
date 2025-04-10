@@ -51,32 +51,84 @@ def test_fix_for_mainresource(tmp_path):
     data = ObjectCSVFile.from_csv(csv_file)
     assert next(data.get_data()).mainResource == "TEI.xml"
 
-@pytest.mark.skip
 def test_objectdata_merge(objdata):
     "Should merge two ObjectData objects."
-    objdata2 = copy.deepcopy(objdata)
+    new_objdata = copy.deepcopy(objdata)
+    original_objdata = copy.deepcopy(objdata)
     #['title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType', 'funder']
-    objdata2.title = "The title 2"
-    objdata2.project = "The project 2"
-    objdata2.creator = "The creator 2"
-    objdata2.rights = "The rights 2"
-    objdata2.publisher = "The publisher 2"
-    objdata2.source = "The source 2"
-    objdata2.objectType = "The objectType 2"
-    objdata2.funder = "The funder 2"
 
-    objdata.merge(objdata2)
-    assert objdata.title == "The title 2"
-    assert objdata.project == "The project 2"
-    assert objdata.description == "The description with ÄÖÜ"
-    assert objdata.creator == "The creator 2"
-    assert objdata.rights == "The rights 2"
-    assert objdata.publisher == "The publisher 2"
-    assert objdata.source == "The source 2"
-    assert objdata.objectType == "The objectType 2"
-    assert objdata.mainResource == "TEI.xml"
-    assert objdata.funder == "The funder 2"
+    new_objdata.title = "Updated title"
+    new_objdata.project = "Updated project"
+    new_objdata.creator = "Updated creator"
+    new_objdata.rights = "Updated rights"
+    new_objdata.publisher = "Updated publisher"
+    new_objdata.source = "Updated source"
+    new_objdata.objectType = "Updated objectType"
+    new_objdata.mainResource = "Updated mainResource"
+    new_objdata.funder = "Updated funder"
 
+    # and now some more changed fields, which should be ignored
+    new_objdata.description = "Updated description"
+    new_objdata.mainResource = "Updated mainResource"
+
+    objdata.merge(new_objdata)
+    assert objdata.title == new_objdata.title
+    assert objdata.project == new_objdata.project
+    assert objdata.creator == new_objdata.creator
+    assert objdata.rights == new_objdata.rights
+    assert objdata.publisher == new_objdata.publisher
+    assert objdata.source == new_objdata.source
+    assert objdata.objectType == new_objdata.objectType
+    assert objdata.funder == new_objdata.funder
+    assert objdata.mainResource == new_objdata.mainResource
+
+    # check that the other fields are not changed
+    assert objdata.recid == original_objdata.recid
+    assert objdata.description == original_objdata.description
+    
+    
+
+def test_objectdata_merge_empty(objdata):
+    "Empty fields should not be merged."
+    new_objdata = copy.deepcopy(objdata)
+    original_objdata = copy.deepcopy(objdata)
+    #['title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType', 'funder']
+
+    new_objdata.title = ""
+    new_objdata.project = ""
+    new_objdata.creator = ""
+    new_objdata.rights = ""
+    new_objdata.publisher = ""
+    new_objdata.source = ""
+    new_objdata.objectType = ""
+    new_objdata.mainResource = ""
+    new_objdata.funder = ""
+
+    # and now some more changed fields, which should be ignored
+    new_objdata.description = ""
+    
+
+    objdata.merge(new_objdata)
+    assert objdata.title == original_objdata.title
+    assert objdata.project == original_objdata.project
+    assert objdata.creator == original_objdata.creator
+    assert objdata.rights == original_objdata.rights
+    assert objdata.publisher == original_objdata.publisher
+    assert objdata.source == original_objdata.source
+    assert objdata.objectType == original_objdata.objectType
+    assert objdata.funder == original_objdata.funder
+    assert objdata.mainResource == original_objdata.mainResource
+   
+    assert objdata.recid == original_objdata.recid
+    assert objdata.description == original_objdata.description
+    
+
+def test_objectdata_merge_different_recid(objdata):
+    "Should raise an exception if recid is different."
+    new_objdata = copy.deepcopy(objdata)
+    new_objdata.recid = "obj2"
+    with pytest.raises(ValueError):
+        objdata.merge(new_objdata)
     
 def test_objectdata_validate(objdata):
     "Should raise an exception if required fields are missing."

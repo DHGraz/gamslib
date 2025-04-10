@@ -149,7 +149,7 @@ def test_create_csv_files(datadir, test_config):
     assert (objects_root_dir / "obj2" / "object.csv").exists()
     assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
 
-@pytest.mark.skip
+#@pytest.mark.skip
 def test_update_csv(datadir, tmp_path, test_config):
     """Test the update_csv function."""
     object_dir = datadir / "objects" / "obj1"

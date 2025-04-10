@@ -36,6 +36,7 @@ def dsdata_fixture() -> DSData:
         creator="Foo Bar",
         rights="GPLv3",
         lang="en de",
+        tags=["tag 1", "tag 2", "tag 3"],
     )
 
 
@@ -62,9 +63,10 @@ def dscsvfile_fixture(dsdata: DSData, tmp_path: Path) -> Path:
     """
     ds1 = asdict(dsdata)
     ds2 = copy.deepcopy(ds1)
-    ds2["dspath"] = "obj2/TEI2.xml"
+    ds2["dspath"] = "obj1/TEI2.xml"
     ds2["dsid"] = "TEI2.xml"
     ds2["lang"] = "nl it"
+    ds2["tags"] = ["tag 8", "tag 9"]
 
     col_names = list(ds1.keys())
 

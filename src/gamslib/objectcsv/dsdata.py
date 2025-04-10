@@ -19,7 +19,7 @@ class DSData:
     rights: str = ""
     lang: str = ""
     tags: str = ""
-    #funder: str = ""  # removed, because we possibly do not need funder here
+    
 
     @property
     def object_id(self):
@@ -28,22 +28,22 @@ class DSData:
 
 
     def merge(self, other_dsdata: "DSData"):
-        """Merge the datastream data with another DSData object."""
+        """Merge the datastream data with another DSData object.
+        This is used to update the datastream if it has been created before.
+        The datastreams are merged by selectively overwriting the values of the current
+        datastream with the values of the other datastream.
+        The datastreams must have the same dspath and dsid."""
         if self.dspath != other_dsdata.dspath:
             raise ValueError("Cannot merge datastreams with different dspath values")
         if self.dsid != other_dsdata.dsid:
             raise ValueError("Cannot merge datastreams with different dsid values")
-        # merge the datastream
-        # - description of other datastream is always empty
-        # - lang and tags are currently set manually. So do not change them
-        # TODO: what should be overwritten? Is this ok?
-        if other_dsdata.title:
+        if other_dsdata.title.strip():
             self.title = other_dsdata.title
-        if other_dsdata.mimetype:
+        if other_dsdata.mimetype.strip():
             self.mimetype = other_dsdata.mimetype
-        if other_dsdata.creator:
+        if other_dsdata.creator.strip():
             self.creator = other_dsdata.creator
-        if other_dsdata.rights:
+        if other_dsdata.rights.strip():
             self.rights = other_dsdata.rights
 
 
