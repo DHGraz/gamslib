@@ -10,17 +10,17 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     "Test the DatastreamsCSVFile object."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
     result = list(dcf.get_datastreams())
-    assert len(result) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])
+    assert len(result) == len(["obj1/TEI.xml", "obj1/TEI2.xml"])
     assert result[0].dspath == "obj1/TEI.xml"
-    assert result[1].dspath == "obj2/TEI2.xml"
+    assert result[1].dspath == "obj1/TEI2.xml"
 
     # test the get_data method with pid parameter
     result = list(dcf.get_datastreams("obj1"))
-    assert len(result) == 1
+    assert len(result) == len(['obj1/TEI.xml', 'obj1/TEI2.xml'])
     assert result[0] == dsdata
 
     result = list(dcf.get_datastreams("obj2"))
-    assert len(result) == 1
+    assert len(result) == 0
 
     # test the __len__ method
     assert len(dcf) == len(["obj1/TEI.xml", "obj2/TEI2.xml"])

@@ -1,10 +1,9 @@
-from gamslib.objectcsv.objectdata import ObjectData
-
-
 import csv
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Generator
+
+from gamslib.objectcsv.objectdata import ObjectData
 
 
 @dataclass
@@ -28,10 +27,9 @@ class ObjectCSVFile:
             if recid is None or objdata.recid == recid:
                 yield objdata
 
-
     def merge_object(self, other: ObjectData) -> ObjectData:
         """Merge the object data with dara from other.
-        
+
         Returns the merged ObjectData object.
         """
         old_objectdata = next(self.get_data(other.recid), None)

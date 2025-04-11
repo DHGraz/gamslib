@@ -36,7 +36,7 @@ def dsdata_fixture() -> DSData:
         creator="Foo Bar",
         rights="GPLv3",
         lang="en de",
-        tags=["tag 1", "tag 2", "tag 3"],
+        tags="tag 1, tag 2, tag 3"
     )
 
 

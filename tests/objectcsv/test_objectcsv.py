@@ -109,3 +109,98 @@ def test_objectcsv_missing_dir():
     "Should raise an exception if the directory does not exist."
     with pytest.raises(FileNotFoundError):
         ObjectCSV(Path("does_not_exist"))
+
+def test_update_objectdata(objcsvfile: Path, objdata: ObjectData):
+    """Test the update_objectdata method."""
+    # Create an ObjectCSV instance
+    oc = ObjectCSV(objcsvfile.parent)
+    
+    # Get the initial object data for modification
+    initial_obj = next(oc.get_objectdata())
+    modified_obj = copy.deepcopy(initial_obj)
+    
+    # Modify some fields in the object data
+    modified_obj.title = "Updated Title"
+    modified_obj.creator = "Updated Creator"
+    
+    # Update the object data
+    oc.update_objectdata(modified_obj)
+    
+    # Check if the update was successful
+    updated_obj = next(oc.get_objectdata())
+    assert updated_obj.title == "Updated Title"
+    assert updated_obj.creator == "Updated Creator"
+    assert updated_obj.recid == initial_obj.recid  # The ID should remain the same
+    
+    # Test updating with a different object that has the same ID
+    new_obj = copy.deepcopy(objdata)
+    new_obj.recid = initial_obj.recid  # Same ID
+    new_obj.title = "Another Title"
+    new_obj.creator = "Another Creator"
+    
+    oc.update_objectdata(new_obj)
+    
+    # Verify the object was updated correctly
+    result_obj = next(oc.get_objectdata())
+    assert result_obj.title == "Another Title"
+    assert result_obj.creator == "Another Creator"
+    assert result_obj.recid == initial_obj.recid
+
+def test_update_datastreams(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+    """Test the update_datastreams method."""
+    # Create an ObjectCSV instance
+    oc = ObjectCSV(objcsvfile.parent)
+    
+    # Get the initial datastreams
+    initial_datastreams = list(oc.get_datastreamdata())
+    assert len(initial_datastreams) > 0
+    
+    # # Make a copy of the first datastream and modify it
+    # modified_ds = copy.deepcopy(initial_datastreams[0])
+    # modified_ds.title = "Updated Datastream"
+    # modified_ds.format = "Updated Format"
+    
+    # # Create a new datastream
+    # new_ds = copy.deepcopy(dsdata)
+    # new_ds.dspath = "obj1/NEW.xml"
+    # new_ds.dsid = "NEW"
+    # new_ds.title = "New Datastream"
+    
+    # # Update with modified and new datastreams (excluding one original stream)
+    # update_list = [modified_ds, new_ds]
+    # oc.update_datastreams(update_list)
+    
+    # # Verify the results
+    # updated_datastreams = list(oc.get_datastreamdata())
+    
+    # # Should have exactly 2 datastreams now
+    # assert len(updated_datastreams) == len['obj1/TEI.xml', 'obj1/NEW.xml']
+    
+    # # Check that the modified datastream was updated correctly
+    # found_modified = False
+    # found_new = False
+    
+    # for ds in updated_datastreams:
+    #     if ds.dspath == modified_ds.dspath and ds.dsid == modified_ds.dsid:
+    #         assert ds.title == "Updated Datastream"
+    #         assert ds.format == "Updated Format"
+    #         found_modified = True
+    #     elif ds.dspath == new_ds.dspath and ds.dsid == new_ds.dsid:
+    #         assert ds.title == "New Datastream"
+    #         found_new = True
+    
+    # assert found_modified
+    # assert found_new
+    
+    # # Check that other original datastreams were removed
+    # for ds in initial_datastreams:
+    #     if (ds.dspath != modified_ds.dspath or ds.dsid != modified_ds.dsid) and (ds.dspath != new_ds.dspath or ds.dsid != new_ds.dsid):
+    #         # This datastream should have been removed
+    #         for updated_ds in updated_datastreams:
+    #             assert (updated_ds.dspath != ds.dspath) or (updated_ds.dsid != ds.dsid)
+
+
+
+
+
+

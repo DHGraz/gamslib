@@ -11,27 +11,32 @@ from gamslib.objectcsv.manage_csv import (
 
 def test_collect_csv_data(datadir, tmp_path):
     "Collect data from all csv files in all object folders."
-    root_dir = datadir / "objects"
 
+    # this is where we put the collected data
     obj_file = tmp_path / "all_objects.csv"
     ds_file = tmp_path / "all_datastreams.csv"
 
+    # this is the root dictory of all object directorie
+    root_dir = datadir / "objects"
+
+
     all_obj_csv = collect_csv_data(root_dir, obj_file, ds_file)
 
+    # check if the objectcsv object and the 2 csv files have been created
     assert all_obj_csv.object_dir == root_dir
     assert isinstance(all_obj_csv, ObjectCSV)
-
     assert obj_file.exists()
     assert ds_file.exists()
 
+    # check if object data has been collected correctly
     with open(obj_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        data = sorted(list(reader), key=lambda x: x["recid"])
+        obj_data = sorted(list(reader), key=lambda x: x["recid"])
+    assert len(obj_data) == len(["obj1", "obj2"])
+    assert obj_data[0]["recid"] == "obj1"
+    assert obj_data[1]["recid"] == "obj2"
 
-    assert len(data) == len(["obj1", "obj2"])
-    assert data[0]["recid"] == "obj1"
-    assert data[1]["recid"] == "obj2"
-
+    # Check if the datastream data has been collected correctly
     with open(ds_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         data = list(reader)

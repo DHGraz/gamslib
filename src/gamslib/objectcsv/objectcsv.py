@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Generator
 
 from gamslib.objectcsv.datastreamscsvfile import DatastreamsCSVFile
-from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 from gamslib.objectcsv.dsdata import DSData
+from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 from gamslib.objectcsv.objectdata import ObjectData
 
 
@@ -31,7 +31,7 @@ class ObjectCSV:
     DATASTREAM_CSV_FILENAME = "datastreams.csv"
 
     object_dir: Path
-    object_file: str = OBJECT_CSV_FILENAME 
+    object_file: str = OBJECT_CSV_FILENAME
     datastream_file: str = DATASTREAM_CSV_FILENAME
 
     def __post_init__(self):
@@ -56,8 +56,6 @@ class ObjectCSV:
 
     def is_new(self):
         """Return True if at least one of the csv files exist."""
-        # obj_csv = self.object_dir / self.OBJECT_CSV_FILENAME
-        # ds_csv = self.object_dir / self.DATASTREAM_CSV_FILENAME
         return not (self.obj_csv_file.exists() or self.ds_csv_file.exists())
 
     def add_datastream(self, dsdata: DSData):
@@ -71,17 +69,10 @@ class ObjectCSV:
         for dsdata in self.get_datastreamdata():
             if (dsdata.dspath, dsdata.dsid) not in new_datastream_ids:
                 self.datastream_data.remove(dsdata.dspath, dsdata.dsid)
-        
+
         # step 2: merge all existing datastreams
-        unmerged_datastreams = []
         for datastream in datastreams:
-            if self.datastream_data.merge_datastream(datastream) is None:
-                unmerged_datastreams.append(datastream)
-
-        # step 3: add all new datastreams
-        for dsdata in unmerged_datastreams:
-            self.datastream_data.add_datastream(dsdata)
-
+            self.datastream_data.merge_datastream(datastream)
 
     def add_objectdata(self, objectdata: ObjectData):
         """Add a object to the object."""
@@ -90,7 +81,7 @@ class ObjectCSV:
     def update_objectdata(self, objectdata: ObjectData):
         """Update the object data."""
         self.object_data.merge_object(objectdata)
-        
+
     def get_objectdata(
         self, pid: str | None = None
     ) -> Generator[ObjectData, None, None]:
@@ -100,9 +91,7 @@ class ObjectCSV:
         """
         return self.object_data.get_data(pid)
 
-    def get_datastreamdata(
-        self, pid: str | None = None
-    ) -> Generator[DSData, None, None]:
+    def get_datastreamdata(self, pid: str = "all") -> Generator[DSData, None, None]:
         """Return the datastream data for a given object pid.
 
         If pid is None, return all datastream data (not just for a single object).

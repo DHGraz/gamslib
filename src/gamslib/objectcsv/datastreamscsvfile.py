@@ -1,10 +1,9 @@
-from gamslib.objectcsv.dsdata import DSData
-
-
 import csv
 from dataclasses import asdict, fields
 from pathlib import Path
 from typing import Generator
+
+from gamslib.objectcsv.dsdata import DSData
 
 
 class DatastreamsCSVFile:
@@ -33,21 +32,18 @@ class DatastreamsCSVFile:
         if old_dsdata is None:
             self.add_datastream(new_dsdata)
             return new_dsdata
-            #return self._datastreams[-1]
-        else:        
+        else:
             old_dsdata.merge(new_dsdata)
             return old_dsdata
-        
 
-
-    def get_datastreams(self, recid: str = 'all') -> Generator[DSData, None, None]:
+    def get_datastreams(self, recid: str = "all") -> Generator[DSData, None, None]:
         """Return the datastream objects for all objects or a given object.
 
         If pid is None, yield all datastream objects.
         Filtering by pid is only needed if we have data from multiple objects.
         """
         for dsdata in self._datastreams:
-            if recid is 'all' or dsdata.object_id == recid:
+            if recid in ("all", dsdata.object_id):
                 yield dsdata
 
     def get_datastream(self, dspath: str) -> DSData | None:
@@ -56,7 +52,6 @@ class DatastreamsCSVFile:
             if dsdata.dspath == dspath:
                 return dsdata
         return None
-        
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":

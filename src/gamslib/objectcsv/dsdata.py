@@ -1,9 +1,8 @@
-from gamslib import formatdetect
-from gamslib.objectcsv import defaultvalues, utils
-
-
 from dataclasses import dataclass
 from pathlib import Path
+
+from gamslib import formatdetect
+from gamslib.objectcsv import defaultvalues, utils
 
 
 @dataclass
@@ -19,13 +18,11 @@ class DSData:
     rights: str = ""
     lang: str = ""
     tags: str = ""
-    
 
     @property
     def object_id(self):
         """Return the object id of the object the datastream is part of."""
         return Path(self.dspath).parts[0]
-
 
     def merge(self, other_dsdata: "DSData"):
         """Merge the datastream data with another DSData object.
@@ -46,7 +43,6 @@ class DSData:
         if other_dsdata.rights.strip():
             self.rights = other_dsdata.rights
 
-
     def validate(self):
         """Validate the datastream data."""
         if not self.dspath.strip():
@@ -57,7 +53,7 @@ class DSData:
             raise ValueError(f"{self.dspath}: mimetype must not be empty")
         if not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
-        #if not self.funder.strip():
+        # if not self.funder.strip():
         #    raise ValueError(f"{self.dspath}: funder must not be empty")
 
     def guess_missing_values(self, object_path: Path):

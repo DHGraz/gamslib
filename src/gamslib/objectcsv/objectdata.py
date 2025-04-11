@@ -17,13 +17,22 @@ class ObjectData:
     mainResource: str = ""  # main datastream
     funder: str = ""
 
-
     def merge(self, other: "ObjectData"):
         """Merge the object data with another ObjectData object."""
         if self.recid != other.recid:
             raise ValueError("Cannot merge objects with different recid values")
         # These are the fields which are possibly set automatically set in the new object data
-        fields_to_merge = ['title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType', 'mainResource', 'funder']
+        fields_to_merge = [
+            "title",
+            "project",
+            "creator",
+            "rights",
+            "publisher",
+            "source",
+            "objectType",
+            "mainResource",
+            "funder",
+        ]
         for field in fields_to_merge:
             if getattr(other, field).strip():
                 setattr(self, field, getattr(other, field))
