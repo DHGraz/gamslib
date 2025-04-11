@@ -86,3 +86,37 @@ def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
 
 def test_repr(detector):
     assert repr(detector) == "MagikaDetector"
+
+def test_fix_result():
+    """Test the _fix_result method."""
+    # Test for javascript with .jsonld extension
+    path = Path("/path/to/file.jsonld")
+    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    assert label == "json"
+    assert mime_type == "application/json"
+
+    # Test for javascript with .json extension
+    path = Path("/path/to/file.json")
+    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    assert label == "json"
+    assert mime_type == "application/json"
+
+    # Test for javascript with other extension
+    path = Path("/path/to/file.js")
+    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    assert label == "javascript"
+    assert mime_type == "application/javascript"
+
+    # Test for text/xml conversion
+    path = Path("/path/to/file.xml")
+    label, mime_type = MagikaDetector._fix_result(path, "xml", "text/xml")
+    assert label == "xml"
+    assert mime_type == "application/xml"
+
+    # Test for non-special case
+    path = Path("/path/to/file.txt")
+    label, mime_type = MagikaDetector._fix_result(path, "text", "text/plain")
+    assert label == "text"
+    assert mime_type == "text/plain"
+
+

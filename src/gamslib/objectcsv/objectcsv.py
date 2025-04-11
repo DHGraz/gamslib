@@ -68,7 +68,7 @@ class ObjectCSV:
         new_datastream_ids = [(ds.dspath, ds.dsid) for ds in datastreams]
         for dsdata in self.get_datastreamdata():
             if (dsdata.dspath, dsdata.dsid) not in new_datastream_ids:
-                self.datastream_data.remove(dsdata.dspath, dsdata.dsid)
+                self.datastream_data.remove_datastream(dsdata.dspath, dsdata.dsid)
 
         # step 2: merge all existing datastreams
         for datastream in datastreams:

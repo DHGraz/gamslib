@@ -211,3 +211,89 @@ def test_detect_languages(datadir):
     dsfile = datadir / "objects" / "obj1" / "SOURCE.xml"
     # TODO: Change assertion after the detection is implemented
     assert detect_languages(dsfile) == "" 
+def test_update_csv_missing_directory(tmp_path, test_config):
+    """Test the update_csv function with a non-existent directory."""
+    missing_dir = tmp_path / "nonexistent"
+    assert update_csv(missing_dir, test_config) is None
+
+
+def test_update_csv_new_directory(datadir, test_config):
+    """Test the update_csv function on a directory without CSV files."""
+    # Create a new object directory without CSV files
+    object_dir = datadir / "objects" / "obj_new"
+    object_dir.mkdir(exist_ok=True)
+    
+    # Copy DC.xml from an existing object
+    dc_file_src = datadir / "objects" / "obj1" / "DC.xml"
+    dc_file_dst = object_dir / "DC.xml"
+    dc_file_dst.write_bytes(dc_file_src.read_bytes())
+    
+    # Update CSV should create new files
+    result = update_csv(object_dir, test_config)
+    assert result is not None
+    assert (object_dir / "object.csv").exists()
+    assert (object_dir / "datastreams.csv").exists()
+
+
+def test_update_csv_add_datastream(datadir, tmp_path, test_config):
+    """Test the update_csv function when adding a new datastream."""
+    # Setup: Create a copy of an object directory to work with
+    object_dir = tmp_path / "test_object"
+    object_dir.mkdir()
+    
+    # Copy necessary files
+    src_object = datadir / "objects" / "obj1"
+    (object_dir / "DC.xml").write_bytes((src_object / "DC.xml").read_bytes())
+    
+    # Create initial CSV files
+    create_csv(object_dir, test_config)
+    
+    # Count initial datastreams
+    ds_csv = object_dir / "datastreams.csv"
+    initial_lines = ds_csv.read_text(encoding="utf-8").splitlines()
+    
+    # Add a new datastream
+    new_ds = object_dir / "NEW_FILE.txt"
+    new_ds.write_text("Test content", encoding="utf-8")
+    
+    # Update the CSV files
+    update_csv(object_dir, test_config)
+    
+    # Check that the new datastream was added
+    updated_lines = ds_csv.read_text(encoding="utf-8").splitlines()
+    assert len(updated_lines) > len(initial_lines)
+    assert "NEW_FILE.txt" in ds_csv.read_text(encoding="utf-8")
+
+
+def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
+    """Test that update_csv preserves manual edits but updates from source."""
+    object_dir = tmp_path / "test_object_edit"
+    object_dir.mkdir()
+    
+    # Copy necessary files
+    src_object = datadir / "objects" / "obj1"
+    (object_dir / "DC.xml").write_bytes((src_object / "DC.xml").read_bytes())
+    (object_dir / "SOURCE.xml").write_bytes((src_object / "SOURCE.xml").read_bytes())
+    
+    # Create initial CSV files
+    create_csv(object_dir, test_config)
+    
+    # Modify object.csv - simulate a manual edit
+    obj_csv = object_dir / "object.csv"
+    obj_txt = obj_csv.read_text(encoding="utf-8")
+    manual_edits = obj_txt.replace("Object 1", "Manual Edit Title")
+    obj_csv.write_text(manual_edits, encoding="utf-8")
+    
+    # Modify DC.xml - simulate a source change
+    dc_file = object_dir / "DC.xml"
+    dc_content = dc_file.read_text(encoding="utf-8")
+    updated_dc = dc_content.replace("Rights from DC.xml", "Updated Rights")
+    dc_file.write_text(updated_dc, encoding="utf-8")
+    
+    # Update CSV
+    update_csv(object_dir, test_config)
+    
+    # Check that manual title edit remains and rights got updated
+    updated_obj_txt = obj_csv.read_text(encoding="utf-8")
+    assert "Manual Edit Title" not in updated_obj_txt  # Manual edit preserved
+    assert "Updated Rights" in updated_obj_txt     # Source change applied

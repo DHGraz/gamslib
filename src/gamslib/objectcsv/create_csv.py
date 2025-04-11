@@ -195,7 +195,7 @@ def update_csv(
 ) -> ObjectCSV | None:
     """Update an existing CSV file for a given object directory.
 
-    This function is used to update the metadata for an existing object directory with existing CSV files.
+    This function is used to update the metadata for an object directory with existing CSV files.
     """
     # The is a new use case: It happens, that eg. datastreams are added to an object after a csv has been created.
     # In this case, we need to update the csv files, but not overwrite them.
@@ -217,10 +217,7 @@ def update_csv(
     datastreams = []
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file):
-            datastreams.append(collect_datastream_data(ds_file, configuration, dc)
-            #objectcsv.update_datastream(
-            #    collect_datastream_data(ds_file, configuration, dc)
-            )
+            datastreams.append(collect_datastream_data(ds_file, configuration, dc))
     objectcsv.update_datastreams(datastreams)
     objectcsv.write()
     return objectcsv

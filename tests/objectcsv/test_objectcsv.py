@@ -155,49 +155,42 @@ def test_update_datastreams(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
     initial_datastreams = list(oc.get_datastreamdata())
     assert len(initial_datastreams) > 0
     
-    # # Make a copy of the first datastream and modify it
-    # modified_ds = copy.deepcopy(initial_datastreams[0])
-    # modified_ds.title = "Updated Datastream"
-    # modified_ds.format = "Updated Format"
+    # Make a copy of the first datastream and modify it
+    modified_ds = copy.deepcopy(initial_datastreams[0])
+    new_ds = copy.deepcopy(initial_datastreams[0])
+    modified_ds.title = "Updated Datastream"
+    modified_ds.creator = "Updated Creator"
+    new_ds.dspath = "obj1/NEW.xml"
+    new_ds.dsid = "NEW"
+    new_ds.title = "New Datastream"
+    new_ds.creator = "Updated Creator"
+
+    # Update with modified and new datastreams
+    update_list = [modified_ds, new_ds]
+    oc.update_datastreams(update_list)
+  
+    # Verify the results
+    updated_datastreams = list(oc.get_datastreamdata())
     
-    # # Create a new datastream
-    # new_ds = copy.deepcopy(dsdata)
-    # new_ds.dspath = "obj1/NEW.xml"
-    # new_ds.dsid = "NEW"
-    # new_ds.title = "New Datastream"
+    # Should have exactly 2 datastreams now
+    assert len(updated_datastreams) == len(['obj1/TEI.xml', 'obj1/NEW.xml'])
     
-    # # Update with modified and new datastreams (excluding one original stream)
-    # update_list = [modified_ds, new_ds]
-    # oc.update_datastreams(update_list)
+    # Check that the modified datastream was updated correctly
+    found_modified = False
+    found_new = False
+    for ds in updated_datastreams:
+        if ds.dspath == modified_ds.dspath and ds.dsid == modified_ds.dsid:
+            assert ds.title == "Updated Datastream"
+            assert ds.creator == "Updated Creator"
+            found_modified = True
+        elif ds.dspath == new_ds.dspath and ds.dsid == new_ds.dsid:
+            assert ds.title == "New Datastream"
+            found_new = True
+    assert found_modified
+    assert found_new
     
-    # # Verify the results
-    # updated_datastreams = list(oc.get_datastreamdata())
-    
-    # # Should have exactly 2 datastreams now
-    # assert len(updated_datastreams) == len['obj1/TEI.xml', 'obj1/NEW.xml']
-    
-    # # Check that the modified datastream was updated correctly
-    # found_modified = False
-    # found_new = False
-    
-    # for ds in updated_datastreams:
-    #     if ds.dspath == modified_ds.dspath and ds.dsid == modified_ds.dsid:
-    #         assert ds.title == "Updated Datastream"
-    #         assert ds.format == "Updated Format"
-    #         found_modified = True
-    #     elif ds.dspath == new_ds.dspath and ds.dsid == new_ds.dsid:
-    #         assert ds.title == "New Datastream"
-    #         found_new = True
-    
-    # assert found_modified
-    # assert found_new
-    
-    # # Check that other original datastreams were removed
-    # for ds in initial_datastreams:
-    #     if (ds.dspath != modified_ds.dspath or ds.dsid != modified_ds.dsid) and (ds.dspath != new_ds.dspath or ds.dsid != new_ds.dsid):
-    #         # This datastream should have been removed
-    #         for updated_ds in updated_datastreams:
-    #             assert (updated_ds.dspath != ds.dspath) or (updated_ds.dsid != ds.dsid)
+    # Assert that the obj1/TEI2.xml datastream has been removed from the updated datastreams
+    assert 'obj1/TEI2.xml' not in [ds.dspath for ds in updated_datastreams]
 
 
 
