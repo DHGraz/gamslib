@@ -2,6 +2,7 @@
 
 # pylint: disable=W0212 # access to ._data
 import pytest
+
 from gamslib.objectcsv.dublincore import DublinCore
 
 
@@ -196,12 +197,14 @@ def test_get_en_element_with_linebreaks(datadir, tmp_path):
     "Test get_en_element with linebreaks in the text: all linebreaks should be removed."
     path = datadir / "DC.xml"
     xml = path.read_text(encoding="utf-8")
-    xml = xml.replace("<dc:creator>Foo, Bar</dc:creator>", "<dc:creator xml:lang=\"en\">Foo,\nBar\r\nFoobar</dc:creator>")
+    xml = xml.replace(
+        "<dc:creator>Foo, Bar</dc:creator>",
+        '<dc:creator xml:lang="en">Foo,\nBar\r\nFoobar</dc:creator>',
+    )
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
     dc = DublinCore(new_path)
     assert dc.get_en_element("creator") == ["Foo, Bar Foobar"]
-
 
 
 def test_get_en_element_as_str(datadir, tmp_path):
@@ -216,7 +219,6 @@ def test_get_en_element_as_str(datadir, tmp_path):
         dc.get_en_element_as_str("foo")
     assert dc.get_en_element_as_str("publisher", default="foo") == "foo"
 
-
     # Let's add a second title in english
     dc_lines = path.read_text(encoding="utf-8").splitlines()
     dc_lines.insert(3, '<dc:title xml:lang="en">pd2</dc:title>')
@@ -225,4 +227,3 @@ def test_get_en_element_as_str(datadir, tmp_path):
     dc = DublinCore(new_dcpath)
     # we have 2 english titles and a german title
     assert dc.get_en_element_as_str("title") == "Person description 1; pd2"
-

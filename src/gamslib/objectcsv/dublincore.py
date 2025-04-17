@@ -122,7 +122,7 @@ class DublinCore:
                 element[lang] = values
                 self._data[elem] = element
         # TODO: Add DC_TERMS and DCMI_TYPES?
-
+    @classmethod
     def remove_linebreaks(cls, text: str) -> str:
         """Remove linebreaks from a string.
 
@@ -131,11 +131,10 @@ class DublinCore:
         """
         return text.replace("\n", " ").replace("\r", "").strip()
 
-
     def get_en_element(self, name: str, default="") -> list[str]:
         """Return the value of a Dublin Core element in English.
 
-        It always returns a list of strings, even if only one value or no element is available. 
+        It always returns a list of strings, even if only one value or no element is available.
 
         :param str name: The name of the element without namespace (e.g. "title").
         :return: The value(s) of the element as list of strings.
@@ -143,12 +142,12 @@ class DublinCore:
         """
         if name not in DC_ELEMENTS:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
-        
+
         values = self._data[name].get("en", [])
         if not values and default != "":
             values = [default]
         return [self.remove_linebreaks(value) for value in values]
-    
+
     def get_en_element_as_str(self, name: str, default="") -> str:
         """Return the joint values of a Dublin Core element in English.
 
@@ -158,7 +157,7 @@ class DublinCore:
         """
 
         return "; ".join(self.get_en_element(name, default=default))
-    
+
     def get_element(
         self, name: str, preferred_lang: str = "en", default: str = ""
     ) -> list[str]:
@@ -193,7 +192,6 @@ class DublinCore:
             )
             return [default]
 
-
         if preferred_lang not in self._data[name]:
             for lang in [*self.lookup_order, "unspecified"]:
                 if lang in self._data[name]:
@@ -206,7 +204,9 @@ class DublinCore:
                         lang,
                     )
                     break
-        return [self.remove_linebreaks(value) for value in self._data[name][preferred_lang]]
+        return [
+            self.remove_linebreaks(value) for value in self._data[name][preferred_lang]
+        ]
 
     def get_element_as_str(
         self, name: str, preferred_lang: str = "en", default: str = ""
@@ -220,7 +220,7 @@ class DublinCore:
         (eg. rights is handled differently than title).
         """
         values = self.get_element(name, preferred_lang, default)
-        if name == 'rights':
+        if name == "rights":
             # we expect the licence name first, followed by the url in brackets
             str_value = values[0] if len(values) == 1 else f"{values[0]} ({values[1]})"
         else:

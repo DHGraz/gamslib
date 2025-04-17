@@ -1,3 +1,6 @@
+"""
+Test the DSData class."""
+
 import copy
 import csv
 from pathlib import Path
@@ -16,7 +19,7 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
 
     # test the get_data method with pid parameter
     result = list(dcf.get_datastreams("obj1"))
-    assert len(result) == len(['obj1/TEI.xml', 'obj1/TEI2.xml'])
+    assert len(result) == len(["obj1/TEI.xml", "obj1/TEI2.xml"])
     assert result[0] == dsdata
 
     result = list(dcf.get_datastreams("obj2"))
@@ -60,13 +63,13 @@ def test_merge_existingdatastream(dscsvfile: Path):
         description="Updated TEI",
         mimetype="application/json",
         creator="Updated Foo Bar",
-        rights="Updated GPLv3"
+        rights="Updated GPLv3",
     )
     dsdata_to_be_merged = dcf.get_datastream(new_dsdata.dspath)
     orig_dsdata = copy.deepcopy(dsdata_to_be_merged)
 
     merged_dsdata = dcf.merge_datastream(new_dsdata)
-  
+
     assert merged_dsdata is dsdata_to_be_merged
     # check if the datastream has been updated
     assert merged_dsdata == dcf.get_datastream(new_dsdata.dspath)
@@ -75,14 +78,13 @@ def test_merge_existingdatastream(dscsvfile: Path):
     assert merged_dsdata.creator == new_dsdata.creator
     assert merged_dsdata.rights == new_dsdata.rights
 
-    assert merged_dsdata.description == orig_dsdata.description    
+    assert merged_dsdata.description == orig_dsdata.description
     assert merged_dsdata.lang == orig_dsdata.lang
     assert merged_dsdata.tags == orig_dsdata.tags
 
 
-
-def test_merge_newdatastream(dscsvfile: Path, dsdata: DSData):
-    """"Test the merge_datastream method is a ds did not exist."
+def test_merge_newdatastream(dscsvfile: Path):
+    """ "Test the merge_datastream method is a ds did not exist."
 
     Testing this totally makes sense, because adding new datastreams is a required functionality.
     """
@@ -100,7 +102,7 @@ def test_merge_newdatastream(dscsvfile: Path, dsdata: DSData):
     )
 
     merged_dsdata = dcf.merge_datastream(new_dsdata)
-  
+
     assert merged_dsdata is new_dsdata
     # check if the datastream has been updated
     assert merged_dsdata == dcf.get_datastream(new_dsdata.dspath)
@@ -109,6 +111,6 @@ def test_merge_newdatastream(dscsvfile: Path, dsdata: DSData):
     assert merged_dsdata.creator == new_dsdata.creator
     assert merged_dsdata.rights == new_dsdata.rights
 
-    assert merged_dsdata.description == new_dsdata.description    
+    assert merged_dsdata.description == new_dsdata.description
     assert merged_dsdata.lang == new_dsdata.lang
     assert merged_dsdata.tags == new_dsdata.tags

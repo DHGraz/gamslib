@@ -36,8 +36,9 @@ def extract_title_from_tei(tei_file):
 def extract_title_from_lido(lido_file):
     "Extract the title from a LIDO file."
     lido = ET.parse(lido_file)
+    # pylint: disable=line-too-long
     title_node = lido.find(
-        'lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue',
-        namespaces=NAMESPACES
+        "lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue",
+        namespaces=NAMESPACES,
     )
     return title_node.text if title_node is not None else ""

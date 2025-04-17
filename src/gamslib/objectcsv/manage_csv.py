@@ -39,7 +39,7 @@ def collect_csv_data(
     return all_objects_csv
 
 
-def update_csv_files(
+def split_csv_files(
     object_root_dir: Path,
     input_dir: Path | None = None,
     object_csv_filename: str = "all_objects.csv",

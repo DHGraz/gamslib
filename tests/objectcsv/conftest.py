@@ -1,7 +1,10 @@
+"""Fixtures for testing objectcsv module."""
+
 import copy
 import csv
 from dataclasses import asdict
 from pathlib import Path
+
 import pytest
 
 from gamslib.objectcsv.dsdata import DSData
@@ -24,6 +27,7 @@ def objdata_fixture() -> ObjectData:
         mainResource="TEI.xml",
     )
 
+
 @pytest.fixture(name="dsdata")
 def dsdata_fixture() -> DSData:
     "Return a DSData object."
@@ -36,7 +40,7 @@ def dsdata_fixture() -> DSData:
         creator="Foo Bar",
         rights="GPLv3",
         lang="en de",
-        tags="tag 1, tag 2, tag 3"
+        tags="tag 1, tag 2, tag 3",
     )
 
 

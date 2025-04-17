@@ -1,5 +1,8 @@
+"""CSV data for a single object.
+"""
 from dataclasses import dataclass
 
+# pylint: disable=too-many-instance-attributes,invalid-name
 
 @dataclass
 class ObjectData:

@@ -6,10 +6,9 @@ from dataclasses import fields
 from pathlib import Path
 
 import pytest
-
 from pytest import fixture
 
-from gamslib.objectcsv.objectdata import ObjectData
+from gamslib.objectcsv import defaultvalues
 from gamslib.objectcsv.create_csv import (
     create_csv,
     create_csv_files,
@@ -19,10 +18,10 @@ from gamslib.objectcsv.create_csv import (
     is_datastream_file,
     update_csv,
 )
-from gamslib.objectcsv.dublincore import DublinCore
 from gamslib.objectcsv.dsdata import DSData
+from gamslib.objectcsv.dublincore import DublinCore
+from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.projectconfiguration.configuration import Configuration
-from gamslib.objectcsv import defaultvalues
 
 
 @fixture(name="test_config")
@@ -37,6 +36,30 @@ def dc_fixture(datadir):
     return DublinCore(datadir / "objects" / "obj1" / "DC.xml")
 
 
+# utility functions
+def read_csv_file(file: Path):
+    """Return the contents of a csv file as a list of dicts."""
+    with open(file, "r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
+
+def read_csv_file_to_dict(file: Path, key_field: str):
+    """Return the contents of a csv file as a dict of dicts."""
+    data = {}
+    for row in read_csv_file(file):
+        data[row[key_field]] = row
+    return data
+
+
+def write_csv_file(file: Path, data: list[dict[str, str]]):
+    """Write contents of a list of dicts to a CSV file."""
+    fieldnames = list(data[0].keys())
+    with open(file, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+
 
 def test_is_datastream_file(datadir):
     """Test the is_datastream_file function."""
@@ -45,7 +68,7 @@ def test_is_datastream_file(datadir):
     ds_csv = datadir / "objects" / "obj1" / "datastreams.csv"
     dc_file = datadir / "objects" / "obj1" / "DC.xml"
     no_file = datadir / "objects" / "obj1"
-    
+
     assert not is_datastream_file(obj_csv)
     assert not is_datastream_file(ds_csv)
     assert is_datastream_file(dc_file)
@@ -71,6 +94,7 @@ def test_create_csv_missing_object(tmp_path, test_config):
     obj_dir = tmp_path / "missing"
     assert create_csv(obj_dir, test_config) is None
 
+
 def test_create_csv(datadir, test_config):
     """Test the create_csv function."""
     object_dir = datadir / "objects" / "obj1"
@@ -92,15 +116,13 @@ def test_create_csv(datadir, test_config):
     # check contents of the newly datastreams.csv file
     ds_csv = object_dir / "datastreams.csv"
     with open(ds_csv, encoding="utf-8", newline="") as f:
-        EXPECTED_NUM_OF_DATASTREAMS = 2
         reader = csv.DictReader(f)
         assert reader.fieldnames == [field.name for field in fields(DSData)]
         data = list(reader)
-        assert len(data) == EXPECTED_NUM_OF_DATASTREAMS
+        assert len(data) == len(["DC.xml", "SOURCE.xml"])
         assert data[0]["dsid"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
         assert data[0]["mimetype"] == "application/xml"
-        #assert data[0]["funder"] == "The funder" # removed, because we possibly do not need funder here
 
 
 def test_create_csv_force_overwrite(datadir, test_config):
@@ -140,8 +162,8 @@ def test_create_csv_files_existing_csvs(datadir, test_config):
 def test_create_csv_files(datadir, test_config):
     """The create_csv_files function should create the csv files for all objects."""
     objects_root_dir = datadir / "objects"
-    processed_folders = create_csv_files(objects_root_dir, test_config)
-    assert len(processed_folders) == len(["obj1", "obj2"])
+    processed_objectscsvs = create_csv_files(objects_root_dir, test_config)
+    assert len(processed_objectscsvs) == len(["obj1", "obj2"])
 
     # Check if all csv files have been created
     assert (objects_root_dir / "obj1" / "object.csv").exists()
@@ -149,33 +171,109 @@ def test_create_csv_files(datadir, test_config):
     assert (objects_root_dir / "obj2" / "object.csv").exists()
     assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
 
-#@pytest.mark.skip
-def test_update_csv(datadir, tmp_path, test_config):
-    """Test the update_csv function."""
+    obj_data = read_csv_file_to_dict(objects_root_dir / "obj1" / "object.csv", "recid")
+    assert obj_data["obj1"]["title"] == "Object 1"
+    obj_data = read_csv_file_to_dict(objects_root_dir / "obj2" / "object.csv", "recid")
+    assert obj_data["obj2"]["title"] == "Object 2"
+
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj1" / "datastreams.csv", "dsid"
+    )
+    assert len(ds_data) == len(["DC.xml", "SOURCE.xml"])
+    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
+    assert "Schuchardt" in ds_data["SOURCE.xml"]["title"]
+
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj2" / "datastreams.csv", "dsid"
+    )
+    assert len(ds_data) == 1
+    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
+
+
+def test_create_csv_files_with_update_flag(datadir, test_config):
+    "The create_csv_files function should update the csv files for all objects."
+    # create the initial csv files
+    objects_root_dir = datadir / "objects"
+    processed_objectcsvs = create_csv_files(objects_root_dir, test_config)
+    assert len(processed_objectcsvs) == len(["obj1", "obj2"])
+
+    # Check if all csv files have been created
+    assert (objects_root_dir / "obj1" / "object.csv").exists()
+    assert (objects_root_dir / "obj1" / "datastreams.csv").exists()
+    assert (objects_root_dir / "obj2" / "object.csv").exists()
+    assert (objects_root_dir / "obj2" / "datastreams.csv").exists()
+
+    # now modify the csv files so we can check if they are updated
+    # change title of the object in obj1/object.csv
+    obj_data = read_csv_file_to_dict(objects_root_dir / "obj1" / "object.csv", "recid")
+    obj_data["obj1"]["title"] = "New title"
+    write_csv_file(objects_root_dir / "obj1" / "object.csv", list(obj_data.values()))
+    # remove SOURCE.xml from the first ds entry from obj1/datastreams.csv
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj1" / "datastreams.csv", "dsid"
+    )
+    ds_data.pop("SOURCE.xml")
+    write_csv_file(
+        objects_root_dir / "obj1" / "datastreams.csv", list(ds_data.values())
+    )
+    # change title of the DC.xml datastream in obj2/datastreams.csv
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj2" / "datastreams.csv", "dsid"
+    )
+    ds_data["DC.xml"]["title"] = "New title"
+    write_csv_file(
+        objects_root_dir / "obj2" / "datastreams.csv", list(ds_data.values())
+    )
+
+    # re-run create_csv_files with update=True
+    processed_objectcsvs = create_csv_files(objects_root_dir, test_config, update=True)
+    assert len(processed_objectcsvs) == len(["obj1", "obj2"])
+
+    # The obj1/object.csv file should have the old title
+    obj_data = read_csv_file_to_dict(objects_root_dir / "obj1" / "object.csv", "recid")
+    assert obj_data["obj1"]["title"] == "Object 1"
+
+    # in obj1/datastreams.csv the SOURCE.xml entry should be back
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj1" / "datastreams.csv", "dsid"
+    )
+    assert "SOURCE.xml" in ds_data
+
+    # in obj2/datastreams.csv the title of the DC.xml entry should be back
+    ds_data = read_csv_file_to_dict(
+        objects_root_dir / "obj2" / "datastreams.csv", "dsid"
+    )
+    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
+
+
+def test_update_csv(datadir, test_config):
+    """Test the update_csv function.
+
+    This function merges two versions of the csv files.
+    """
     object_dir = datadir / "objects" / "obj1"
     obj_csv = object_dir / "object.csv"
     ds_csv = object_dir / "datastreams.csv"
-    # create the first version of the csv files
+
+    # create the initial version of the csv files
     create_csv(object_dir, test_config)
     assert obj_csv.exists()
     assert ds_csv.exists()
 
-    # change the existing csv files and call update_csv: result should be the same as before
-    # change the title in the object.csv file
+    # change the existing csv files:
     obj_txt = obj_csv.read_text(encoding="utf-8").replace(",Object 1,", ",Object 2,")
     # remove the last line (datastream) from the datastreams.csv file
     ds_lines = ds_csv.read_text(encoding="utf-8").splitlines()
     removed_line = ds_lines.pop()
     obj_csv.write_text(obj_txt, encoding="utf-8")
     ds_csv.write_text("\n".join(ds_lines), encoding="utf-8")
-    
+
     update_csv(object_dir, test_config)
     obj_txt = obj_csv.read_text(encoding="utf-8")
-    assert ',Object 1,' in obj_txt
+    assert ",Object 1," in obj_txt
     ds_lines = ds_csv.read_text(encoding="utf-8").splitlines()
     assert removed_line in ds_lines
 
-    
 
 def test_extract_dsid():
     """Test the extract_dsid function."""
@@ -201,16 +299,17 @@ def test_extract_dsid():
         assert extract_dsid(Path("test.a1234"), False) == "test.a1234"
 
 
-
 def test_detect_languages(datadir):
     """We assume that dc does not contain language information.
-    
+
     So we have to detect the language from the contents of the file.
-    """    
-    
+    This method does nothing for now, but might be implemented in the future.
+    """
+
     dsfile = datadir / "objects" / "obj1" / "SOURCE.xml"
-    # TODO: Change assertion after the detection is implemented
-    assert detect_languages(dsfile) == "" 
+    assert detect_languages(dsfile) == ""
+
+
 def test_update_csv_missing_directory(tmp_path, test_config):
     """Test the update_csv function with a non-existent directory."""
     missing_dir = tmp_path / "nonexistent"
@@ -222,12 +321,12 @@ def test_update_csv_new_directory(datadir, test_config):
     # Create a new object directory without CSV files
     object_dir = datadir / "objects" / "obj_new"
     object_dir.mkdir(exist_ok=True)
-    
+
     # Copy DC.xml from an existing object
     dc_file_src = datadir / "objects" / "obj1" / "DC.xml"
     dc_file_dst = object_dir / "DC.xml"
     dc_file_dst.write_bytes(dc_file_src.read_bytes())
-    
+
     # Update CSV should create new files
     result = update_csv(object_dir, test_config)
     assert result is not None
@@ -240,25 +339,25 @@ def test_update_csv_add_datastream(datadir, tmp_path, test_config):
     # Setup: Create a copy of an object directory to work with
     object_dir = tmp_path / "test_object"
     object_dir.mkdir()
-    
+
     # Copy necessary files
     src_object = datadir / "objects" / "obj1"
     (object_dir / "DC.xml").write_bytes((src_object / "DC.xml").read_bytes())
-    
+
     # Create initial CSV files
     create_csv(object_dir, test_config)
-    
+
     # Count initial datastreams
     ds_csv = object_dir / "datastreams.csv"
     initial_lines = ds_csv.read_text(encoding="utf-8").splitlines()
-    
+
     # Add a new datastream
     new_ds = object_dir / "NEW_FILE.txt"
     new_ds.write_text("Test content", encoding="utf-8")
-    
+
     # Update the CSV files
     update_csv(object_dir, test_config)
-    
+
     # Check that the new datastream was added
     updated_lines = ds_csv.read_text(encoding="utf-8").splitlines()
     assert len(updated_lines) > len(initial_lines)
@@ -269,31 +368,31 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     """Test that update_csv preserves manual edits but updates from source."""
     object_dir = tmp_path / "test_object_edit"
     object_dir.mkdir()
-    
+
     # Copy necessary files
     src_object = datadir / "objects" / "obj1"
     (object_dir / "DC.xml").write_bytes((src_object / "DC.xml").read_bytes())
     (object_dir / "SOURCE.xml").write_bytes((src_object / "SOURCE.xml").read_bytes())
-    
+
     # Create initial CSV files
     create_csv(object_dir, test_config)
-    
+
     # Modify object.csv - simulate a manual edit
     obj_csv = object_dir / "object.csv"
     obj_txt = obj_csv.read_text(encoding="utf-8")
     manual_edits = obj_txt.replace("Object 1", "Manual Edit Title")
     obj_csv.write_text(manual_edits, encoding="utf-8")
-    
+
     # Modify DC.xml - simulate a source change
     dc_file = object_dir / "DC.xml"
     dc_content = dc_file.read_text(encoding="utf-8")
     updated_dc = dc_content.replace("Rights from DC.xml", "Updated Rights")
     dc_file.write_text(updated_dc, encoding="utf-8")
-    
+
     # Update CSV
     update_csv(object_dir, test_config)
-    
+
     # Check that manual title edit remains and rights got updated
     updated_obj_txt = obj_csv.read_text(encoding="utf-8")
     assert "Manual Edit Title" not in updated_obj_txt  # Manual edit preserved
-    assert "Updated Rights" in updated_obj_txt     # Source change applied
+    assert "Updated Rights" in updated_obj_txt  # Source change applied

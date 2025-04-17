@@ -1,5 +1,9 @@
+"""
+Test the DSData class."""
+
 import copy
 from pathlib import Path
+
 import pytest
 
 from gamslib import formatdetect
@@ -75,80 +79,51 @@ def test_ds_data_guess_missing_values(detector, shared_datadir, monkeypatch):
         assert dsdata.title == ""
 
 
-def test_merge(dsdata):
-    "Should merge two DSData objects."
-    # add data which is normally added manually in the csv file
-    dsdata.description = "The description"
-    dsdata.tags = "tag1 tag2"
-    dsdata.lang = "en de"
+@pytest.mark.parametrize(
+    "fieldname, old_value, new_value, expected_value",
+    [
+        ("title", "Old title", "New title", "New title"),
+        ("title", "", "New title", "New title"),
+        ("title", "Old title", "", "Old title"),
+        ("mimetype", "Old mimetype", "New mimetype", "New mimetype"),
+        ("mimetype", "", "New mimetype", "New mimetype"),
+        ("mimetype", "Old mimetype", "", "Old mimetype"),
+        ("creator", "Old creator", "New creator", "New creator"),
+        ("creator", "", "New creator", "New creator"),
+        ("creator", "Old creator", "", "Old creator"),
+        ("rights", "Old rights", "New rights", "New rights"),
+        ("rights", "", "New rights", "New rights"),
+        ("rights", "Old rights", "", "Old rights"),
+        # description should not be touched
+        ("description", "Old description", "New description", "Old description"),
+        ("description", "", "New description", ""),
+        ("description", "Old description", "", "Old description"),
+        # lang should not be touched
+        ("lang", "en de", "", "en de"),
+        ("lang", "", "en de", ""),
+        ("lang", "en de", "de en", "en de"),
+        # tags should not be touched
+        ("tags", "tag1 tag2", "", "tag1 tag2"),
+        ("tags", "", "tag1 tag2", ""),
+        ("tags", "tag1 tag2", "tag3 tag4", "tag1 tag2"),
+        # dspath and dsid must not change
+        ("dspath", "obj1/TEI.xml", "obj2/TEI.xml", "ValueError"),
+        ("dsid", "TEI.xml", "TEI2.xml", "ValueError"),
+    ],
+)
+def test_merge(dsdata, fieldname, old_value, new_value, expected_value):
+    "Test merge with many combinations of values"
 
-    # clone and change some values
-    updated_dsdata = copy.deepcopy(dsdata)
-    updated_dsdata.title = "Updated title"
-    updated_dsdata.description = ""
-    updated_dsdata.mimetype = "application/json"
-    updated_dsdata.creator = "Updated creator"
-    updated_dsdata.rights = "Updated rights"
-    # lang an tags should not be changed as they are set manually
-    updated_dsdata.lang = ""
-    updated_dsdata.tags = ""
+    new_dsdata = copy.deepcopy(dsdata)
+    setattr(dsdata, fieldname, old_value)
+    setattr(new_dsdata, fieldname, new_value)
+    if expected_value == "ValueError":
+        with pytest.raises(ValueError):
+            dsdata.merge(new_dsdata)
+    else:
+        dsdata.merge(new_dsdata)
+        assert getattr(dsdata, fieldname) == expected_value
 
-    dsdata.merge(updated_dsdata)
-
-    assert dsdata.title == "Updated title"
-    assert dsdata.description == "The description"
-    assert dsdata.mimetype == "application/json"
-    assert dsdata.creator == "Updated creator"
-    assert dsdata.rights == "Updated rights"
-    assert dsdata.lang == "en de"
-    assert dsdata.tags == "tag1 tag2"
-    assert dsdata.lang == "en de"
-
-
-def test_merge_do_not_overwrite(dsdata):
-    "If other_dsdata has empty values, do not overwrite the current values."
-    # add data which is normally added manually in the csv file
-    dsdata.description = "The description"
-    dsdata.tags = "tag1 tag2"
-    dsdata.lang = "en de"
-
-    dsdata_original = copy.deepcopy(dsdata) # for comparision
-
-    # clone and change some values
-    updated_dsdata = copy.deepcopy(dsdata)
-    updated_dsdata.title = ""
-    updated_dsdata.description = ""
-    updated_dsdata.mimetype = ""
-    updated_dsdata.creator = ""
-    updated_dsdata.rights = ""
-    # lang an tags should not be changed as they are set manually
-    updated_dsdata.lang = ""
-    updated_dsdata.tags = ""
-
-    dsdata.merge(updated_dsdata)
-
-    assert dsdata.title == dsdata_original.title
-    assert dsdata.description == dsdata_original.description
-    assert dsdata.mimetype == dsdata_original.mimetype
-    assert dsdata.creator == dsdata_original.creator
-    assert dsdata.rights == dsdata_original.rights
-    assert dsdata.lang == dsdata_original.lang
-    assert dsdata.tags == dsdata_original.tags
-    assert dsdata.lang == dsdata_original.lang
-
-def test_merge_different_dspaths():
-    "Should raise an exception if dspaths are different."
-    dsdata = DSData(dspath="obj1", dsid="TEI.xml")
-    updated_dsdata = DSData(dspath="obj2", dsid="TEI.xml")
-    with pytest.raises(ValueError):
-        dsdata.merge(updated_dsdata)
-
-def test_merge_different_dsid():
-    "Should raise an exception if dsids are different."
-    dsdata = DSData(dspath="obj1", dsid="TEI.xml")
-    updated_dsdata = DSData(dspath="obj1", dsid="TEI2.xml")
-    with pytest.raises(ValueError):
-        dsdata.merge(updated_dsdata)
 
 def test_dsdata_validate(dsdata):
     "Should raise an exception if required fields are missing."

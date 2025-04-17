@@ -1,3 +1,5 @@
+"""Represents an object.csv file of a single GAMS Object.
+"""
 import csv
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
@@ -36,9 +38,9 @@ class ObjectCSVFile:
         if old_objectdata is None:
             self.add_objectdata(other)
             return other
-        else:
-            old_objectdata.merge(other)
-            return old_objectdata
+
+        old_objectdata.merge(other)
+        return old_objectdata
 
     @classmethod
     def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":

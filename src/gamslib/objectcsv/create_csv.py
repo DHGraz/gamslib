@@ -9,19 +9,17 @@ will be left blank or filled with default values.
 import logging
 import mimetypes
 import re
-from pathlib import Path
 import warnings
+from pathlib import Path
 
-from .dsdata import DSData
-
-from .objectdata import ObjectData
 from gamslib.projectconfiguration import Configuration
 
-from .objectcsv import ObjectCSV
-from .dublincore import DublinCore
-from .utils import find_object_folders
 from . import defaultvalues
-
+from .dsdata import DSData
+from .dublincore import DublinCore
+from .objectcsv import ObjectCSV
+from .objectdata import ObjectData
+from .utils import find_object_folders
 
 logger = logging.getLogger()
 
@@ -35,7 +33,7 @@ def is_datastream_file(ds_file: Path) -> bool:
     """Check if the file should be used as datastream file."""
     return ds_file.is_file() and ds_file.name not in (
         ObjectCSV.OBJECT_CSV_FILENAME,
-        ObjectCSV.DATASTREAM_CSV_FILENAME
+        ObjectCSV.DATASTREAM_CSV_FILENAME,
     )
 
 
@@ -103,7 +101,7 @@ def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
     Return detected language(s) as a string separated by the given delimiter.
     """
     languages = []
-    # TODO: Implement language detection
+    # we decided not to use language detection for now
     return delimiter.join(languages) if languages else ""
 
 
@@ -196,14 +194,19 @@ def update_csv(
     """Update an existing CSV file for a given object directory.
 
     This function is used to update the metadata for an object directory with existing CSV files.
+
+    This function is useful if new datastreams have been added to an object directory
+    after the CSV files have been initailly created.
+    Another use case is when settings in the metadata coniguration
+    have changed and the metadata in the CSV files need to be updated.
+    The CSV files are not overwritten, but updated with the new data.
     """
-    # The is a new use case: It happens, that eg. datastreams are added to an object after a csv has been created.
-    # In this case, we need to update the csv files, but not overwrite them.
     if not object_directory.is_dir():
         logger.warning("Object directory '%s' does not exist.", object_directory)
         return None
 
-    objectcsv = ObjectCSV(object_directory)
+    objectcsv = ObjectCSV(object_directory, ignore_existing_csv_files=True)
+
     if objectcsv.is_new():
         logger.warning(
             "Object directory '%s' has no existing CSV files. Will be created.",
@@ -224,12 +227,18 @@ def update_csv(
 
 
 def create_csv_files(
-    root_folder: Path, config: Configuration, force_overwrite: bool = False
+    root_folder: Path,
+    config: Configuration,
+    force_overwrite: bool = False,
+    update: bool = False,
 ) -> list[ObjectCSV]:
     """Create the CSV files for all objects below root_folder."""
     extended_objects: list[ObjectCSV] = []
     for path in find_object_folders(root_folder):
-        extended_obj = create_csv(path, config, force_overwrite)
+        if update:
+            extended_obj = update_csv(path, config)
+        else:
+            extended_obj = create_csv(path, config, force_overwrite)
 
         if extended_obj is not None:
             extended_objects.append(extended_obj)

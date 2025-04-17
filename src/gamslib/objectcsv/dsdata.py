@@ -1,3 +1,9 @@
+"""
+GAMS Object CSV File
+
+The DSData class represents the datastream metadata for a single object.
+"""
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -5,6 +11,7 @@ from gamslib import formatdetect
 from gamslib.objectcsv import defaultvalues, utils
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class DSData:
     """Represents csv data for a single datastream of a single object."""
@@ -26,22 +33,22 @@ class DSData:
 
     def merge(self, other_dsdata: "DSData"):
         """Merge the datastream data with another DSData object.
+
         This is used to update the datastream if it has been created before.
         The datastreams are merged by selectively overwriting the values of the current
         datastream with the values of the other datastream.
-        The datastreams must have the same dspath and dsid."""
+        The datastreams must have the same dspath and dsid.
+        """
         if self.dspath != other_dsdata.dspath:
             raise ValueError("Cannot merge datastreams with different dspath values")
         if self.dsid != other_dsdata.dsid:
             raise ValueError("Cannot merge datastreams with different dsid values")
-        if other_dsdata.title.strip():
-            self.title = other_dsdata.title
-        if other_dsdata.mimetype.strip():
-            self.mimetype = other_dsdata.mimetype
-        if other_dsdata.creator.strip():
-            self.creator = other_dsdata.creator
-        if other_dsdata.rights.strip():
-            self.rights = other_dsdata.rights
+
+        # replace only these fields with new values if the new value is not empty
+        fields_to_replace = ["title", "mimetype", "creator", "rights"]
+        for field in fields_to_replace:
+            if getattr(other_dsdata, field).strip():
+                setattr(self, field, getattr(other_dsdata, field))
 
     def validate(self):
         """Validate the datastream data."""

@@ -1,3 +1,5 @@
+"""Represent a single datastreams.csv file of a GAMS object."""
+
 import csv
 from dataclasses import asdict, fields
 from pathlib import Path
@@ -32,9 +34,9 @@ class DatastreamsCSVFile:
         if old_dsdata is None:
             self.add_datastream(new_dsdata)
             return new_dsdata
-        else:
-            old_dsdata.merge(new_dsdata)
-            return old_dsdata
+
+        old_dsdata.merge(new_dsdata)
+        return old_dsdata
 
     def get_datastreams(self, recid: str = "all") -> Generator[DSData, None, None]:
         """Return the datastream objects for all objects or a given object.

@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from gamslib.objectcsv.dsdata import DSData
-from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.objectcsv.objectcsv import ObjectCSV
+from gamslib.objectcsv.objectdata import ObjectData
 
 
 def test_object_csv(objcsvfile: Path, dscsvfile: Path, tmp_path: Path):
@@ -77,9 +77,9 @@ def test_object_csv_modify_get_set_data(
     assert oc.count_datastreams() == len(
         ["obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"]
     )
-    assert len(list(oc.get_datastreamdata())) == len([
-        "obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"
-    ])
+    assert len(list(oc.get_datastreamdata())) == len(
+        ["obj1/TEI.xml", "obj2/TEI2.xml", "obj1/TEI3.xml"]
+    )
     assert list(oc.get_datastreamdata("obj1"))[-1] == new_ds
 
     # test add_objectdata() and get_objectdata()
@@ -110,51 +110,53 @@ def test_objectcsv_missing_dir():
     with pytest.raises(FileNotFoundError):
         ObjectCSV(Path("does_not_exist"))
 
+
 def test_update_objectdata(objcsvfile: Path, objdata: ObjectData):
     """Test the update_objectdata method."""
     # Create an ObjectCSV instance
     oc = ObjectCSV(objcsvfile.parent)
-    
+
     # Get the initial object data for modification
     initial_obj = next(oc.get_objectdata())
     modified_obj = copy.deepcopy(initial_obj)
-    
+
     # Modify some fields in the object data
     modified_obj.title = "Updated Title"
     modified_obj.creator = "Updated Creator"
-    
+
     # Update the object data
     oc.update_objectdata(modified_obj)
-    
+
     # Check if the update was successful
     updated_obj = next(oc.get_objectdata())
     assert updated_obj.title == "Updated Title"
     assert updated_obj.creator == "Updated Creator"
     assert updated_obj.recid == initial_obj.recid  # The ID should remain the same
-    
+
     # Test updating with a different object that has the same ID
     new_obj = copy.deepcopy(objdata)
     new_obj.recid = initial_obj.recid  # Same ID
     new_obj.title = "Another Title"
     new_obj.creator = "Another Creator"
-    
+
     oc.update_objectdata(new_obj)
-    
+
     # Verify the object was updated correctly
     result_obj = next(oc.get_objectdata())
     assert result_obj.title == "Another Title"
     assert result_obj.creator == "Another Creator"
     assert result_obj.recid == initial_obj.recid
 
-def test_update_datastreams(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+# pylint: disable=unused-argument
+def test_update_datastreams(objcsvfile: Path, dscsvfile: Path):
     """Test the update_datastreams method."""
     # Create an ObjectCSV instance
     oc = ObjectCSV(objcsvfile.parent)
-    
+
     # Get the initial datastreams
     initial_datastreams = list(oc.get_datastreamdata())
     assert len(initial_datastreams) > 0
-    
+
     # Make a copy of the first datastream and modify it
     modified_ds = copy.deepcopy(initial_datastreams[0])
     new_ds = copy.deepcopy(initial_datastreams[0])
@@ -168,13 +170,13 @@ def test_update_datastreams(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
     # Update with modified and new datastreams
     update_list = [modified_ds, new_ds]
     oc.update_datastreams(update_list)
-  
+
     # Verify the results
     updated_datastreams = list(oc.get_datastreamdata())
-    
+
     # Should have exactly 2 datastreams now
-    assert len(updated_datastreams) == len(['obj1/TEI.xml', 'obj1/NEW.xml'])
-    
+    assert len(updated_datastreams) == len(["obj1/TEI.xml", "obj1/NEW.xml"])
+
     # Check that the modified datastream was updated correctly
     found_modified = False
     found_new = False
@@ -188,12 +190,6 @@ def test_update_datastreams(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
             found_new = True
     assert found_modified
     assert found_new
-    
+
     # Assert that the obj1/TEI2.xml datastream has been removed from the updated datastreams
-    assert 'obj1/TEI2.xml' not in [ds.dspath for ds in updated_datastreams]
-
-
-
-
-
-
+    assert "obj1/TEI2.xml" not in [ds.dspath for ds in updated_datastreams]

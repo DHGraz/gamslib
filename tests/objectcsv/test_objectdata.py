@@ -1,12 +1,11 @@
 "Tests for the ObjectData class."
+
 import copy
 import csv
-from pathlib import Path
-import pytest
-from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
-from gamslib.objectcsv.objectdata import ObjectData
-from gamslib.objectcsv.dublincore import DublinCore
 
+import pytest
+
+from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 
 
 def test_objectdata_creation(objdata):
@@ -30,16 +29,16 @@ def test_fix_for_mainresource(tmp_path):
     This test makes sure that it works like expected.
     """
     obj_dict = {
-        'recid': "obj1",
-        'title': "The title",
-        'project': "The project",
-        'description': "The description with ÄÖÜ",
-        'creator': "The creator",
-        'rights': "The rights",
-        'publisher': "The publisher",
-        'source': "The source",
-        'objectType': "The objectType",
-        'mainresource': "TEI.xml",
+        "recid": "obj1",
+        "title": "The title",
+        "project": "The project",
+        "description": "The description with ÄÖÜ",
+        "creator": "The creator",
+        "rights": "The rights",
+        "publisher": "The publisher",
+        "source": "The source",
+        "objectType": "The objectType",
+        "mainresource": "TEI.xml",
     }
     # write test data to file
     csv_file = tmp_path / "object.csv"
@@ -47,89 +46,62 @@ def test_fix_for_mainresource(tmp_path):
         writer = csv.DictWriter(f, fieldnames=list(obj_dict.keys()))
         writer.writeheader()
         writer.writerow(obj_dict)
-    
+
     data = ObjectCSVFile.from_csv(csv_file)
     assert next(data.get_data()).mainResource == "TEI.xml"
 
-def test_objectdata_merge(objdata):
+
+@pytest.mark.parametrize(
+    "fieldname, old_value, new_value, expected_value",
+    [
+        ("title", "Old title", "New title", "New title"),
+        ("title", "", "New title", "New title"),
+        ("title", "Old title", "", "Old title"),
+        ("project", "Old project", "New project", "New project"),
+        ("project", "", "New project", "New project"),
+        ("project", "Old project", "", "Old project"),
+        ("creator", "Old creator", "New creator", "New creator"),
+        ("creator", "", "New creator", "New creator"),
+        ("creator", "Old creator", "", "Old creator"),
+        ("rights", "Old rights", "New rights", "New rights"),
+        ("rights", "", "New rights", "New rights"),
+        ("rights", "Old rights", "", "Old rights"),
+        ("publisher", "Old publisher", "New publisher", "New publisher"),
+        ("publisher", "", "New publisher", "New publisher"),
+        ("publisher", "Old publisher", "", "Old publisher"),
+        ("source", "Old source", "New source", "New source"),
+        ("source", "", "New source", "New source"),
+        ("source", "Old source", "", "Old source"),
+        ("objectType", "Old objectType", "New objectType", "New objectType"),
+        ("objectType", "", "New objectType", "New objectType"),
+        ("objectType", "Old objectType", "", "Old objectType"),
+        ("mainResource", "Old mainResource", "New mainResource", "New mainResource"),
+        ("mainResource", "", "New mainResource", "New mainResource"),
+        ("mainResource", "Old mainResource", "", "Old mainResource"),
+        ("funder", "Old funder", "New funder", "New funder"),
+        ("funder", "", "New funder", "New funder"),
+        ("funder", "Old funder", "", "Old funder"),
+        # description should not be touched
+        ("description", "Old description", "New description", "Old description"),
+        # changed recid should raise an exception
+        ("recid", "obj2", "obj3", "ValueError"),
+    ],
+)
+def test_objectdata_merge(objdata, fieldname, old_value, new_value, expected_value):
     "Should merge two ObjectData objects."
     new_objdata = copy.deepcopy(objdata)
-    original_objdata = copy.deepcopy(objdata)
-    #['title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType', 'funder']
 
-    new_objdata.title = "Updated title"
-    new_objdata.project = "Updated project"
-    new_objdata.creator = "Updated creator"
-    new_objdata.rights = "Updated rights"
-    new_objdata.publisher = "Updated publisher"
-    new_objdata.source = "Updated source"
-    new_objdata.objectType = "Updated objectType"
-    new_objdata.mainResource = "Updated mainResource"
-    new_objdata.funder = "Updated funder"
+    setattr(objdata, fieldname, old_value)
+    setattr(new_objdata, fieldname, new_value)
 
-    # and now some more changed fields, which should be ignored
-    new_objdata.description = "Updated description"
-    new_objdata.mainResource = "Updated mainResource"
-
-    objdata.merge(new_objdata)
-    assert objdata.title == new_objdata.title
-    assert objdata.project == new_objdata.project
-    assert objdata.creator == new_objdata.creator
-    assert objdata.rights == new_objdata.rights
-    assert objdata.publisher == new_objdata.publisher
-    assert objdata.source == new_objdata.source
-    assert objdata.objectType == new_objdata.objectType
-    assert objdata.funder == new_objdata.funder
-    assert objdata.mainResource == new_objdata.mainResource
-
-    # check that the other fields are not changed
-    assert objdata.recid == original_objdata.recid
-    assert objdata.description == original_objdata.description
-    
-    
-
-def test_objectdata_merge_empty(objdata):
-    "Empty fields should not be merged."
-    new_objdata = copy.deepcopy(objdata)
-    original_objdata = copy.deepcopy(objdata)
-    #['title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType', 'funder']
-
-    new_objdata.title = ""
-    new_objdata.project = ""
-    new_objdata.creator = ""
-    new_objdata.rights = ""
-    new_objdata.publisher = ""
-    new_objdata.source = ""
-    new_objdata.objectType = ""
-    new_objdata.mainResource = ""
-    new_objdata.funder = ""
-
-    # and now some more changed fields, which should be ignored
-    new_objdata.description = ""
-    
-
-    objdata.merge(new_objdata)
-    assert objdata.title == original_objdata.title
-    assert objdata.project == original_objdata.project
-    assert objdata.creator == original_objdata.creator
-    assert objdata.rights == original_objdata.rights
-    assert objdata.publisher == original_objdata.publisher
-    assert objdata.source == original_objdata.source
-    assert objdata.objectType == original_objdata.objectType
-    assert objdata.funder == original_objdata.funder
-    assert objdata.mainResource == original_objdata.mainResource
-   
-    assert objdata.recid == original_objdata.recid
-    assert objdata.description == original_objdata.description
-    
-
-def test_objectdata_merge_different_recid(objdata):
-    "Should raise an exception if recid is different."
-    new_objdata = copy.deepcopy(objdata)
-    new_objdata.recid = "obj2"
-    with pytest.raises(ValueError):
+    if expected_value == "ValueError":
+        with pytest.raises(ValueError):
+            objdata.merge(new_objdata)
+    else:
         objdata.merge(new_objdata)
-    
+        assert getattr(objdata, fieldname) == expected_value
+
+
 def test_objectdata_validate(objdata):
     "Should raise an exception if required fields are missing."
     objdata.recid = ""
@@ -151,4 +123,3 @@ def test_objectdata_validate(objdata):
     objdata.objectType = ""
     with pytest.raises(ValueError):
         objdata.validate()
-

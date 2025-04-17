@@ -5,7 +5,7 @@ import csv
 from gamslib.objectcsv import ObjectCSV
 from gamslib.objectcsv.manage_csv import (
     collect_csv_data,
-    update_csv_files,
+    split_csv_files,
 )
 
 
@@ -63,7 +63,7 @@ def test_update_csv_files(datadir):
     collected_dir = datadir / "collected_csvs"
     objects_dir = datadir / "objects"
 
-    num_objects, num_ds = update_csv_files(objects_dir, collected_dir)
+    num_objects, num_ds = split_csv_files(objects_dir, collected_dir)
     assert num_objects == len(["obj1", "obj2"])
     assert num_ds == len([
         "obj1/foo.xml",
@@ -106,7 +106,7 @@ def test_update_csv_files_no_collect_dir(datadir, monkeypatch):
     objects_dir = datadir / "objects"
 
     monkeypatch.chdir(input_dir)
-    num_objects, num_ds = update_csv_files(objects_dir)
+    num_objects, num_ds = split_csv_files(objects_dir)
     assert num_objects == len(["obj1", "obj2"])
     assert num_ds == len([
         "obj1/foo.xml",

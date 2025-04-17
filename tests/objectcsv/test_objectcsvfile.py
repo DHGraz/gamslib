@@ -1,5 +1,8 @@
+"""Tests for the ObjectCSVFile class."""
+
 import copy
 from pathlib import Path
+
 from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 from gamslib.objectcsv.objectdata import ObjectData
 
@@ -65,8 +68,8 @@ def test_merge(objcsvfile: Path):
 def test_merge_non_existent(objcsvfile: Path):
     "Should mergin to a non existing object should not merge but add the new object."
     ocf = ObjectCSVFile.from_csv(objcsvfile)
-    #old_objdata = next(ocf.get_data("obj1"))
-    #original_objdata = copy.deepcopy(old_objdata)
+    # old_objdata = next(ocf.get_data("obj1"))
+    # original_objdata = copy.deepcopy(old_objdata)
     new_objdata = ObjectData(
         recid="obj99",
         title="Updated title",
