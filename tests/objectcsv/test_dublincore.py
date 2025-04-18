@@ -2,6 +2,7 @@
 
 # pylint: disable=W0212 # access to ._data
 import pytest
+from lxml import etree as ET
 
 from gamslib.objectcsv.dublincore import DublinCore
 
@@ -220,10 +221,17 @@ def test_get_en_element_as_str(datadir, tmp_path):
     assert dc.get_en_element_as_str("publisher", default="foo") == "foo"
 
     # Let's add a second title in english
-    dc_lines = path.read_text(encoding="utf-8").splitlines()
-    dc_lines.insert(3, '<dc:title xml:lang="en">pd2</dc:title>')
+    # and check if we get both titles back
+    # we have an english title and a german title
+    # we should have 2 english titles and a german title
+    ET.register_namespace("xml", "http://www.w3.org/XML/1998/namespace")
     new_dcpath = tmp_path / "DC.xml"
-    new_dcpath.write_text("\n".join(dc_lines))
+    tree = ET.parse(path)
+    root = tree.getroot()
+    root.append(ET.Element("{http://purl.org/dc/elements/1.1/}title", {"{http://www.w3.org/XML/1998/namespace}lang": "en"}))
+    root[-1].text = "pd2"   
+    tree.write(new_dcpath, encoding="utf-8", xml_declaration=True)
+
     dc = DublinCore(new_dcpath)
-    # we have 2 english titles and a german title
+    # we should have 2 english titles and a german title
     assert dc.get_en_element_as_str("title") == "Person description 1; pd2"

@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+import re
 from typing import Any
 from xml.etree import ElementTree as ET
 
@@ -129,7 +130,7 @@ class DublinCore:
         :param str text: The string to remove linebreaks from.
         :return: The string without linebreaks.
         """
-        return text.replace("\n", " ").replace("\r", "").strip()
+        return re.sub(r"[\r\n]+", " ", text).strip()
 
     def get_en_element(self, name: str, default="") -> list[str]:
         """Return the value of a Dublin Core element in English.
