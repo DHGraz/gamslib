@@ -8,6 +8,7 @@ from io import StringIO
 from pathlib import Path
 
 from dotenv import dotenv_values
+from tomlkit import toml_file
 
 
 def find_project_toml(start_dir: Path) -> Path:
@@ -56,10 +57,10 @@ def create_project_toml(project_dir: Path) -> None:
 
     Return the path to the created project.toml file or None if the file already exists.
     """
-    toml_file = project_dir / "project.toml"
-    if toml_file.exists():
+    toml_file_ = project_dir / "project.toml"
+    if toml_file_.exists():
         warnings.warn(
-            f"'{toml_file}' already exists. Will not be re-created.", UserWarning
+            f"'{toml_file_}' already exists. Will not be re-created.", UserWarning
         )
     else:
         toml_template_file = str(
@@ -68,7 +69,7 @@ def create_project_toml(project_dir: Path) -> None:
             / "resources"
             / "project.toml"
         )
-        shutil.copy(toml_template_file, toml_file)
+        shutil.copy(toml_template_file, toml_file_)
 
 
 def initialize_project_dir(project_dir: Path) -> None:
@@ -121,4 +122,72 @@ def get_config_file_from_env():
         else:
             config_path = None
     return config_path
-            
+
+
+def configuration_needs_update(config_file: Path) -> bool:
+    """Check if the config file needs to be updated."""
+
+    def deep_compare(real_doc, template_doc):
+        "Return True if both configurations contain the same keys."
+        for key, value in template_doc.items():
+            if key not in real_doc:
+                return False
+            if isinstance(value, dict):
+                return deep_compare(real_doc[key], value)
+        return True
+
+    # nothing to compare
+    if not config_file.exists():
+        return False
+
+    template_file = (
+        impresources.files("gamslib")
+        / "projectconfiguration"
+        / "resources"
+        / "project.toml"
+    )
+
+    config_toml_file = toml_file.TOMLFile(config_file)
+    config_toml_document = config_toml_file.read()
+    template_toml_document = toml_file.TOMLFile(template_file).read()
+
+    return not deep_compare(config_toml_document, template_toml_document)
+
+
+def update_configuration(config_file: Path):
+    """Update the configuration file with missing entries from config template.
+
+    This function adds new config file entries from the template file to the existing config file.
+    Currently it only handles additions, not deletions or changes.
+    Existing values in the config file will not be overwritten.
+    """
+
+    def deep_update(real_doc, template_doc):
+        for key, value in template_doc.items():
+            if key not in real_doc:
+                real_doc.add(key, value)
+            elif isinstance(value, dict):
+                if not key in real_doc:
+                    real_doc.add(key, value)
+                else:
+                    deep_update(real_doc[key], value)
+
+    template_file = (
+        impresources.files("gamslib")
+        / "projectconfiguration"
+        / "resources"
+        / "project.toml"
+    )
+
+    # make a backup of the current config file
+    backup_file = config_file.parent / f"{config_file.name}.bak"
+    shutil.copy(config_file, backup_file)
+
+    # parse the two files using tomlkit (keeps the comments)
+    config_toml_file = toml_file.TOMLFile(config_file)
+    config_toml_document = config_toml_file.read()
+    template_toml_document = toml_file.TOMLFile(template_file).read()
+
+    deep_update(config_toml_document, template_toml_document)
+
+    config_toml_file.write(config_toml_document)
