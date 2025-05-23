@@ -146,7 +146,7 @@ def collect_datastream_data(
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
         lang=detect_languages(ds_file, delimiter=";"),
-        # funder=config.metadata.funder, # removed, because we possibly do not need funder here
+        tags=""
     )
 
 

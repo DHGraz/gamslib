@@ -23,7 +23,7 @@ def test_dsdata_creation(dsdata):
     assert dsdata.mimetype == "application/xml"
     assert dsdata.creator == "Foo Bar"
     assert dsdata.rights == "GPLv3"
-    assert dsdata.lang == "en de"
+    assert dsdata.lang == "en; de"
 
 
 @pytest.mark.parametrize("detector", [MinimalDetector(), MagikaDetector()])

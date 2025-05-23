@@ -48,19 +48,21 @@ def test_object_csv(objcsvfile: Path, dscsvfile: Path, tmp_path: Path):
 def test_objectcsv_get_languages(objcsvfile: Path, dscsvfile: Path):
     "Test the get_languages method."
     oc = ObjectCSV(objcsvfile.parent)
+    #oc.datastream_data._datastreams[0].lang = "en; de; nl"
+    #oc.datastream_data._datastreams[1].lang = "it;en"
     assert oc.get_languages() == ["en", "de", "nl", "it"]
 
     # we add a second de, which should move de to first position
     with dscsvfile.open("r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         data = list(reader)
-        data[-1]["lang"] = "de fr"
+        data[-1]["lang"] += "; de"
     with dscsvfile.open("w", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=reader.fieldnames)
         writer.writeheader()
         writer.writerows(data)
     oc = ObjectCSV(objcsvfile.parent)
-    assert oc.get_languages() == ["de", "en", "fr"]
+    assert oc.get_languages() == ["de", "en", "nl", "it"]
 
 
 def test_object_csv_modify_get_set_data(

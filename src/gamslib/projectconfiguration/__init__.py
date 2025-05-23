@@ -60,8 +60,7 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
         config_path = Path(config_file)
     else:
         config_path = utils.get_config_file_from_env()
-    
+
     if config_path is None:
         raise MissingConfigurationException
     return Configuration.from_toml(config_path)
-    
