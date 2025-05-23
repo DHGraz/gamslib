@@ -89,7 +89,9 @@ class DatastreamsCSVFile:
         """
         languages = []
         for ds in self._datastreams:
-            languages.extend(ds.lang.split())
+            for lang in ds.lang.split(";"):
+                if lang.strip() and lang not in languages:
+                    languages.append(lang.strip())
         return languages
 
     def __len__(self):

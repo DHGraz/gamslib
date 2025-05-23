@@ -189,6 +189,14 @@ def test_config_needs_update_update_needed(tmp_path):
     assert configuration_needs_update(config_path)
 
 
+def test_config_needs_update_no_cfg_file(tmp_path):
+    """Test the config_needs_update function with non existing config file.
+
+    This means that config_needs_update should False.
+    """
+    non_existting_cfg = tmp_path / "project.toml"
+    assert not configuration_needs_update(non_existting_cfg)
+
 def test_update_configuration_no_changes(tmp_path):
     """Test the update_configuration function.
     without a need to update the configuration.

@@ -168,7 +168,7 @@ def update_configuration(config_file: Path):
                 real_doc.add(key, value)
             elif isinstance(value, dict):
                 if not key in real_doc:
-                    real_doc.add(key, value)
+                    real_doc.add(key, value)  # pragma: no cover
                 else:
                     deep_update(real_doc[key], value)
 
