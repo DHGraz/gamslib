@@ -10,7 +10,7 @@ DEFAULT_CREATOR = "Unknown"
 DEFAULT_MIMETYPE = "application/octet-stream"
 DEFAULT_OBJECT_TYPE = "text"
 DEFAULT_RIGHTS = ("Creative Commons Attribution-NonCommercial 4.0 "
-                  "(https://creativecommons.org/licenses/by-nc/4.0/)")
+                  "(http://creativecommons.org/licenses/by-nc/4.0/)")
 DEFAULT_SOURCE = "local"
 
 # This is a mapping of filenames to default metadata values.
