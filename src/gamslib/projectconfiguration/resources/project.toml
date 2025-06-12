@@ -4,7 +4,7 @@
 # the id of the project (eg.: hsa)
 project_id = ""  
 
-# The project creator (like in Dublin Core)
+# The project creator (e.g. the prinicpal investigator)
 creator = "" 
 
 # Set this to the funder of the project. Will be added to each object metadata
@@ -15,7 +15,7 @@ publisher = "GAMS"
 
 # Set the default license for the project. 
 # Can be overriden in project.csv and datastream.csv for single objects/data streams
-rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+rights = "Creative Commons Attribution-NonCommercial 4.0 (http://creativecommons.org/licenses/by-nc/4.0/)"
 
 
 
