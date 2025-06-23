@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Generator
 
+from gamslib.objectcsv.exceptions import ValidationError
 from gamslib.objectcsv.objectdata import ObjectData
 
 
@@ -12,8 +13,9 @@ from gamslib.objectcsv.objectdata import ObjectData
 class ObjectCSVFile:
     """Represents csv data for a single object."""
 
-    def __init__(self):
+    def __init__(self, object_dir: Path | None = None):
         self._objectdata: list[ObjectData] = []
+        self._object_dir: Path|None = None
 
     def add_objectdata(self, objectdata: ObjectData):
         """Add a ObjectData object."""
@@ -45,7 +47,7 @@ class ObjectCSVFile:
     @classmethod
     def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":
         """Load the object data from a csv file."""
-        obj_csv_file = ObjectCSVFile()
+        obj_csv_file = ObjectCSVFile(csv_file.parent)
         with csv_file.open(encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -55,8 +57,10 @@ class ObjectCSVFile:
                 obj_csv_file.add_objectdata(ObjectData(**row))
         return obj_csv_file
 
-    def to_csv(self, csv_file: Path) -> None:
+    def to_csv(self, csv_file: Path|None) -> None:
         """Save the object data to a csv file."""
+        if csv_file is None:
+            csv_file = self._object_dir / "object.csv"
         with csv_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(
                 f, fieldnames=[field.name for field in fields(ObjectData)]
@@ -64,10 +68,21 @@ class ObjectCSVFile:
             writer.writeheader()
             for objdata in self._objectdata:
                 writer.writerow(asdict(objdata))
+        self._object_dir = csv_file.parent
 
     def sort(self):
         """Sort collected object data by recid value."""
         self._objectdata.sort(key=lambda x: x.recid)
+
+    def validate(self) -> None:
+        """Validate the datastreams data.
+        
+        Raises ValueError if the object data is invalid."""
+        if len(self._objectdata) == 0:
+            raise ValidationError(f"Empty object.csv in {self._object_dir}.")
+        for objdata in self._objectdata:
+            objdata.validate()
+
 
     def __len__(self):
         """Return the number of objectdata objects."""

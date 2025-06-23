@@ -5,10 +5,28 @@ import copy
 import csv
 from pathlib import Path
 
+import pytest
+
 from gamslib.objectcsv.datastreamscsvfile import DatastreamsCSVFile
 from gamslib.objectcsv.dsdata import DSData
+from gamslib.objectcsv.exceptions import ValidationError
 
-
+@pytest.fixture
+def sample_dsdata() -> DSData:
+    """Fixture to provide DSData object for testing."""
+    ds = DSData(
+        dspath="obj1/TEI.xml",
+        dsid="TEI.xml",
+        mimetype="application/xml",
+        rights="Rights",
+        title="TEI file",
+        description="TEI description",
+        creator="Creator Name",
+        lang="en",
+        tags="tag1 tag2"
+    )
+    return ds
+    
 def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     "Test the DatastreamsCSVFile object."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
@@ -114,3 +132,58 @@ def test_merge_newdatastream(dscsvfile: Path):
     assert merged_dsdata.description == new_dsdata.description
     assert merged_dsdata.lang == new_dsdata.lang
     assert merged_dsdata.tags == new_dsdata.tags
+
+
+
+def test_validate_empty_datastreamscsvfile(tmp_path: Path):
+    """Test that validate raises ValidationError when DatastreamsCSVFile is empty."""
+    dsfile = tmp_path / "datastreams.csv"
+
+    # totally empty file
+    dsfile.touch()
+    ds_csv_file = DatastreamsCSVFile.from_csv(dsfile)
+    with pytest.raises(ValidationError) as excinfo:
+        ds_csv_file.validate()
+    assert "Empty datastreams.csv" in str(excinfo.value)
+
+    # only header
+    ds_csv_file = DatastreamsCSVFile(tmp_path)
+    ds_csv_file.to_csv(dsfile)  # create an empty datastreams.csv file
+
+    with pytest.raises(ValidationError) as excinfo:
+        ds_csv_file.validate()
+    assert "Empty datastreams.csv" in str(excinfo.value)
+
+def test_validate_valid_datastream(tmp_path, sample_dsdata):
+    """Test that validate does not raise an error when DSData is valid."""
+    ds_csv_file = DatastreamsCSVFile(tmp_path)
+    ds_csv_file.add_datastream(sample_dsdata)
+    ds_csv_file.validate()  # should not raise an error
+
+def test_validate_multiple_datastreams(tmp_path, sample_dsdata):    
+    """Test that validate does not raise an error when multiple DSData are valid."""
+    #dsfile = tmp_path / "datastreams.csv"
+    ds_csv_file = DatastreamsCSVFile(tmp_path)
+    ds_csv_file.add_datastream(sample_dsdata)
+    ds2 = copy.deepcopy(sample_dsdata)
+    ds2.dsid = "TEI2.xml"
+    ds_csv_file.add_datastream(ds2)
+    ds_csv_file.validate()
+
+def test_validate_invalid_datastream(tmp_path, sample_dsdata):
+    """Test that validate raises ValueError when DSData is invalid."""
+    dsfile = tmp_path / "datastreams.csv"
+    ds_csv_file = DatastreamsCSVFile(tmp_path)
+    ds_csv_file.add_datastream(sample_dsdata)
+    ds2 = copy.deepcopy(sample_dsdata)
+    ds2.dsid = "foo"  
+    ds_csv_file.add_datastream(ds2)
+    ds_csv_file.validate()  # should not raise an error
+
+def test_validate_datastreamscsvfile_with_empty_object_dir(tmp_path):
+    """Test that validate raises ValidationError when DatastreamsCSVFile has empty object_dir."""
+    ds_csv_file = DatastreamsCSVFile(tmp_path)
+    ds_csv_file._object_dir = Path("")
+    with pytest.raises(ValidationError) as excinfo:
+        ds_csv_file.validate()
+    assert "Empty datastreams.csv in " in str(excinfo.value)

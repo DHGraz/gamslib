@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Generator
 
 from gamslib.objectcsv.dsdata import DSData
+from gamslib.objectcsv.exceptions import ValidationError
 
 
 class DatastreamsCSVFile:
@@ -79,6 +80,16 @@ class DatastreamsCSVFile:
     def sort(self):
         """Sort collected datastream data by dspath value."""
         self._datastreams.sort(key=lambda x: x.dspath)
+
+    def validate(self) -> None:
+        """Validate the datastreams data.
+        
+        Raises ValueError if the datastreams data is invalid.
+        """
+        if len(self._datastreams) == 0:
+            raise ValidationError(f"Empty datastreams.csv in {self._object_dir}.")
+        for dsdata in self._datastreams:
+            dsdata.validate()
 
     def get_languages(self) -> list[str]:
         """Return the languages of all datastreams.

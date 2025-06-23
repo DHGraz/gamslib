@@ -5,6 +5,10 @@ from pathlib import Path
 
 from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 from gamslib.objectcsv.objectdata import ObjectData
+from gamslib.objectcsv.exceptions import ValidationError
+import pytest
+from gamslib.objectcsv.exceptions import ValidationError
+import pytest
 
 
 def test_objectcsvfile(objcsvfile: Path, objdata: ObjectData):
@@ -99,3 +103,65 @@ def test_merge_non_existent(objcsvfile: Path):
     assert updated_objdata.mainResource == new_objdata.mainResource
 
     assert updated_objdata.description == new_objdata.description
+
+# ----------------- test the validate method of ObjectCSVFile ----------------
+
+def test_validate_empty_objectcsvfile(tmp_path: Path):
+    """Test that validate raises ValidationError when ObjectCSVFile is empty."""
+    # a fresh ObjectCSVFile should raise ValidationError
+    obj_csv_file = ObjectCSVFile()
+    with pytest.raises(ValidationError) as excinfo:
+        obj_csv_file.validate()
+    assert "Empty object.csv" in str(excinfo.value)
+
+def test_validate_empty_objectcsvfile_with_empty_csv(tmp_path: Path):
+    csv_file = tmp_path / "object.csv"
+
+    # create a csv file which only contains the header
+    obj_csv_file = ObjectCSVFile()
+    obj_csv_file.to_csv(csv_file)
+    assert csv_file.exists()
+    assert len(csv_file.read_text().splitlines()) == 1 # only header line
+
+    # validation shlould fail if there is no data in the csv file
+    with pytest.raises(ValidationError) as excinfo:
+        obj_csv_file.validate()
+    assert "Empty object.csv" in str(excinfo.value)
+
+
+ 
+
+def test_validate_valid_objectdata():
+    """Test that validate does not raise an error when ObjectData is valid."""
+    obj_csv_file = ObjectCSVFile()
+    obj_data = ObjectData(recid="obj1", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_csv_file.add_objectdata(obj_data)
+    obj_csv_file.validate()  # should not raise an error
+
+def test_validate_invalid_objectdata():
+    """Test that validate raises ValueError when ObjectData is invalid."""
+    obj_csv_file = ObjectCSVFile()
+    obj_data = ObjectData(recid="", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_csv_file.add_objectdata(obj_data)
+    with pytest.raises(ValueError) as excinfo:
+        obj_csv_file.validate()
+    assert "recid must not be empty" in str(excinfo.value)
+
+def test_validate_multiple_objectdata():
+    """Test that validate checks all ObjectData objects."""
+    obj_csv_file = ObjectCSVFile()
+    obj_data1 = ObjectData(recid="obj1", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_data2 = ObjectData(recid="", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_csv_file.add_objectdata(obj_data1)
+    obj_csv_file.add_objectdata(obj_data2)
+    with pytest.raises(ValueError) as excinfo:
+        obj_csv_file.validate()
+    assert "recid must not be empty" in str(excinfo.value)
+
+def test_validate_objectcsvfile_with_empty_object_dir():
+    """Test that validate raises ValidationError when ObjectCSVFile has empty object_dir."""
+    obj_csv_file = ObjectCSVFile()
+    obj_csv_file._object_dir = Path("")
+    with pytest.raises(ValidationError) as excinfo:
+        obj_csv_file.validate()
+    assert "Empty object.csv in " in str(excinfo.value)
