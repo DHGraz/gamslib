@@ -2,6 +2,7 @@
 
 This detector uses the magika library to detect file formats.
 """
+
 import warnings
 from pathlib import Path
 
@@ -39,7 +40,7 @@ class MagikaDetector(FormatDetector):
 
     def guess_file_type(self, filepath: Path) -> FormatInfo:
         detector_name = self.__class__.__name__
-        subtype = None       
+        subtype = None
         try:
             result = self._magika_object.identify_path(filepath)
             _, mime_type = self._fix_result(

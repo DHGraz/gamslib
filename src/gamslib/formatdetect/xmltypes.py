@@ -1,7 +1,6 @@
 """This module contains data and functions to detect XML types and subtypes."""
 
 import warnings
-from enum import StrEnum
 from pathlib import Path
 
 from lxml import etree as ET

@@ -39,10 +39,13 @@ def test_get_element(datadir):
 
     # as in default lookup order 'en' is first, we get the english title
     assert dc.get_element("title") == ["Person description 1"]
+    assert dc.get_element("title") == ["Person description 1"]
 
     # test fields without an explicit lang (lang='unspecified')
-    assert dc.get_element("creator") == ["Foo, Bar"]
-    assert dc.get_element("date") == ["2015"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("creator") == ["Foo, Bar"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("date") == ["2015"]
 
 
 def test_get_element_with_changed_preferred_order(datadir):
@@ -52,7 +55,8 @@ def test_get_element_with_changed_preferred_order(datadir):
 
     # we changed lookup order to 'de' first. As we do not have an entry for 'fr',
     # the german title should be returned
-    assert dc.get_element("title", "fr") == ["Personenbeschreibung 1"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("title", "fr") == ["Personenbeschreibung 1"]
 
 
 def test_get_element_with_preferred_lang(datadir):
@@ -60,8 +64,10 @@ def test_get_element_with_preferred_lang(datadir):
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     assert dc.get_element("title", "de") == ["Personenbeschreibung 1"]
-    assert dc.get_element("title", "fr") == ["Person description 1"]
-    assert dc.get_element("date", "de") == ["2015"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("title", "fr") == ["Person description 1"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("date", "de") == ["2015"]
 
 
 def test_get_non_dc_element(datadir):
@@ -81,7 +87,8 @@ def test_get_element_with_linebreaks(datadir, tmp_path):
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
     dc = DublinCore(new_path)
-    assert dc.get_element("creator") == ["Foo, Bar Foobar"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("creator") == ["Foo, Bar Foobar"]
 
 
 def test_get_missing_element(datadir):
@@ -89,7 +96,8 @@ def test_get_missing_element(datadir):
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["creator"]
-    assert dc.get_element("creator") == [""]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("creator") == [""]
 
 
 def test_get_missing_element_with_explicit_default(datadir):
@@ -97,7 +105,8 @@ def test_get_missing_element_with_explicit_default(datadir):
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["creator"]
-    assert dc.get_element("creator", default="not set") == ["not set"]
+    with pytest.warns(UserWarning):
+        assert dc.get_element("creator", default="not set") == ["not set"]
 
 
 def test_get_element_as_str(datadir):
@@ -122,21 +131,22 @@ def test_get_element_as_str(datadir):
     }
     dc = DublinCore(path)
     dc._data = data
-    assert dc.get_element_as_str("contributor") == "contributor 1; contributor 2"
-    assert dc.get_element_as_str("coverage") == "coverage1; coverage 2"
-    assert dc.get_element_as_str("creator") == "creator 1; creator 2"
-    assert dc.get_element_as_str("date") == "2015; 2016"
-    assert dc.get_element_as_str("description") == "description 1; description 2"
-    assert dc.get_element_as_str("format") == "format 1; format 2"
-    assert dc.get_element_as_str("identifier") == "identifier 1; identifier 2"
-    assert dc.get_element_as_str("language") == "language 1; language 2"
-    assert dc.get_element_as_str("publisher") == "publisher 1; publisher 2"
-    assert dc.get_element_as_str("relation") == "relation 1; relation 2"
-    assert dc.get_element_as_str("rights") == "rights 1 (rights 2)"
-    assert dc.get_element_as_str("source") == "source 1; source 2"
-    assert dc.get_element_as_str("subject") == "subject 1; subject 2"
-    assert dc.get_element_as_str("title") == "title 1; title 2"
-    assert dc.get_element_as_str("type") == "type 1; type 2"
+    with pytest.warns(UserWarning):
+        assert dc.get_element_as_str("contributor") == "contributor 1; contributor 2"
+        assert dc.get_element_as_str("coverage") == "coverage1; coverage 2"
+        assert dc.get_element_as_str("creator") == "creator 1; creator 2"
+        assert dc.get_element_as_str("date") == "2015; 2016"
+        assert dc.get_element_as_str("description") == "description 1; description 2"
+        assert dc.get_element_as_str("format") == "format 1; format 2"
+        assert dc.get_element_as_str("identifier") == "identifier 1; identifier 2"
+        assert dc.get_element_as_str("language") == "language 1; language 2"
+        assert dc.get_element_as_str("publisher") == "publisher 1; publisher 2"
+        assert dc.get_element_as_str("relation") == "relation 1; relation 2"
+        assert dc.get_element_as_str("rights") == "rights 1 (rights 2)"
+        assert dc.get_element_as_str("source") == "source 1; source 2"
+        assert dc.get_element_as_str("subject") == "subject 1; subject 2"
+        assert dc.get_element_as_str("title") == "title 1; title 2"
+        assert dc.get_element_as_str("type") == "type 1; type 2"
 
 
 def test_get_element_as_str_single_values(datadir):
@@ -162,21 +172,22 @@ def test_get_element_as_str_single_values(datadir):
     }
     dc = DublinCore(path)
     dc._data = data
-    assert dc.get_element_as_str("contributor") == "contributor 1"
-    assert dc.get_element_as_str("coverage") == "coverage1"
-    assert dc.get_element_as_str("creator") == "creator 1"
-    assert dc.get_element_as_str("date") == "2015"
-    assert dc.get_element_as_str("description") == "description 1"
-    assert dc.get_element_as_str("format") == "format 1"
-    assert dc.get_element_as_str("identifier") == "identifier 1"
-    assert dc.get_element_as_str("language") == "language 1"
-    assert dc.get_element_as_str("publisher") == "publisher 1"
-    assert dc.get_element_as_str("relation") == "relation 1"
-    assert dc.get_element_as_str("rights") == "rights 1"
-    assert dc.get_element_as_str("source") == "source 1"
-    assert dc.get_element_as_str("subject") == "subject 1"
-    assert dc.get_element_as_str("title") == "title 1"
-    assert dc.get_element_as_str("type") == "type 1"
+    with pytest.warns(UserWarning):
+        assert dc.get_element_as_str("contributor") == "contributor 1"
+        assert dc.get_element_as_str("coverage") == "coverage1"
+        assert dc.get_element_as_str("creator") == "creator 1"
+        assert dc.get_element_as_str("date") == "2015"
+        assert dc.get_element_as_str("description") == "description 1"
+        assert dc.get_element_as_str("format") == "format 1"
+        assert dc.get_element_as_str("identifier") == "identifier 1"
+        assert dc.get_element_as_str("language") == "language 1"
+        assert dc.get_element_as_str("publisher") == "publisher 1"
+        assert dc.get_element_as_str("relation") == "relation 1"
+        assert dc.get_element_as_str("rights") == "rights 1"
+        assert dc.get_element_as_str("source") == "source 1"
+        assert dc.get_element_as_str("subject") == "subject 1"
+        assert dc.get_element_as_str("title") == "title 1"
+        assert dc.get_element_as_str("type") == "type 1"
 
 
 def test_get_en_element(datadir):
