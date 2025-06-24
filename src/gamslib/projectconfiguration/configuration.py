@@ -45,7 +45,7 @@ class Configuration(BaseModel):
     metadata: Metadata
     general: General
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, context: Any, /) -> None:
         self._update_from_dotenv()
         self._update_from_env()
 

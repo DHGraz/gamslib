@@ -1,7 +1,6 @@
 "Module to inspect json files."
 
 import json
-from enum import StrEnum
 from pathlib import Path
 
 from gamslib.formatdetect.formatinfo import SubType

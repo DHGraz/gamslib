@@ -15,7 +15,7 @@ class ObjectCSVFile:
 
     def __init__(self, object_dir: Path | None = None):
         self._objectdata: list[ObjectData] = []
-        self._object_dir: Path|None = None
+        self._object_dir: Path|None = object_dir
 
     def add_objectdata(self, objectdata: ObjectData):
         """Add a ObjectData object."""

@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 import re
 from typing import Any
+import warnings
 from xml.etree import ElementTree as ET
 
 logger = logging.getLogger(__name__)
@@ -71,20 +72,20 @@ DC_ELEMENTS = [
 #     "valid",
 # ]
 
-# DCMI_TYPES = [
-#     "Collection",
-#     "Dataset",
-#     "Event",
-#     "Image",
-#     "InteractiveResource",
-#     "MovingImage",
-#     "PhysicalObject",
-#     "Service",
-#     "Software",
-#     "Sound",
-#     "StillImage",
-#     "Text",
-# ]
+DCMI_TYPES = [
+    "Collection",
+    "Dataset",
+    "Event",
+    "Image",
+    "InteractiveResource",
+    "MovingImage",
+    "PhysicalObject",
+    "Service",
+    "Software",
+    "Sound",
+    "StillImage",
+    "Text",
+]
 
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
@@ -101,6 +102,7 @@ NAMESPACES = {
 class DublinCore:
     """Represents data from DC.xml and provides some methods to access it."""
 
+    UNSPECIFIED_LANG = "unspecified"
     def __init__(
         self, path: Path, lookup_order: tuple = ("en", "de", "fr", "es", "it")
     ):
@@ -115,7 +117,7 @@ class DublinCore:
 
         for elem in DC_ELEMENTS:
             for child in root.findall(f"dc:{elem}", namespaces=NAMESPACES):
-                lang = child.attrib.get(f"{{{NAMESPACES['xml']}}}lang", "unspecified")
+                lang = child.attrib.get(f"{{{NAMESPACES['xml']}}}lang", self.UNSPECIFIED_LANG)
                 element = self._data.get(elem, {})
                 values = element.get(lang, [])
                 if child.text is not None:
@@ -183,28 +185,37 @@ class DublinCore:
         if name not in DC_ELEMENTS:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
         # element not in DC.xml
-        # TODO: possible this should better be a warning?
         if name not in self._data:
-            logger.debug(
-                "Element %s not found in %s. Returning default value: [%s]",
-                name,
-                self.path,
-                default,
+            warnings.warn(
+                f"Element '{name}' not found in {self.path}. Returning default value: [{default}]",
+                UserWarning,
             )
             return [default]
 
+        # search for an entry in desired language
         if preferred_lang not in self._data[name]:
-            for lang in [*self.lookup_order, "unspecified"]:
+            # search for another language in defined lookup order
+            alternative_lang = self.UNSPECIFIED_LANG
+            for lang in self.lookup_order:
                 if lang in self._data[name]:
-                    preferred_lang = lang
-                    # TODO: this should be a warning, not a debug message
-                    logger.debug(
-                        "Preferred language %s not found in %s. Using %s instead.",
-                        preferred_lang,
-                        self.path,
-                        lang,
-                    )
+                    alternative_lang = lang
                     break
+            if alternative_lang == self.UNSPECIFIED_LANG:
+                # we did no entry for any lang in lookup_order, so we use the first entry without lang
+                warnings.warn(
+                    f"Preferred language '{preferred_lang}' not found in {self.path}. "
+                    f"Using first entry without xml:lang attribute instead.",
+                    UserWarning,
+                )
+            # we found an alternative lang
+            else:
+                warnings.warn(
+                    f"Preferred language '{preferred_lang}' not found in {self.path}. "
+                    f"Using value for language '{lang}' instead.",
+                    UserWarning,
+                )
+            preferred_lang = alternative_lang        
+        
         return [
             self.remove_linebreaks(value) for value in self._data[name][preferred_lang]
         ]

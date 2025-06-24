@@ -78,15 +78,18 @@ def test_is_datastream_file(datadir):
 def test_get_rights(test_config, test_dc):
     """Test the get_rights function."""
     # If set in dc file, this value should be returned.
-    assert get_rights(test_config, test_dc) == "Rights from DC.xml"
+    with pytest.warns(UserWarning):
+        assert get_rights(test_config, test_dc) == "Rights from DC.xml"
 
     # if not set in DC, use the value from the project configuration
     test_dc._data["rights"] = {"unspecified": [""]}
-    assert get_rights(test_config, test_dc) == "Rights from project.toml"
+    with pytest.warns(UserWarning):
+        assert get_rights(test_config, test_dc) == "Rights from project.toml"
 
     # if not set in configuration either, use the default value
     test_config.metadata.rights = ""
-    assert get_rights(test_config, test_dc) == defaultvalues.DEFAULT_RIGHTS
+    with pytest.warns(UserWarning):
+        assert get_rights(test_config, test_dc) == defaultvalues.DEFAULT_RIGHTS
 
 
 def test_create_csv_missing_object(tmp_path, test_config):
@@ -99,7 +102,8 @@ def test_create_csv(datadir, test_config):
     """Test the create_csv function."""
     object_dir = datadir / "objects" / "obj1"
     test_config.general.format_detector = "base"
-    create_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config)
 
     # check contents of the newly created object.csv file
     obj_csv = object_dir / "object.csv"
@@ -138,12 +142,14 @@ def test_create_csv_force_overwrite(datadir, test_config):
     ds_csv = object_dir / "datastreams.csv"
 
     # create the csv files for the first time
-    create_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config)
     assert len(read_csv(obj_csv)) == 1
     assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
     # recreate the csv files with force_overwrite=True
-    create_csv(object_dir, test_config, force_overwrite=True)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config, force_overwrite=True)
     assert len(read_csv(obj_csv)) == 1
     assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
@@ -162,7 +168,8 @@ def test_create_csv_files_existing_csvs(datadir, test_config):
 def test_create_csv_files(datadir, test_config):
     """The create_csv_files function should create the csv files for all objects."""
     objects_root_dir = datadir / "objects"
-    processed_objectscsvs = create_csv_files(objects_root_dir, test_config)
+    with pytest.warns(UserWarning):
+        processed_objectscsvs = create_csv_files(objects_root_dir, test_config)
     assert len(processed_objectscsvs) == len(["obj1", "obj2"])
 
     # Check if all csv files have been created
@@ -194,7 +201,8 @@ def test_create_csv_files_with_update_flag(datadir, test_config):
     "The create_csv_files function should update the csv files for all objects."
     # create the initial csv files
     objects_root_dir = datadir / "objects"
-    processed_objectcsvs = create_csv_files(objects_root_dir, test_config)
+    with pytest.warns(UserWarning):
+        processed_objectcsvs = create_csv_files(objects_root_dir, test_config)
     assert len(processed_objectcsvs) == len(["obj1", "obj2"])
 
     # Check if all csv files have been created
@@ -216,7 +224,7 @@ def test_create_csv_files_with_update_flag(datadir, test_config):
     write_csv_file(
         objects_root_dir / "obj1" / "datastreams.csv", list(ds_data.values())
     )
-    # change title of the DC.xml datastream in obj2/datastreams.csv
+    #change title of the DC.xml datastream in obj2/datastreams.csv
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"
     )
@@ -225,8 +233,9 @@ def test_create_csv_files_with_update_flag(datadir, test_config):
         objects_root_dir / "obj2" / "datastreams.csv", list(ds_data.values())
     )
 
-    # re-run create_csv_files with update=True
-    processed_objectcsvs = create_csv_files(objects_root_dir, test_config, update=True)
+    # # re-run create_csv_files with update=True
+    with pytest.warns(UserWarning):
+        processed_objectcsvs = create_csv_files(objects_root_dir, test_config, update=True)
     assert len(processed_objectcsvs) == len(["obj1", "obj2"])
 
     # The obj1/object.csv file should have the old title
@@ -256,7 +265,8 @@ def test_update_csv(datadir, test_config):
     ds_csv = object_dir / "datastreams.csv"
 
     # create the initial version of the csv files
-    create_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config)
     assert obj_csv.exists()
     assert ds_csv.exists()
 
@@ -268,7 +278,8 @@ def test_update_csv(datadir, test_config):
     obj_csv.write_text(obj_txt, encoding="utf-8")
     ds_csv.write_text("\n".join(ds_lines), encoding="utf-8")
 
-    update_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        update_csv(object_dir, test_config)
     obj_txt = obj_csv.read_text(encoding="utf-8")
     assert ",Object 1," in obj_txt
     ds_lines = ds_csv.read_text(encoding="utf-8").splitlines()
@@ -328,7 +339,8 @@ def test_update_csv_new_directory(datadir, test_config):
     dc_file_dst.write_bytes(dc_file_src.read_bytes())
 
     # Update CSV should create new files
-    result = update_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        result = update_csv(object_dir, test_config)
     assert result is not None
     assert (object_dir / "object.csv").exists()
     assert (object_dir / "datastreams.csv").exists()
@@ -345,7 +357,8 @@ def test_update_csv_add_datastream(datadir, tmp_path, test_config):
     (object_dir / "DC.xml").write_bytes((src_object / "DC.xml").read_bytes())
 
     # Create initial CSV files
-    create_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config)
 
     # Count initial datastreams
     ds_csv = object_dir / "datastreams.csv"
@@ -356,7 +369,8 @@ def test_update_csv_add_datastream(datadir, tmp_path, test_config):
     new_ds.write_text("Test content", encoding="utf-8")
 
     # Update the CSV files
-    update_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        update_csv(object_dir, test_config)
 
     # Check that the new datastream was added
     updated_lines = ds_csv.read_text(encoding="utf-8").splitlines()
@@ -375,7 +389,8 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     (object_dir / "SOURCE.xml").write_bytes((src_object / "SOURCE.xml").read_bytes())
 
     # Create initial CSV files
-    create_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+        create_csv(object_dir, test_config)
 
     # Modify object.csv - simulate a manual edit
     obj_csv = object_dir / "object.csv"
@@ -390,7 +405,8 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     dc_file.write_text(updated_dc, encoding="utf-8")
 
     # Update CSV
-    update_csv(object_dir, test_config)
+    with pytest.warns(UserWarning):
+            update_csv(object_dir, test_config)
 
     # Check that manual title edit remains and rights got updated
     updated_obj_txt = obj_csv.read_text(encoding="utf-8")

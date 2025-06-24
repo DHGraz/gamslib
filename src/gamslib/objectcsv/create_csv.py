@@ -48,10 +48,7 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
     """
     rights = dc.get_element_as_str("rights", preferred_lang="en", default="")
     if not rights:  # empty string is a valid value
-        if config.metadata.rights:
-            rights = config.metadata.rights
-        else:
-            rights = defaultvalues.DEFAULT_RIGHTS
+        rights = config.metadata.rights or defaultvalues.DEFAULT_RIGHTS
     return rights
 
 

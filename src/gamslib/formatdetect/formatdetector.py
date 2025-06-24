@@ -13,7 +13,7 @@ from .formatinfo import FormatInfo
 DEFAULT_TYPE = "application/octet-stream"
 
 
-class FormatDetector(abc.ABC):
+class FormatDetector(abc.ABC):   # pylint: disable=too-few-public-methods
     """An abstract format detection class."""
 
     @abc.abstractmethod
