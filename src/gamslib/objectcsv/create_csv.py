@@ -79,7 +79,7 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
                 logger.debug("Removed extension for ID: %s", parts[0])
             else:
                 warnings.warn(
-                    f"'{pid[-1]}' does not look like an extension. Keeping it in PID.",
+                    f"'{parts[-1]}' does not look like an extension. Keeping it in PID.",
                     UserWarning,
                 )
 
