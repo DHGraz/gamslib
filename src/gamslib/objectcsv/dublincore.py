@@ -99,6 +99,20 @@ NAMESPACES = {
 }
 
 
+# class DublinCoreWarning(UserWarning):
+#     """Warning for missing Dublin Core elements.
+
+#     This warning is raised when a requested element is not found 
+#     in the Dublin Core data and a default value is used instead.
+#     """
+
+# class MissingLangWarning(DublinCoreWarning):
+#     """Warning for missing language in Dublin Core elements.
+
+#     This warning is raised when a requested language (xml:lang) is not 
+#     found in the Dublin Core data.
+#     """
+
 class DublinCore:
     """Represents data from DC.xml and provides some methods to access it."""
 
@@ -186,9 +200,9 @@ class DublinCore:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
         # element not in DC.xml
         if name not in self._data:
-            warnings.warn(
-                f"Element '{name}' not found in {self.path}. Returning default value: [{default}]",
-                UserWarning,
+            logger.debug(
+                "Element '%s{name}' not found in %s{self.path}. Returning default value: [%s]", 
+                name, self.path, default
             )
             return [default]
 
@@ -202,17 +216,17 @@ class DublinCore:
                     break
             if alternative_lang == self.UNSPECIFIED_LANG:
                 # we did no entry for any lang in lookup_order, so we use the first entry without lang
-                warnings.warn(
-                    f"Preferred language '{preferred_lang}' not found in {self.path}. "
-                    f"Using first entry without xml:lang attribute instead.",
-                    UserWarning,
+                logger.debug(
+                    "Preferred language '%s{preferred_lang}' not found in %s{self.path}. "
+                    "Using first entry without xml:lang attribute instead.",
+                    preferred_lang, self.path
                 )
             # we found an alternative lang
             else:
-                warnings.warn(
-                    f"Preferred language '{preferred_lang}' not found in {self.path}. "
-                    f"Using value for language '{lang}' instead.",
-                    UserWarning,
+                logger.debug(
+                    "Preferred language '%s{preferred_lang}' not found in %s{self.path}. "
+                    "Using value for language '%s{alternative_lang}' instead.",
+                    preferred_lang, self.path, alternative_lang
                 )
             preferred_lang = alternative_lang        
         
