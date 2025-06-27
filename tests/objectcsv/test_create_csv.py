@@ -61,18 +61,22 @@ def write_csv_file(file: Path, data: list[dict[str, str]]):
         writer.writerows(data)
 
 
-def test_is_datastream_file(datadir):
+def test_is_datastream_file(datadir, test_config):
     """Test the is_datastream_file function."""
     # Create a test file
     obj_csv = datadir / "objects" / "obj1" / "object.csv"
     ds_csv = datadir / "objects" / "obj1" / "datastreams.csv"
     dc_file = datadir / "objects" / "obj1" / "DC.xml"
-    no_file = datadir / "objects" / "obj1"
 
-    assert not is_datastream_file(obj_csv)
-    assert not is_datastream_file(ds_csv)
-    assert is_datastream_file(dc_file)
-    assert not is_datastream_file(no_file)
+    assert not is_datastream_file(obj_csv, test_config)
+    assert not is_datastream_file(ds_csv, test_config)
+    assert is_datastream_file(dc_file, test_config)
+
+    no_file = datadir / "objects" / "obj1"
+    assert not is_datastream_file(no_file, test_config)
+
+    log_file = datadir / "objects" / "obj1" / "ingest.log"
+    assert not is_datastream_file(log_file, test_config)
 
 
 def test_get_rights(test_config, test_dc):

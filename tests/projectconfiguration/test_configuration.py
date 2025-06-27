@@ -55,6 +55,7 @@ def test_general_class():
     assert general.loglevel == "error"
     assert general.format_detector == "magika"
     assert general.format_detector_url == ""
+    assert general.ds_ignore_files == []
 
 
 def test_configuration_class_creation(configobj, datadir):

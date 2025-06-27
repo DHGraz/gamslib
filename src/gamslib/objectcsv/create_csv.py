@@ -6,6 +6,7 @@ to fill in the metadata. When not enough information is available, some fields
 will be left blank or filled with default values.
 """
 
+import fnmatch
 import logging
 import mimetypes
 import re
@@ -29,12 +30,28 @@ NAMESPACES = {
 }
 
 
-def is_datastream_file(ds_file: Path) -> bool:
-    """Check if the file should be used as datastream file."""
-    return ds_file.is_file() and ds_file.name not in (
+def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
+    """Check if the file should be used as datastream file.
+
+    We ignore objects.csv and datastreams.csv files, as well as files
+    matching any of the ignore patterns in the configuration.
+    """
+    if not ds_file.is_file():
+        return False
+    if ds_file.name in (
         ObjectCSV.OBJECT_CSV_FILENAME,
         ObjectCSV.DATASTREAM_CSV_FILENAME,
-    )
+    ):
+        return False
+    for pattern in configuration.general.ds_ignore_files:
+        if fnmatch.fnmatch(ds_file.name, pattern):
+            logger.debug(
+                "Ignoring datastream file '%s' due to ignore pattern '%s'.",
+                ds_file.name,
+                pattern,
+            )
+            return False
+    return True
 
 
 def get_rights(config: Configuration, dc: DublinCore) -> str:
@@ -143,7 +160,7 @@ def collect_datastream_data(
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
         lang=detect_languages(ds_file, delimiter=";"),
-        tags=""
+        tags="",
     )
 
 
@@ -177,11 +194,11 @@ def create_csv(
         collect_object_data(objectcsv.object_id, configuration, dc)
     )
     for ds_file in object_directory.glob("*"):
-        if is_datastream_file(ds_file):
+        if is_datastream_file(ds_file, configuration):
             objectcsv.add_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )
-    objectcsv.guess_mainresource() 
+    objectcsv.guess_mainresource()
     objectcsv.write()
     return objectcsv
 
@@ -217,10 +234,10 @@ def update_csv(
     )
     datastreams = []
     for ds_file in object_directory.glob("*"):
-        if is_datastream_file(ds_file):
+        if is_datastream_file(ds_file, configuration):
             datastreams.append(collect_datastream_data(ds_file, configuration, dc))
     objectcsv.update_datastreams(datastreams)
-    objectcsv.guess_mainresource() 
+    objectcsv.guess_mainresource()
     objectcsv.write()
     return objectcsv
 
