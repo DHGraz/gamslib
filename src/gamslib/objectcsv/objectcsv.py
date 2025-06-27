@@ -144,3 +144,28 @@ class ObjectCSV:
         """Return the languages of the datastreams ordered by frequency."""
         langcounter = Counter(self.datastream_data.get_languages())
         return [entry[0] for entry in langcounter.most_common()]
+
+    def guess_mainresource(self) -> None:
+        """Guess (and set)the main resource of the object based on the datastreams.
+
+        Heuristics:
+          - if there is only one xml datastream beside DC.xml
+            use this one as mainResource.
+        """
+        # TODO: this heuristic is very basic, we should improve this later
+        main_resource = ""
+        xml_files = []
+        for dsdata in self.datastream_data.get_datastreams():
+            if (
+                dsdata.dsid not in ("DC.xml", "DC")
+                and dsdata.mimetype in (
+                    "application/xml",
+                    "text/xml",
+                    "application/tei+xml",
+                )
+            ):
+                xml_files.append(dsdata.dsid)
+        if len(xml_files) == 1:
+            main_resource = xml_files[0]
+            self.object_data.set_mainresource(self.object_id, main_resource)
+        return main_resource

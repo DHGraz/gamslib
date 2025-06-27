@@ -74,6 +74,20 @@ class ObjectCSVFile:
         """Sort collected object data by recid value."""
         self._objectdata.sort(key=lambda x: x.recid)
 
+    def set_mainresource(self, recid: str, dsid: str) -> None:
+        """Set the main resource for the object data.
+
+        This is used to set the main resource for the object data.
+        The main resource is the datastream with the given dsid.
+        If the mainResource is already set, it will not be changed.
+        """
+        for objdata in self._objectdata:
+            if objdata.recid == recid and objdata.mainResource == "":
+                objdata.mainResource = dsid
+                # If the mainResource is set, we don't need to check further
+                # as there should be only one object with the same recid.
+                return
+
     def validate(self) -> None:
         """Validate the datastreams data.
         

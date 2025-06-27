@@ -165,3 +165,34 @@ def test_validate_objectcsvfile_with_empty_object_dir():
     with pytest.raises(ValidationError) as excinfo:
         obj_csv_file.validate()
     assert "Empty object.csv in " in str(excinfo.value)
+
+def test_to_csv_with_path(tmp_path: Path):
+    """Test to_csv with a provided path."""
+    obj_csv_file = ObjectCSVFile()
+    obj_data = ObjectData(recid="obj1", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_csv_file.add_objectdata(obj_data)
+    
+    csv_file = tmp_path / "custom_object.csv"
+    obj_csv_file.to_csv(csv_file)
+    
+    # Check if file exists and has correct content
+    assert csv_file.exists()
+    content = csv_file.read_text()
+    assert "recid,title,project,description" in content
+    
+    # Check if object_dir was updated
+    assert obj_csv_file._object_dir == tmp_path
+
+def test_to_csv_without_path(tmp_path: Path):
+    """Test to_csv using the default path from object_dir."""
+    obj_csv_file = ObjectCSVFile(tmp_path)
+    obj_data = ObjectData(recid="obj1", title="Title", rights="Rights", source="Source", objectType="Type")
+    obj_csv_file.add_objectdata(obj_data)
+    
+    obj_csv_file.to_csv(None)
+    
+    # Check if file exists at the default location
+    csv_file = tmp_path / "object.csv"
+    assert csv_file.exists()
+    content = csv_file.read_text()
+    assert "recid,title,project,description" in content

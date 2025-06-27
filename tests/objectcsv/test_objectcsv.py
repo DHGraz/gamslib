@@ -195,3 +195,99 @@ def test_update_datastreams(objcsvfile: Path, dscsvfile: Path):
 
     # Assert that the obj1/TEI2.xml datastream has been removed from the updated datastreams
     assert "obj1/TEI2.xml" not in [ds.dspath for ds in updated_datastreams]
+
+
+def test_guess_mainresource_single_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+    """Test the guess_mainresource method with a single XML file."""
+    # Create an ObjectCSV instance
+    oc = ObjectCSV(objcsvfile.parent)
+    
+    # Clear existing datastreams and add a single XML file
+    oc.clear()
+    
+    # Add a DC.xml file which should be ignored
+    dc_ds = copy.deepcopy(dsdata)
+    dc_ds.dspath = "obj1/DC.xml"
+    dc_ds.dsid = "DC.xml"
+    dc_ds.mimetype = "application/xml"
+    oc.add_datastream(dc_ds)
+    
+    # Add a TEI XML file which should be detected as main resource
+    tei_ds = copy.deepcopy(dsdata)
+    tei_ds.dspath = "obj1/TEI.xml"
+    tei_ds.dsid = "TEI.xml"
+    tei_ds.mimetype = "application/tei+xml"
+    oc.add_datastream(tei_ds)
+    
+    # Add object data
+    obj = ObjectData(recid=oc.object_id)
+    oc.add_objectdata(obj)
+    
+    # Test guessing the main resource
+    oc.guess_mainresource()
+       
+    # Verify the object data was updated
+    updated_obj = next(oc.get_objectdata())
+    assert updated_obj.mainResource == "TEI.xml"
+
+
+def test_guess_mainresource_multiple_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+    """Test the guess_mainresource method with multiple XML files."""
+    # Create an ObjectCSV instance
+    oc = ObjectCSV(objcsvfile.parent)
+    
+    # Clear existing datastreams and add multiple XML files
+    oc.clear()
+    
+    # Add an object data record
+    obj = ObjectData(recid=oc.object_id)
+    oc.add_objectdata(obj)
+    
+    # Add several XML files
+    xml_ds1 = copy.deepcopy(dsdata)
+    xml_ds1.dspath = "obj1/file1.xml"
+    xml_ds1.dsid = "FILE1"
+    xml_ds1.mimetype = "application/xml"
+    oc.add_datastream(xml_ds1)
+    
+    xml_ds2 = copy.deepcopy(dsdata)
+    xml_ds2.dspath = "obj1/file2.xml"
+    xml_ds2.dsid = "FILE2"
+    xml_ds2.mimetype = "text/xml"
+    oc.add_datastream(xml_ds2)
+    
+    # Test guessing the main resource - should return empty string for multiple XML files
+    oc.guess_mainresource()
+    
+    # Verify object data mainResource was not set
+    updated_obj = next(oc.get_objectdata())
+    assert not updated_obj.mainResource  # Should be empty
+
+
+def test_guess_mainresource_no_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+    """Test the guess_mainresource method with no XML files."""
+    # Create an ObjectCSV instance
+    oc = ObjectCSV(objcsvfile.parent)
+    
+    # Clear existing datastreams
+    oc.clear()
+    
+    # Add an object data record
+    obj = ObjectData(recid=oc.object_id)
+    oc.add_objectdata(obj)
+    
+    # Add a non-XML file
+    non_xml_ds = copy.deepcopy(dsdata)
+    non_xml_ds.dspath = "obj1/image.jpg"
+    non_xml_ds.dsid = "IMG"
+    non_xml_ds.mimetype = "image/jpeg"
+    oc.add_datastream(non_xml_ds)
+    
+    # Test guessing the main resource - should return empty string for no XML files
+    oc.guess_mainresource()
+    
+    # Verify object data mainResource was not set
+    updated_obj = next(oc.get_objectdata())
+    assert not updated_obj.mainResource  # Should be empty
+
+
