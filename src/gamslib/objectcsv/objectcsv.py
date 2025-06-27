@@ -167,6 +167,5 @@ class ObjectCSV:
             ):
                 xml_files.append(dsdata.dsid)
         if len(xml_files) == 1:
-            main_resource = xml_files[0]
-            self.object_data.set_mainresource(self.object_id, main_resource)
+            self.object_data.set_mainresource(self.object_id, xml_files[0])
         return main_resource
