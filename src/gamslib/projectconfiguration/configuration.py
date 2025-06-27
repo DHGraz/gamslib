@@ -32,6 +32,7 @@ class General(BaseModel, validate_assignment=True):
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
     format_detector: Literal["magika", "base", ""] = "magika"
     format_detector_url: str = ""
+    ds_ignore_files: list[str] = []
 
 
 class Configuration(BaseModel):
