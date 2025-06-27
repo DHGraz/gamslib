@@ -181,6 +181,7 @@ def create_csv(
             objectcsv.add_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )
+    objectcsv.guess_mainresource() 
     objectcsv.write()
     return objectcsv
 
@@ -219,6 +220,7 @@ def update_csv(
         if is_datastream_file(ds_file):
             datastreams.append(collect_datastream_data(ds_file, configuration, dc))
     objectcsv.update_datastreams(datastreams)
+    objectcsv.guess_mainresource() 
     objectcsv.write()
     return objectcsv
 
