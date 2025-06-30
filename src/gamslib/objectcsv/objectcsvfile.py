@@ -47,14 +47,18 @@ class ObjectCSVFile:
     @classmethod
     def from_csv(cls, csv_file: Path) -> "ObjectCSVFile":
         """Load the object data from a csv file."""
+        if not csv_file.is_file():
+            raise FileNotFoundError(f"Object CSV file {csv_file} does not exist.")
         obj_csv_file = ObjectCSVFile(csv_file.parent)
         with csv_file.open(encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                # mainresource was renamed to mainResource. Just in case we have existing data
+            for row in csv.DictReader(f):
+                # mainresource has been renamed to mainResource and mainresource was renamed to mainResource. 
+                # Just in case we have existing data we fix this here.
                 if "mainresource" in row:
                     row["mainResource"] = row.pop("mainresource")
                 obj_csv_file.add_objectdata(ObjectData(**row))
+        if len(obj_csv_file._objectdata) == 0:
+            raise ValidationError(f"Empty object.csv file {csv_file}.")
         return obj_csv_file
 
     def to_csv(self, csv_file: Path|None) -> None:

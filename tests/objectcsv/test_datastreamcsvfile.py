@@ -52,6 +52,27 @@ def test_dscsvfile(dscsvfile: Path, dsdata: DSData):
     assert dscsvfile.read_text(encoding="utf-8") == csv_file.read_text(encoding="utf-8")
 
 
+def test_from_csv_file_no_file(tmp_path: Path):
+    """Test that from_csv raises FileNotFoundError if the csv file does not exist."""
+    with pytest.raises(FileNotFoundError, match="Datastreams CSV file .* does not exist"):
+        DatastreamsCSVFile.from_csv(tmp_path / "datastreams.csv")
+
+def test_from_csv_files_empty(tmp_path: Path):
+    """Test that from_csv raises ValidationError if the csv file is empty."""
+    # file is totally empty
+    dsfile = tmp_path / "datastreams.csv"
+    dsfile.touch()  # create an empty file
+    with pytest.raises(ValidationError, match="Empty datastreams.csv file .*"):
+        DatastreamsCSVFile.from_csv(dsfile)        
+
+        # file has only the header
+    dsfile = tmp_path / "datastreams.csv"
+    with dsfile.open("w", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=DSData.__dataclass_fields__.keys())
+        writer.writeheader()
+    with pytest.raises(ValidationError, match="Empty datastreams.csv file .*"):
+        DatastreamsCSVFile.from_csv(dsfile)
+
 def test_dccsvfile_get_languages(dscsvfile: Path):
     "Test the get_languages method."
     dcf = DatastreamsCSVFile.from_csv(dscsvfile)
@@ -135,16 +156,9 @@ def test_merge_newdatastream(dscsvfile: Path):
 
 
 
-def test_validate_empty_datastreamscsvfile(tmp_path: Path):
+def test_validate_empty_datastreamscsvfile(tmp_path: Path, dscsvfile: Path):
     """Test that validate raises ValidationError when DatastreamsCSVFile is empty."""
     dsfile = tmp_path / "datastreams.csv"
-
-    # totally empty file
-    dsfile.touch()
-    ds_csv_file = DatastreamsCSVFile.from_csv(dsfile)
-    with pytest.raises(ValidationError) as excinfo:
-        ds_csv_file.validate()
-    assert "Empty datastreams.csv" in str(excinfo.value)
 
     # only header
     ds_csv_file = DatastreamsCSVFile(tmp_path)

@@ -1,6 +1,7 @@
 """Tests for the ObjectCSVFile class."""
 
 import copy
+import csv
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,30 @@ def test_objectcsvfile(objcsvfile: Path, objdata: ObjectData):
     ocf.to_csv(csv_file)
     assert objcsvfile.read_text() == csv_file.read_text()
 
+
+def test_from_csv_file_no_file(tmp_path: Path):
+    """Test that from_csv raises FileNotFoundError if the csv file does not exist."""
+    with pytest.raises(FileNotFoundError, match="Object CSV file .* does not exist"):
+        ObjectCSVFile.from_csv(tmp_path / "object.csv") 
+
+
+def test_from_csv_file_empty(tmp_path: Path):
+    """Test that from_csv raises ValidationError if the csv file is empty."""
+    # totaly empty file
+    csv_file = tmp_path / "object.csv"
+    csv_file.touch()
+    with pytest.raises(ValidationError, match="Empty object.csv file"):
+        ObjectCSVFile.from_csv(csv_file)    
+
+
+    # only header line
+    with csv_file.open("w", encoding="utf-8", newline="") as f:
+        # write only the header line
+        writer = csv.DictWriter(f, fieldnames=ObjectData.__dataclass_fields__.keys())
+        writer.writeheader()
+
+    with pytest.raises(ValidationError, match="Empty object.csv file"):
+        ObjectCSVFile.from_csv(csv_file)    
 
 def test_merge(objcsvfile: Path):
     "Should merge two ObjectCSVFile objects."

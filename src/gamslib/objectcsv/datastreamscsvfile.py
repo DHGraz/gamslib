@@ -59,11 +59,14 @@ class DatastreamsCSVFile:
     @classmethod
     def from_csv(cls, csv_file: Path) -> "DatastreamsCSVFile":
         """Load the datastream container data from a csv file."""
+        if not csv_file.is_file():
+            raise FileNotFoundError(f"Datastreams CSV file {csv_file} does not exist.")
         ds_csv_file = DatastreamsCSVFile(csv_file.parent)
         with csv_file.open(encoding="utf-8", newline="") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
+            for row in csv.DictReader(f):
                 ds_csv_file.add_datastream(DSData(**row))
+        if len(ds_csv_file._datastreams) == 0:
+            raise ValidationError(f"Empty datastreams.csv file {csv_file}.")
         return ds_csv_file
 
     def to_csv(self, csv_file: Path):
