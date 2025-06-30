@@ -4,6 +4,7 @@
 import csv
 from dataclasses import fields
 from pathlib import Path
+import shutil
 
 import pytest
 from pytest import fixture
@@ -152,15 +153,19 @@ def test_create_csv_force_overwrite(datadir, test_config):
     assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
 
-def test_create_csv_files_existing_csvs(datadir, test_config):
+def test_create_csv_files_existing_csvs(datadir, test_config, objcsvfile: Path, dscsvfile: Path):
     """Test the create_csv_files function.
+
     If the csv files already exist, they should not be overwritten.
     """
-    object_dir = datadir / "objects"
-    (object_dir / "obj1" / "object.csv").touch()
-    (object_dir / "obj2" / "datastreams.csv").touch()
-
-    assert len(create_csv_files(object_dir, test_config)) == 0
+    # we create csv files in obj1 and obj2 dirextories to make sure
+    # that existing csv files are not overwritten
+    root = datadir / "objects"
+    for obj in ["obj1", "obj2"]:
+        obj_csv_path = root / obj / "object.csv"
+        shutil.copy(objcsvfile, obj_csv_path)
+        shutil.copy(dscsvfile, root / obj / "datastreams.csv")
+    assert len(create_csv_files(root, test_config)) == 0
 
 
 def test_create_csv_files(datadir, test_config):
