@@ -28,8 +28,11 @@ def collect_csv_data(
     all_objects_csv = ObjectCSV(object_root_dir)
 
     for objectfolder in find_object_folders(object_root_dir):
-        obj_csv = ObjectCSV(objectfolder)
-
+        obj_csv = ObjectCSV(
+            objectfolder,
+            ObjectCSV.OBJECT_CSV_FILENAME,
+            ObjectCSV.DATASTREAM_CSV_FILENAME,
+        )
         for objmeta in obj_csv.get_objectdata():
             all_objects_csv.add_objectdata(objmeta)
         for dsmeta in obj_csv.get_datastreamdata():
