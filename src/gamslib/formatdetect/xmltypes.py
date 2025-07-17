@@ -1,5 +1,6 @@
 """This module contains data and functions to detect XML types and subtypes."""
 
+from enum import StrEnum
 import warnings
 from pathlib import Path
 
@@ -105,7 +106,7 @@ MIMETYPES = {
 }
 
 
-def is_xml_type(mimetype: str) -> SubType | None:
+def is_xml_type(mimetype: str) -> StrEnum | None:
     "Return True if mimetype is a known XML type."
     return mimetype in MIMETYPES.values() or mimetype in XML_MIME_TYPES
 
@@ -133,7 +134,7 @@ def guess_xml_subtype(filepath: Path) -> str:
     return None
 
 
-def get_format_info(filepath: Path, mime_type: str) -> tuple[str, SubType | None]:
+def get_format_info(filepath: Path, mime_type: str) -> tuple[str, StrEnum | None]:
     """Get the format info for an XML file.
 
     Args:

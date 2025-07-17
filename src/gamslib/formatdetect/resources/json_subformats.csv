@@ -1,0 +1,5 @@
+subformat,full name,ds name,mimetype
+JSON,JSON,JSON document,application/json
+JSONLD,JSON-LD,JSON LD document,application/ld+json
+JSONSCHEMA,JSON-Schema, JSON Schema document,application/json
+JSONL,JSON Lines, JSON lines document,application/json
