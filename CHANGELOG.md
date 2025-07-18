@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-07-18
+
+### Changed
+
+  * Massively refactored. 
+  * CSV handling was heavily rewritten: objectcsv was replaced by two new 
+    classes: ObjectCSVManager and ObjectCollector
+  * mainResource is set automatically for XML files
+  * title for datastreams now contains the Type and Subtype. This was request from the
+    front end people
+
+
 ## [0.5.0] - 2025-02-28
 
 ### Changed
