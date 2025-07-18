@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.5.7"
+version = "0.6.0"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
