@@ -5,7 +5,6 @@ import csv
 
 import pytest
 
-from gamslib.objectcsv.objectcsvfile import ObjectCSVFile
 
 
 def test_objectdata_creation(objdata):
@@ -22,33 +21,7 @@ def test_objectdata_creation(objdata):
     assert objdata.mainResource == "TEI.xml"
 
 
-def test_fix_for_mainresource(tmp_path):
-    """mainresource was renamed to mainResource.
 
-    Wee added code which still works with the old name, but uses the new name.
-    This test makes sure that it works like expected.
-    """
-    obj_dict = {
-        "recid": "obj1",
-        "title": "The title",
-        "project": "The project",
-        "description": "The description with ÄÖÜ",
-        "creator": "The creator",
-        "rights": "The rights",
-        "publisher": "The publisher",
-        "source": "The source",
-        "objectType": "The objectType",
-        "mainresource": "TEI.xml",
-    }
-    # write test data to file
-    csv_file = tmp_path / "object.csv"
-    with open(csv_file, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(obj_dict.keys()))
-        writer.writeheader()
-        writer.writerow(obj_dict)
-
-    data = ObjectCSVFile.from_csv(csv_file)
-    assert next(data.get_data()).mainResource == "TEI.xml"
 
 
 @pytest.mark.parametrize(

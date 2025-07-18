@@ -1,6 +1,7 @@
 """CSV data for a single object.
 """
 from dataclasses import dataclass
+import dataclasses
 
 # pylint: disable=too-many-instance-attributes,invalid-name
 
@@ -19,6 +20,12 @@ class ObjectData:
     objectType: str = ""
     mainResource: str = ""  # main datastream
     funder: str = ""
+
+    @classmethod
+    def fieldnames(cls) -> list[str]:
+        """Return the fields of the object data."""
+        return [field.name for field in dataclasses.fields(cls)]
+
 
     def merge(self, other: "ObjectData"):
         """Merge the object data with another ObjectData object."""

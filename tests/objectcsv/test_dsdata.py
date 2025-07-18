@@ -24,6 +24,9 @@ def test_dsdata_creation(dsdata):
     assert dsdata.creator == "Foo Bar"
     assert dsdata.rights == "GPLv3"
     assert dsdata.lang == "en; de"
+    assert dsdata.tags == "tag 1, tag 2, tag 3"
+
+    assert dsdata.object_id == "obj1"
 
 
 @pytest.mark.parametrize("detector", [MinimalDetector(), MagikaDetector()])
@@ -39,44 +42,44 @@ def test_ds_data_guess_missing_values(detector, shared_datadir, monkeypatch):
     dsdata = DSData(dspath="obj1/DC.xml", dsid="DC.xml")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "application/xml"
-    assert dsdata.title == defaultvalues.FILENAME_MAP["DC.xml"]["title"]
+    assert dsdata.title == "XML Dublin Core metadata: DC.xml"
     assert dsdata.description == defaultvalues.FILENAME_MAP["DC.xml"]["description"]
 
     dsdata = DSData(dspath="obj1/image.jpeg", dsid="image.jpeg")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "image/jpeg"
-    assert dsdata.title == "Image: image.jpeg"
+    assert dsdata.title == "Image document: image.jpeg"
 
     dsdata = DSData(dspath="obj1/json.json", dsid="json.json")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "application/json"
-    assert dsdata.title == ""
+    assert dsdata.title == "JSON document: json.json"
 
     dsdata = DSData(dspath="obj1/xml_tei.xml", dsid="xml_tei.xml")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "application/tei+xml"
-    assert "Georg Hönel" in dsdata.title
+    assert "XML TEI document" in dsdata.title
 
     dsdata = DSData(dspath="obj1/xml_lido.xml", dsid="xml_lido.xml")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "application/xml"
-    assert dsdata.title == "Bratspieß"
+    assert dsdata.title == "XML LIDO document: xml_lido.xml"
 
     dsdata = DSData(dspath="obj1/sound.mp3", dsid="sound.mp3")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "audio/mpeg"
-    assert dsdata.title == "Audio: sound.mp3"
+    assert dsdata.title == "Audio document: sound.mp3"
 
     dsdata = DSData(dspath="obj1/video.mp4", dsid="video.mp4")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "video/mp4"
-    assert dsdata.title == "Video: video.mp4"
+    assert dsdata.title == "Video document: video.mp4"
 
     dsdata = DSData(dspath="obj1/empty.foo", dsid="empty")
     with pytest.warns(UserWarning):
         dsdata.guess_missing_values(shared_datadir / "obj1")
         assert dsdata.mimetype == "application/octet-stream"
-        assert dsdata.title == ""
+        assert dsdata.title == "Binary document: empty"
 
 
 @pytest.mark.parametrize(

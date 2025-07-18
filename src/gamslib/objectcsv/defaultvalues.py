@@ -1,6 +1,9 @@
 """Default values for the datastream meatadata."""
 
 
+from pathlib import Path
+
+
 NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "lido": "http://www.lido-schema.org",
