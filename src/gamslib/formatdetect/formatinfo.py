@@ -96,9 +96,25 @@ class FormatInfo:
     @property
     def description(self) -> str:
         """Return a human-friendly description of the format."""
-
+        mime_prefix_map = {
+            "text/": "Text document",
+            "image/": "Image document",
+            "audio/": "Audio document",
+            "video/": "Video document",
+            "application/": "Application document",
+        }
+        desc = ""
         subtype_info = self._get_subtype_info()
-        return subtype_info["ds name"] if subtype_info else ""
+        if subtype_info is not None:
+            desc = subtype_info["ds name"]
+        elif self.mimetype == "application/octet-stream":
+            desc = "Binary document"
+        else:
+            for prefix, description in mime_prefix_map.items():
+                if self.mimetype.startswith(prefix):
+                    desc = description
+                    break
+        return desc
 
     def _get_subtype_info(self) -> dict[str, str] | None:
         """Get the full subtype information from the CSV files for this format."""

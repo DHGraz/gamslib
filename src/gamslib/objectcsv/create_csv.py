@@ -13,15 +13,17 @@ import re
 import warnings
 from pathlib import Path
 
+from gamslib import formatdetect
+from gamslib.formatdetect.formatinfo import FormatInfo
 from gamslib.projectconfiguration import Configuration
 
 from . import defaultvalues
 from .dsdata import DSData
 from .dublincore import DublinCore
-from .objectcsv import ObjectCSV
+from .objectcsvmanager import ObjectCSVManager, OBJ_CSV_FILENAME, DS_CSV_FILENAME
+
 from .objectdata import ObjectData
 from .utils import find_object_folders
-
 logger = logging.getLogger()
 
 
@@ -39,8 +41,8 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
     if not ds_file.is_file():
         return False
     if ds_file.name in (
-        ObjectCSV.OBJECT_CSV_FILENAME,
-        ObjectCSV.DATASTREAM_CSV_FILENAME,
+        OBJ_CSV_FILENAME,
+        DS_CSV_FILENAME,
     ):
         return False
     for pattern in configuration.general.ds_ignore_files:
@@ -52,6 +54,7 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
             )
             return False
     return True
+
 
 
 def get_rights(config: Configuration, dc: DublinCore) -> str:
@@ -141,6 +144,23 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
     )
 
 
+def make_ds_title(dsid: str, format: FormatInfo) -> str:
+    """Create a title for the datastream based on its ID and format."""
+    return f"{format.description}: {dsid}"
+
+
+def make_ds_description(dsid: str, format: FormatInfo) -> str:
+    """Create a description for the datastream based on its ID and format.
+    
+    If no subtype is available, an empty string is returned.
+    """
+    # We have agreed to set the format subtype as description if available. 
+    # Not happy with this, but we need the subtype in csv dat. I'd prefer an
+    # extra field for the subtype, but this was rejected by the team.
+    if format.subtype:
+        return format.subtype.name
+    return ""
+
 def collect_datastream_data(
     ds_file: Path, config: Configuration, dc: DublinCore
 ) -> DSData:
@@ -151,11 +171,13 @@ def collect_datastream_data(
     # title = "; ".join(dc.get_element("title", default=dsid)) # ??
     # description = "; ".join(dc.get_element("description", default="")) #??
 
+    format:FormatInfo = formatdetect.detect_format(ds_file) 
+
     return DSData(
         dspath=str(ds_file.relative_to(ds_file.parents[1])),  # objectsdir
         dsid=dsid,
-        title="",
-        description="",
+        title=make_ds_title(dsid, format),
+        description=make_ds_description(dsid, format),
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
@@ -166,7 +188,7 @@ def collect_datastream_data(
 
 def create_csv(
     object_directory: Path, configuration: Configuration, force_overwrite: bool = False
-) -> ObjectCSV | None:
+) -> ObjectCSVManager | None:
     """Generate the csv file containing the preliminary metadata for a single object.
 
     Existing csv files will not be touched unless 'force_overwrite' is True.
@@ -175,14 +197,12 @@ def create_csv(
         logger.warning("Object directory '%s' does not exist.", object_directory)
         return None
 
-    objectcsv = ObjectCSV(object_directory)
+    objectcsv = ObjectCSVManager(object_directory)
 
     # Avoid that existing (and potentially already edited) metadata is replaced
-    if force_overwrite and not objectcsv.is_new():
+    if force_overwrite and not objectcsv.is_empty():
         objectcsv.clear()
-        objectcsv.obj_csv_file.unlink()
-        objectcsv.ds_csv_file.unlink()
-    if not objectcsv.is_new():
+    if not objectcsv.is_empty():
         logger.info(
             "CSV files for object '%s' already exist. Will not be re-created.",
             objectcsv.object_id,
@@ -190,22 +210,24 @@ def create_csv(
         return None
 
     dc = DublinCore(object_directory / "DC.xml")
-    objectcsv.add_objectdata(
-        collect_object_data(objectcsv.object_id, configuration, dc)
+    obj = collect_object_data(
+        objectcsv.object_id, configuration, dc
     )
+    objectcsv.set_object(obj)
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
             objectcsv.add_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )
     objectcsv.guess_mainresource()
-    objectcsv.write()
+    objectcsv.validate()
+    objectcsv.save()
     return objectcsv
 
 
 def update_csv(
     object_directory: Path, configuration: Configuration
-) -> ObjectCSV | None:
+) -> ObjectCSVManager | None:
     """Update an existing CSV file for a given object directory.
 
     This function is used to update the metadata for an object directory with existing CSV files.
@@ -220,25 +242,31 @@ def update_csv(
         logger.warning("Object directory '%s' does not exist.", object_directory)
         return None
 
-    objectcsv = ObjectCSV(object_directory, ignore_existing_csv_files=True)
+    objectcsv = ObjectCSVManager(object_directory, ignore_existing_csv_files=True)
 
-    if objectcsv.is_new():
+    if objectcsv.is_empty():
         logger.warning(
             "Object directory '%s' has no existing CSV files. Will be created.",
             object_directory,
         )
     dc = DublinCore(object_directory / "DC.xml")
 
-    objectcsv.update_objectdata(
+    #objectcsv.update_objectdata(
+    objectcsv.merge_object(
         collect_object_data(objectcsv.object_id, configuration, dc)
     )
-    datastreams = []
+    #datastreams = []
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
-            datastreams.append(collect_datastream_data(ds_file, configuration, dc))
-    objectcsv.update_datastreams(datastreams)
+            dsdata = collect_datastream_data(ds_file, configuration, dc)
+            #datastreams.append(collect_datastream_data(ds_file, configuration, dc))
+            objectcsv.merge_datastream(collect_datastream_data(ds_file, configuration, dc))
+                
+#                ds_file)
+    #        datastreams.append(collect_datastream_data(ds_file, configuration, dc))
+    #objectcsv.update_datastreams(datastreams)
     objectcsv.guess_mainresource()
-    objectcsv.write()
+    objectcsv.save()
     return objectcsv
 
 
@@ -247,9 +275,9 @@ def create_csv_files(
     config: Configuration,
     force_overwrite: bool = False,
     update: bool = False,
-) -> list[ObjectCSV]:
+) -> list[ObjectCSVManager]:
     """Create the CSV files for all objects below root_folder."""
-    extended_objects: list[ObjectCSV] = []
+    extended_objects: list[ObjectCSVManager] = []
     for path in find_object_folders(root_folder):
         if update:
             extended_obj = update_csv(path, config)

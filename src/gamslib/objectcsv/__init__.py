@@ -42,9 +42,11 @@ available in the objectcsv:
 
 from .dsdata import DSData
 from .objectdata import ObjectData
-from .objectcsv import ObjectCSV
+#from .objectcsv import ObjectCSV
+from .objectcsvmanager import ObjectCSVManager
+from .objectcollection import ObjectCollection
 from .create_csv import create_csv_files
-from .manage_csv import collect_csv_data, split_csv_files
+#from .manage_csv import collect_csv_data, split_csv_files
 from .xlsx import csv_to_xlsx, xlsx_to_csv
 
 __all__ = [

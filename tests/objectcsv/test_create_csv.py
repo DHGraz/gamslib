@@ -189,14 +189,14 @@ def test_create_csv_files(datadir, test_config):
         objects_root_dir / "obj1" / "datastreams.csv", "dsid"
     )
     assert len(ds_data) == len(["DC.xml", "SOURCE.xml"])
-    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
-    assert "Schuchardt" in ds_data["SOURCE.xml"]["title"]
+    assert ds_data["DC.xml"]["title"] == "XML Dublin Core metadata: DC.xml"
+    assert ds_data["SOURCE.xml"]["title"] =="XML TEI document: SOURCE.xml"
 
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"
     )
     assert len(ds_data) == 1
-    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
+    assert ds_data["DC.xml"]["title"] == "XML Dublin Core metadata: DC.xml"
 
 
 def test_create_csv_files_with_update_flag(datadir, test_config):
@@ -252,7 +252,7 @@ def test_create_csv_files_with_update_flag(datadir, test_config):
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"
     )
-    assert ds_data["DC.xml"]["title"] == "Dublin Core Metadata"
+    assert ds_data["DC.xml"]["title"] == "XML Dublin Core metadata: DC.xml"
 
 
 def test_update_csv(datadir, test_config):
@@ -405,3 +405,49 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     updated_obj_txt = obj_csv.read_text(encoding="utf-8")
     assert "Manual Edit Title" not in updated_obj_txt  # Manual edit preserved
     assert "Updated Rights" in updated_obj_txt  # Source change applied
+
+
+def test_is_datastream_file_with_ignores(datadir, test_config):
+    """Test the is_datastream_file function more comprehensively.
+    
+    Main reason is to test if the function correctly identifies files
+    that should be ignored based on the configuration settings.
+    This includes regular files, CSV files, directories, and non-existent files.
+    Also checks for files that match patterns but are not in the ignore list.
+    """
+    # Setup test files
+    obj_dir = datadir / "objects" / "obj1"
+    
+    # Test regular files
+    dc_file = obj_dir / "DC.xml"
+    assert is_datastream_file(dc_file, test_config)
+    
+    # Test CSV files that should be ignored
+    obj_csv = obj_dir / "object.csv"
+    ds_csv = obj_dir / "datastreams.csv"
+    assert not is_datastream_file(obj_csv, test_config)
+    assert not is_datastream_file(ds_csv, test_config)
+    
+    # Test directories (should be ignored)
+    assert not is_datastream_file(obj_dir, test_config)
+    
+    # Test non-existent files
+    non_existent = obj_dir / "non_existent.txt"
+    assert not is_datastream_file(non_existent, test_config)
+    
+    # Test ignored patterns from configuration
+    log_file = obj_dir / "ingest.log"
+    assert not is_datastream_file(log_file, test_config)
+    
+    # Test other common files that should be accepted
+    text_file = obj_dir / "text.txt"
+    if not text_file.exists():
+        text_file.touch()
+    assert is_datastream_file(text_file, test_config)
+    
+    # Test with file that matches a pattern but is not in the ignore list
+    xml_file = obj_dir / "metadata.xml"
+    if not xml_file.exists():
+        xml_file.touch()
+    assert is_datastream_file(xml_file, test_config)
+
