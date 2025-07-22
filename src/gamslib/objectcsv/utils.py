@@ -42,3 +42,13 @@ def extract_title_from_lido(lido_file):
         namespaces=NAMESPACES,
     )
     return title_node.text if title_node is not None else ""
+
+def split_entry(entry: str) -> list[str]:
+    """Split a string of csv entries into a list.
+    
+    The only supported delimiter is a semicolon (;).
+    If the entry is empty, an empty list is returned.
+    Leading and trailing whitespace is removed from each entry.
+    """
+    values = entry.split(";") if entry else []
+    return [value.strip() for value in values if value.strip()]
