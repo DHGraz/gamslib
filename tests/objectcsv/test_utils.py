@@ -88,3 +88,13 @@ def test_extract_title_from_lido(datadir):
     ).remove(title)
     tei.write(lido_file)
     assert utils.extract_title_from_tei(lido_file) == ""
+
+
+def test_split_entry():
+    "Test the split_entry method."
+    assert utils.split_entry("foo bar  ") == ["foo bar"]
+    assert utils.split_entry("foo;bar") == ["foo", "bar"]
+    assert utils.split_entry("foo; bar") == ["foo", "bar"]
+    assert utils.split_entry("foo,bar") == ["foo,bar"]
+    assert utils.split_entry("foo , bar") == ["foo , bar"]
+    assert utils.split_entry("foo:foo, bar-bar;") == ["foo:foo, bar-bar"]

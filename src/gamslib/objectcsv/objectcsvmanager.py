@@ -4,12 +4,14 @@ It reads and writes the metadata to CSV files named `object.csv` and `datastream
 It also provides methods to validate, merge, and manipulate the object and datastream metadata.
 """
 
+from collections import Counter
 import copy
 import csv
 import dataclasses
 from pathlib import Path
 from typing import Generator
 
+from gamslib.objectcsv import utils
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectdata import ObjectData
 
@@ -86,6 +88,20 @@ class ObjectCSVManager:
         """Return a generator for the datastream data."""
         for dsdata in self._datastream_data:
             yield dsdata
+
+    def count_datastreams(self) -> int:
+        """Return the number of datastreams."""
+        return len(self._datastream_data)
+
+    def get_languages(self):
+        """Return the languages of the datastreams ordered by frequency."""
+        languages = []
+        for dsdata in self.get_datastreamdata():
+            if dsdata.lang:
+                dlangs = utils.split_entry(dsdata.lang)
+                languages.extend(dlangs)
+        langcounter = Counter(languages)
+        return [entry[0] for entry in langcounter.most_common()]  
 
     def is_empty(self) -> bool:
         """Return True if the object has no csv metadata."""
