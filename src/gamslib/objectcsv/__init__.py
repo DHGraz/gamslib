@@ -5,14 +5,16 @@ files (which are not part of the bag, btw).
 
 The objectcsv package provides tools to handle this metadata.
 
-  * The ObjectCSV class represents the object and datastream csv data
-    for a single object. It is created by providing the path to the
-    object directory. It is composed of two classes:
-
-    * ObjectCSVFile represents the object metadata. It hold typically
-      a single ObjectData object, but can hold multiple objects if needed.
-    * DatastreamsCSVFile represents the datastream metadata. It holds
-        typically multiple DSData objects, one for each datastream.
+  * The ObjectCSVManager class is used to manage the metadata
+    of a single object and its datastreams. It reads and writes the
+    metadata to CSV files named `object.csv` and `datastreams.csv`
+    respectively. It also provides methods to validate, merge, and manipulate
+    the object and datastream metadata.
+  * The ObjectCollection class is used to collect metadata from multiple
+    objects into a single csv file. It can also distribute the collected data
+    back to the individual object directories. This is useful for managing
+    metadata for a large number of objects, as it allows to edit the data in
+    a single file and then distribute the changes back to the individual objects.
   * The dublincore_csv module represents the object metadata stored in
     the objects 'DC.xml' file. It provides useful functions for acessing
     DC data e.g. for prefered languages etc.
@@ -30,14 +32,16 @@ The objectcsv package provides tools to handle this metadata.
 The "public" functions and classes from the submodules are directly
 available in the objectcsv:
 
-  * ObjectCSV
-  * ObjectData
-  * DSData
-  * create_csv_files
-  * collect_csv_data
-  * update_csv_files
-  * csv_to_xlsx
-  * xlsx_to_csv
+    DSData
+    ObjectCSVManager
+    ObjectCollection
+    ObjectData
+    collect_csv_data()
+    create_csv_files()
+    csv_to_xlsx()
+    split_from_csv()
+    split_from_xlsx()
+    xlsx_to_csv()
 """
 
 from .dsdata import DSData
