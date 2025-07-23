@@ -215,6 +215,8 @@ class ObjectCSVManager:
     def _write_datastreams_csv(self):
         """Write the datastream data to the CSV file."""
         csv_file = self.obj_dir / DS_CSV_FILENAME
+        # we want to have the list sorted by dsid
+        self._datastream_data.sort(key=lambda ds: ds.dsid)
         with csv_file.open("w", encoding="utf-8", newline="") as f:
             fieldnames = DSData.fieldnames()
             writer = csv.DictWriter(f, fieldnames=fieldnames)
