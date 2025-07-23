@@ -73,7 +73,8 @@ MIMETYPES = {
     SubType.RelaxNG: "application/relax-ng+xml",
     SubType.PresentationML: "application/vnd.openxmlformats-officedocument.presentationml",
     SubType.SpreadsheetML: "application/vnd.openxmlformats-officedocument.spreadsheetml",
-    SubType.WordprocessingML: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    SubType.WordprocessingML:  \
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     SubType.SOAP: "application/soap+xml",
     SubType.WSDL: "application/wsdl+xml",
     SubType.Collada: "application/vnd.collada+xml",

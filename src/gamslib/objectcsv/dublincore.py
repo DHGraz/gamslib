@@ -4,7 +4,6 @@ import logging
 from pathlib import Path
 import re
 from typing import Any
-import warnings
 from xml.etree import ElementTree as ET
 
 logger = logging.getLogger(__name__)
@@ -102,21 +101,23 @@ NAMESPACES = {
 # class DublinCoreWarning(UserWarning):
 #     """Warning for missing Dublin Core elements.
 
-#     This warning is raised when a requested element is not found 
+#     This warning is raised when a requested element is not found
 #     in the Dublin Core data and a default value is used instead.
 #     """
 
 # class MissingLangWarning(DublinCoreWarning):
 #     """Warning for missing language in Dublin Core elements.
 
-#     This warning is raised when a requested language (xml:lang) is not 
+#     This warning is raised when a requested language (xml:lang) is not
 #     found in the Dublin Core data.
 #     """
+
 
 class DublinCore:
     """Represents data from DC.xml and provides some methods to access it."""
 
     UNSPECIFIED_LANG = "unspecified"
+
     def __init__(
         self, path: Path, lookup_order: tuple = ("en", "de", "fr", "es", "it")
     ):
@@ -131,7 +132,9 @@ class DublinCore:
 
         for elem in DC_ELEMENTS:
             for child in root.findall(f"dc:{elem}", namespaces=NAMESPACES):
-                lang = child.attrib.get(f"{{{NAMESPACES['xml']}}}lang", self.UNSPECIFIED_LANG)
+                lang = child.attrib.get(
+                    f"{{{NAMESPACES['xml']}}}lang", self.UNSPECIFIED_LANG
+                )
                 element = self._data.get(elem, {})
                 values = element.get(lang, [])
                 if child.text is not None:
@@ -139,6 +142,7 @@ class DublinCore:
                 element[lang] = values
                 self._data[elem] = element
         # TODO: Add DC_TERMS and DCMI_TYPES?
+
     @classmethod
     def remove_linebreaks(cls, text: str) -> str:
         """Remove linebreaks from a string.
@@ -201,8 +205,10 @@ class DublinCore:
         # element not in DC.xml
         if name not in self._data:
             logger.debug(
-                "Element '%s{name}' not found in %s{self.path}. Returning default value: [%s]", 
-                name, self.path, default
+                "Element '%s{name}' not found in %s{self.path}. Returning default value: [%s]",
+                name,
+                self.path,
+                default,
             )
             return [default]
 
@@ -215,21 +221,24 @@ class DublinCore:
                     alternative_lang = lang
                     break
             if alternative_lang == self.UNSPECIFIED_LANG:
-                # we did no entry for any lang in lookup_order, so we use the first entry without lang
+                # no entry for any lang in lookup_order, so we use the first entry without lang
                 logger.debug(
                     "Preferred language '%s{preferred_lang}' not found in %s{self.path}. "
                     "Using first entry without xml:lang attribute instead.",
-                    preferred_lang, self.path
+                    preferred_lang,
+                    self.path,
                 )
             # we found an alternative lang
             else:
                 logger.debug(
                     "Preferred language '%s{preferred_lang}' not found in %s{self.path}. "
                     "Using value for language '%s{alternative_lang}' instead.",
-                    preferred_lang, self.path, alternative_lang
+                    preferred_lang,
+                    self.path,
+                    alternative_lang,
                 )
-            preferred_lang = alternative_lang        
-        
+            preferred_lang = alternative_lang
+
         return [
             self.remove_linebreaks(value) for value in self._data[name][preferred_lang]
         ]

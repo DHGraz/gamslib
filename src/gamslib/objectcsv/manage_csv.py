@@ -4,10 +4,7 @@ import logging
 from pathlib import Path
 
 from gamslib.objectcsv import objectcollection
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 from gamslib.objectcsv.objectcollection import ObjectCollection
-
-from .utils import find_object_folders
 
 logger = logging.getLogger()
 
@@ -46,16 +43,19 @@ def collect_csv_data(
     # all_objects_csv.write(object_csv_path, datastream_csv_path)
     # return all_objects_csv
 
-def split_from_xlsx(object_root_dir: Path, xlsx_file: Path | None = None) -> tuple[int, int]:
-    """Update object folder csv metadata from the an xlsx file. 
-    
-    This function reads the xlsx file, which was created by collect_csv_data(), and 
-    updates the csv files in all object folders below object_root_dir. 
+
+def split_from_xlsx(
+    object_root_dir: Path, xlsx_file: Path | None = None
+) -> tuple[int, int]:
+    """Update object folder csv metadata from the an xlsx file.
+
+    This function reads the xlsx file, which was created by collect_csv_data(), and
+    updates the csv files in all object folders below object_root_dir.
 
     object_root_dir is the root directory containing all object folders.
     If xlsx_file is None, it defaults to the current working directory with the name
     'all_objects.xlsx'.
-    
+
     Returns a a tuple of ints: number of updated objects and number of updated datastreams.
 
     Raises a UserWarning if an object directory does not exist.
@@ -65,15 +65,19 @@ def split_from_xlsx(object_root_dir: Path, xlsx_file: Path | None = None) -> tup
     return collector.distribute_to_objects(object_root_dir)
 
 
-def split_from_csv(object_root_dir: Path, object_csv_path: Path | None = None, ds_csv_path: Path | None = None) -> tuple[int, int]:  
-    """Update object folder csv metadata from the combined csv data. 
-    
-    This function reads the csv files, which were created by collect_csv_data(), and 
-    updates the csv files in all object folders below object_root_dir. 
+def split_from_csv(
+    object_root_dir: Path,
+    object_csv_path: Path | None = None,
+    ds_csv_path: Path | None = None,
+) -> tuple[int, int]:
+    """Update object folder csv metadata from the combined csv data.
+
+    This function reads the csv files, which were created by collect_csv_data(), and
+    updates the csv files in all object folders below object_root_dir.
 
     object_root_dir is the root directory containing all object folders.
-    If object_csv_path and ds_csv_path are None, it defaults to the current working directory with the name
-    'object.csv' and 'datastreams.csv'.
+    If object_csv_path and ds_csv_path are None, it defaults to the current working
+    directory with the name 'object.csv' and 'datastreams.csv'.
 
     Returns a a tuple of ints: number of updated objects and number of updated datastreams.
 
@@ -82,6 +86,7 @@ def split_from_csv(object_root_dir: Path, object_csv_path: Path | None = None, d
     collector = ObjectCollection()
     collector.load_from_csv(object_csv_path, ds_csv_path)
     return collector.distribute_to_objects(object_root_dir)
+
 
 #     object_root_dir: Path,
 #     input_dir: Path | None = None,

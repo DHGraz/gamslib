@@ -2,9 +2,11 @@
 
 FormatInfo objects are returned by format detectors.
 
-It also defines the SubType enum, which contains all supported subtypes of formats.
+It also defines the SubType enum, which contains all supported subtypes
+of formats.
 
-The subtype data is fetched from CSV files located in the resources directory of the formatdetect package.
+The subtype data is fetched from CSV files located in the resources directory
+of the formatdetect package.
 """
 
 import csv
@@ -28,7 +30,8 @@ def load_subtypes_from_csv() -> list[dict[str, str]]:
     """Load subtypes from all CSV files in the resources directory.
 
     Returns:
-        A list of dictionaries, each containing 'subformat', 'full name', 'ds name', 'mimetype', and 'maintype'.
+        A list of dictionaries, each containing all of the following keys:
+        'subformat', 'full name', 'ds name', 'mimetype', and 'maintype'.
     """
     subtypes = []
     for csvfile in find_subtype_csv_files():
@@ -54,7 +57,8 @@ def extract_subtype_info_from_csv() -> dict[str, str]:
 
 
 # `SubType` is an enum for all supported subtypes of formats.
-# The values of this are extracted from entries of all csv files in the src/gamslib/formatdetect/resources directory.
+# The values of this are extracted from entries of all csv files in
+# the src/gamslib/formatdetect/resources directory.
 # It is used to provide a consistent way to refer to these subtypes in the code.
 # To add new subtypes, edit one of the csv files.
 
@@ -118,8 +122,9 @@ class FormatInfo:
 
     def _get_subtype_info(self) -> dict[str, str] | None:
         """Get the full subtype information from the CSV files for this format."""
-        if self.subtype is None:
-            return None
-        for subtype in load_subtypes_from_csv():
-            if subtype["subformat"] == self.subtype.name:
-                return subtype
+        subtype_info = None
+        if self.subtype is not None:
+            for subtype in load_subtypes_from_csv():
+                if subtype["subformat"] == self.subtype.name:
+                    subtype_info = subtype
+        return subtype_info

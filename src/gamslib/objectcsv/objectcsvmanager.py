@@ -1,11 +1,15 @@
 """
-This module provides the ObjectCSVManager class, which manages the metadata of an object and its datastreams.
-It reads and writes the metadata to CSV files named `object.csv` and `datastreams.csv` respectively.
-It also provides methods to validate, merge, and manipulate the object and datastream metadata.
+Manage CSV metadata for GAMS objects and their datastreams.
+
+This module provides the ObjectCSVManager class, which manages the metadata 
+of an object and its datastreams.
+It reads and writes the metadata to CSV files named `object.csv` and 
+`datastreams.csv` respectively.
+It also provides methods to validate, merge, and manipulate the object and 
+datastream metadata.
 """
 
 from collections import Counter
-import copy
 import csv
 import dataclasses
 from pathlib import Path
@@ -55,13 +59,21 @@ class ObjectCSVManager:
             self._object_data.merge(object_data)
 
     def get_object(self) -> ObjectData:
+        """Return the object csv data.
+        
+        This is always a single ObjectData object, as we only have one 
+        object per directory.
+        If the object data has not been set, it returns None.
+        """
         return self._object_data
 
     def add_datastream(self, dsdata: DSData, replace: bool = False) -> None:
         """Add a datastream to the object.
 
-        If the datastream with the same dsid already exists, it raises a ValueError unless `replace` is True.
-        If `replace` is True, it will replace the existing datastream with the new one.
+        If the datastream with the same dsid already exists, it raises a 
+        ValueError unless `replace` is True.
+        If `replace` is True, it will replace the existing datastream with 
+        the new one.
         """
         if dsdata.dsid in [ds.dsid for ds in self._datastream_data]:
             if replace:
@@ -86,8 +98,7 @@ class ObjectCSVManager:
 
     def get_datastreamdata(self) -> Generator[DSData, None, None]:
         """Return a generator for the datastream data."""
-        for dsdata in self._datastream_data:
-            yield dsdata
+        yield from self._datastream_data
 
     def count_datastreams(self) -> int:
         """Return the number of datastreams."""
@@ -101,7 +112,7 @@ class ObjectCSVManager:
                 dlangs = utils.split_entry(dsdata.lang)
                 languages.extend(dlangs)
         langcounter = Counter(languages)
-        return [entry[0] for entry in langcounter.most_common()]  
+        return [entry[0] for entry in langcounter.most_common()]
 
     def is_empty(self) -> bool:
         """Return True if the object has no csv metadata."""
@@ -177,7 +188,7 @@ class ObjectCSVManager:
                 # we only can have one object per object directory
                 return ObjectData(**row)
 
-    def _write_object_csv(self, overwrite: bool = False):
+    def _write_object_csv(self):
         """Write the object data to the CSV file."""
         csv_file = self.obj_dir / OBJ_CSV_FILENAME
         if csv_file.is_file() and not self._ignore_existing_csv_files:
