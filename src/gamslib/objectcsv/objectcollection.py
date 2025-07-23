@@ -1,9 +1,10 @@
 """Collect csv info from multiple objects into two csv or a single xlsx file.
 
-This module provides the `ObjectCollection` class to manage and manipulate collections 
+This module provides the `ObjectCollection` class to manage and manipulate collections
 of GAMS objects and their associated datastreams.
 It allows for collecting, saving, and loading data from CSV and XLSX formats.
 """
+
 import csv
 from dataclasses import asdict
 from pathlib import Path
@@ -18,16 +19,16 @@ ALL_OBJECTS_CSV = "all_objects.csv"
 ALL_DATASTREAMS_CSV = "all_datastreams.csv"
 ALL_OBJECTS_XLSX = "all_objects.xlsx"
 
+
 class ObjectCollection:
     """Represents a collection of CSV data for any number of GAMS objects.
-    
+
     This is only used to collect data from multiple objects into a single csv/xslx file.
     """
 
     def __init__(self):
         self.objects: dict[str, ObjectData] = {}  # keys are recids (pid)
         self.datastreams: dict[str, list[DSData]] = {}  # keys are object ids (recids)
-
 
     def collect_from_objects(self, root_dir: Path) -> None:
         """Collect csv data from all object dirs below root_dir.
@@ -51,11 +52,11 @@ class ObjectCollection:
         """Distribute the collected data to the individual object directories.
 
         This will update the object.csv and datastreams.csv files in each object directory.
-        
+
         It is expected that all object directories are direct subdirectories of root_dir.
 
         Returns a tuple of ints: number of updated objects and number of updated datastreams.
-        Raises a UserWarning if an object directory does not exist. 
+        Raises a UserWarning if an object directory does not exist.
         """
         updated_objects_counter = 0
         updated_datastreams_counter = 0
@@ -70,21 +71,10 @@ class ObjectCollection:
                     updated_datastreams_counter += 1
                 obj_mgr.save()
             else:
-                raise UserWarning(f"Object directory {obj_dir} does not exist. Skipping.")
+                raise UserWarning(
+                    f"Object directory {obj_dir} does not exist. Skipping."
+                )
         return updated_objects_counter, updated_datastreams_counter
-    
-        # for obj_dir in find_object_folders(root_dir):
-        #     obj_id = obj_dir.name
-        #     if obj_id not in self.objects:
-        #         raise ValueError(f"Object {obj_id} not found in {the collection.")
-        #     if obj_id not in self.datastreams:
-        #         self.datastreams[obj_id] = []
-        # for obj_id, obj_data in self.objects.items():
-        #     obj_dir = Path(obj_id)
-        #     obj_csv = ObjectCSVManager(obj_dir)
-        #     obj_csv.set_objectdata(obj_data)
-        #     obj_csv.set_datastreamdata(self.datastreams.get(obj_id, []))
-        #     obj_csv.write()
 
     def count_objects(self) -> int:
         """Return the number of objects in the collection."""
@@ -93,8 +83,10 @@ class ObjectCollection:
     def count_datastreams(self) -> int:
         """Return the number of datastreams in the collection."""
         return sum(len(ds) for ds in self.datastreams.values())
-    
-    def save_to_csv(self, obj_file:Path|None = None, ds_file: Path|None = None) -> None:
+
+    def save_to_csv(
+        self, obj_file: Path | None = None, ds_file: Path | None = None
+    ) -> None:
         """Save data to two csv file (object.csv and datastreams.csv).
 
         If obj_file is None, it defaults to object.csv in the current directory.
@@ -103,23 +95,19 @@ class ObjectCollection:
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
         ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
         with obj_file.open("w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=ObjectData.fieldnames()
-            )
+            writer = csv.DictWriter(f, fieldnames=ObjectData.fieldnames())
             writer.writeheader()
             for obj in self.objects.values():
                 writer.writerow(asdict(obj))
         with ds_file.open("w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=DSData.fieldnames()
-            )
+            writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
             writer.writeheader()
-            for dspath, datastreams in self.datastreams.items(): #dsdata in self.datastreams:
+            for datastreams in self.datastreams.values():
+                # ) in self.datastreams.items():  # dsdata in self.datastreams:
                 for dsdata in datastreams:
                     writer.writerow(asdict(dsdata))
-    
-    
-    def save_to_xlsx(self, xlsx_file: Path|None = None) -> None:
+
+    def save_to_xlsx(self, xlsx_file: Path | None = None) -> None:
         """Save data to a single xlsx file with two sheets (objects and datastreams).
 
         If xlsx_file is None, it defaults to all_objects.xlsx in the current directory.
@@ -131,7 +119,9 @@ class ObjectCollection:
             self.save_to_csv(obj_file, ds_file)
             xlsx.csv_to_xlsx(obj_file, ds_file, xlsx_file)
 
-    def load_from_csv(self, obj_file: Path|None = None, ds_file: Path|None=None) -> None:
+    def load_from_csv(
+        self, obj_file: Path | None = None, ds_file: Path | None = None
+    ) -> None:
         """Load data from two csv files (object.csv and datastreams.csv).
 
         If obj_file is None, it defaults to object.csv in the current directory.
@@ -145,23 +135,23 @@ class ObjectCollection:
             raise FileNotFoundError(f"Required csv file {ds_file} does not exist.")
         self.objects.clear()
         self.datastreams.clear()
-        
+
         with obj_file.open("r", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 obj_data = ObjectData(**row)
                 self.objects[obj_data.recid] = obj_data
-        
+
         with ds_file.open("r", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 ds_data = DSData(**row)
-                obj_id = ds_data.dspath.split('/')[0]  # Extract object id from dspath
+                obj_id = ds_data.dspath.split("/")[0]  # Extract object id from dspath
                 if obj_id not in self.datastreams:
                     self.datastreams[obj_id] = []
                 self.datastreams[obj_id].append(ds_data)
 
-    def load_from_xlsx(self, xlsx_file: Path|None=None) -> None:
+    def load_from_xlsx(self, xlsx_file: Path | None = None) -> None:
         """Load data from a single xlsx file with two sheets (objects and datastreams).
 
         If xlsx_file is None, it defaults to all_objects.xlsx in the current directory.

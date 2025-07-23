@@ -24,6 +24,7 @@ from .objectcsvmanager import ObjectCSVManager, OBJ_CSV_FILENAME, DS_CSV_FILENAM
 
 from .objectdata import ObjectData
 from .utils import find_object_folders
+
 logger = logging.getLogger()
 
 
@@ -54,7 +55,6 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
             )
             return False
     return True
-
 
 
 def get_rights(config: Configuration, dc: DublinCore) -> str:
@@ -144,22 +144,24 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
     )
 
 
-def make_ds_title(dsid: str, format: FormatInfo) -> str:
+def make_ds_title(dsid: str, format_info: FormatInfo) -> str:
     """Create a title for the datastream based on its ID and format."""
-    return f"{format.description}: {dsid}"
+    return f"{format_info.description}: {dsid}"
 
 
-def make_ds_description(dsid: str, format: FormatInfo) -> str:
+def make_ds_description(dsid: str, format_info: FormatInfo) -> str:
     """Create a description for the datastream based on its ID and format.
-    
+
     If no subtype is available, an empty string is returned.
     """
-    # We have agreed to set the format subtype as description if available. 
-    # Not happy with this, but we need the subtype in csv dat. I'd prefer an
-    # extra field for the subtype, but this was rejected by the team.
-    if format.subtype:
-        return format.subtype.name
+    # We have agreed to set the format subtype as description if available.
+    # Not happy with this, but we need the subtype in csv data.
+    # I'd prefer an extra field for the subtype, but this was rejected
+    # by the team.
+    if format_info.subtype:
+        return format_info.subtype.name
     return ""
+
 
 def collect_datastream_data(
     ds_file: Path, config: Configuration, dc: DublinCore
@@ -171,13 +173,13 @@ def collect_datastream_data(
     # title = "; ".join(dc.get_element("title", default=dsid)) # ??
     # description = "; ".join(dc.get_element("description", default="")) #??
 
-    format:FormatInfo = formatdetect.detect_format(ds_file) 
+    format_info: FormatInfo = formatdetect.detect_format(ds_file)
 
     return DSData(
         dspath=str(ds_file.relative_to(ds_file.parents[1])),  # objectsdir
         dsid=dsid,
-        title=make_ds_title(dsid, format),
-        description=make_ds_description(dsid, format),
+        title=make_ds_title(dsid, format_info),
+        description=make_ds_description(dsid, format_info),
         mimetype=mimetypes.guess_type(ds_file)[0] or "",
         creator=config.metadata.creator,
         rights=get_rights(config, dc),
@@ -210,9 +212,7 @@ def create_csv(
         return None
 
     dc = DublinCore(object_directory / "DC.xml")
-    obj = collect_object_data(
-        objectcsv.object_id, configuration, dc
-    )
+    obj = collect_object_data(objectcsv.object_id, configuration, dc)
     objectcsv.set_object(obj)
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
@@ -251,20 +251,14 @@ def update_csv(
         )
     dc = DublinCore(object_directory / "DC.xml")
 
-    #objectcsv.update_objectdata(
-    objectcsv.merge_object(
-        collect_object_data(objectcsv.object_id, configuration, dc)
-    )
-    #datastreams = []
+    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc))
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
             dsdata = collect_datastream_data(ds_file, configuration, dc)
-            #datastreams.append(collect_datastream_data(ds_file, configuration, dc))
-            objectcsv.merge_datastream(collect_datastream_data(ds_file, configuration, dc))
-                
-#                ds_file)
-    #        datastreams.append(collect_datastream_data(ds_file, configuration, dc))
-    #objectcsv.update_datastreams(datastreams)
+            objectcsv.merge_datastream(
+                collect_datastream_data(ds_file, configuration, dc)
+            )
+
     objectcsv.guess_mainresource()
     objectcsv.save()
     return objectcsv

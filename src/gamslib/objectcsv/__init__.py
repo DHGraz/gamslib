@@ -46,7 +46,7 @@ from .objectcsvmanager import ObjectCSVManager
 from .objectcollection import ObjectCollection
 from .create_csv import create_csv_files
 from .xlsx import csv_to_xlsx, xlsx_to_csv
-from .manage_csv import split_from_csv, split_from_xlsx
+from .manage_csv import split_from_csv, split_from_xlsx, collect_csv_data
 
 __all__ = [
     "DSData",
@@ -56,7 +56,6 @@ __all__ = [
     "collect_csv_data",
     "create_csv_files",
     "csv_to_xlsx",
-    "split_csv_files",
     "split_from_csv",
     "split_from_xlsx",
     "xlsx_to_csv",
