@@ -406,48 +406,47 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     assert "Manual Edit Title" not in updated_obj_txt  # Manual edit preserved
     assert "Updated Rights" in updated_obj_txt  # Source change applied
 
-
-def test_is_datastream_file_with_ignores(datadir, test_config):
-    """Test the is_datastream_file function more comprehensively.
     
-    Main reason is to test if the function correctly identifies files
-    that should be ignored based on the configuration settings.
-    This includes regular files, CSV files, directories, and non-existent files.
-    Also checks for files that match patterns but are not in the ignore list.
-    """
-    # Setup test files
-    obj_dir = datadir / "objects" / "obj1"
-    
-    # Test regular files
-    dc_file = obj_dir / "DC.xml"
-    assert is_datastream_file(dc_file, test_config)
-    
-    # Test CSV files that should be ignored
+def test_is_datastream_file_excludes_object_and_datastream_csv(tmp_path, test_config):
+    """is_datastream_file should exclude object.csv and datastreams.csv files."""
+    obj_dir = tmp_path
     obj_csv = obj_dir / "object.csv"
     ds_csv = obj_dir / "datastreams.csv"
+    obj_csv.touch()
+    ds_csv.touch()
     assert not is_datastream_file(obj_csv, test_config)
     assert not is_datastream_file(ds_csv, test_config)
-    
-    # Test directories (should be ignored)
+
+def test_is_datastream_file_excludes_non_files(tmp_path, test_config):
+    """is_datastream_file should return False for non-files (directories)."""
+    obj_dir = tmp_path / "folder"
+    obj_dir.mkdir()
     assert not is_datastream_file(obj_dir, test_config)
-    
-    # Test non-existent files
-    non_existent = obj_dir / "non_existent.txt"
-    assert not is_datastream_file(non_existent, test_config)
-    
-    # Test ignored patterns from configuration
-    log_file = obj_dir / "ingest.log"
+
+def test_is_datastream_file_excludes_by_ignore_pattern(tmp_path, test_config):
+    """is_datastream_file should exclude files matching ignore patterns."""
+    # Add a pattern to ignore .log files
+    test_config.general.ds_ignore_files.append("*.log")
+    log_file = tmp_path / "ingest.log"
+    log_file.write_text("log content")
     assert not is_datastream_file(log_file, test_config)
-    
-    # Test other common files that should be accepted
-    text_file = obj_dir / "text.txt"
-    if not text_file.exists():
-        text_file.touch()
-    assert is_datastream_file(text_file, test_config)
-    
-    # Test with file that matches a pattern but is not in the ignore list
-    xml_file = obj_dir / "metadata.xml"
-    if not xml_file.exists():
-        xml_file.touch()
-    assert is_datastream_file(xml_file, test_config)
+
+def test_is_datastream_file_includes_normal_file(tmp_path, test_config):
+    """is_datastream_file should include normal files not matching ignore patterns."""
+    normal_file = tmp_path / "data.txt"
+    normal_file.write_text("some data")
+    assert is_datastream_file(normal_file, test_config)
+
+def test_is_datastream_file_multiple_ignore_patterns(tmp_path, test_config):
+    """is_datastream_file should handle multiple ignore patterns."""
+    test_config.general.ds_ignore_files.extend(["*.tmp", "ignoreme.*"])
+    tmp_file = tmp_path / "file.tmp"
+    ignore_file = tmp_path / "ignoreme.txt"
+    ok_file = tmp_path / "goodfile.xml"
+    tmp_file.write_text("tmp")
+    ignore_file.write_text("ignore")
+    ok_file.write_text("ok")
+    assert not is_datastream_file(tmp_file, test_config)
+    assert not is_datastream_file(ignore_file, test_config)
+    assert is_datastream_file(ok_file, test_config)
 

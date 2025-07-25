@@ -1,2 +1,2 @@
 #!/bin/bash
-pytest --cov --cov-report term-missing --cov=gamslib tests
+uv run pytest --cov --cov-report term-missing --cov=gamslib tests
