@@ -1,8 +1,9 @@
-"""Collect csv info from multiple objects into two csv or a single xlsx file.
+"""Aggregate and manage CSV/XLSX metadata for multiple GAMS objects.
 
-This module provides the `ObjectCollection` class to manage and manipulate collections
-of GAMS objects and their associated datastreams.
-It allows for collecting, saving, and loading data from CSV and XLSX formats.
+This module provides the ObjectCollection class to collect, save, load, and distribute
+object and datastream metadata across multiple GAMS object directories. Supports
+aggregation to CSV and XLSX formats and updating individual object folders from
+centralized metadata files.
 """
 
 import csv
@@ -21,19 +22,29 @@ ALL_OBJECTS_XLSX = "all_objects.xlsx"
 
 
 class ObjectCollection:
-    """Represents a collection of CSV data for any number of GAMS objects.
+    """
+    Represents a collection of metadata for multiple GAMS objects and their datastreams.
 
-    This is only used to collect data from multiple objects into a single csv/xslx file.
+    Used to aggregate, save, load, and distribute object and datastream metadata
+    between individual object directories and combined CSV/XLSX files.
     """
 
     def __init__(self):
+        """
+        Initialize an empty ObjectCollection.
+        """
         self.objects: dict[str, ObjectData] = {}  # keys are recids (pid)
         self.datastreams: dict[str, list[DSData]] = {}  # keys are object ids (recids)
 
     def collect_from_objects(self, root_dir: Path) -> None:
-        """Collect csv data from all object dirs below root_dir.
+        """
+        Collect metadata from all object directories below root_dir.
 
-        Raises a ValueError if the object metadata (csv) is not set for any object directory.
+        Args:
+            root_dir (Path): Directory containing object folders.
+
+        Raises:
+            ValueError: If object metadata (CSV) is missing for any object directory.
         """
         for obj_dir in find_object_folders(root_dir):
             object_meta = ObjectCSVManager(obj_dir)
@@ -49,14 +60,19 @@ class ObjectCollection:
                 self.datastreams[obj_dir.name].append(dsdata)
 
     def distribute_to_objects(self, root_dir: Path) -> tuple[int, int]:
-        """Distribute the collected data to the individual object directories.
+        """
+        Distribute aggregated metadata to individual object directories.
 
-        This will update the object.csv and datastreams.csv files in each object directory.
+        Updates object.csv and datastreams.csv files in each object directory.
 
-        It is expected that all object directories are direct subdirectories of root_dir.
+        Args:
+            root_dir (Path): Directory containing object folders.
 
-        Returns a tuple of ints: number of updated objects and number of updated datastreams.
-        Raises a UserWarning if an object directory does not exist.
+        Returns:
+            tuple[int, int]: Number of updated objects and datastreams.
+
+        Raises:
+            UserWarning: If an object directory does not exist.
         """
         updated_objects_counter = 0
         updated_datastreams_counter = 0
@@ -77,20 +93,32 @@ class ObjectCollection:
         return updated_objects_counter, updated_datastreams_counter
 
     def count_objects(self) -> int:
-        """Return the number of objects in the collection."""
+        """
+        Return the number of objects in the collection.
+
+        Returns:
+            int: Number of objects.
+        """
         return len(self.objects)
 
     def count_datastreams(self) -> int:
-        """Return the number of datastreams in the collection."""
+        """
+        Return the total number of datastreams in the collection.
+
+        Returns:
+            int: Number of datastreams.
+        """
         return sum(len(ds) for ds in self.datastreams.values())
 
     def save_to_csv(
         self, obj_file: Path | None = None, ds_file: Path | None = None
     ) -> None:
-        """Save data to two csv file (object.csv and datastreams.csv).
+        """
+        Save object and datastream metadata to two CSV files.
 
-        If obj_file is None, it defaults to object.csv in the current directory.
-        If ds_file is None, it defaults to datastreams.csv in the current directory.
+        Args:
+            obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.
         """
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
         ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
@@ -103,14 +131,15 @@ class ObjectCollection:
             writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
             writer.writeheader()
             for datastreams in self.datastreams.values():
-                # ) in self.datastreams.items():  # dsdata in self.datastreams:
                 for dsdata in datastreams:
                     writer.writerow(asdict(dsdata))
 
     def save_to_xlsx(self, xlsx_file: Path | None = None) -> None:
-        """Save data to a single xlsx file with two sheets (objects and datastreams).
+        """
+        Save object and datastream metadata to a single XLSX file with two sheets.
 
-        If xlsx_file is None, it defaults to all_objects.xlsx in the current directory.
+        Args:
+            xlsx_file (Path | None): Path for XLSX file. Defaults to 'all_objects.xlsx'.
         """
         xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -122,10 +151,15 @@ class ObjectCollection:
     def load_from_csv(
         self, obj_file: Path | None = None, ds_file: Path | None = None
     ) -> None:
-        """Load data from two csv files (object.csv and datastreams.csv).
+        """
+        Load object and datastream metadata from two CSV files.
 
-        If obj_file is None, it defaults to object.csv in the current directory.
-        If ds_file is None, it defaults to datastreams.csv in the current directory.
+        Args:
+            obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.
+
+        Raises:
+            FileNotFoundError: If either CSV file does not exist.
         """
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
         ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
@@ -152,9 +186,14 @@ class ObjectCollection:
                 self.datastreams[obj_id].append(ds_data)
 
     def load_from_xlsx(self, xlsx_file: Path | None = None) -> None:
-        """Load data from a single xlsx file with two sheets (objects and datastreams).
+        """
+        Load object and datastream metadata from a single XLSX file with two sheets.
 
-        If xlsx_file is None, it defaults to all_objects.xlsx in the current directory.
+        Args:
+            xlsx_file (Path | None): Path for XLSX file. Defaults to 'all_objects.xlsx'.
+
+        Raises:
+            FileNotFoundError: If the XLSX file does not exist.
         """
         xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
 

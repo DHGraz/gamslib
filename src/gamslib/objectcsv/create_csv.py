@@ -1,9 +1,8 @@
-"""Create object.csv and datastreams.csv files.
+"""Create object.csv and datastreams.csv files for GAMS objects.
 
-This module creates the object.csv and datastreams.csv files for one or many given
-object folder. It uses data from the DC.xml file and the project configuration
-to fill in the metadata. When not enough information is available, some fields
-will be left blank or filled with default values.
+This module generates `object.csv` and `datastreams.csv` files for one or more object folders.
+It uses data from the DC.xml file and the project configuration to populate metadata fields.
+If information is missing, fields are left blank or filled with default values.
 """
 
 import fnmatch
@@ -34,10 +33,18 @@ NAMESPACES = {
 
 
 def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
-    """Check if the file should be used as datastream file.
+    """
+    Determine if a file should be treated as a datastream file.
 
-    We ignore objects.csv and datastreams.csv files, as well as files
-    matching any of the ignore patterns in the configuration.
+    Excludes files named 'object.csv' or 'datastreams.csv', and files matching ignore patterns
+    specified in the configuration.
+
+    Args:
+        ds_file (Path): Path to the candidate datastream file.
+        configuration (Configuration): Project configuration containing ignore patterns.
+
+    Returns:
+        bool: True if the file should be used as a datastream, False otherwise.
     """
     if not ds_file.is_file():
         return False
@@ -58,13 +65,22 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
 
 
 def get_rights(config: Configuration, dc: DublinCore) -> str:
-    """Get the rights from various sources.
+    """
+    Retrieve the rights information for an object or datastream.
 
-    Lookup in this ortder:
+    Lookup order:
 
-      1. Check if set in dublin core
-      2. Check if set in the configuration
-      3. Use a default value.
+      1. Value from Dublin Core metadata (DC.xml).
+      2. Value from project configuration.
+      3. Default value if none found.
+
+    Args:
+
+      - config (Configuration): Project configuration.
+      - dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        str: Rights value.
     """
     rights = dc.get_element_as_str("rights", preferred_lang="en", default="")
     if not rights:  # empty string is a valid value
@@ -73,9 +89,21 @@ def get_rights(config: Configuration, dc: DublinCore) -> str:
 
 
 def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
-    """Extract and validate the datastream id from a datastream path.
+    """
+    Extract and validate the datastream ID from a file path.
 
-    If remove_extension is True, the file extension is removed from the PID.
+    If keep_extension is False, attempts to remove the file extension from the ID.
+    Validates the resulting ID format.
+
+    Args:
+        datastream (Path | str): Path or filename of the datastream.
+        keep_extension (bool): Whether to keep the file extension in the ID.
+
+    Returns:
+        str: The extracted datastream ID.
+
+    Raises:
+        ValueError: If the resulting ID is invalid.
     """
     if isinstance(datastream, str):
         datastream = Path(datastream)
@@ -113,9 +141,18 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
 
 
 def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
-    """Detect the language(s) of a file.
+    """
+    Detect the language(s) of a file.
 
-    Return detected language(s) as a string separated by the given delimiter.
+    Returns detected language(s) as a string separated by the given delimiter.
+    (Currently returns an empty string; language detection is not implemented.)
+
+    Args:
+        ds_file (Path): Path to the file.
+        delimiter (str): Delimiter for joining detected languages.
+
+    Returns:
+        str: Detected languages, or empty string if none.
     """
     languages = []
     # we decided not to use language detection for now
@@ -123,9 +160,18 @@ def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
 
 
 def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> ObjectData:
-    """Find data for the object.csv by examining dc file and configuration.
+    """
+    Collect metadata for an object to populate object.csv.
 
-    This is the place to change the resolving order for data from other sources.
+    Resolves values from Dublin Core metadata and project configuration.
+
+    Args:
+        pid (str): Object identifier.
+        config (Configuration): Project configuration.
+        dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        ObjectData: Populated object metadata.
     """
     title = "; ".join(dc.get_en_element("title", default=pid))
     # description = "; ".join(dc.get_element("description", default=""))
@@ -145,14 +191,31 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
 
 
 def make_ds_title(dsid: str, format_info: FormatInfo) -> str:
-    """Create a title for the datastream based on its ID and format."""
+    """
+    Generate a title for a datastream based on its ID and format.
+
+    Args:
+        dsid (str): Datastream ID.
+        format_info (FormatInfo): Format information for the datastream.
+
+    Returns:
+        str: Generated datastream title.
+    """
     return f"{format_info.description}: {dsid}"
 
 
 def make_ds_description(dsid: str, format_info: FormatInfo) -> str:
-    """Create a description for the datastream based on its ID and format.
+    """
+    Generate a description for a datastream based on its ID and format.
 
-    If no subtype is available, an empty string is returned.
+    Uses the format subtype as the description if available.
+
+    Args:
+        dsid (str): Datastream ID.
+        format_info (FormatInfo): Format information for the datastream.
+
+    Returns:
+        str: Datastream description, or empty string if not available.
     """
     # We have agreed to set the format subtype as description if available.
     # Not happy with this, but we need the subtype in csv data.
@@ -166,7 +229,19 @@ def make_ds_description(dsid: str, format_info: FormatInfo) -> str:
 def collect_datastream_data(
     ds_file: Path, config: Configuration, dc: DublinCore
 ) -> DSData:
-    """Collect data for a single datastream."""
+    """
+    Collect metadata for a single datastream to populate datastreams.csv.
+
+    Uses file information, format detection, and configuration values.
+
+    Args:
+        ds_file (Path): Path to the datastream file.
+        config (Configuration): Project configuration.
+        dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        DSData: Populated datastream metadata.
+    """
     dsid = extract_dsid(ds_file, config.general.dsid_keep_extension)
 
     # I think it's not possible to derive a ds title or description from the DC file
@@ -191,9 +266,19 @@ def collect_datastream_data(
 def create_csv(
     object_directory: Path, configuration: Configuration, force_overwrite: bool = False
 ) -> ObjectCSVManager | None:
-    """Generate the csv file containing the preliminary metadata for a single object.
+    """
+    Generate object.csv and datastreams.csv for a single object directory.
 
-    Existing csv files will not be touched unless 'force_overwrite' is True.
+    Existing CSV files are not overwritten unless 'force_overwrite' is True.
+    Metadata is collected from DC.xml and configuration.
+
+    Args:
+        object_directory (Path): Path to the object directory.
+        configuration (Configuration): Project configuration.
+        force_overwrite (bool): Whether to overwrite existing CSV files.
+
+    Returns:
+        ObjectCSVManager | None: Manager for the created CSV files, or None if not created.
     """
     if not object_directory.is_dir():
         logger.warning("Object directory '%s' does not exist.", object_directory)
@@ -228,15 +313,18 @@ def create_csv(
 def update_csv(
     object_directory: Path, configuration: Configuration
 ) -> ObjectCSVManager | None:
-    """Update an existing CSV file for a given object directory.
+    """
+    Update existing CSV files for an object directory with new metadata.
 
-    This function is used to update the metadata for an object directory with existing CSV files.
+    Adds new datastreams and updates metadata if configuration or DC.xml has changed.
+    Existing CSV files are updated, not overwritten.
 
-    This function is useful if new datastreams have been added to an object directory
-    after the CSV files have been initailly created.
-    Another use case is when settings in the metadata coniguration
-    have changed and the metadata in the CSV files need to be updated.
-    The CSV files are not overwritten, but updated with the new data.
+    Args:
+        object_directory (Path): Path to the object directory.
+        configuration (Configuration): Project configuration.
+
+    Returns:
+        ObjectCSVManager | None: Manager for the updated CSV files, or None if not updated.
     """
     if not object_directory.is_dir():
         logger.warning("Object directory '%s' does not exist.", object_directory)
@@ -270,7 +358,21 @@ def create_csv_files(
     force_overwrite: bool = False,
     update: bool = False,
 ) -> list[ObjectCSVManager]:
-    """Create the CSV files for all objects below root_folder."""
+    """
+    Create or update CSV files for all objects under the given root folder.
+
+    Iterates through all object directories found below root_folder and creates or updates
+    their object.csv and datastreams.csv files.
+
+    Args:
+        root_folder (Path): Root directory containing object folders.
+        config (Configuration): Project configuration.
+        force_overwrite (bool): If True, overwrite existing CSV files.
+        update (bool): If True, update existing CSV files instead of creating new ones.
+
+    Returns:
+        list[ObjectCSVManager]: List of managers for the processed object directories.
+    """
     extended_objects: list[ObjectCSVManager] = []
     for path in find_object_folders(root_folder):
         if update:

@@ -1,4 +1,4 @@
-"""Utility function for the projectconfiguration sub module."""
+"""Utility functions for the projectconfiguration sub module."""
 
 import os
 import shutil
@@ -12,10 +12,20 @@ from tomlkit import toml_file
 
 
 def find_project_toml(start_dir: Path) -> Path:
-    """Find the project.toml file in the start_dir or above.
+    """
+    Search for a 'project.toml' file starting from the given directory and moving upwards.
 
-    Return a path object to the project.toml file.
-    If no project.toml file is found, raise a FileNotFoundError.
+    Args:
+        start_dir (Path): The directory to begin the search.
+
+    Returns:
+        Path: The path to the first 'project.toml' file found.
+
+    Raises:
+        FileNotFoundError: If no 'project.toml' file is found in the start_dir, its parents, or the current working directory.
+
+    The function checks each parent directory of start_dir for a 'project.toml' file.
+    If none is found, it checks the current working directory as a fallback.
     """
     for folder in (start_dir / "a_non_existing_folder_to_include_start_dir").parents:
         project_toml = folder / "project.toml"
@@ -32,7 +42,18 @@ def find_project_toml(start_dir: Path) -> Path:
 
 
 def create_gitignore(project_dir: Path) -> None:
-    """Create a .gitignore file in the project_dir directory."""
+    """
+    Create a '.gitignore' file in the specified project directory.
+
+    If a '.gitignore' file already exists in the directory, a warning is issued and the file is not overwritten.
+    Otherwise, a template '.gitignore' is copied from the package resources to the project directory.
+
+    Args:
+        project_dir (Path): The target directory for the '.gitignore' file.
+
+    Raises:
+        UserWarning: If the '.gitignore' file already exists and will not be recreated.
+    """
     gitignore_target = project_dir / ".gitignore"
     if gitignore_target.exists():
         warnings.warn(
@@ -49,13 +70,20 @@ def create_gitignore(project_dir: Path) -> None:
 
 
 def create_project_toml(project_dir: Path) -> None:
-    """Create a project.toml template file in the project_dir directory.
+    """
+    Create a template 'project.toml' file in the specified project directory.
 
-    It is assumed that the project_dir is the root directory of a GAMS project
-    and that the directory exists.
-    The template file will not be created if a project.toml file already exists.
+    If a 'project.toml' file already exists in the directory, a warning is issued and the file is not overwritten.
+    Otherwise, a template file is copied from the package resources to the project directory.
 
-    Return the path to the created project.toml file or None if the file already exists.
+    Args:
+        project_dir (Path): The target directory for the 'project.toml' file.
+
+    Returns:
+        None
+
+    Raises:
+        UserWarning: If the 'project.toml' file already exists and will not be recreated.
     """
     toml_file_ = project_dir / "project.toml"
     if toml_file_.exists():
@@ -91,26 +119,53 @@ def initialize_project_dir(project_dir: Path) -> None:
 
 
 def read_path_from_dotenv(dotenv_file: Path, fieldname: str) -> Path | None:
-    """Read a path value from a dotenv file.
-
-    This utility function returns a correct path, even if the path was given as a
-    windows path ('c:\foo\bar') in the dotenv file. If the given filed_name is not
-    found in the dotenv file, None is returned.
     """
+    Read and normalize a path value from a dotenv file.
+
+    This function searches for the specified field name in the dotenv file and returns its value as a Path object.
+    Windows-style backslashes are converted to forward slashes for cross-platform compatibility.
+    If the field is not found, returns None.
+
+    Args:
+        dotenv_file (Path): Path to the dotenv file.
+        fieldname (str): Name of the field to search for.
+
+    Returns:
+        Path | None: The normalized path value if found, otherwise None.
+    """
+    if not dotenv_file.is_file():
+        return None
+
     fixed_lines = []
     with dotenv_file.open(encoding="utf-8", newline="") as f:
         for line in f.read().splitlines():
+            # Only process lines that start with the field name (ignoring leading whitespace)
             if line.lstrip().startswith(fieldname):
-                fixed_lines.append(line.replace("\\", "/").replace("//", "/"))
+                # Normalize Windows paths to POSIX style
+                normalized_line = line.replace("\\", "/").replace("//", "/")
+                fixed_lines.append(normalized_line)
+    if not fixed_lines:
+        return None
+
     envdata = dotenv_values(stream=StringIO("\n".join(fixed_lines)))
-    return Path(envdata[fieldname]) if fieldname in envdata else None
+    value = envdata.get(fieldname)
+    return Path(value) if value else None
 
 
-def get_config_file_from_env():
-    """Tries to extract the path to the config file from the environment.
+def get_config_file_from_env() -> Path | None:
+    """
+    Retrieve the path to the project configuration file from environment sources.
 
-    The path can either be set in the environment variable 'GAMSCFG_PROJECT_TOML'
-    or in the .env file in the current directory ('project_toml =').
+    The function checks for the configuration file path in the following order:
+
+      1. The 'GAMSCFG_PROJECT_TOML' environment variable.
+      2. The 'project_toml' field in a '.env' file located in the current working directory.
+
+    Returns:
+        Path | None: The path to the configuration file if found, otherwise None.
+
+    Note:
+        If neither source provides a path, the function returns None.
     """
     if "GAMSCFG_PROJECT_TOML" in os.environ:
         config_path = Path(os.environ["GAMSCFG_PROJECT_TOML"])
@@ -125,7 +180,24 @@ def get_config_file_from_env():
 
 
 def configuration_needs_update(config_file: Path) -> bool:
-    """Check if the config file needs to be updated."""
+    """
+    Check if the given configuration file is missing required keys compared to the template.
+
+    This function compares the structure of the provided config file against the template 'project.toml'
+    included with the package. It returns True if any required keys from the template are missing in the
+    config file, and False if all required keys are present.
+
+    Args:
+        config_file (Path): Path to the configuration file to check.
+
+    Returns:
+        bool: True if the config file is missing keys and needs to be updated, False otherwise.
+
+    Notes:
+        - Only missing keys are detected; extra keys or differing values are ignored.
+        - If the config file does not exist, returns False.
+        - Nested keys are checked recursively.
+    """
 
     def deep_compare(real_doc, template_doc):
         "Return True if both configurations contain the same keys."
@@ -155,11 +227,22 @@ def configuration_needs_update(config_file: Path) -> bool:
 
 
 def update_configuration(config_file: Path):
-    """Update the configuration file with missing entries from config template.
+    """
+    Update the configuration file by adding missing entries from the template.
 
-    This function adds new config file entries from the template file to the existing config file.
-    Currently it only handles additions, not deletions or changes.
-    Existing values in the config file will not be overwritten.
+    Compares the provided config file to the template 'project.toml' included with the package.
+    Any keys present in the template but missing from the config file are added, preserving existing values and comments.
+    The function does not remove or modify existing entries—only additions are handled.
+
+    A backup of the original config file is created before any changes are made.
+
+    Args:
+        config_file (Path): Path to the configuration file to update.
+
+    Notes:
+        - Only missing keys are added; existing values are not overwritten.
+        - Comments and formatting in the config file are preserved.
+        - The original config file is backed up as '<filename>.bak' in the same directory.
     """
 
     def deep_update(real_doc, template_doc):

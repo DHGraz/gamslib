@@ -1,6 +1,9 @@
-"""A library with modules which a needed in other GAMS packages.
+"""General-purpose library for shared GAMS package functionality.
 
-The gamslib package contains modules which are needed in other GAMS packages.
+The gamslib package provides reusable modules for GAMS projects, including:
 
-  * The objectcsv module provides tools to handle object and datastream metadata
+  - objectcsv: Tools for reading, writing, validating, and managing object and datastream metadata
+    in CSV format for GAMS objects. Supports batch editing, conversion to XLSX, and metadata aggregation.
+
+Other modules may be added to support common tasks across GAMS packages.
 """

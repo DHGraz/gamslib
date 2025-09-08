@@ -1,14 +1,24 @@
-"""A submodule for file format detection.
+"""File format detection utilities for GAMS projects.
 
-The package provides a single important function `detect_format` that
-can be used to detect the format of a file and returns
-a FormatInfo object.
+This submodule provides functions and classes to detect the format of files and return
+a FormatInfo object describing the detected format.
 
-Format detection is done by one of the available detectors, based on the configuration
-setting 'gernal.format_detector'. The default detector is the BaseDetector.
+Features:
+    - `detect_format`: Main function to detect the format of a file.
+    - Detector selection based on configuration ('general.format_detector').
+    - Support for multiple detectors (e.g., Magika, MinimalDetector).
+    - Extensible for future REST-based detectors (e.g., FITS).
 
-In future we plan to provide REST based detectors like FITS. This is the reason
-for the 'format_detector_url' setting in the configuration.
+Usage:
+    Use `detect_format(filepath)` to get format information for a file.
+    Detector is chosen automatically based on configuration, but can be set explicitly for testing.
+
+Configuration:
+    - 'general.format_detector': Name of the detector to use (default: 'magika').
+    - 'general.format_detector_url': Optional URL for REST-based detectors.
+
+Future:
+    Additional detectors and REST-based services may be supported.
 """
 
 import os
@@ -26,7 +36,23 @@ DEFAULT_DETECTOR_NAME = "magika"
 
 @lru_cache
 def make_detector(detector_name: str, detector_url: str = "") -> FormatDetector:
-    """Return a detector object based on the configuration."""
+    """
+    Return a detector object based on the given name and optional URL.
+
+    Args:
+        detector_name (str): Name of the detector to use ('base', 'magika', etc.).
+        detector_url (str): Optional URL for REST-based detectors.
+
+    Returns:
+        FormatDetector: An instance of the selected detector.
+
+    Raises:
+        ValueError: If the detector name is unknown.
+
+    Notes:
+        - If no detector name is provided, the default detector is used.
+        - Future detectors may require checking for software or service availability.
+    """
     # TODO: as soon we have detector which depend on installed software or available services,
     #       we must check for availability if no explicit detector is given
     detector = None
@@ -43,10 +69,19 @@ def make_detector(detector_name: str, detector_url: str = "") -> FormatDetector:
 
 
 def detect_format(filepath: Path) -> FormatInfo:
-    """Detect the format of a file and return a FormatInfo object describing the format.
+    """
+    Detect the format of a file and return a FormatInfo object describing the format.
 
-    Normally the detector is chosen based on the configuration setting 'general.format_detector'.
-    Setting a detector explicitely is only needed for testing or special cases.
+    Args:
+        filepath (Path): Path to the file to detect format for.
+
+    Returns:
+        FormatInfo: Object containing format information for the file.
+
+    Notes:
+        - Detector is chosen based on the configuration setting 'general.format_detector'.
+        - If no configuration is found, the default detector is used.
+        - Explicit detector selection is only needed for testing or special cases.
     """
     try:
         config = get_configuration()

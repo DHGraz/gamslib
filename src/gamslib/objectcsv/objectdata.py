@@ -1,5 +1,9 @@
-"""CSV data for a single object.
+"""CSV data model for a single GAMS object.
+
+Defines the ObjectData class, representing metadata for a single object as stored in object.csv.
+Provides methods for merging, validating, and listing field names.
 """
+
 from dataclasses import dataclass
 import dataclasses
 
@@ -7,7 +11,23 @@ import dataclasses
 
 @dataclass
 class ObjectData:
-    """Represents csv data for a single object."""
+    """
+    Represents CSV metadata for a single GAMS object.
+
+    Fields:
+
+      - recid (str): Object identifier.
+      - title (str): Title of the object.
+      - project (str): Project name or identifier.
+      - description (str): Description of the object.
+      - creator (str): Creator of the object.
+      - rights (str): Rights statement for the object.
+      - publisher (str): Publisher of the object.
+      - source (str): Source of the object.
+      - objectType (str): Type of the object.
+      - mainResource (str): Main datastream identifier.
+      - funder (str): Funder information.
+    """
 
     recid: str
     title: str = ""
@@ -23,12 +43,27 @@ class ObjectData:
 
     @classmethod
     def fieldnames(cls) -> list[str]:
-        """Return the fields of the object data."""
+        """
+        Return the list of field names for ObjectData.
+
+        Returns:
+            list[str]: Names of all fields in the ObjectData dataclass.
+        """
         return [field.name for field in dataclasses.fields(cls)]
 
-
     def merge(self, other: "ObjectData"):
-        """Merge the object data with another ObjectData object."""
+        """
+        Merge the object data with another ObjectData instance.
+
+        Overwrites fields with non-empty values from the other instance.
+        Both objects must have the same recid.
+
+        Args:
+            other (ObjectData): Another ObjectData instance to merge from.
+
+        Raises:
+            ValueError: If recid values do not match.
+        """
         if self.recid != other.recid:
             raise ValueError("Cannot merge objects with different recid values")
         # These are the fields which are possibly set automatically set in the new object data
@@ -48,7 +83,12 @@ class ObjectData:
                 setattr(self, field, getattr(other, field))
 
     def validate(self):
-        """Validate the object data."""
+        """
+        Validate required metadata fields.
+
+        Raises:
+            ValueError: If any required field is empty.
+        """
         if not self.recid:
             raise ValueError("recid must not be empty")
         if not self.title:
