@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.projectconfiguration.configuration API documentation</title>
+<meta name="description" content="Configuration management for GAMS projects …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.projectconfiguration.configuration</code></h1>
+</header>
+<section id="section-intro">
+<p>Configuration management for GAMS projects.</p>
+<p>This module defines models and logic for loading, validating, and overriding project configuration
+data from multiple sources: <code>project.toml</code>, <code>.env</code>, and environment variables.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Strongly-typed configuration models using Pydantic.</li>
+<li>Automatic loading and validation of configuration files.</li>
+<li>Layered override system: <code>.env</code> values override <code>project.toml</code>, environment variables override both.</li>
+<li>Helpful error messages for validation issues.</li>
+<li>Support for updating configuration values at runtime.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>Use <code>Configuration.from_toml(Path("project.toml"))</code> to load and validate a configuration.
+Access configuration sections via <code>config.metadata</code> and <code>config.general</code>.
+Overrides from <code>.env</code> and environment variables are applied automatically.</p>
+<h2 id="sections">Sections</h2>
+<ul>
+<li>Metadata: Project identification and publishing info.</li>
+<li>General: Project-wide settings and options.</li>
+</ul>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.Configuration"><code class="flex name class">
+<span>class <span class="ident">Configuration</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Configuration(BaseModel):
+    &#34;&#34;&#34;
+    Represents the complete configuration for a GAMS project.
+
+    This class aggregates configuration data from multiple sources:
+
+      - `project.toml` file (base configuration)
+      - `.env` file (overrides TOML values)
+      - Environment variables (override both `.env` and TOML)
+
+    Attributes:
+        toml_file (Path): Path to the loaded TOML configuration file.
+        metadata (Metadata): Project metadata section.
+        general (General): General project settings.
+
+    Configuration values are loaded and overridden in the following order:
+
+      1. Values from `project.toml`.
+      2. Values from `.env` (fields in the format `metadata.field` or `general.field`).
+      3. Values from environment variables prefixed with `GAMSCFG_` (e.g., `GAMSCFG_METADATA_PUBLISHER`).
+
+    Example usage:
+
+    ```
+        config = Configuration.from_toml(Path(&#34;project.toml&#34;))
+        print(config.metadata.publisher)
+        print(config.general.loglevel)
+    ```
+    &#34;&#34;&#34;
+    toml_file: Path
+    metadata: Metadata
+    general: General
+
+    def model_post_init(self, context: Any, /) -&gt; None:
+        self._update_from_dotenv()
+        self._update_from_env()
+
+    @classmethod
+    def _make_readable_message(cls, cfgfile, error_type: str, loc: tuple) -&gt; str | None:
+        &#34;&#34;&#34;Return a readable error message or None.
+
+        Helper function which creates a readable error messages.
+
+        Returns a readable error message or None if &#39;type&#39; is not known by function.
+        &#34;&#34;&#34;
+        # There are many more types which could be handled, but are not needed yet.
+        # See: https://docs.pydantic.dev/latest/errors/validation_errors/
+        reasons = {
+            &#34;missing&#34;: &#34;missing required field&#34;,
+            &#34;string_too_short&#34;: &#34;value is too short&#34;,
+            &#34;bool_type&#34;: &#34;value is not a boolean&#34;,
+            &#34;bool_parsing&#34;: &#34;value is not a boolean&#34;,
+            &#34;literal_error&#34;: &#34;value is not allowed here&#34;,
+        }
+
+        loc_str = &#34;.&#34;.join([str(e) for e in loc])
+        reason = reasons.get(error_type)
+        if reason is None:
+            return None
+        return f&#34;Error in project TOML file &#39;{cfgfile}&#39;. {reason}: &#39;{loc_str}&#39;&#34;
+
+    @classmethod
+    def from_toml(cls, toml_file: Path) -&gt; &#34;Configuration&#34;:
+        &#34;&#34;&#34;
+        Load configuration from a TOML file and return a Configuration object.
+
+        Reads the specified TOML file, validates its structure, and constructs a Configuration instance.
+        Automatically sets the `toml_file` attribute and applies overrides from `.env` and environment variables.
+
+        Args:
+            toml_file (Path): Path to the TOML configuration file.
+
+        Returns:
+            Configuration: The loaded and validated configuration object.
+
+        Raises:
+            FileNotFoundError: If the TOML file does not exist.
+            tomllib.TOMLDecodeError: If the TOML file cannot be parsed.
+            ValueError: If validation fails for required fields or types.
+        &#34;&#34;&#34;
+        try:
+            with toml_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as tfile:
+                data = tomllib.loads(tfile.read())
+                data[&#34;toml_file&#34;] = toml_file
+            return cls(**data)
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f&#34;Configuration file &#39;{toml_file.parent}&#39; not found.&#34;
+            ) from exc
+        except tomllib.TOMLDecodeError as exc:
+            raise tomllib.TOMLDecodeError(
+                f&#34;Error in project TOML file &#39;{toml_file}&#39;: {exc}&#34;
+            ) from exc
+        except ValidationError as exc:
+            msg = cls._make_readable_message(
+                toml_file, exc.errors()[0][&#34;type&#34;], exc.errors()[0][&#34;loc&#34;]
+            )
+            raise ValueError(msg) from exc
+
+    def _update_from_dotenv(self, dotenv_file: Path | None = None):
+        &#34;&#34;&#34;Update the configuration object from the &#39;.env&#39; file.&#34;&#34;&#34;
+        if dotenv_file is None:
+            dotenv_file = Path.cwd() / &#34;.env&#34;
+        for key, value in dotenv_values(dotenv_file).items():
+            if &#34;.&#34; in key:  # global fields are ignored
+                table, field = key.lower().split(&#34;.&#34;)
+                logger.debug(&#34;Setting %s to %s (from .env file.)&#34;, key, value)
+                if table == &#34;metadata&#34;:
+                    setattr(self.metadata, field, value)
+                elif table == &#34;general&#34;:
+                    setattr(self.general, field, value)
+
+    def _update_from_env(self):
+        &#34;&#34;&#34;Update the configuration object from environment variables.&#34;&#34;&#34;
+        for key, value in os.environ.items():
+            if key.startswith(&#34;GAMSCFG_&#34;) and key != &#34;GAMSCFG_PROJECT_TOML&#34;:
+                new_key = key[8:].lower()
+                if &#34;_&#34; in new_key:
+                    table, field = new_key.split(&#34;_&#34;, 1)
+                    logger.debug(
+                        &#34;Setting %s to %s (from environment variable.)&#34;, key, value
+                    )
+                    if table == &#34;metadata&#34;:
+                        setattr(self.metadata, field, value)
+                    elif table == &#34;general&#34;:
+                        setattr(self.general, field, value)</code></pre>
+</details>
+<div class="desc"><p>Represents the complete configuration for a GAMS project.</p>
+<p>This class aggregates configuration data from multiple sources:</p>
+<ul>
+<li><code>project.toml</code> file (base configuration)</li>
+<li><code>.env</code> file (overrides TOML values)</li>
+<li>Environment variables (override both <code>.env</code> and TOML)</li>
+</ul>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>toml_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the loaded TOML configuration file.</dd>
+<dt><strong><code>metadata</code></strong> :&ensp;<code><a title="gamslib.projectconfiguration.configuration.Metadata" href="#gamslib.projectconfiguration.configuration.Metadata">Metadata</a></code></dt>
+<dd>Project metadata section.</dd>
+<dt><strong><code>general</code></strong> :&ensp;<code><a title="gamslib.projectconfiguration.configuration.General" href="#gamslib.projectconfiguration.configuration.General">General</a></code></dt>
+<dd>General project settings.</dd>
+</dl>
+<p>Configuration values are loaded and overridden in the following order:</p>
+<ol>
+<li>Values from <code>project.toml</code>.</li>
+<li>Values from <code>.env</code> (fields in the format <code>metadata.field</code> or <code>general.field</code>).</li>
+<li>Values from environment variables prefixed with <code>GAMSCFG_</code> (e.g., <code>GAMSCFG_METADATA_PUBLISHER</code>).</li>
+</ol>
+<p>Example usage:</p>
+<pre><code>    config = Configuration.from_toml(Path(&quot;project.toml&quot;))
+    print(config.metadata.publisher)
+    print(config.general.loglevel)
+</code></pre>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.general"><code class="name">var <span class="ident">general</span> : <a title="gamslib.projectconfiguration.configuration.General" href="#gamslib.projectconfiguration.configuration.General">General</a></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.metadata"><code class="name">var <span class="ident">metadata</span> : <a title="gamslib.projectconfiguration.configuration.Metadata" href="#gamslib.projectconfiguration.configuration.Metadata">Metadata</a></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.toml_file"><code class="name">var <span class="ident">toml_file</span> : pathlib._local.Path</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.from_toml"><code class="name flex">
+<span>def <span class="ident">from_toml</span></span>(<span>toml_file: pathlib._local.Path) ‑> <a title="gamslib.projectconfiguration.configuration.Configuration" href="#gamslib.projectconfiguration.configuration.Configuration">Configuration</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load configuration from a TOML file and return a Configuration object.</p>
+<p>Reads the specified TOML file, validates its structure, and constructs a Configuration instance.
+Automatically sets the <code>toml_file</code> attribute and applies overrides from <code>.env</code> and environment variables.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>toml_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the TOML configuration file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="gamslib.projectconfiguration.configuration.Configuration" href="#gamslib.projectconfiguration.configuration.Configuration">Configuration</a></code></dt>
+<dd>The loaded and validated configuration object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the TOML file does not exist.</dd>
+<dt><code>tomllib.TOMLDecodeError</code></dt>
+<dd>If the TOML file cannot be parsed.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If validation fails for required fields or types.</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.Configuration.model_post_init"><code class="name flex">
+<span>def <span class="ident">model_post_init</span></span>(<span>self, context: Any, /) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def model_post_init(self, context: Any, /) -&gt; None:
+    self._update_from_dotenv()
+    self._update_from_env()</code></pre>
+</details>
+<div class="desc"><p>Override this method to perform additional initialization after <code>__init__</code> and <code>model_construct</code>.
+This is useful if you want to do some validation that requires the entire model to be initialized.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General"><code class="flex name class">
+<span>class <span class="ident">General</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class General(BaseModel, validate_assignment=True):
+    &#34;&#34;&#34;Represent the &#39;general&#39; section of the configuration file.&#34;&#34;&#34;
+
+    dsid_keep_extension: bool = True
+    loglevel: Literal[&#34;debug&#34;, &#34;info&#34;, &#34;warning&#34;, &#34;error&#34;, &#34;critical&#34;] = &#34;info&#34;
+    format_detector: Literal[&#34;magika&#34;, &#34;base&#34;, &#34;&#34;] = &#34;magika&#34;
+    format_detector_url: str = &#34;&#34;
+    ds_ignore_files: list[str] = []</code></pre>
+</details>
+<div class="desc"><p>Represent the 'general' section of the configuration file.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.General.ds_ignore_files"><code class="name">var <span class="ident">ds_ignore_files</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General.dsid_keep_extension"><code class="name">var <span class="ident">dsid_keep_extension</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General.format_detector"><code class="name">var <span class="ident">format_detector</span> : Literal['magika', 'base', '']</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General.format_detector_url"><code class="name">var <span class="ident">format_detector_url</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General.loglevel"><code class="name">var <span class="ident">loglevel</span> : Literal['debug', 'info', 'warning', 'error', 'critical']</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.General.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata"><code class="flex name class">
+<span>class <span class="ident">Metadata</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Metadata(BaseModel, validate_assignment=True):
+    &#34;&#34;&#34;Represent the &#39;metadata&#39; section of the configuration file.&#34;&#34;&#34;
+
+    project_id: Annotated[str, StringConstraints(min_length=2)]
+    creator: Annotated[str, StringConstraints(min_length=3)]
+    publisher: Annotated[str, StringConstraints(min_length=3)]
+    rights: str = &#34;&#34;
+    funder:str = &#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Represent the 'metadata' section of the configuration file.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.creator"><code class="name">var <span class="ident">creator</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.funder"><code class="name">var <span class="ident">funder</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.project_id"><code class="name">var <span class="ident">project_id</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.publisher"><code class="name">var <span class="ident">publisher</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.projectconfiguration.configuration.Metadata.rights"><code class="name">var <span class="ident">rights</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.projectconfiguration" href="index.html">gamslib.projectconfiguration</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.projectconfiguration.configuration.Configuration" href="#gamslib.projectconfiguration.configuration.Configuration">Configuration</a></code></h4>
+<ul class="two-column">
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.from_toml" href="#gamslib.projectconfiguration.configuration.Configuration.from_toml">from_toml</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.general" href="#gamslib.projectconfiguration.configuration.Configuration.general">general</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.metadata" href="#gamslib.projectconfiguration.configuration.Configuration.metadata">metadata</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.model_config" href="#gamslib.projectconfiguration.configuration.Configuration.model_config">model_config</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.model_post_init" href="#gamslib.projectconfiguration.configuration.Configuration.model_post_init">model_post_init</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Configuration.toml_file" href="#gamslib.projectconfiguration.configuration.Configuration.toml_file">toml_file</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="gamslib.projectconfiguration.configuration.General" href="#gamslib.projectconfiguration.configuration.General">General</a></code></h4>
+<ul class="two-column">
+<li><code><a title="gamslib.projectconfiguration.configuration.General.ds_ignore_files" href="#gamslib.projectconfiguration.configuration.General.ds_ignore_files">ds_ignore_files</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.General.dsid_keep_extension" href="#gamslib.projectconfiguration.configuration.General.dsid_keep_extension">dsid_keep_extension</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.General.format_detector" href="#gamslib.projectconfiguration.configuration.General.format_detector">format_detector</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.General.format_detector_url" href="#gamslib.projectconfiguration.configuration.General.format_detector_url">format_detector_url</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.General.loglevel" href="#gamslib.projectconfiguration.configuration.General.loglevel">loglevel</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.General.model_config" href="#gamslib.projectconfiguration.configuration.General.model_config">model_config</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="gamslib.projectconfiguration.configuration.Metadata" href="#gamslib.projectconfiguration.configuration.Metadata">Metadata</a></code></h4>
+<ul class="two-column">
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.creator" href="#gamslib.projectconfiguration.configuration.Metadata.creator">creator</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.funder" href="#gamslib.projectconfiguration.configuration.Metadata.funder">funder</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.model_config" href="#gamslib.projectconfiguration.configuration.Metadata.model_config">model_config</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.project_id" href="#gamslib.projectconfiguration.configuration.Metadata.project_id">project_id</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.publisher" href="#gamslib.projectconfiguration.configuration.Metadata.publisher">publisher</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.configuration.Metadata.rights" href="#gamslib.projectconfiguration.configuration.Metadata.rights">rights</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

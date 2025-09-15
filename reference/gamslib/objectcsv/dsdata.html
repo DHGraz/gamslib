@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.objectcsv.dsdata API documentation</title>
+<meta name="description" content="Datastream metadata model for GAMS object CSV files …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.objectcsv.dsdata</code></h1>
+</header>
+<section id="section-intro">
+<p>Datastream metadata model for GAMS object CSV files.</p>
+<p>Defines the DSData class, which represents metadata for a single datastream of a GAMS object.
+Provides methods for merging, validating, and inferring missing metadata values.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.objectcsv.dsdata.DSData"><code class="flex name class">
+<span>class <span class="ident">DSData</span></span>
+<span>(</span><span>dspath: str,<br>dsid: str = '',<br>title: str = '',<br>description: str = '',<br>mimetype: str = '',<br>creator: str = '',<br>rights: str = '',<br>lang: str = '',<br>tags: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclasses.dataclass
+class DSData:
+    &#34;&#34;&#34;
+    Represents metadata for a single datastream of a GAMS object.
+
+    Fields:
+
+      - dspath (str): Relative path to the datastream file.
+      - dsid (str): Datastream identifier.
+      - title (str): Title of the datastream.
+      - description (str): Description of the datastream.
+      - mimetype (str): MIME type of the datastream.
+      - creator (str): Creator of the datastream.
+      - rights (str): Rights statement for the datastream.
+      - lang (str): Language(s) of the datastream.
+      - tags (str): Additional tags for the datastream.
+    &#34;&#34;&#34;
+
+    dspath: str
+    dsid: str = &#34;&#34;
+    title: str = &#34;&#34;
+    description: str = &#34;&#34;
+    mimetype: str = &#34;&#34;
+    creator: str = &#34;&#34;
+    rights: str = &#34;&#34;
+    lang: str = &#34;&#34;
+    tags: str = &#34;&#34;
+
+    @property
+    def object_id(self):
+        &#34;&#34;&#34;
+        Return the object ID for the datastream.
+
+        The object ID is inferred from the first part of the datastream path.
+        &#34;&#34;&#34;
+        return Path(self.dspath).parts[0]
+
+    @classmethod
+    def fieldnames(cls) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Return the list of field names for DSData.
+
+        Returns:
+            list[str]: Names of all fields in the DSData dataclass.
+        &#34;&#34;&#34;
+        return [field.name for field in dataclasses.fields(cls)]
+
+    def merge(self, other_dsdata: &#34;DSData&#34;):
+        &#34;&#34;&#34;
+        Merge metadata from another DSData instance.
+
+        Selectively overwrites fields (&#39;title&#39;, &#39;mimetype&#39;, &#39;creator&#39;, &#39;rights&#39;) with non-empty
+        values from the other instance. Both datastreams must have the same dspath and dsid.
+
+        Args:
+            other_dsdata (DSData): Another DSData instance to merge from.
+
+        Raises:
+            ValueError: If dspath or dsid do not match.
+        &#34;&#34;&#34;
+        if self.dspath != other_dsdata.dspath:
+            raise ValueError(&#34;Cannot merge datastreams with different dspath values&#34;)
+        if self.dsid != other_dsdata.dsid:
+            raise ValueError(&#34;Cannot merge datastreams with different dsid values&#34;)
+
+        fields_to_replace = [&#34;title&#34;, &#34;mimetype&#34;, &#34;creator&#34;, &#34;rights&#34;]
+        for field in fields_to_replace:
+            if getattr(other_dsdata, field).strip():
+                setattr(self, field, getattr(other_dsdata, field))
+
+    def validate(self):
+        &#34;&#34;&#34;
+        Validate required metadata fields.
+
+        Raises:
+            ValueError: If any required field (dspath, dsid, mimetype, rights) is empty.
+        &#34;&#34;&#34;
+        if not self.dspath.strip():
+            raise ValueError(f&#34;{self.dsid}: dspath must not be empty&#34;)
+        if not self.dsid.strip():
+            raise ValueError(f&#34;{self.dspath}: dsid must not be empty&#34;)
+        if not self.mimetype.strip():
+            raise ValueError(f&#34;{self.dspath}: mimetype must not be empty&#34;)
+        if not self.rights.strip():
+            raise ValueError(f&#34;{self.dspath}: rights must not be empty&#34;)
+
+    def guess_missing_values(self, object_path: Path):
+        &#34;&#34;&#34;
+        Infer missing metadata values by analyzing the datastream file.
+
+        Uses format detection and default values to fill in missing fields.
+
+        Args:
+            object_path (Path): Path to the object directory containing the datastream.
+        &#34;&#34;&#34;
+        ds_file = object_path / Path(self.dspath).name
+        format_info = formatdetect.detect_format(ds_file)
+        self._guess_mimetype(format_info)
+        self._guess_missing_values(ds_file, format_info)
+
+    def _guess_mimetype(self, format_info=None):
+        &#34;&#34;&#34;
+        Guess and set the MIME type if it is missing.
+
+        Args:
+            format_info (FormatInfo, optional): Format information for the datastream.
+        &#34;&#34;&#34;
+        if not self.mimetype and format_info is not None:
+            self.mimetype = format_info.mimetype
+
+    def _guess_missing_values(self, file_path: Path, format_info=None):
+        &#34;&#34;&#34;
+        Infer and set missing metadata fields using file and format info.
+
+        Args:
+            file_path (Path): Path to the datastream file.
+            format_info (FormatInfo, optional): Format information for the datastream.
+        &#34;&#34;&#34;
+        if not self.title and format_info is not None:
+            self.title = f&#34;{format_info.description}: {self.dsid}&#34;
+
+        if not self.description and file_path.name in defaultvalues.FILENAME_MAP:
+            self.description = defaultvalues.FILENAME_MAP[self.dsid][&#34;description&#34;]
+        if not self.rights:
+            self.rights = defaultvalues.DEFAULT_RIGHTS
+        if not self.creator:
+            self.creator = defaultvalues.DEFAULT_CREATOR</code></pre>
+</details>
+<div class="desc"><p>Represents metadata for a single datastream of a GAMS object.</p>
+<h2 id="fields">Fields</h2>
+<ul>
+<li>dspath (str): Relative path to the datastream file.</li>
+<li>dsid (str): Datastream identifier.</li>
+<li>title (str): Title of the datastream.</li>
+<li>description (str): Description of the datastream.</li>
+<li>mimetype (str): MIME type of the datastream.</li>
+<li>creator (str): Creator of the datastream.</li>
+<li>rights (str): Rights statement for the datastream.</li>
+<li>lang (str): Language(s) of the datastream.</li>
+<li>tags (str): Additional tags for the datastream.</li>
+</ul></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="gamslib.objectcsv.dsdata.DSData.fieldnames"><code class="name flex">
+<span>def <span class="ident">fieldnames</span></span>(<span>) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the list of field names for DSData.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>Names of all fields in the DSData dataclass.</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="gamslib.objectcsv.dsdata.DSData.creator"><code class="name">var <span class="ident">creator</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.dsid"><code class="name">var <span class="ident">dsid</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.dspath"><code class="name">var <span class="ident">dspath</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.lang"><code class="name">var <span class="ident">lang</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.mimetype"><code class="name">var <span class="ident">mimetype</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.object_id"><code class="name">prop <span class="ident">object_id</span></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def object_id(self):
+    &#34;&#34;&#34;
+    Return the object ID for the datastream.
+
+    The object ID is inferred from the first part of the datastream path.
+    &#34;&#34;&#34;
+    return Path(self.dspath).parts[0]</code></pre>
+</details>
+<div class="desc"><p>Return the object ID for the datastream.</p>
+<p>The object ID is inferred from the first part of the datastream path.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.rights"><code class="name">var <span class="ident">rights</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.tags"><code class="name">var <span class="ident">tags</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.title"><code class="name">var <span class="ident">title</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.objectcsv.dsdata.DSData.guess_missing_values"><code class="name flex">
+<span>def <span class="ident">guess_missing_values</span></span>(<span>self, object_path: pathlib._local.Path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def guess_missing_values(self, object_path: Path):
+    &#34;&#34;&#34;
+    Infer missing metadata values by analyzing the datastream file.
+
+    Uses format detection and default values to fill in missing fields.
+
+    Args:
+        object_path (Path): Path to the object directory containing the datastream.
+    &#34;&#34;&#34;
+    ds_file = object_path / Path(self.dspath).name
+    format_info = formatdetect.detect_format(ds_file)
+    self._guess_mimetype(format_info)
+    self._guess_missing_values(ds_file, format_info)</code></pre>
+</details>
+<div class="desc"><p>Infer missing metadata values by analyzing the datastream file.</p>
+<p>Uses format detection and default values to fill in missing fields.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory containing the datastream.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.merge"><code class="name flex">
+<span>def <span class="ident">merge</span></span>(<span>self,<br>other_dsdata: <a title="gamslib.objectcsv.dsdata.DSData" href="#gamslib.objectcsv.dsdata.DSData">DSData</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def merge(self, other_dsdata: &#34;DSData&#34;):
+    &#34;&#34;&#34;
+    Merge metadata from another DSData instance.
+
+    Selectively overwrites fields (&#39;title&#39;, &#39;mimetype&#39;, &#39;creator&#39;, &#39;rights&#39;) with non-empty
+    values from the other instance. Both datastreams must have the same dspath and dsid.
+
+    Args:
+        other_dsdata (DSData): Another DSData instance to merge from.
+
+    Raises:
+        ValueError: If dspath or dsid do not match.
+    &#34;&#34;&#34;
+    if self.dspath != other_dsdata.dspath:
+        raise ValueError(&#34;Cannot merge datastreams with different dspath values&#34;)
+    if self.dsid != other_dsdata.dsid:
+        raise ValueError(&#34;Cannot merge datastreams with different dsid values&#34;)
+
+    fields_to_replace = [&#34;title&#34;, &#34;mimetype&#34;, &#34;creator&#34;, &#34;rights&#34;]
+    for field in fields_to_replace:
+        if getattr(other_dsdata, field).strip():
+            setattr(self, field, getattr(other_dsdata, field))</code></pre>
+</details>
+<div class="desc"><p>Merge metadata from another DSData instance.</p>
+<p>Selectively overwrites fields ('title', 'mimetype', 'creator', 'rights') with non-empty
+values from the other instance. Both datastreams must have the same dspath and dsid.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>other_dsdata</code></strong> :&ensp;<code><a title="gamslib.objectcsv.dsdata.DSData" href="#gamslib.objectcsv.dsdata.DSData">DSData</a></code></dt>
+<dd>Another DSData instance to merge from.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If dspath or dsid do not match.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.dsdata.DSData.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate(self):
+    &#34;&#34;&#34;
+    Validate required metadata fields.
+
+    Raises:
+        ValueError: If any required field (dspath, dsid, mimetype, rights) is empty.
+    &#34;&#34;&#34;
+    if not self.dspath.strip():
+        raise ValueError(f&#34;{self.dsid}: dspath must not be empty&#34;)
+    if not self.dsid.strip():
+        raise ValueError(f&#34;{self.dspath}: dsid must not be empty&#34;)
+    if not self.mimetype.strip():
+        raise ValueError(f&#34;{self.dspath}: mimetype must not be empty&#34;)
+    if not self.rights.strip():
+        raise ValueError(f&#34;{self.dspath}: rights must not be empty&#34;)</code></pre>
+</details>
+<div class="desc"><p>Validate required metadata fields.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If any required field (dspath, dsid, mimetype, rights) is empty.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.objectcsv" href="index.html">gamslib.objectcsv</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.objectcsv.dsdata.DSData" href="#gamslib.objectcsv.dsdata.DSData">DSData</a></code></h4>
+<ul class="">
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.creator" href="#gamslib.objectcsv.dsdata.DSData.creator">creator</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.description" href="#gamslib.objectcsv.dsdata.DSData.description">description</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.dsid" href="#gamslib.objectcsv.dsdata.DSData.dsid">dsid</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.dspath" href="#gamslib.objectcsv.dsdata.DSData.dspath">dspath</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.fieldnames" href="#gamslib.objectcsv.dsdata.DSData.fieldnames">fieldnames</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.guess_missing_values" href="#gamslib.objectcsv.dsdata.DSData.guess_missing_values">guess_missing_values</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.lang" href="#gamslib.objectcsv.dsdata.DSData.lang">lang</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.merge" href="#gamslib.objectcsv.dsdata.DSData.merge">merge</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.mimetype" href="#gamslib.objectcsv.dsdata.DSData.mimetype">mimetype</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.object_id" href="#gamslib.objectcsv.dsdata.DSData.object_id">object_id</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.rights" href="#gamslib.objectcsv.dsdata.DSData.rights">rights</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.tags" href="#gamslib.objectcsv.dsdata.DSData.tags">tags</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.title" href="#gamslib.objectcsv.dsdata.DSData.title">title</a></code></li>
+<li><code><a title="gamslib.objectcsv.dsdata.DSData.validate" href="#gamslib.objectcsv.dsdata.DSData.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

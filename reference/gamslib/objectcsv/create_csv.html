@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.objectcsv.create_csv API documentation</title>
+<meta name="description" content="Create object.csv and datastreams.csv files for GAMS objects …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.objectcsv.create_csv</code></h1>
+</header>
+<section id="section-intro">
+<p>Create object.csv and datastreams.csv files for GAMS objects.</p>
+<p>This module generates <code>object.csv</code> and <code>datastreams.csv</code> files for one or more object folders.
+It uses data from the DC.xml file and the project configuration to populate metadata fields.
+If information is missing, fields are left blank or filled with default values.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.objectcsv.create_csv.collect_datastream_data"><code class="name flex">
+<span>def <span class="ident">collect_datastream_data</span></span>(<span>ds_file: pathlib._local.Path,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>dc: <a title="gamslib.objectcsv.dublincore.DublinCore" href="dublincore.html#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a>) ‑> <a title="gamslib.objectcsv.dsdata.DSData" href="dsdata.html#gamslib.objectcsv.dsdata.DSData">DSData</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def collect_datastream_data(
+    ds_file: Path, config: Configuration, dc: DublinCore
+) -&gt; DSData:
+    &#34;&#34;&#34;
+    Collect metadata for a single datastream to populate datastreams.csv.
+
+    Uses file information, format detection, and configuration values.
+
+    Args:
+        ds_file (Path): Path to the datastream file.
+        config (Configuration): Project configuration.
+        dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        DSData: Populated datastream metadata.
+    &#34;&#34;&#34;
+    dsid = extract_dsid(ds_file, config.general.dsid_keep_extension)
+
+    # I think it&#39;s not possible to derive a ds title or description from the DC file
+    # title = &#34;; &#34;.join(dc.get_element(&#34;title&#34;, default=dsid)) # ??
+    # description = &#34;; &#34;.join(dc.get_element(&#34;description&#34;, default=&#34;&#34;)) #??
+
+    format_info: FormatInfo = formatdetect.detect_format(ds_file)
+
+    return DSData(
+        dspath=str(ds_file.relative_to(ds_file.parents[1])),  # objectsdir
+        dsid=dsid,
+        title=make_ds_title(dsid, format_info),
+        description=make_ds_description(dsid, format_info),
+        mimetype=mimetypes.guess_type(ds_file)[0] or &#34;&#34;,
+        creator=config.metadata.creator,
+        rights=get_rights(config, dc),
+        lang=detect_languages(ds_file, delimiter=&#34;;&#34;),
+        tags=&#34;&#34;,
+    )</code></pre>
+</details>
+<div class="desc"><p>Collect metadata for a single datastream to populate datastreams.csv.</p>
+<p>Uses file information, format detection, and configuration values.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ds_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the datastream file.</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration.</dd>
+<dt><strong><code>dc</code></strong> :&ensp;<code>DublinCore</code></dt>
+<dd>Dublin Core metadata object.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>DSData</code></dt>
+<dd>Populated datastream metadata.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.collect_object_data"><code class="name flex">
+<span>def <span class="ident">collect_object_data</span></span>(<span>pid: str,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>dc: <a title="gamslib.objectcsv.dublincore.DublinCore" href="dublincore.html#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a>) ‑> <a title="gamslib.objectcsv.objectdata.ObjectData" href="objectdata.html#gamslib.objectcsv.objectdata.ObjectData">ObjectData</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -&gt; ObjectData:
+    &#34;&#34;&#34;
+    Collect metadata for an object to populate object.csv.
+
+    Resolves values from Dublin Core metadata and project configuration.
+
+    Args:
+        pid (str): Object identifier.
+        config (Configuration): Project configuration.
+        dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        ObjectData: Populated object metadata.
+    &#34;&#34;&#34;
+    title = &#34;; &#34;.join(dc.get_en_element(&#34;title&#34;, default=pid))
+    # description = &#34;; &#34;.join(dc.get_element(&#34;description&#34;, default=&#34;&#34;))
+
+    return ObjectData(
+        recid=pid,
+        title=title,
+        project=config.metadata.project_id,
+        description=&#34;&#34;,
+        creator=config.metadata.creator,
+        rights=get_rights(config, dc),
+        source=defaultvalues.DEFAULT_SOURCE,
+        objectType=defaultvalues.DEFAULT_OBJECT_TYPE,
+        publisher=config.metadata.publisher,
+        funder=config.metadata.funder,
+    )</code></pre>
+</details>
+<div class="desc"><p>Collect metadata for an object to populate object.csv.</p>
+<p>Resolves values from Dublin Core metadata and project configuration.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>pid</code></strong> :&ensp;<code>str</code></dt>
+<dd>Object identifier.</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration.</dd>
+<dt><strong><code>dc</code></strong> :&ensp;<code>DublinCore</code></dt>
+<dd>Dublin Core metadata object.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ObjectData</code></dt>
+<dd>Populated object metadata.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.create_csv"><code class="name flex">
+<span>def <span class="ident">create_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_csv(
+    object_directory: Path, configuration: Configuration, force_overwrite: bool = False
+) -&gt; ObjectCSVManager | None:
+    &#34;&#34;&#34;
+    Generate object.csv and datastreams.csv for a single object directory.
+
+    Existing CSV files are not overwritten unless &#39;force_overwrite&#39; is True.
+    Metadata is collected from DC.xml and configuration.
+
+    Args:
+        object_directory (Path): Path to the object directory.
+        configuration (Configuration): Project configuration.
+        force_overwrite (bool): Whether to overwrite existing CSV files.
+
+    Returns:
+        ObjectCSVManager | None: Manager for the created CSV files, or None if not created.
+    &#34;&#34;&#34;
+    if not object_directory.is_dir():
+        logger.warning(&#34;Object directory &#39;%s&#39; does not exist.&#34;, object_directory)
+        return None
+
+    objectcsv = ObjectCSVManager(object_directory)
+
+    # Avoid that existing (and potentially already edited) metadata is replaced
+    if force_overwrite and not objectcsv.is_empty():
+        objectcsv.clear()
+    if not objectcsv.is_empty():
+        logger.info(
+            &#34;CSV files for object &#39;%s&#39; already exist. Will not be re-created.&#34;,
+            objectcsv.object_id,
+        )
+        return None
+
+    dc = DublinCore(object_directory / &#34;DC.xml&#34;)
+    obj = collect_object_data(objectcsv.object_id, configuration, dc)
+    objectcsv.set_object(obj)
+    for ds_file in object_directory.glob(&#34;*&#34;):
+        if is_datastream_file(ds_file, configuration):
+            objectcsv.add_datastream(
+                collect_datastream_data(ds_file, configuration, dc)
+            )
+    objectcsv.guess_mainresource()
+    objectcsv.validate()
+    objectcsv.save()
+    return objectcsv</code></pre>
+</details>
+<div class="desc"><p>Generate object.csv and datastreams.csv for a single object directory.</p>
+<p>Existing CSV files are not overwritten unless 'force_overwrite' is True.
+Metadata is collected from DC.xml and configuration.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_directory</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+<dt><strong><code>configuration</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration.</dd>
+<dt><strong><code>force_overwrite</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether to overwrite existing CSV files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ObjectCSVManager | None</code></dt>
+<dd>Manager for the created CSV files, or None if not created.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.create_csv_files"><code class="name flex">
+<span>def <span class="ident">create_csv_files</span></span>(<span>root_folder: pathlib._local.Path,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False,<br>update: bool = False) ‑> list[<a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_csv_files(
+    root_folder: Path,
+    config: Configuration,
+    force_overwrite: bool = False,
+    update: bool = False,
+) -&gt; list[ObjectCSVManager]:
+    &#34;&#34;&#34;
+    Create or update CSV files for all objects under the given root folder.
+
+    Iterates through all object directories found below root_folder and creates or updates
+    their object.csv and datastreams.csv files.
+
+    Args:
+        root_folder (Path): Root directory containing object folders.
+        config (Configuration): Project configuration.
+        force_overwrite (bool): If True, overwrite existing CSV files.
+        update (bool): If True, update existing CSV files instead of creating new ones.
+
+    Returns:
+        list[ObjectCSVManager]: List of managers for the processed object directories.
+    &#34;&#34;&#34;
+    extended_objects: list[ObjectCSVManager] = []
+    for path in find_object_folders(root_folder):
+        if update:
+            extended_obj = update_csv(path, config)
+        else:
+            extended_obj = create_csv(path, config, force_overwrite)
+
+        if extended_obj is not None:
+            extended_objects.append(extended_obj)
+    return extended_objects</code></pre>
+</details>
+<div class="desc"><p>Create or update CSV files for all objects under the given root folder.</p>
+<p>Iterates through all object directories found below root_folder and creates or updates
+their object.csv and datastreams.csv files.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>root_folder</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Root directory containing object folders.</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration.</dd>
+<dt><strong><code>force_overwrite</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, overwrite existing CSV files.</dd>
+<dt><strong><code>update</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, update existing CSV files instead of creating new ones.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[ObjectCSVManager]</code></dt>
+<dd>List of managers for the processed object directories.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.detect_languages"><code class="name flex">
+<span>def <span class="ident">detect_languages</span></span>(<span>ds_file: pathlib._local.Path, delimiter: str = ' ') ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_languages(ds_file: Path, delimiter: str = &#34; &#34;) -&gt; str:
+    &#34;&#34;&#34;
+    Detect the language(s) of a file.
+
+    Returns detected language(s) as a string separated by the given delimiter.
+    (Currently returns an empty string; language detection is not implemented.)
+
+    Args:
+        ds_file (Path): Path to the file.
+        delimiter (str): Delimiter for joining detected languages.
+
+    Returns:
+        str: Detected languages, or empty string if none.
+    &#34;&#34;&#34;
+    languages = []
+    # we decided not to use language detection for now
+    return delimiter.join(languages) if languages else &#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Detect the language(s) of a file.</p>
+<p>Returns detected language(s) as a string separated by the given delimiter.
+(Currently returns an empty string; language detection is not implemented.)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ds_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the file.</dd>
+<dt><strong><code>delimiter</code></strong> :&ensp;<code>str</code></dt>
+<dd>Delimiter for joining detected languages.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Detected languages, or empty string if none.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.extract_dsid"><code class="name flex">
+<span>def <span class="ident">extract_dsid</span></span>(<span>datastream: pathlib._local.Path | str, keep_extension=True) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_dsid(datastream: Path | str, keep_extension=True) -&gt; str:
+    &#34;&#34;&#34;
+    Extract and validate the datastream ID from a file path.
+
+    If keep_extension is False, attempts to remove the file extension from the ID.
+    Validates the resulting ID format.
+
+    Args:
+        datastream (Path | str): Path or filename of the datastream.
+        keep_extension (bool): Whether to keep the file extension in the ID.
+
+    Returns:
+        str: The extracted datastream ID.
+
+    Raises:
+        ValueError: If the resulting ID is invalid.
+    &#34;&#34;&#34;
+    if isinstance(datastream, str):
+        datastream = Path(datastream)
+
+    pid = datastream.name
+
+    if not keep_extension:
+        # not everything after the last dot is an extension :-(
+        mtype = mimetypes.guess_type(datastream)[0]
+        if mtype is None:
+            known_extensions = []
+        else:
+            known_extensions = mimetypes.guess_all_extensions(mtype)
+        if datastream.suffix in known_extensions:
+            pid = pid.removesuffix(datastream.suffix)
+            logger.debug(&#34;Removed extension &#39;%s&#39; for ID: %s&#34;, datastream.suffix, pid)
+        else:
+            parts = pid.split(&#34;.&#34;)
+            if re.match(r&#34;^[a-zA-Z]+\w?$&#34;, parts[-1]):
+                pid = &#34;.&#34;.join(parts[:-1])
+                logger.debug(&#34;Removed extension for ID: %s&#34;, parts[0])
+            else:
+                warnings.warn(
+                    f&#34;&#39;{parts[-1]}&#39; does not look like an extension. Keeping it in PID.&#34;,
+                    UserWarning,
+                )
+
+    if re.match(r&#34;^[a-zA-Z0-9]+[-.%_a-zA-Z0-9]+[a-zA-Z0-9]+$&#34;, pid) is None:
+        raise ValueError(f&#34;Invalid PID: &#39;{pid}&#39;&#34;)
+
+    logger.debug(
+        &#34;Extracted PID: %s from %s (keep_extension=%s)&#34;, pid, datastream, keep_extension
+    )
+    return pid</code></pre>
+</details>
+<div class="desc"><p>Extract and validate the datastream ID from a file path.</p>
+<p>If keep_extension is False, attempts to remove the file extension from the ID.
+Validates the resulting ID format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>datastream</code></strong> :&ensp;<code>Path | str</code></dt>
+<dd>Path or filename of the datastream.</dd>
+<dt><strong><code>keep_extension</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether to keep the file extension in the ID.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The extracted datastream ID.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the resulting ID is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.get_rights"><code class="name flex">
+<span>def <span class="ident">get_rights</span></span>(<span>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>dc: <a title="gamslib.objectcsv.dublincore.DublinCore" href="dublincore.html#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a>) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_rights(config: Configuration, dc: DublinCore) -&gt; str:
+    &#34;&#34;&#34;
+    Retrieve the rights information for an object or datastream.
+
+    Lookup order:
+
+      1. Value from Dublin Core metadata (DC.xml).
+      2. Value from project configuration.
+      3. Default value if none found.
+
+    Args:
+
+      - config (Configuration): Project configuration.
+      - dc (DublinCore): Dublin Core metadata object.
+
+    Returns:
+        str: Rights value.
+    &#34;&#34;&#34;
+    rights = dc.get_element_as_str(&#34;rights&#34;, preferred_lang=&#34;en&#34;, default=&#34;&#34;)
+    if not rights:  # empty string is a valid value
+        rights = config.metadata.rights or defaultvalues.DEFAULT_RIGHTS
+    return rights</code></pre>
+</details>
+<div class="desc"><p>Retrieve the rights information for an object or datastream.</p>
+<p>Lookup order:</p>
+<ol>
+<li>Value from Dublin Core metadata (DC.xml).</li>
+<li>Value from project configuration.</li>
+<li>Default value if none found.</li>
+</ol>
+<h2 id="args">Args</h2>
+<ul>
+<li>config (Configuration): Project configuration.</li>
+<li>dc (DublinCore): Dublin Core metadata object.</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Rights value.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.is_datastream_file"><code class="name flex">
+<span>def <span class="ident">is_datastream_file</span></span>(<span>ds_file: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_datastream_file(ds_file: Path, configuration: Configuration) -&gt; bool:
+    &#34;&#34;&#34;
+    Determine if a file should be treated as a datastream file.
+
+    Excludes files named &#39;object.csv&#39; or &#39;datastreams.csv&#39;, and files matching ignore patterns
+    specified in the configuration.
+
+    Args:
+        ds_file (Path): Path to the candidate datastream file.
+        configuration (Configuration): Project configuration containing ignore patterns.
+
+    Returns:
+        bool: True if the file should be used as a datastream, False otherwise.
+    &#34;&#34;&#34;
+    if not ds_file.is_file():
+        return False
+    if ds_file.name in (
+        OBJ_CSV_FILENAME,
+        DS_CSV_FILENAME,
+    ):
+        return False
+    for pattern in configuration.general.ds_ignore_files:
+        if fnmatch.fnmatch(ds_file.name, pattern):
+            logger.debug(
+                &#34;Ignoring datastream file &#39;%s&#39; due to ignore pattern &#39;%s&#39;.&#34;,
+                ds_file.name,
+                pattern,
+            )
+            return False
+    return True</code></pre>
+</details>
+<div class="desc"><p>Determine if a file should be treated as a datastream file.</p>
+<p>Excludes files named 'object.csv' or 'datastreams.csv', and files matching ignore patterns
+specified in the configuration.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ds_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the candidate datastream file.</dd>
+<dt><strong><code>configuration</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration containing ignore patterns.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the file should be used as a datastream, False otherwise.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.make_ds_description"><code class="name flex">
+<span>def <span class="ident">make_ds_description</span></span>(<span>dsid: str,<br>format_info: <a title="gamslib.formatdetect.formatinfo.FormatInfo" href="../formatdetect/formatinfo.html#gamslib.formatdetect.formatinfo.FormatInfo">FormatInfo</a>) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_ds_description(dsid: str, format_info: FormatInfo) -&gt; str:
+    &#34;&#34;&#34;
+    Generate a description for a datastream based on its ID and format.
+
+    Uses the format subtype as the description if available.
+
+    Args:
+        dsid (str): Datastream ID.
+        format_info (FormatInfo): Format information for the datastream.
+
+    Returns:
+        str: Datastream description, or empty string if not available.
+    &#34;&#34;&#34;
+    # We have agreed to set the format subtype as description if available.
+    # Not happy with this, but we need the subtype in csv data.
+    # I&#39;d prefer an extra field for the subtype, but this was rejected
+    # by the team.
+    if format_info.subtype:
+        return format_info.subtype.name
+    return &#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a description for a datastream based on its ID and format.</p>
+<p>Uses the format subtype as the description if available.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dsid</code></strong> :&ensp;<code>str</code></dt>
+<dd>Datastream ID.</dd>
+<dt><strong><code>format_info</code></strong> :&ensp;<code>FormatInfo</code></dt>
+<dd>Format information for the datastream.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Datastream description, or empty string if not available.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.make_ds_title"><code class="name flex">
+<span>def <span class="ident">make_ds_title</span></span>(<span>dsid: str,<br>format_info: <a title="gamslib.formatdetect.formatinfo.FormatInfo" href="../formatdetect/formatinfo.html#gamslib.formatdetect.formatinfo.FormatInfo">FormatInfo</a>) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_ds_title(dsid: str, format_info: FormatInfo) -&gt; str:
+    &#34;&#34;&#34;
+    Generate a title for a datastream based on its ID and format.
+
+    Args:
+        dsid (str): Datastream ID.
+        format_info (FormatInfo): Format information for the datastream.
+
+    Returns:
+        str: Generated datastream title.
+    &#34;&#34;&#34;
+    return f&#34;{format_info.description}: {dsid}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a title for a datastream based on its ID and format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dsid</code></strong> :&ensp;<code>str</code></dt>
+<dd>Datastream ID.</dd>
+<dt><strong><code>format_info</code></strong> :&ensp;<code>FormatInfo</code></dt>
+<dd>Format information for the datastream.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Generated datastream title.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.create_csv.update_csv"><code class="name flex">
+<span>def <span class="ident">update_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_csv(
+    object_directory: Path, configuration: Configuration
+) -&gt; ObjectCSVManager | None:
+    &#34;&#34;&#34;
+    Update existing CSV files for an object directory with new metadata.
+
+    Adds new datastreams and updates metadata if configuration or DC.xml has changed.
+    Existing CSV files are updated, not overwritten.
+
+    Args:
+        object_directory (Path): Path to the object directory.
+        configuration (Configuration): Project configuration.
+
+    Returns:
+        ObjectCSVManager | None: Manager for the updated CSV files, or None if not updated.
+    &#34;&#34;&#34;
+    if not object_directory.is_dir():
+        logger.warning(&#34;Object directory &#39;%s&#39; does not exist.&#34;, object_directory)
+        return None
+
+    objectcsv = ObjectCSVManager(object_directory, ignore_existing_csv_files=True)
+
+    if objectcsv.is_empty():
+        logger.warning(
+            &#34;Object directory &#39;%s&#39; has no existing CSV files. Will be created.&#34;,
+            object_directory,
+        )
+    dc = DublinCore(object_directory / &#34;DC.xml&#34;)
+
+    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc))
+    for ds_file in object_directory.glob(&#34;*&#34;):
+        if is_datastream_file(ds_file, configuration):
+            dsdata = collect_datastream_data(ds_file, configuration, dc)
+            objectcsv.merge_datastream(
+                collect_datastream_data(ds_file, configuration, dc)
+            )
+
+    objectcsv.guess_mainresource()
+    objectcsv.save()
+    return objectcsv</code></pre>
+</details>
+<div class="desc"><p>Update existing CSV files for an object directory with new metadata.</p>
+<p>Adds new datastreams and updates metadata if configuration or DC.xml has changed.
+Existing CSV files are updated, not overwritten.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_directory</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+<dt><strong><code>configuration</code></strong> :&ensp;<code>Configuration</code></dt>
+<dd>Project configuration.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ObjectCSVManager | None</code></dt>
+<dd>Manager for the updated CSV files, or None if not updated.</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.objectcsv" href="index.html">gamslib.objectcsv</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.objectcsv.create_csv.collect_datastream_data" href="#gamslib.objectcsv.create_csv.collect_datastream_data">collect_datastream_data</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.collect_object_data" href="#gamslib.objectcsv.create_csv.collect_object_data">collect_object_data</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.create_csv" href="#gamslib.objectcsv.create_csv.create_csv">create_csv</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.create_csv_files" href="#gamslib.objectcsv.create_csv.create_csv_files">create_csv_files</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.detect_languages" href="#gamslib.objectcsv.create_csv.detect_languages">detect_languages</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.extract_dsid" href="#gamslib.objectcsv.create_csv.extract_dsid">extract_dsid</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.get_rights" href="#gamslib.objectcsv.create_csv.get_rights">get_rights</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.is_datastream_file" href="#gamslib.objectcsv.create_csv.is_datastream_file">is_datastream_file</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.make_ds_description" href="#gamslib.objectcsv.create_csv.make_ds_description">make_ds_description</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.make_ds_title" href="#gamslib.objectcsv.create_csv.make_ds_title">make_ds_title</a></code></li>
+<li><code><a title="gamslib.objectcsv.create_csv.update_csv" href="#gamslib.objectcsv.create_csv.update_csv">update_csv</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

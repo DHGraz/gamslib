@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.projectconfiguration API documentation</title>
+<meta name="description" content="GAMS Project Configuration Management …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.projectconfiguration</code></h1>
+</header>
+<section id="section-intro">
+<p>GAMS Project Configuration Management.</p>
+<p>This module provides tools to locate, validate, and load project configuration files
+for GAMS projects.
+Supported sources include <code>project.toml</code>, <code>.env</code>, and environment variables, with a
+clear precedence order.</p>
+<p>Main features:</p>
+<ul>
+<li>Automatic discovery of configuration files.</li>
+<li>Validation of configuration structure and values.</li>
+<li>Access to configuration data as Python objects.</li>
+<li>Layered overrides: <code>.env</code> values override <code>project.toml</code>, environment variables override both.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>Call <code><a title="gamslib.projectconfiguration.get_configuration" href="#gamslib.projectconfiguration.get_configuration">get_configuration()</a></code> to retrieve the current project configuration.
+If no configuration file is found, <code><a title="gamslib.projectconfiguration.MissingConfigurationException" href="#gamslib.projectconfiguration.MissingConfigurationException">MissingConfigurationException</a></code> is raised.</p>
+<p>Precedence example:</p>
+<ul>
+<li><code>project.toml</code>: base configuration.</li>
+<li><code>.env</code>: overrides values in <code>project.toml</code>.</li>
+<li>Environment variables: override both <code>.env</code> and <code>project.toml</code>.</li>
+</ul>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="gamslib.projectconfiguration.configuration" href="configuration.html">gamslib.projectconfiguration.configuration</a></code></dt>
+<dd>
+<div class="desc"><p>Configuration management for GAMS projects …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.projectconfiguration.utils" href="utils.html">gamslib.projectconfiguration.utils</a></code></dt>
+<dd>
+<div class="desc"><p>Utility functions for the projectconfiguration sub module.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.projectconfiguration.get_configuration"><code class="name flex">
+<span>def <span class="ident">get_configuration</span></span>(<span>config_file: pathlib._local.Path | str | None = None) ‑> <a title="gamslib.projectconfiguration.configuration.Configuration" href="configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@lru_cache()
+def get_configuration(config_file: Path | str | None = None) -&gt; Configuration:
+    &#34;&#34;&#34;
+    Load and return the project configuration.
+
+    The configuration is determined in the following order:
+
+      1. If `config_file` is provided, use it.
+      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value as the path.
+      3. If a `.env` file exists in the current directory and contains a `project_toml` field, use that.
+
+    Raises:
+        MissingConfigurationException: If no configuration file is found.
+
+    Note:
+        Values from `project.toml` are overridden by those in `.env`, which are further overridden by environment variables.
+        For example:
+
+          - `project.toml` sets `metadata.publisher = &#34;foo&#34;` → used by default.
+          - `.env` sets `metadata.publisher = &#34;bar&#34;` → overrides `project.toml`.
+          - Environment variable `GAMSCFG_METADATA_PUBLISHER = &#34;baz&#34;` → overrides both.
+    &#34;&#34;&#34;
+    if config_file is not None:
+        config_path = Path(config_file)
+    else:
+        config_path = utils.get_config_file_from_env()
+
+    if config_path is None:
+        raise MissingConfigurationException()
+    return Configuration.from_toml(config_path)</code></pre>
+</details>
+<div class="desc"><p>Load and return the project configuration.</p>
+<p>The configuration is determined in the following order:</p>
+<ol>
+<li>If <code>config_file</code> is provided, use it.</li>
+<li>If the environment variable <code>GAMSCFG_PROJECT_TOML</code> is set, use its value as the path.</li>
+<li>If a <code>.env</code> file exists in the current directory and contains a <code>project_toml</code> field, use that.</li>
+</ol>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.projectconfiguration.MissingConfigurationException" href="#gamslib.projectconfiguration.MissingConfigurationException">MissingConfigurationException</a></code></dt>
+<dd>If no configuration file is found.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<p>Values from <code>project.toml</code> are overridden by those in <code>.env</code>, which are further overridden by environment variables.
+For example:</p>
+<ul>
+<li><code>project.toml</code> sets <code>metadata.publisher = "foo"</code> → used by default.</li>
+<li><code>.env</code> sets <code>metadata.publisher = "bar"</code> → overrides <code>project.toml</code>.</li>
+<li>Environment variable <code>GAMSCFG_METADATA_PUBLISHER = "baz"</code> → overrides both.</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.projectconfiguration.MissingConfigurationException"><code class="flex name class">
+<span>class <span class="ident">MissingConfigurationException</span></span>
+<span>(</span><span>message="You must provide a configuration file. Set it when calling the get_configuration() function, use the 'GAMSCFG_PROJECT_TOML' environment variable or set 'project_toml' in the .env file.")</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MissingConfigurationException(Exception):
+    &#34;&#34;&#34;Raised if the configuration is missing.&#34;&#34;&#34;
+
+    def __init__(
+        self,
+        message=(
+            &#34;You must provide a configuration file. Set it when calling the &#34;
+            &#34;get_configuration() function, use the &#39;GAMSCFG_PROJECT_TOML&#39; environment &#34;
+            &#34;variable or set &#39;project_toml&#39; in the .env file.&#34;
+        ),
+    ):
+        self.message = message
+        super().__init__(self.message)</code></pre>
+</details>
+<div class="desc"><p>Raised if the configuration is missing.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib" href="../index.html">gamslib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="gamslib.projectconfiguration.configuration" href="configuration.html">gamslib.projectconfiguration.configuration</a></code></li>
+<li><code><a title="gamslib.projectconfiguration.utils" href="utils.html">gamslib.projectconfiguration.utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.projectconfiguration.get_configuration" href="#gamslib.projectconfiguration.get_configuration">get_configuration</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.projectconfiguration.MissingConfigurationException" href="#gamslib.projectconfiguration.MissingConfigurationException">MissingConfigurationException</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
