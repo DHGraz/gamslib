@@ -53,8 +53,8 @@ def test_roundtrip(datadir):
 
 def test_encoding_roundtrip(datadir, tmp_path):
     "Test if converting csv to xslx and back works with special characters."
-    object_csv = datadir / "objects.csv"
-    ds_csv = datadir / "datastreams.csv"
+    object_csv = datadir / "objects_encoding_problem.csv"
+    ds_csv = datadir / "datastreams_encoding_problem.csv"
     xlsx_file = datadir / "metadata.xlsx"
 
     csv_to_xlsx(object_csv, ds_csv, xlsx_file)
@@ -67,22 +67,23 @@ def test_encoding_roundtrip(datadir, tmp_path):
 
     with new_object_csv.open("r", encoding="utf-8", newline="") as f:
         text = f.read()
-        assert "Description 1 äÜß" in text  
+        assert "الوصف" in text  
     with ds_csv.open("r", encoding="utf-8", newline="") as f:
         text = f.read()
-        assert "Description äÜß" in text
+        assert "الوصف" in text
 
 
-def test_encoing_in_xslx(datadir, tmp_path):
+def test_encoing_in_xslx(datadir):
     "Test if special characters are correctly written to xlsx we circumvent openpyxl when reading."
-    object_csv = datadir / "objects.csv"
-    ds_csv = datadir / "datastreams.csv"
-    xlsx_file = tmp_path / "metadata.xlsx"
-
+    object_csv = datadir / "objects_encoding_problem.csv"
+    ds_csv = datadir / "datastreams_encoding_problem.csv"
+    xlsx_file = datadir / "metadata.xlsx"
     csv_to_xlsx(object_csv, ds_csv, xlsx_file)
     assert xlsx_file.exists()
 
     # now read the xlsx file and check if special characters are present
-    with zipfile.ZipFile(xlsx_file, "r") as zip:
-        xml = zip.read("xl/sharedStrings.xml").decode("utf-8")
-    assert 'äÜß' in xml
+    with zipfile.ZipFile(xlsx_file, "r") as zip_:
+        xml = zip_.read("xl/sharedStrings.xml").decode("utf-8")
+    assert 'الوصف' in xml
+
+
