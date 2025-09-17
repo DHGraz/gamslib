@@ -1,6 +1,7 @@
 """Tests for the objectsv.xlsx module."""
 
 import csv
+import zipfile
 from gamslib.objectcsv.xlsx import csv_to_xlsx, xlsx_to_csv, read_csv
 
 
@@ -48,3 +49,40 @@ def test_roundtrip(datadir):
         reader = csv.reader(f)
         new_ds_data = list(reader)
     assert old_ds_data == new_ds_data
+
+
+def test_encoding_roundtrip(datadir, tmp_path):
+    "Test if converting csv to xslx and back works with special characters."
+    object_csv = datadir / "objects.csv"
+    ds_csv = datadir / "datastreams.csv"
+    xlsx_file = datadir / "metadata.xlsx"
+
+    csv_to_xlsx(object_csv, ds_csv, xlsx_file)
+    assert xlsx_file.exists()
+
+    # converting back to csv should work anyhow
+    new_object_csv = tmp_path / "new_objects.csv"
+    new_ds_csv = tmp_path / "new_datastreams.csv"
+    xlsx_to_csv(xlsx_file, new_object_csv, new_ds_csv)
+
+    with new_object_csv.open("r", encoding="utf-8", newline="") as f:
+        text = f.read()
+        assert "Description 1 äÜß" in text  
+    with ds_csv.open("r", encoding="utf-8", newline="") as f:
+        text = f.read()
+        assert "Description äÜß" in text
+
+
+def test_encoing_in_xslx(datadir, tmp_path):
+    "Test if special characters are correctly written to xlsx we circumvent openpyxl when reading."
+    object_csv = datadir / "objects.csv"
+    ds_csv = datadir / "datastreams.csv"
+    xlsx_file = tmp_path / "metadata.xlsx"
+
+    csv_to_xlsx(object_csv, ds_csv, xlsx_file)
+    assert xlsx_file.exists()
+
+    # now read the xlsx file and check if special characters are present
+    with zipfile.ZipFile(xlsx_file, "r") as zip:
+        xml = zip.read("xl/sharedStrings.xml").decode("utf-8")
+    assert 'äÜß' in xml
