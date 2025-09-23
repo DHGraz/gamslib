@@ -1,11 +1,13 @@
 
-from pathlib import Path
-import mimetypes
-import json
-import pytest
 import hashlib
+import json
+import mimetypes
+from pathlib import Path
+
+import pytest
 
 from gamslib.sip import utils
+
 
 def make_contentfile_for_sip_json(file_path:Path):
     """Helper function for test data creation.
