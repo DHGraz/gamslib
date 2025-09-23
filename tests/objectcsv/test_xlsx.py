@@ -73,11 +73,13 @@ def test_encoding_roundtrip(datadir, tmp_path):
         assert "الوصف" in text
 
 
-def test_encoing_in_xslx(datadir):
+def test_encoding_in_xslx(datadir):
     "Test if special characters are correctly written to xlsx we circumvent openpyxl when reading."
     object_csv = datadir / "objects_encoding_problem.csv"
     ds_csv = datadir / "datastreams_encoding_problem.csv"
     xlsx_file = datadir / "metadata.xlsx"
+    # I'd expect this to fail if special characters are not correctly written to xlsx,
+    # but it seems to work even under windows with cp1252 as default encoding?!?
     csv_to_xlsx(object_csv, ds_csv, xlsx_file)
     assert xlsx_file.exists()
 
