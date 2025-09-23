@@ -1,0 +1,41 @@
+{
+  "title": "Charles Baissac an Hugo Schuchardt (15-00432)",
+  "project": "hsa",
+  "description": "digital object description",
+  "creator": "Gams HSA Project",
+  "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+  "publisher": "Institut für Sprachwissenschaft, Karl-Franzens-Universität Graz",
+  "contentFiles": [
+    {
+      "size": 849,
+      "bagpath": "data/content/DC.xml",
+      "dsid": "dc.xml",
+      "mimetype": "text/xml",
+      "title": "DC.xml",
+      "description": "ds description",
+      "creator": "creator 1",
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0"
+    },
+    {
+      "size": 76255,
+      "bagpath": "data/content/IMG.jpeg",
+      "dsid": "dc",
+      "mimetype": "text/xml",
+      "title": "img1.jpeg",
+      "description": "img description",
+      "creator": "creator 1",
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0"
+    }
+  ],
+  "$schema": "https://gitlab.cern.ch/digitalmemory/sip-spec/-/raw/master/sip-schema-d1.json",
+  "created_by": "CSV to SIP JSON converter",
+  "source": "local",
+  "recid": "hsa.letter.1",
+  "objectType": "text",
+  "mainResource": "IMG.jpeg",
+  "lang": ["fr", "de"],
+  "funder": "The project funder"
+}
+
+
+
