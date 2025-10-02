@@ -117,4 +117,80 @@ def test_description():
     assert formatinfo.description == "Video document"
     formatinfo = FormatInfo(detector="test_detector", mimetype="application/octet-stream")
     assert formatinfo.description == "Binary document"
-    
+def test_is_xml_type_true(monkeypatch):
+    """Test is_xml_type returns True when subtype maintype is 'xml' and subformat matches."""
+    class DummySubType:
+        name = "TEI"
+    # Mock _get_subtype_info to return xml maintype and matching subformat
+    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "TEI", "maintype": "xml"})
+    assert fi.is_xml_type() is True
+
+def test_is_xml_type_false_wrong_maintype(monkeypatch):
+    """Test is_xml_type returns False when maintype is not 'xml'."""
+    class DummySubType:
+        name = "TEI"
+    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "TEI", "maintype": "json"})
+    assert fi.is_xml_type() is False
+
+def test_is_xml_type_false_wrong_subformat(monkeypatch):
+    """Test is_xml_type returns False when subformat does not match subtype name."""
+    class DummySubType:
+        name = "OTHER"
+    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "TEI", "maintype": "xml"})
+    assert fi.is_xml_type() is False
+
+def test_is_xml_type_false_no_subtype_info(monkeypatch):
+    """Test is_xml_type returns False when _get_subtype_info returns None."""
+    class DummySubType:
+        name = "TEI"
+    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: None)
+    assert fi.is_xml_type() is False
+
+def test_is_xml_type_false_no_subtype():
+    """Test is_xml_type returns False when subtype is None."""
+    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=None)
+    assert fi.is_xml_type() is False
+
+
+def test_is_json_type_true(monkeypatch):
+    """Test is_json_type returns True when subtype maintype is 'json' and subformat matches."""
+    class DummySubType:
+        name = "JSON"
+    fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "JSON", "maintype": "json"})
+    assert fi.is_json_type() is True
+
+def test_is_json_type_false_wrong_maintype(monkeypatch):
+    """Test is_json_type returns False when maintype is not 'json'."""
+    class DummySubType:
+        name = "JSON"
+    fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "JSON", "maintype": "xml"})
+    assert fi.is_json_type() is False
+
+def test_is_json_type_false_wrong_subformat(monkeypatch):
+    """Test is_json_type returns False when subformat does not match subtype name."""
+    class DummySubType:
+        name = "OTHER"
+    fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: {"subformat": "JSON", "maintype": "json"})
+    assert fi.is_json_type() is False
+
+def test_is_json_type_false_no_subtype_info(monkeypatch):
+    """Test is_json_type returns False when _get_subtype_info returns None."""
+    class DummySubType:
+        name = "JSON"
+    fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
+    monkeypatch.setattr(fi, "_get_subtype_info", lambda: None)
+    assert fi.is_json_type() is False
+
+def test_is_json_type_false_no_subtype():
+    """Test is_json_type returns False when subtype is None."""
+    fi = FormatInfo(detector="det", mimetype="application/json", subtype=None)
+    assert fi.is_json_type() is False
+
+

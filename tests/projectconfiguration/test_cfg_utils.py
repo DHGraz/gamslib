@@ -86,7 +86,13 @@ def test_read_path_from_dotenv(datadir):
     result = read_path_from_dotenv(dotenv_file, "not_existing")
     assert result is None
 
+def test_read_path_from_dotenv_returns_none_if_file_not_exists(tmp_path):
+    """Test that read_path_from_dotenv returns None if the dotenv file does not exist."""
+    dotenv_file = tmp_path / "nonexistent.env"
+    result = read_path_from_dotenv(dotenv_file, "MY_PATH")
+    assert result is None
 
+    
 def test_initialize_project_dir(tmp_path):
     "Test the initialize_project_dir function."
     initialize_project_dir(tmp_path)
