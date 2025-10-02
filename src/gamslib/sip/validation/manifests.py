@@ -1,5 +1,19 @@
-"""Validate the manifest files in a bag directory.
+"""Validation functions for manifest files in Bagit directories for GAMS projects.
+
+This module provides functions to validate the manifest-md5.txt and manifest-sha512.txt files
+in a Bagit directory, ensuring that all payload files are listed and checksums are correct.
+
+Features:
+    - Validates manifest-md5.txt and manifest-sha512.txt files.
+    - Checks that all files in the data directory are listed in the manifests.
+    - Verifies that checksums match the actual file contents.
+    - Raises BagValidationError for any validation failures.
+
+Usage:
+    Call `validate_manifest_md5(bag_dir)` to validate the MD5 manifest.
+    Call `validate_manifest_sha512(bag_dir)` to validate the SHA512 manifest.
 """
+
 import hashlib
 from pathlib import Path
 
@@ -7,9 +21,19 @@ from .. import BagValidationError
 
 
 def validate_manifest_md5(bag_dir: Path) -> None:
-    """Validate the manifest-md5.txt file.
+    """
+    Validate the manifest-md5.txt file in a Bagit directory.
 
-    Raises a BagValidationError if the manifest-md5.txt file
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the manifest-md5.txt file is missing, empty, contains invalid lines,
+            has checksum mismatches, or does not list all payload files.
+
+    Notes:
+        - Checks that all files in the data directory are listed in the manifest.
+        - Verifies that each listed file's MD5 checksum matches the manifest entry.
     """
     manifest_md5_file = bag_dir / "manifest-md5.txt"
 
@@ -45,11 +69,19 @@ def validate_manifest_md5(bag_dir: Path) -> None:
 
 
 def validate_manifest_sha512(bag_dir: Path) -> None:
-    """Validate the manifest-sha512.txt file.
+    """
+    Validate the manifest-sha512.txt file in a Bagit directory.
 
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
 
-    Returns True if the manifest-sha512.txt file is valid.
-    Raises a BagValidationError if the manifest-sha512.txt file is invalid.
+    Raises:
+        BagValidationError: If the manifest-sha512.txt file is missing, empty, contains invalid lines,
+            has checksum mismatches, or does not list all payload files.
+
+    Notes:
+        - Checks that all files in the data directory are listed in the manifest.
+        - Verifies that each listed file's SHA512 checksum matches the manifest entry.
     """
     manifest_sha512_file = bag_dir / "manifest-sha512.txt"
     with open(manifest_sha512_file, "r", encoding="utf-8", newline="") as f:

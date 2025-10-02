@@ -1,5 +1,16 @@
-"""Validation of the sip.json file.
-This module provides functions to validate the `sip.json` file in a GAMS packaging context.
+"""Validation functions for the sip.json file in GAMS Bagit directories.
+
+This module provides functions to validate the `sip.json` file in a GAMS packaging context,
+ensuring that it is present, valid, and conforms to its declared JSON schema.
+
+Features:
+    - Checks for existence and validity of sip.json.
+    - Validates JSON structure and schema compliance.
+    - Ensures the mainResource is listed in contentFiles.
+    - Raises BagValidationError for any validation failures.
+
+Usage:
+    Call `validate_sip_json(bag_dir)` to validate the sip.json file in a Bagit directory.
 """
 
 import json
@@ -12,9 +23,14 @@ from .. import BagValidationError, utils
 
 
 def validate_main_resource(data: dict) -> None:
-    """Make sure the object main resource id is listed in the contentFiles.
+    """
+    Ensure the object main resource id is listed in the contentFiles.
 
-    Raises a BagValidationError if the mainResource is not listed in contentFiles.
+    Args:
+        data (dict): Parsed JSON data from sip.json.
+
+    Raises:
+        BagValidationError: If the mainResource is not listed in contentFiles.
     """
     mainresource = data.get("mainResource", "")
     known_ds_ids = [content_file["dsid"] for content_file in data["contentFiles"]]
@@ -25,9 +41,20 @@ def validate_main_resource(data: dict) -> None:
 
 
 def validate_sip_json(bag_dir: Path) -> None:
-    """Validate the sip.json file.
+    """
+    Validate the sip.json file in a Bagit directory.
 
-    Raises a BagValidationError if the sip.json file is invalid.
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the sip.json file is missing, contains invalid JSON,
+            is missing a $schema, fails schema validation, or has an invalid mainResource.
+
+    Notes:
+        - Checks for the existence of sip.json in data/meta.
+        - Validates the JSON structure and schema compliance.
+        - Ensures the mainResource is listed in contentFiles.
     """
     sip_json_file = bag_dir / "data" / "meta" / "sip.json"
     if not sip_json_file.is_file():
@@ -42,7 +69,7 @@ def validate_sip_json(bag_dir: Path) -> None:
 
     schema = utils.fetch_json_schema(data["$schema"])
 
-    # do  the real validation
+    # do the real validation
     try:
         jsonschema.validate(data, schema)
         validate_main_resource(data)

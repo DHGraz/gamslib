@@ -1,7 +1,17 @@
-"""Validate the bag-info.txt file in a GAMS bag."
+"""Validation functions for the bag-info.txt file in GAMS Bagit directories.
 
 This module provides functions to validate the contents of the bag-info.txt file
 and ensure that all required entries are present and correctly formatted.
+
+Features:
+    - Checks for required fields in bag-info.txt.
+    - Validates date, time, payload oxum, email, and description fields.
+    - Reads bag-info.txt as a list of (key, value) tuples to support duplicate keys.
+    - Raises BagValidationError for any validation failures.
+
+Usage:
+    Call `validate_baginfo_text(bag_dir)` to validate the bag-info.txt file in a Bagit directory.
+    Individual validation functions are also available for more granular checks.
 """
 
 from datetime import datetime
@@ -12,9 +22,14 @@ from .. import utils, BagValidationError
 
 
 def validate_required_baginfo_entries(entries: list[tuple[str, str]]) -> None:
-    """Check if all required values are present in the bag-info.txt file.
+    """
+    Check if all required values are present in the bag-info.txt file.
 
-    Raises a BagValidationError if a required entry is missing.
+    Args:
+        entries (list[tuple[str, str]]): List of (key, value) tuples from bag-info.txt.
+
+    Raises:
+        BagValidationError: If a required entry is missing.
     """
     required_keys = [
         "Bagging-Date",
@@ -31,9 +46,14 @@ def validate_required_baginfo_entries(entries: list[tuple[str, str]]) -> None:
 
 
 def validate_bagging_date(value: str) -> None:
-    """Check if the value for 'Bagging-Date' is a valid date.
+    """
+    Check if the value for 'Bagging-Date' is a valid date.
 
-    Raises a BagValidationError if the value is not a valid date.
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is not a valid date.
     """
     try:
         datetime.strptime(value, "%Y-%m-%d")
@@ -45,9 +65,14 @@ def validate_bagging_date(value: str) -> None:
 
 
 def validate_bagging_time(value: str) -> None:
-    """Check if the value for 'Bagging-Time' is a valid time.
+    """
+    Check if the value for 'Bagging-Time' is a valid time.
 
-    Raises a BagValidationError if the value is not a valid time.
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is not a valid time.
     """
     try:
         datetime.strptime(value, "%H:%M:%S %Z")
@@ -64,13 +89,19 @@ def validate_bagging_time(value: str) -> None:
 
 
 def validate_payload_oxum(value: str, bag_dir: Path) -> None:
-    """Check the value for 'Payload-Oxum'.
+    """
+    Check the value for 'Payload-Oxum'.
 
     The value must be in the format 'size.file_count'.
     The size must match the actual size of the payload.
     The file_count must match the actual number of files in the payload.
 
-    Raises a BagValidationError if the value is not valid.
+    Args:
+        value (str): Value to validate.
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the value is not valid or does not match the payload.
     """
     parts = value.split(".")
     if len(parts) != len(["size", "file_count"]):
@@ -106,9 +137,14 @@ def validate_payload_oxum(value: str, bag_dir: Path) -> None:
 
 
 def validate_contact_email(value: str) -> None:
-    """Check the value for 'Contact-Email'.
+    """
+    Check the value for 'Contact-Email'.
 
-    Raises a BagValidationError if the value is not a valid email address.
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is not a valid email address.
     """
     pattern = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}$"
     if not re.match(pattern, value):
@@ -118,19 +154,32 @@ def validate_contact_email(value: str) -> None:
 
 
 def validate_external_description(value: str) -> None:
-    """Check the value for 'External-Description'.
+    """
+    Check the value for 'External-Description'.
 
-    Raises a BagValidationError if the value is empty.
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is empty.
     """
     if not value.strip():
         raise BagValidationError("Value for 'External-Description' must not be empty")
 
 
 def read_baginfo_txt(baginfo_txt_file: Path) -> list[tuple[str, str]]:
-    """Read the bag-info.txt file and return a list of tuples (key, value) with its entries.
-    We us a List of tuples and not a dict, because the same key can appear multiple times.
+    """
+    Read the bag-info.txt file and return a list of tuples (key, value) with its entries.
 
-    This is a helper function for validate_baginfo_text.
+    Args:
+        baginfo_txt_file (Path): Path to the bag-info.txt file.
+
+    Returns:
+        list[tuple[str, str]]: List of (key, value) tuples from the file.
+
+    Notes:
+        - Uses a list of tuples instead of a dict, because the same key can appear multiple times.
+        - Raises BagValidationError if a line is invalid or missing a colon.
     """
     entries = []
 
@@ -149,10 +198,18 @@ def read_baginfo_txt(baginfo_txt_file: Path) -> list[tuple[str, str]]:
 
 
 def validate_baginfo_text(bag_dir: Path) -> None:
-    """Validate the bag-info.txt file.
+    """
+    Validate the bag-info.txt file in a Bagit directory.
 
-    Returns True if the bag-info.txt file is valid.
-    Raises a BagValidationError if the bag-info.txt file is invalid.
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the bag-info.txt file is missing or invalid.
+
+    Notes:
+        - Checks for required entries and validates their values.
+        - Raises an error immediately if any check fails.
     """
     baginfo_txt_file = bag_dir / "bag-info.txt"
 

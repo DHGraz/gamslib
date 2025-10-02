@@ -1,6 +1,16 @@
-"""Validate the structure and contents of a bagit directory.
-This module provides functions to validate the general structure of a bagit directory,
+"""Validation functions for the structure and contents of Bagit directories in GAMS projects.
+
+This module provides functions to validate the general structure of a Bagit directory,
 the contents of the bagit.txt file, and the existence of required directories and files.
+
+Features:
+    - Checks for required directories and files in a Bagit directory.
+    - Validates the format and contents of bagit.txt.
+    - Raises BagValidationError for any validation failures.
+
+Usage:
+    Call `validate_structure(bag_dir)` to check the directory structure and required files.
+    Call `validate_bagit_txt(bag_dir)` to validate the bagit.txt file.
 """
 
 from pathlib import Path
@@ -9,10 +19,19 @@ from .. import BagValidationError
 
 
 def validate_structure(bag_dir: Path) -> None:
-    """Validate the general structure of the bagit directory.
+    """
+    Validate the general structure of a Bagit directory.
 
-    Existence of the required directories and files are checked.
-    Raises BagValidationError if a required directory or file is missing.
+    Args:
+        bag_dir (Path): Path to the Bagit directory to validate.
+
+    Raises:
+        BagValidationError: If a required directory or file is missing.
+
+    Notes:
+        - Checks for the existence of 'data', 'data/meta', and 'data/content' directories.
+        - Checks for required files: bagit.txt, manifest-md5.txt, manifest-sha512.txt,
+          data/meta/sip.json, and data/content/DC.xml.
     """
     required_dirs = ["data", "data/meta", "data/content"]
     required_files = [
@@ -35,9 +54,18 @@ def validate_structure(bag_dir: Path) -> None:
 
 
 def validate_bagit_txt(bag_dir: Path) -> None:
-    """Validate the bagit.txt file.
+    """
+    Validate the bagit.txt file in a Bagit directory.
 
-    Raises BagValidationError if the bagit.txt file is invalid.
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the bagit.txt file is missing or invalid.
+
+    Notes:
+        - Checks for exactly two lines: 'BagIt-Version: 1.0' and 'Tag-File-Character-Encoding: UTF-8'.
+        - Raises an error if the format or values are incorrect.
     """
     bagit_txt_file = bag_dir / "bagit.txt"
     if not bagit_txt_file.is_file():

@@ -25,3 +25,4 @@ src/gamslib/validate/xml/X_teivalidator.py
 tests/validate/xml/X_test_dtdvalidator.py
 tests/validate/xml/data/Xminimal_non_existing_schema_reference.xml
 .DS_Store
+coverage
