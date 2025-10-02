@@ -1,6 +1,8 @@
 # make test, coverage, documentation, etc
 SHELL := /bin/bash
 
+.PHONY: all test coverage clean
+
 docs:
 	@echo "Generating documentation..."
 	@pdoc3 --html --output-dir reference --force gamslib
@@ -8,7 +10,10 @@ docs:
 
 
 test:
-	uv run pytest tests --cov=gamslib --cov-report=term-missing
+	@uv run pytest tests 
+
+coverage:
+	@uv run pytest tests --cov-report term-missing --cov=gamslib 
 
 build:
-	uv build	
+	@uv build	
