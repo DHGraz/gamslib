@@ -15,6 +15,8 @@ Usage:
 """
 
 from pathlib import Path
+import re
+import urllib
 from .. import BagValidationError
 from .baginfo import validate_baginfo_text
 from .bagit import validate_bagit_txt, validate_structure
@@ -23,6 +25,62 @@ from .manifests import (
     validate_manifest_sha512,
 )
 from .sip_json import validate_sip_json
+
+def is_valid_id(pid: str, allow_uppercase: bool = False) -> bool:
+    """
+    Check if the given ID (PID, DSID) is valid.
+
+    This follows the rules of xml:id, with some modifications:
+
+     - Every id must have the project sigle as prefix, followed by a dot. 
+       The prefix must start with a letter, followed by any number of letters and numbers.
+     - The part after the dot must start with a letter or a number, followed by any 
+       number of ASCII letters, numbers, dots, dashes and underscores.
+     - For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
+       but we discourage the use of this prefix for new objects.
+
+    So a valid ids are for example:
+
+        - abc.def123
+        - abc.123-def
+        - abc.123_456
+
+    An id like "o:abc.123" is also valid, but we discourage the use of the "o:" prefix.
+
+    Invalid ids are for example:
+
+        - .abcdef  (starts with a dot)
+        - 1abcdef (starts with a number)
+        - abc/def (contains invalid character '/')
+        - abc@def (contains invalid character '@')
+        - abcdef  (no dot)
+        - abc..def (double dot)    
+
+    Args:
+        pid (str): The ID to validate.
+
+    Returns:
+        bool: True if the ID is valid, False otherwise.
+    """
+    # If we store a pid to a file name, we replace : with %3A
+    # We transform it back before validating because we use 
+    # this function also for validating file names
+    # in the object directory.
+    decoded_pid = pid.replace("%3A", ":")
+    #              o:foo1.bar-123_baz
+    if '..' in decoded_pid or '--' in decoded_pid or '__' in decoded_pid:
+        return False
+    # Regex explanation:
+    # ^([a-z]+:)?      - optional type prefix (e.g., 'o:') with lowercase letters only
+    # [a-z][a-z0-9_.-]* - project prefix starting with a letter, followed by letters, numbers, underscores, dots, or dashes
+    # \.               - literal dot separator
+    # [a-z0-9][a-z0-9_.-]*$ - object identifier starting with a letter or number, followed by letters, numbers, underscores, dots, or
+    pattern = r'^([a-z]+:)?[a-z][a-z0-9_.-]*\.[a-z0-9][a-z0-9_.-]*$'
+    if allow_uppercase:
+        m = re.match(pattern, decoded_pid, re.IGNORECASE)
+    else:
+        m = re.match(pattern, decoded_pid)
+    return m is not None
 
 
 def validate_bag(bag_dir: Path) -> None:

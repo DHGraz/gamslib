@@ -32,13 +32,15 @@ import requests
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 
 from . import BagValidationError, ObjectDirectoryValidationError
+from .validation import is_valid_id
 
 logger = logging.getLogger(__name__)
 
-GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json" 
+GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json"
 
 # This is the path were the schema is stored in the package
 SCHEMA_PATH = Path(__file__).parent / "resources" / "sip-schema-d1.json"
+
 
 def validate_object_dir(object_path: Path) -> None:
     """
@@ -118,7 +120,7 @@ def extract_id(path: Path | str, remove_extension=False) -> str:
         path = Path(path)
     pid = path.name
 
-    if re.match(r"^[a-zA-Z0-9]+[-.%_a-zA-Z0-9]+[a-zA-Z0-9]+$", pid):
+    if is_valid_id(pid):
         if remove_extension:
             # not everything after the last dot is an extension :-(
             parts = pid.split(".")
@@ -200,6 +202,7 @@ def count_files(root_dir: Path) -> int:
             total_files += 1
     return total_files
 
+
 def read_sip_schema_from_package():
     """
     Read the SIP JSON schema from the package data.
@@ -244,7 +247,11 @@ def fetch_json_schema(url: str) -> dict:
 
     try:
         return response.json()
-    except (requests.JSONDecodeError, requests.exceptions.InvalidJSONError, TypeError) as e:
+    except (
+        requests.JSONDecodeError,
+        requests.exceptions.InvalidJSONError,
+        TypeError,
+    ) as e:
         raise BagValidationError(
             f"Schema referenced in 'sip.json' is not valid JSON: {e}"
         ) from e

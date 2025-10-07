@@ -1,4 +1,7 @@
 "Test the validate_bag function with various scenarios"
+import pytest
+from gamslib.sip.validation import is_valid_id
+
 
 from unittest.mock import patch
 
@@ -78,3 +81,64 @@ def test_validate_bag_raises_on_validation_failure(bag_dir, fail_func, fail_exce
         with pytest.raises(BagValidationError) as excinfo:
             validate_bag(bag_dir)
         assert str(fail_exception) in str(excinfo.value)
+
+
+
+@pytest.mark.parametrize("pid", [
+    "abc.def123",
+    "abc.123-def",
+    "abc.123_456",
+    "o:abc.123",
+    "abc.1",
+    "abc.1-2_3",
+    "abc.1.2",
+    "abc.1-2.3_4",
+    "abc.def",
+    "abc.123",
+    "abc.123_456-789",
+    "abc.123-456_789",
+    "abc.123_456.789",
+    "abc.123-456.789",
+    "abc.123_456-789.0",
+    "o%3Aabc.def",  # encoded colon, should decode to valid
+])
+def test_is_valid_id_valid(pid):
+    "Test valid IDs"
+    assert is_valid_id(pid) is True
+
+@pytest.mark.parametrize("pid", [
+    "abc.A",        # contains uppercase letter
+    "Abc:abc",    # contains uppercase letter
+    ".abcdef",      # starts with dot
+    "1abcdef",      # starts with number
+    "abc/def",      # contains invalid character
+    "abc@def",      # contains invalid character
+    "abcdef",       # no dot
+    "abc..def",     # double dot
+    "abc.",         # ends with dot
+    "abc.-def",     # dot followed by dash
+    "abc._def",     # dot followed by underscore
+    "abc.def/",     # ends with slash
+    "abc.def@",     # ends with @
+    "abc.def#",     # ends with #
+    "abc.def$",     # ends with $
+    "abc.def%",     # ends with %
+    "abc.def:ghi",  # extra colon after dot
+    "abc..def",     # double dot
+    "abc",          # no dot
+    "abc.def..ghi", # double dot after valid part
+])
+def test_is_valid_id_invalid(pid):
+    "Test invalid IDs"
+    assert is_valid_id(pid) is False
+
+def test_is_valid_id_allow_uppercase():
+    "Test valid IDs with uppercase letters when allowed"
+    assert is_valid_id("ABC.DEF123", allow_uppercase=True) is True
+    assert is_valid_id("O:ABC.DEF", allow_uppercase=True) is True
+    assert is_valid_id("ABC.DEF123") is False  # default is sensitive
+
+def test_is_valid_id_percent_encoded_colon():
+    "Test IDs with percent-encoded colon"
+    assert is_valid_id("o%3Aabc.123") is True
+    assert is_valid_id("O%3AABC.DEF", allow_uppercase=True) is True
