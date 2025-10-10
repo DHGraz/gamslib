@@ -33,7 +33,6 @@ def validate_required_baginfo_entries(entries: list[tuple[str, str]]) -> None:
     """
     required_keys = [
         "Bagging-Date",
-        "Bagging-Time",
         "Payload-Oxum",
         "Contact-Email",
         "External-Description",
@@ -62,30 +61,6 @@ def validate_bagging_date(value: str) -> None:
             f"Value for 'Bagging-Date' is not a valid date: {value}"
         ) from e
     return True
-
-
-def validate_bagging_time(value: str) -> None:
-    """
-    Check if the value for 'Bagging-Time' is a valid time.
-
-    Args:
-        value (str): Value to validate.
-
-    Raises:
-        BagValidationError: If the value is not a valid time.
-    """
-    try:
-        datetime.strptime(value, "%H:%M:%S %Z")
-    except ValueError:
-        # On some systems, the %Z directive is not supported. We can check the timezone separately.
-        try:
-            parts = value.split()
-            datetime.strptime(parts[0], "%H:%M:%S")
-            return
-        except ValueError as exp:
-            raise BagValidationError(
-                f"Value for 'Bagging-Time' is not a valid time: {value}"
-            ) from exp
 
 
 def validate_payload_oxum(value: str, bag_dir: Path) -> None:
@@ -226,8 +201,6 @@ def validate_baginfo_text(bag_dir: Path) -> None:
     for key, value in entries:
         if key == "Bagging-Date":
             validate_bagging_date(value)
-        elif key == "Bagging-Time":
-            validate_bagging_time(value)
         elif key == "Payload-Oxum":
             validate_payload_oxum(value, bag_dir)
         elif key == "Contact-Email":

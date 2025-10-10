@@ -14,9 +14,11 @@ Usage:
     Individual validation functions are also available for more granular checks.
 """
 
-from pathlib import Path
 import re
 import urllib
+from pathlib import Path
+import warnings
+
 from .. import BagValidationError
 from .baginfo import validate_baginfo_text
 from .bagit import validate_bagit_txt, validate_structure
@@ -26,26 +28,175 @@ from .manifests import (
 )
 from .sip_json import validate_sip_json
 
-def is_valid_id(pid: str, allow_uppercase: bool = False) -> bool:
+
+def _split_id(pid: str) -> tuple[str, str, str]:
     """
-    Check if the given ID (PID, DSID) is valid.
+    Split a given ID into type prefix, project prefix, and object identifier.
 
-    This follows the rules of xml:id, with some modifications:
+    This is a helper function for the is_valid_id function.
 
-     - Every id must have the project sigle as prefix, followed by a dot. 
-       The prefix must start with a letter, followed by any number of letters and numbers.
-     - The part after the dot must start with a letter or a number, followed by any 
+    so a pid like "o:abc.def123" will be split into:
+        - type_prefix: "o"
+        - project_prefix: "abc"
+        - object_identifier: "def123"
+
+    Args:
+        pid (str): The ID to split.
+
+    Raises:
+        ValueError: If the ID is not splitable
+    Returns:
+        tuple: A tuple containing (type_prefix, project_prefix, object_identifier).
+               type_prefix is empty string if not present.
+    """
+    if not "." in pid:
+        raise ValueError(
+            "ID must contain a dot (.) separating project prefix and object identifier"
+        )
+    if (
+        pid[0] == "."
+    ):  # we have to keep the dot if it is the first char (will fail later)
+        return "", "", pid
+    prefix, object_id = pid.split(".", 1)
+    # Decode percent-encoded colon if present
+    cleaned_prefix = prefix.replace("%3A", ":")
+    # if prefix starts with colon, it is not a type prefix
+    if ":" in cleaned_prefix and cleaned_prefix[0] != ":":
+        type_prefix, project_prefix = cleaned_prefix.split(":", 1)
+    else:
+        type_prefix, project_prefix = "", cleaned_prefix
+    return type_prefix, project_prefix, object_id
+
+
+def _validate_type_prefix(type_prefix: str) -> None:
+    """
+    Validate the type prefix of an ID.
+
+    The type prefix is the part before the colon (:) in an ID like "o:abc.def123".
+    It must contain only lowercase letters or be empty.
+
+    Args:
+        type_prefix (str): The type prefix to validate.
+    Raises:
+        ValueError: If the type prefix is invalid.
+    """
+    # the commented out prefixes are legacy prefixes which
+    # do not make sense in GAMS5+. Keep them
+    # here for reference, but currently do not allow them.
+    allowed_type_prefixes = [
+        "",
+        "collection",
+        "container",
+        "context",
+        "corpus",
+        "o",
+        "podcast",
+        "query",
+        # "FgsConfig",
+        # "cirilo",
+        # "cm",
+        # "fedora-system",
+        # "sdef",
+        # "sdep",
+    ]
+    if type_prefix not in allowed_type_prefixes:
+        raise ValueError(
+            f"The type prefix ('{type_prefix}') is not allowed. "
+            f"Allowed prefixes are: {', '.join(allowed_type_prefixes)}"
+            "Note: Using types prefixes is discouraged for new objects."
+        )
+
+
+def _validate_project_prefix(
+    project_prefix: str, allow_uppercase: bool = False
+) -> None:
+    """
+    Validate the project prefix of an ID.
+
+    The project prefix is the part before the dot (.) in an ID like "abc.def123".
+    It must start with a letter, followed by any number of letters, numbers, or dashes.
+    Consecutive dashes are not allowed.
+
+    Args:
+        project_prefix (str): The project prefix to validate.
+        allow_uppercase (bool, optional): If True, allow uppercase letters in project prefix. Defaults to False.
+            Project prefixes should normally be lowercase only.
+
+    Raises:
+        ValueError: If the project prefix is invalid.
+    """
+    if not project_prefix:
+        raise ValueError("Project prefix (before dot) is empty")
+    if "--" in project_prefix:
+        raise ValueError(
+            "Project prefix (before dot) must not contain consecutive dashes"
+        )
+
+    pattern_string = r"^[a-z][a-z0-9-]*$"
+    if allow_uppercase:
+        pattern_string = r"^[a-zA-Z][a-zA-Z0-9-]*$"
+    if not re.match(pattern_string, project_prefix):
+        raise ValueError(
+            "Project prefix (before dot) must start with a letter and contain "
+            "only lowercase letters, numbers, or dashes"
+        )
+
+
+def _validate_object_id(object_id: str, allow_uppercase: bool = False) -> None:
+    """
+    Validate the object identifier of an ID.
+
+    The object identifier is the part after the firstdot (.) in an ID like "abc.def123".
+    It must start with a letter or a number, followed by any number of letters, numbers, dots, dashes, or underscores.
+    Consecutive dots, underscores, or dashes are not allowed.
+
+    Args:
+        object_id (str): The object identifier to validate.
+        allow_uppercase (bool, optional): If True, allow uppercase letters in object identifier. Defaults to False.
+            Object identifiers should normally be lowercase only.
+
+    Raises:
+        ValueError: If the object identifier is invalid.
+    """
+    if not object_id:
+        raise ValueError("Object identifier (after dot) is empty")
+    if ".." in object_id:
+        raise ValueError(
+            "Object identifier (after dot) must not contain consecutive dots"
+        )
+    if "__" in object_id:
+        raise ValueError(
+            "Object identifier (after dot) must not contain consecutive underscores"
+        )
+    if "--" in object_id:
+        raise ValueError(
+            "Object identifier (after dot) must not contain consecutive dashes"
+        )
+
+    pattern_string = r"^[a-z0-9][a-z0-9_.-]*$"
+    if allow_uppercase:
+        pattern_string = r"^[a-zA-Z0-9][a-zA-Z0-9_.-]*$"
+    if not re.match(pattern_string, object_id):
+        raise ValueError(
+            "Object identifier (after dot) must start with a letter or number and "
+            "contain only lowercase letters, numbers, dots, dashes, or underscores"
+        )
+
+
+def validate_pid(pid: str) -> None:
+    """Validate a given PID (Project Identifier).
+
+    A valid id follows the rules of xml:id, with some modifications:
+
+     - All letters must be lowercase ASCII letters.
+     - Every id must have the project sigle as prefix, followed by a dot.
+       The prefix must start with a letter, followed by any number
+       of letters and numbers or dashes.
+     - The part after the dot must start with a letter or a number, followed by any
        number of ASCII letters, numbers, dots, dashes and underscores.
      - For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
-       but we discourage the use of this prefix for new objects.
-
-    So a valid ids are for example:
-
-        - abc.def123
-        - abc.123-def
-        - abc.123_456
-
-    An id like "o:abc.123" is also valid, but we discourage the use of the "o:" prefix.
+       but we discourage the use of this prefix for new objects. Only lowercase letters are allowed as
+       type prefix.
 
     Invalid ids are for example:
 
@@ -54,33 +205,39 @@ def is_valid_id(pid: str, allow_uppercase: bool = False) -> bool:
         - abc/def (contains invalid character '/')
         - abc@def (contains invalid character '@')
         - abcdef  (no dot)
-        - abc..def (double dot)    
+        - abc..def (double dot)
 
     Args:
         pid (str): The ID to validate.
+        allow_uppercase (bool, optional): If True, allow uppercase letters in pid. Defaults to False.
+            Object IDs (PIDs) should normally be lowercase only, but datastream id can be uppercase too.
 
-    Returns:
-        bool: True if the ID is valid, False otherwise.
+    Raises:
+        ValueError: If the ID is invalid. The error message will indicate the reason.
     """
-    # If we store a pid to a file name, we replace : with %3A
-    # We transform it back before validating because we use 
-    # this function also for validating file names
-    # in the object directory.
-    decoded_pid = pid.replace("%3A", ":")
-    #              o:foo1.bar-123_baz
-    if '..' in decoded_pid or '--' in decoded_pid or '__' in decoded_pid:
-        return False
-    # Regex explanation:
-    # ^([a-z]+:)?      - optional type prefix (e.g., 'o:') with lowercase letters only
-    # [a-z][a-z0-9_.-]* - project prefix starting with a letter, followed by letters, numbers, underscores, dots, or dashes
-    # \.               - literal dot separator
-    # [a-z0-9][a-z0-9_.-]*$ - object identifier starting with a letter or number, followed by letters, numbers, underscores, dots, or
-    pattern = r'^([a-z]+:)?[a-z][a-z0-9_.-]*\.[a-z0-9][a-z0-9_.-]*$'
-    if allow_uppercase:
-        m = re.match(pattern, decoded_pid, re.IGNORECASE)
-    else:
-        m = re.match(pattern, decoded_pid)
-    return m is not None
+    type_prefix, project_prefix, object_id = _split_id(pid)
+    _validate_type_prefix(type_prefix)
+    _validate_project_prefix(project_prefix)
+    _validate_object_id(object_id)
+    if type_prefix:
+        warnings.warn(
+            "Using type prefixes in PIDs is discouraged for new objects.", UserWarning
+        )
+
+
+def validate_datastream_id(datastream_id: str) -> None:
+    """Validate a given datastream ID.
+
+    A valid datastream is must start with a letter or a number, followed by any
+    number of ASCII letters, numbers, dots, dashes and underscores.
+
+    Args:
+        datastream_id (str): The datastream ID to validate.
+
+    Raises:
+        ValueError: If the datastream ID is invalid. The error message will indicate the reason.
+    """
+    _validate_object_id(datastream_id, allow_uppercase=True)
 
 
 def validate_bag(bag_dir: Path) -> None:

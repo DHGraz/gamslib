@@ -32,7 +32,7 @@ import requests
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 
 from . import BagValidationError, ObjectDirectoryValidationError
-from .validation import is_valid_id
+from .validation import validate_pid
 
 logger = logging.getLogger(__name__)
 
@@ -98,49 +98,42 @@ def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
             )
 
 
-def extract_id(path: Path | str, remove_extension=False) -> str:
-    """
-    Extract and validate the ID (PID, DSID) from the object or datastream path.
+# def extract_object_id_from_path(path: Path | str) -> str:
+#     """
+#     Extract the object ID (PID) from a path (pointing to the object directory).
 
-    Args:
-        path (Path | str): Path or filename of the object or datastream.
-        remove_extension (bool): If True, remove the file extension from the ID.
+#     Args:
+#         path (Path | str): Path or filename of the object.
 
-    Returns:
-        str: The extracted and validated ID.
+#     Returns:
+#         str: The extracted ID.
+#     """
+#     if isinstance(path, str):
+#         path = Path(path)
+#     pid = path.name
 
-    Raises:
-        ValueError: If the ID does not match the expected pattern.
-
-    Notes:
-        - If remove_extension is True, only removes the extension if it looks like a real extension.
-        - Logs a warning if the extension does not look standard.
-    """
-    if isinstance(path, str):
-        path = Path(path)
-    pid = path.name
-
-    if is_valid_id(pid):
-        if remove_extension:
-            # not everything after the last dot is an extension :-(
-            parts = pid.split(".")
-            if re.match(r"^[a-zA-Z]+\w?$", parts[-1]):
-                pid = ".".join(parts[:-1])
-                logger.debug("Removed extension for ID: %s", parts[0])
-            else:
-                logger.warning(
-                    "'%s' does not look like an extension. Keeping it in PID.", pid[-1]
-                )
-            return pid
-        logger.debug(
-            "Extracted PID: %s from %s (remove_extension=%s)",
-            pid,
-            path,
-            remove_extension,
-        )
-        return pid
-
-    raise ValueError(f"Invalid PID: '{pid}'")
+#     if remove_extension:
+#         # not everything after the last dot is an extension :-(
+#         parts = pid.split(".")
+#         if re.match(r"^[a-zA-Z]+\w?$", parts[-1]):
+#             pid = ".".join(parts[:-1])
+#             logger.debug("Removed extension for ID: %s", parts[0])
+#         else:
+#             logger.warning(
+#                 "'%s' does not look like an extension. Keeping it in PID.", pid[-1]
+#             )
+#     logger.debug(
+#         "Extracted PID: %s from %s (remove_extension=%s)",
+#         pid,
+#         path,
+#         remove_extension,
+#     )
+#     # TODO: is this the right place to validate the ID?
+#     try:
+#         validate_pid(pid)
+#         return pid
+#     except ValueError as exp:
+#         raise ValueError(f"Invalid PID: '{pid}: {exp}'") from exp
 
 
 def md5hash(file: Path) -> str:

@@ -13,7 +13,6 @@ from gamslib.sip.utils import (
     GAMS_SIP_SCHEMA_URL,
     count_bytes,
     count_files,
-    extract_id,
     fetch_json_schema,
     find_object_folders,
     md5hash,
@@ -49,40 +48,41 @@ def test_find_project_folders(datadir):
     assert datadir / "folder3" / "folder_a" in project_folders
     assert datadir / "folder3" not in project_folders
 
+# I removed the extract_id function as it is no longer needed.
+# but the test might be usefull in the future.
+# def test_extract_id():
+#     "Test the create_id function."
+#     assert extract_id(Path("/foo/bar/hsa.letter.1")) == "hsa.letter.1"
+#     assert extract_id(Path("hsa.letter.1")) == "hsa.letter.1"
+#     assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml")) == "DC.xml"
+#     assert extract_id(Path("/foo/bar/hsa.le-tt_er.1")) == "hsa.le-tt_er.1"
 
-def test_extract_id():
-    "Test the create_id function."
-    assert extract_id(Path("/foo/bar/hsa.letter.1")) == "hsa.letter.1"
-    assert extract_id(Path("hsa.letter.1")) == "hsa.letter.1"
-    assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml")) == "DC.xml"
-    assert extract_id(Path("/foo/bar/hsa.le-tt_er.1")) == "hsa.le-tt_er.1"
+#     assert (
+#         extract_id(Path("/foo/bar/o%3Ahsa.letter.11745"), True)
+#         == "o%3Ahsa.letter.11745"
+#     )
+#     assert extract_id("/foo/bar/o%3Ahsa.letter.11745", True) == "o%3Ahsa.letter.11745"
 
-    assert (
-        extract_id(Path("/foo/bar/o%3Ahsa.letter.11745"), True)
-        == "o%3Ahsa.letter.11745"
-    )
-    assert extract_id("/foo/bar/o%3Ahsa.letter.11745", True) == "o%3Ahsa.letter.11745"
+#     # traiiling slash
+#     assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/")) == "DC.xml"
+#     assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/.")) == "DC.xml"
 
-    # traiiling slash
-    assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/")) == "DC.xml"
-    assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/.")) == "DC.xml"
+#     # With remove_extension=True
+#     assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml"), True) == "DC"
+#     assert extract_id(Path("/foo/bar/hsa.letter.1/DC.X.Y.xml"), True) == "DC.X.Y"
 
-    # With remove_extension=True
-    assert extract_id(Path("/foo/bar/hsa.letter.1/DC.xml"), True) == "DC"
-    assert extract_id(Path("/foo/bar/hsa.letter.1/DC.X.Y.xml"), True) == "DC.X.Y"
+#     assert extract_id(Path("/foo/bar/o%3ahsa.letter.1/DC.xml/"), True) == "DC"
+#     assert extract_id(Path("/foo/bar/o%3ahsa.letter.1/DC.xml/"), True) == "DC"
 
-    assert extract_id(Path("/foo/bar/o%3ahsa.letter.1/DC.xml/"), True) == "DC"
-    assert extract_id(Path("/foo/bar/o%3ahsa.letter.1/DC.xml/"), True) == "DC"
+#     # Invalid PID
+#     with pytest.raises(ValueError):
+#         extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/.."))
 
-    # Invalid PID
-    with pytest.raises(ValueError):
-        extract_id(Path("/foo/bar/hsa.letter.1/DC.xml/.."))
+#     with pytest.raises(ValueError):
+#         extract_id(Path("/foo/bar/hsa.lätters.1"))
 
-    with pytest.raises(ValueError):
-        extract_id(Path("/foo/bar/hsa.lätters.1"))
-
-    with pytest.raises(ValueError):
-        extract_id(Path("/foo/bar/hsa.letter.1/D C.xml"))
+#     with pytest.raises(ValueError):
+#         extract_id(Path("/foo/bar/hsa.letter.1/D C.xml"))
 
 
 def test_md5hash(tmp_path):

@@ -10,7 +10,6 @@ from gamslib.sip.validation.baginfo import (
 from gamslib.sip.validation.baginfo import (
     read_baginfo_txt,
     validate_bagging_date,
-    validate_bagging_time,
     validate_contact_email,
     validate_external_description,
     validate_payload_oxum,
@@ -24,7 +23,6 @@ def make_valid_baginfo() -> list[tuple[str, str]]:
     "Return the content of a valid bag-info.txt file."
     return [
         ("Bagging-Date", "2024-08-22"),
-        ("Bagging-Time", "14:26:35 UTC"),
         ("Payload-Oxum", "78207.3"),
         ("Contact-Email", "dh@uni-graz.at"),
         ("Contact-Email", "foo@example.com"),
@@ -52,11 +50,10 @@ def test_read_baginfo_txt(valid_bag_dir):
     baginfo_path = valid_bag_dir / "bag-info.txt"
     data = read_baginfo_txt(baginfo_path)
     assert data[0] == ("Bagging-Date", "2024-08-22")
-    assert data[1] == ("Bagging-Time", "14:26:35 UTC")
-    assert data[2] == ("Payload-Oxum", f"{total_bytes}.{num_of_files}")
-    assert data[3] == ("Contact-Email", "dh@uni-graz.at")
-    assert data[4] == ("Contact-Email", "foo@example.com")
-    assert data[5] == ("External-Description", "Test SIP")
+    assert data[1] == ("Payload-Oxum", f"{total_bytes}.{num_of_files}")
+    assert data[2] == ("Contact-Email", "dh@uni-graz.at")
+    assert data[3] == ("Contact-Email", "foo@example.com")
+    assert data[4] == ("External-Description", "Test SIP")
 
 
 def test_validate_required_baginfo_entries(valid_baginfo):
@@ -90,19 +87,6 @@ def test_validate_bagging_date():
         validate_bagging_date("2024-08-22T14:26:35")
 
 
-def test_validate_bagging_time():
-    """Test if the validator detects invalid Bagging-Time entries."""
-    # valid time
-    assert validate_bagging_time("14:26:35 UTC") is None
-
-    # We decided to allow times without timezone information
-    assert validate_bagging_time("14:26:35") is None
-
-    # invalid time
-    with pytest.raises(
-        BagValidationError, match="Value for 'Bagging-Time' is not a valid time:"
-    ) as excinfo:
-        validate_bagging_time("14:26:35+02:00")
 
 
 def test_validate_payload_oxum(valid_bag_dir):
@@ -144,7 +128,7 @@ def test_validate_contact_email():
     ):
         validate_contact_email("foo")
 
-    with pytest.raises(BagValidationError) as excinfo:
+    with pytest.raises(BagValidationError):
         validate_contact_email("foo@")
 
     with pytest.raises(BagValidationError) as excinfo:
