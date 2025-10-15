@@ -164,18 +164,14 @@ def _validate_object_id(object_id: str, allow_uppercase: bool = False) -> None:
         raise ValueError(
             "Object identifier (after dot) must not contain consecutive dots"
         )
-    if "__" in object_id:
-        raise ValueError(
-            "Object identifier (after dot) must not contain consecutive underscores"
-        )
     if "--" in object_id:
         raise ValueError(
             "Object identifier (after dot) must not contain consecutive dashes"
         )
 
-    pattern_string = r"^[a-z0-9][a-z0-9_.-]*$"
+    pattern_string = r"^[a-z0-9][a-z0-9.-]*$"
     if allow_uppercase:
-        pattern_string = r"^[a-zA-Z0-9][a-zA-Z0-9_.-]*$"
+        pattern_string = r"^[a-zA-Z0-9][a-zA-Z0-9.-]*$"
     if not re.match(pattern_string, object_id):
         raise ValueError(
             "Object identifier (after dot) must start with a letter or number and "
@@ -215,6 +211,8 @@ def validate_pid(pid: str) -> None:
     Raises:
         ValueError: If the ID is invalid. The error message will indicate the reason.
     """
+    if len(pid) > 64:
+        raise ValueError("ID must not be longer than 64 characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
     _validate_project_prefix(project_prefix)

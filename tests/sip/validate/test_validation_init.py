@@ -182,18 +182,11 @@ def test_split_id(pid, expected):
     [
         "abc.def123",
         "abc.123-def",
-        "abc.123_456",
         "abc.1",
-        "abc.1-2_3",
         "abc.1.2",
-        "abc.1-2.3_4",
         "abc.def",
         "abc.123",
-        "abc.123_456-789",
-        "abc.123-456_789",
-        "abc.123_456.789",
         "abc.123-456.789",
-        "abc.123_456-789.0",
         "o:abc.123",
         "o%3Aabc.def",  # encoded colon, should decode to valid
     ],
@@ -268,11 +261,7 @@ def test_validate_pid_percent_encoded_colon():
         "1abc",
         "abc.def",
         "abc-def",
-        "abc_def",
-        "ABC.DEF_123-xyz",
         "a.b.c",
-        "Z9_",
-        "0abc.def-ghi_jkl",
     ],
 )
 def test_validate_datastream_id_valid(datastream_id):
@@ -286,7 +275,7 @@ def test_validate_datastream_id_valid(datastream_id):
         ("", "empty"),  # empty string
         ("..abc", "consecutive dots"),  # starts with consecutive dots
         ("abc..def", "consecutive dots"),  # consecutive dots
-        ("abc__def", "consecutive underscores"),  # consecutive underscores
+        ("abc__def", "lowercase letters"),  # consecutive underscores
         ("abc--def", "consecutive dashes"),  # consecutive dashes
         (".abc", "contain only"),  # starts with dot
         ("_abc", "contain only"),  # starts with underscore
