@@ -1,7 +1,7 @@
 # make test, coverage, documentation, etc
 SHELL := /bin/bash
 
-.PHONY: all test coverage clean
+.PHONY: all test coverage clean docs build test-all
 
 docs:
 	@echo "Generating documentation..."
