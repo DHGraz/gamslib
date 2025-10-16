@@ -6,7 +6,7 @@ import pytest
 
 from gamslib.sip import BagValidationError
 from gamslib.sip.validation import (
-    _validate_project_prefix,
+    validate_project_name,
     _validate_type_prefix,
     validate_bag,
     validate_datastream_id,
@@ -189,6 +189,43 @@ def test_split_id(pid, expected):
         "abc.123-456.789",
         "o:abc.123",
         "o%3Aabc.def",  # encoded colon, should decode to valid
+
+        ## some more complex but valid IDs, provided by Sebis AI
+        "test.1",
+        "test.123",
+        "test.test1",
+        "test.abc",
+        "test.a1b2c3",
+    
+        # With numbers, dots, dashes, underscores after the dot
+        "test.object-1",
+        "test.object.sub",
+        "test.doc-2024-001",
+        "test.item.1.2.3",
+        
+        # Legacy format with type prefix (discouraged but valid)
+        "o:test.1",
+        "o:hsa.manuscript-001",
+        "o:gams.doc123",
+        
+        # Complex valid IDs
+        "hsa.collection.subcol.item-001",
+        
+        # Edge cases (valid)
+        "a.1",                          # shortest project prefix (1 letter)
+        "abcdefghij.1",                 # 10-char project prefix
+        "test.a",                       # single letter after dot
+        "test.1a",                      # starts with number after dot (valid)
+        "test.123abc",                  # number start after dot
+        "test.a-b-c-d-e",               # multiple dashes
+        "test.a.b.c.d.e",               # multiple dots
+        
+        # Real-world examples based on your test data
+        "test.test",
+        "test.manifest",
+        "test.dc-metadata",
+        "hsa.manuscript-01",
+        "gams.tei-document-2024"
     ],
 )
 def test_validate_pid_valid(pid):
@@ -227,7 +264,10 @@ def test_validate_pid_valid(pid):
         ("abc.def:ghi", "contain only"),  # extra colon after dot
         ("abc.d..ef", "consecutive"),  # double dot
         ("abc", "must contain a dot"),  # no dot
-        ("ab--cd.ef_gh-ij", "consecutive"),  # double dash
+        ("ab--cd.ef_gh-ij", "contain only"),  # double dash
+        ("test-proj.item1", "contain only"),
+        ("test-proj.123abc", "contain only"),  # ("test-proj.123abc", "Allowed prefixes")
+        ("abc." + 'x' * 61, "longer than 64 characters"),  # too long
     ],
 )
 def test_validate_pid_invalid(pid, reason):
@@ -292,17 +332,16 @@ def test_validate_datastream_id_invalid(datastream_id, reason):
         validate_datastream_id(datastream_id)
 
 
-@pytest.mark.parametrize("project_prefix", [
+@pytest.mark.parametrize("project_name", [
+    "a",
     "abc",
     "abc123",
-    "abc-123",
-    "a",
-    "a1-b2-c3",
+    "a567"
 ])
-def test_validate_project_prefix_valid(project_prefix):
+def test_validate_project_name_valid(project_name):
     "Test valid project prefixes"
     # Should not raise for valid lowercase prefixes
-    _validate_project_prefix(project_prefix)
+    validate_project_name(project_name)
 
 @pytest.mark.parametrize("project_prefix", [
     "",
@@ -315,24 +354,6 @@ def test_validate_project_prefix_valid(project_prefix):
     "abc/def",
     "abc--",
     "abc--def--ghi",
-])
-def test_validate_project_prefix_invalid(project_prefix):
-    "Test invalid project prefixes"
-    with pytest.raises(ValueError):
-        _validate_project_prefix(project_prefix)
-
-@pytest.mark.parametrize("project_prefix", [
-    "Abc",
-    "ABC123",
-    "Abc-Def",
-    "A1-B2-C3",
-])
-def test_validate_project_prefix_allow_uppercase_valid(project_prefix):
-    "Test valid project prefixes with allow_uppercase=True"
-    # Should not raise when allow_uppercase=True
-    _validate_project_prefix(project_prefix, allow_uppercase=True)
-
-@pytest.mark.parametrize("project_prefix", [
     "1Abc",
     "-Abc",
     "Abc--Def",
@@ -341,10 +362,11 @@ def test_validate_project_prefix_allow_uppercase_valid(project_prefix):
     "Abc@Def",
     "Abc/Def",
 ])
-def test_validate_project_prefix_allow_uppercase_invalid(project_prefix):
-    "Test invalid project prefixes with allow_uppercase=True"
+def test_validate_project_name_invalid(project_prefix):
+    "Test invalid project prefixes"
     with pytest.raises(ValueError):
-        _validate_project_prefix(project_prefix, allow_uppercase=True)
+        validate_project_name(project_prefix)
+
 
 @pytest.mark.parametrize("type_prefix", [
     "",

@@ -39,6 +39,25 @@ el.replaceWith(d);
 <p>File format detection utilities for GAMS projects.</p>
 <p>This submodule provides functions and classes to detect the format of files and return
 a FormatInfo object describing the detected format.</p>
+<p>Currently these Detectors are available:</p>
+<ul>
+<li>MimeDetector: Uses the <code>mimetypes</code> library to identify
+file formats based on file extensions. This is a minimal detector
+and should be used as a fallback only.</li>
+<li>MagikaDetector: Uses the Google Magika library to identify
+file formats based on file content. This is the preferred
+detector and should be used by default.</li>
+</ul>
+<p>All detectors implement the FormatDetector abstract base class
+and return FormatInfo objects with the detected format information.
+The FormatInfo object includes the MIME type, detector name, and the
+subformat name if applicable. The subformat is determined by heuristics
+based on the MIME type and file content. </p>
+<p>Currently supported subformats include:</p>
+<ul>
+<li>XML subformats</li>
+<li>JSON subformats</li>
+</ul>
 <h2 id="features">Features</h2>
 <ul>
 <li><code><a title="gamslib.formatdetect.detect_format" href="#gamslib.formatdetect.detect_format">detect_format()</a></code>: Main function to detect the format of a file.</li>

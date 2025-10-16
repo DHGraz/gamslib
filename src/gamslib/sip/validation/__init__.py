@@ -107,38 +107,28 @@ def _validate_type_prefix(type_prefix: str) -> None:
         )
 
 
-def _validate_project_prefix(
-    project_prefix: str, allow_uppercase: bool = False
+def validate_project_name(
+    value: str
 ) -> None:
     """
-    Validate the project prefix of an ID.
+    Validate the project name. Can also be used to validate the project prefix of a PID.
 
+    The value must start with a letter, followed by any number of letters and numbers.
     The project prefix is the part before the dot (.) in an ID like "abc.def123".
-    It must start with a letter, followed by any number of letters, numbers, or dashes.
-    Consecutive dashes are not allowed.
 
     Args:
-        project_prefix (str): The project prefix to validate.
-        allow_uppercase (bool, optional): If True, allow uppercase letters in project prefix. Defaults to False.
-            Project prefixes should normally be lowercase only.
+        value (str): The project prefix to validate.
 
     Raises:
         ValueError: If the project prefix is invalid.
     """
-    if not project_prefix:
+    if not value:
         raise ValueError("Project prefix (before dot) is empty")
-    if "--" in project_prefix:
-        raise ValueError(
-            "Project prefix (before dot) must not contain consecutive dashes"
-        )
 
-    pattern_string = r"^[a-z][a-z0-9-]*$"
-    if allow_uppercase:
-        pattern_string = r"^[a-zA-Z][a-zA-Z0-9-]*$"
-    if not re.match(pattern_string, project_prefix):
+    if not re.match(r"^[a-z][a-z0-9]*$", value):
         raise ValueError(
-            "Project prefix (before dot) must start with a letter and contain "
-            "only lowercase letters, numbers, or dashes"
+            "A project name must start with a letter and contain "
+            "only lowercase letters and numbers."
         )
 
 
@@ -175,7 +165,7 @@ def _validate_object_id(object_id: str, allow_uppercase: bool = False) -> None:
     if not re.match(pattern_string, object_id):
         raise ValueError(
             "Object identifier (after dot) must start with a letter or number and "
-            "contain only lowercase letters, numbers, dots, dashes, or underscores"
+            "contain only lowercase letters, numbers, dots or dashes"
         )
 
 
@@ -187,9 +177,9 @@ def validate_pid(pid: str) -> None:
      - All letters must be lowercase ASCII letters.
      - Every id must have the project sigle as prefix, followed by a dot.
        The prefix must start with a letter, followed by any number
-       of letters and numbers or dashes.
+       of letters and numbers.
      - The part after the dot must start with a letter or a number, followed by any
-       number of ASCII letters, numbers, dots, dashes and underscores.
+       number of ASCII letters, numbers, dots, and dashes.
      - For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
        but we discourage the use of this prefix for new objects. Only lowercase letters are allowed as
        type prefix.
@@ -215,7 +205,7 @@ def validate_pid(pid: str) -> None:
         raise ValueError("ID must not be longer than 64 characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
-    _validate_project_prefix(project_prefix)
+    validate_project_name(project_prefix)
     _validate_object_id(object_id)
     if type_prefix:
         warnings.warn(
