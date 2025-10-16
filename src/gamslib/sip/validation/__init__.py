@@ -201,8 +201,10 @@ def validate_pid(pid: str) -> None:
     Raises:
         ValueError: If the ID is invalid. The error message will indicate the reason.
     """
-    if len(pid) > 64:
-        raise ValueError("ID must not be longer than 64 characters")
+    MAX_ID_LENGTH = 64
+    # Check if the PID is a valid URI
+    if len(pid) > MAX_ID_LENGTH:
+        raise ValueError(f"ID must not be longer than {MAX_ID_LENGTH} characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
     validate_project_name(project_prefix)
