@@ -107,9 +107,7 @@ def _validate_type_prefix(type_prefix: str) -> None:
         )
 
 
-def validate_project_name(
-    value: str
-) -> None:
+def validate_project_name(value: str) -> None:
     """
     Validate the project name. Can also be used to validate the project prefix of a PID.
 
@@ -132,12 +130,13 @@ def validate_project_name(
         )
 
 
-def _validate_object_id(object_id: str, allow_uppercase: bool = False) -> None:
+def _validate_object_id(object_id: str) -> None:
     """
     Validate the object identifier of an ID.
 
-    The object identifier is the part after the firstdot (.) in an ID like "abc.def123".
-    It must start with a letter or a number, followed by any number of letters, numbers, dots, dashes, or underscores.
+    The object identifier is the part after the first dot (.) in an ID like "abc.def123".
+    It must start with a letter or a number, followed by any number of letters, numbers,
+    dots, dashes, or underscores.
     Consecutive dots, underscores, or dashes are not allowed.
 
     Args:
@@ -159,10 +158,7 @@ def _validate_object_id(object_id: str, allow_uppercase: bool = False) -> None:
             "Object identifier (after dot) must not contain consecutive dashes"
         )
 
-    pattern_string = r"^[a-z0-9][a-z0-9.-]*$"
-    if allow_uppercase:
-        pattern_string = r"^[a-zA-Z0-9][a-zA-Z0-9.-]*$"
-    if not re.match(pattern_string, object_id):
+    if not re.match(r"^[a-z0-9][a-z0-9.-]*$", object_id):
         raise ValueError(
             "Object identifier (after dot) must start with a letter or number and "
             "contain only lowercase letters, numbers, dots or dashes"
@@ -201,10 +197,10 @@ def validate_pid(pid: str) -> None:
     Raises:
         ValueError: If the ID is invalid. The error message will indicate the reason.
     """
-    MAX_ID_LENGTH = 64
+    max_id_length = 64
     # Check if the PID is a valid URI
-    if len(pid) > MAX_ID_LENGTH:
-        raise ValueError(f"ID must not be longer than {MAX_ID_LENGTH} characters")
+    if len(pid) > max_id_length:
+        raise ValueError(f"ID must not be longer than {max_id_length} characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
     validate_project_name(project_prefix)
@@ -219,7 +215,7 @@ def validate_datastream_id(datastream_id: str) -> None:
     """Validate a given datastream ID.
 
     A valid datastream is must start with a letter or a number, followed by any
-    number of ASCII letters, numbers, dots, dashes and underscores.
+    number of ASCII letters, numbers, dots, and dashes. 
 
     Args:
         datastream_id (str): The datastream ID to validate.
@@ -227,7 +223,24 @@ def validate_datastream_id(datastream_id: str) -> None:
     Raises:
         ValueError: If the datastream ID is invalid. The error message will indicate the reason.
     """
-    _validate_object_id(datastream_id, allow_uppercase=True)
+    if not datastream_id:
+        raise ValueError("Object identifier (after dot) is empty")
+    if ".." in datastream_id:
+        raise ValueError(
+            "Datastream identifier (after dot) must not contain consecutive dots"
+        )
+    if "--" in datastream_id:
+        raise ValueError(
+            "Datastream identifier (after dot) must not contain consecutive dashes"
+        )
+
+    if not re.match(r"^[a-z0-9][a-z0-9.-]*$", datastream_id):
+        raise ValueError(
+            "Datastream identifier (after dot) must start with a letter or number and "
+            "contain only lowercase letters, numbers, dots or dashes"
+        )
+
+
 
 
 def validate_bag(bag_dir: Path) -> None:
