@@ -297,8 +297,8 @@ def test_validate_pid_percent_encoded_colon():
     "datastream_id",
     [
         "abc123",
-        "A123",
-        "1abc",
+        "a123.1",
+        "1abc.foo",
         "abc.def",
         "abc-def",
         "a.b.c",
