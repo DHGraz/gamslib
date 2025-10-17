@@ -1,9 +1,7 @@
 # make test, coverage, documentation, etc
 SHELL := /bin/bash
 
-.PHONY: all test coverage clean docs build test-versions lint
-
-all: test coverage lint docs build
+.PHONY: all test coverage clean docs build test-all
 
 docs:
 	@echo "Generating documentation..."
@@ -15,7 +13,7 @@ test:
 	@uv run pytest tests 
 
 # Run all tests with different python versions
-test-versions:
+test-all:
 	@uv run --python 3.11 --isolated --with-editable '.[test]' pytest
 	@uv run --python 3.12 --isolated --with-editable '.[test]' pytest
 	@uv run --python 3.13 --isolated --with-editable '.[test]' pytest
@@ -24,9 +22,6 @@ test-versions:
 
 coverage:
 	@uv run pytest tests --cov-report term-missing --cov=gamslib 
-
-lint:
-	@uv run ruff check src gamslib 
 
 build:
 	@uv build	
