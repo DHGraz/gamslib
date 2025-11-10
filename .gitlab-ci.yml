@@ -3,19 +3,10 @@ variables:
   PYTHON_BASE_VERSION: 3.12
   BASE_LAYER: bookworm-slim
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-
-  merge_requests:
-    branches:
-      - main
-      - develop
 stages:
   - test
   - lint
+
 
 # A hidden job template that can be used by different Python versions
 .test-template:
@@ -59,3 +50,7 @@ lint:
     - python --version
     - echo "Running uv check with ruff"
     - uv run ruff check src
+
+.rules:
+  - if: $CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "develop"
+    when: always
