@@ -51,6 +51,8 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
     if ds_file.name in (
         OBJ_CSV_FILENAME,
         DS_CSV_FILENAME,
+        ".DS_Store",
+        "Thumbs.db",
     ):
         return False
     for pattern in configuration.general.ds_ignore_files:

@@ -68,9 +68,18 @@ def test_is_datastream_file(datadir, test_config):
     obj_csv = datadir / "objects" / "obj1" / "object.csv"
     ds_csv = datadir / "objects" / "obj1" / "datastreams.csv"
     dc_file = datadir / "objects" / "obj1" / "DC.xml"
+    ds_store = datadir / "objects" / "obj1" / ".DS_Store"
+    ds_store.write_text("test")
+    thumbs_db = datadir / "objects" / "obj1" / "Thumbs.db"
+    thumbs_db.write_text("test")
+    ingest_log = datadir / "objects" / "obj1" / "ingest.log"
+    ingest_log.write_text("test")
 
     assert not is_datastream_file(obj_csv, test_config)
     assert not is_datastream_file(ds_csv, test_config)
+    assert not is_datastream_file(ds_store, test_config)
+    assert not is_datastream_file(thumbs_db, test_config)
+    assert not is_datastream_file(ingest_log, test_config)
     assert is_datastream_file(dc_file, test_config)
 
     no_file = datadir / "objects" / "obj1"
