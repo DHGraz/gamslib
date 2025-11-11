@@ -13,7 +13,7 @@ test:
 	@uv run pytest tests 
 
 # Run all tests with different python versions
-test-all:
+test-versions:
 	@uv run --python 3.11 --isolated --with-editable '.[test]' pytest
 	@uv run --python 3.12 --isolated --with-editable '.[test]' pytest
 	@uv run --python 3.13 --isolated --with-editable '.[test]' pytest
