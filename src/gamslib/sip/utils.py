@@ -26,6 +26,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Generator
+import warnings
 import zipfile
 
 import requests
@@ -250,14 +251,15 @@ def fetch_json_schema(url: str) -> dict:
             f"Schema referenced in 'sip.json' is not valid JSON: {e}"
         ) from e
 
+
 def is_bag(bag_path: Path) -> bool:
     """Check if the given path points to a Bag.
 
     It does not check the validity of the Bag, only if the structure indicates
-    that it looks like a Bag. 
-    
-    To check the validity of the Bag, unpack it using the unpack function 
-    and use the validate_object_dir function. 
+    that it looks like a Bag.
+
+    To check the validity of the Bag, unpack it using the unpack function
+    and use the validate_object_dir function.
 
     pag_path can be either a directory or a file (zip).
 
@@ -267,22 +269,29 @@ def is_bag(bag_path: Path) -> bool:
     Returns:
         bool: True if the path points to a Bag, False otherwise.
     """
-    expected_files = [
-        "bagit.txt", 
+    expected_files = {
+        "bagit.txt",
         "manifest-md5.txt",
         "manifest-sha512.txt",
-        "data/meta/sip.json"
-        "data/content/DC.xml"
-    ]
+        "data/meta/sip.json",
+    }
+    looks_like_a_bag = False
+    all_files = set()
     if bag_path.is_dir():
-        for needed_file in expected_files:
-            if not (bag_path / needed_file).is_file():
-                return False    
+        all_files = {
+            file_path.relative_to(bag_path).as_posix()
+            for file_path in bag_path.rglob("*")
+        }
     elif bag_path.is_file() and bag_path.suffix == ".zip":
-        # Check for bagit.txt file in zip archive
-        with zipfile.ZipFile(bag_path, 'r') as zip_ref:
-            zip_files = zip_ref.namelist()
-            for needed_file in expected_files:
-                if needed_file not in zip_files:
-                    return False
-    return True   
+        with zipfile.ZipFile(bag_path, "r") as zip_ref:
+            all_files = set(zip_ref.namelist())
+    if expected_files.issubset(all_files):
+        looks_like_a_bag = True
+    else:
+        missing_files = expected_files - all_files
+        warnings.warn(
+            f"Path {bag_path} is missing expected Bag files: "
+            f"{', '.join(sorted(missing_files))}"
+        )
+        looks_like_a_bag = False
+    return looks_like_a_bag

@@ -49,6 +49,7 @@ def fixture_bag_dir(tmp_path) -> Path:
     (bag_dir / "data" / "meta").mkdir()
     (bag_dir / "data" / "meta" / "sip.json").write_text(json.dumps({"version": "1.0"}))
     (bag_dir / "data" / "content").mkdir()
+    (bag_dir / "data" / "content" / "DC.xml").touch()
     return bag_dir
 
 
