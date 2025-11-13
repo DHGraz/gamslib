@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+import shutil
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -15,6 +16,7 @@ from gamslib.sip.utils import (
     count_files,
     fetch_json_schema,
     find_object_folders,
+    is_bag,
     md5hash,
     read_sip_schema_from_package,
     sha512hash,
@@ -35,6 +37,45 @@ class DummyCSVManager:
         pass
 
 
+@pytest.fixture(name="bag_dir")
+def fixture_bag_dir(tmp_path) -> Path:
+    """Fixture that creates a minimal temporary bag directory."""
+    bag_dir = tmp_path / "test_bag"
+    bag_dir.mkdir()
+    (bag_dir / "bagit.txt").touch()
+    (bag_dir / "manifest-md5.txt").touch()
+    (bag_dir / "manifest-sha512.txt").touch()
+    (bag_dir / "data").mkdir()
+    (bag_dir / "data" / "meta").mkdir()
+    (bag_dir / "data" / "meta" / "sip.json").write_text(json.dumps({"version": "1.0"}))
+    (bag_dir / "data" / "content").mkdir()
+    return bag_dir
+
+
+@pytest.fixture(name="zipped_bag")
+def fixture_zipped_bag(tmp_path, bag_dir):
+    """Fixture that creates a minimal zipped bag."""
+    zip_path = shutil.make_archive(str(tmp_path / "test_bag"), "zip", bag_dir)
+    return Path(zip_path)
+
+
+@pytest.fixture(
+    name="incomplete_zipped_bag",
+    params=[
+        "bagit.txt",
+        "manifest-md5.txt",
+        "manifest-sha512.txt",
+        "data/meta/sip.jsondata/content/DC.xml",
+    ],
+)
+def incomplete_zipped_bag_fixture(request, tmp_path, bag_dir):
+    """Return path to a zipped bag, based on bag_dir,
+    where each time one required file is missing."""
+    (bag_dir / request.param).unlink()
+    zip_path = shutil.make_archive(str(tmp_path / "test_bag"), "zip", bag_dir)
+    return Path(zip_path)
+
+
 def test_find_project_folders(datadir):
     """Test if the find_object_folders function return all folder containing a DC.xml."""
     project_folders = list(find_object_folders(datadir))
@@ -47,6 +88,7 @@ def test_find_project_folders(datadir):
     assert datadir / "folder2" in project_folders
     assert datadir / "folder3" / "folder_a" in project_folders
     assert datadir / "folder3" not in project_folders
+
 
 # I removed the extract_id function as it is no longer needed.
 # but the test might be usefull in the future.
@@ -234,7 +276,9 @@ def test_read_sip_schema_from_package_raises_on_invalid_json(monkeypatch, tmp_pa
     resources_dir.mkdir()
     schema_path = resources_dir / "sip.json"
     schema_path.write_text("{invalid json}")
-    monkeypatch.setattr("gamslib.sip.utils.SCHEMA_PATH", schema_path) # "gamslib.sip.utils.    schema_path", str(fake_module_file))
+    monkeypatch.setattr(
+        "gamslib.sip.utils.SCHEMA_PATH", schema_path
+    )  # "gamslib.sip.utils.    schema_path", str(fake_module_file))
 
     with pytest.raises(json.JSONDecodeError):
         read_sip_schema_from_package()
@@ -326,3 +370,59 @@ def test_fetch_json_schema_json_type_error(mock_get):
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema(url)
     assert "not valid JSON" in str(excinfo.value)
+
+
+def test_is_bag_with_valid_directory(bag_dir):
+    """Test that is_bag returns True for a directory with bagit.txt."""
+    assert is_bag(bag_dir)
+
+
+def test_is_bag_with_incomplete_directory(bag_dir: Path):
+    """Test that is_bag returns False for a directory without bagit.txt."""
+    (bag_dir / "bagit.txt").unlink()
+    assert is_bag(bag_dir) is False
+
+
+def test_is_bag_with_valid_zip(zipped_bag: Path):
+    """Test that is_bag returns True for a zip file containing bagit.txt."""
+    # Create a temporary directory with bagit.txt
+    assert is_bag(zipped_bag)
+
+
+@pytest.mark.parametrize(
+    "incomplete_zipped_bag", ["bagit.txt", "manifest-md5.txt"], indirect=True
+)
+def test_is_bag_with_incomplete_zip(incomplete_zipped_bag):
+    """Test that is_bag returns False if one of the required files is missing."""
+    assert is_bag(incomplete_zipped_bag) is False
+
+
+def test_is_bag_with_non_zip_file(tmp_path):
+    """Test that is_bag returns False for a non-zip file."""
+    txt_file = tmp_path / "file.txt"
+    txt_file.touch()
+
+    assert is_bag(txt_file) is False
+
+
+def test_is_bag_with_nonexistent_path(tmp_path):
+    """Test that is_bag returns False for a nonexistent path."""
+    nonexistent = tmp_path / "does_not_exist"
+
+    assert is_bag(nonexistent) is False
+
+
+def test_is_bag_with_empty_directory(tmp_path):
+    """Test that is_bag returns False for an empty directory."""
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+
+    assert is_bag(empty_dir) is False
+
+
+def test_is_bag_with_bagit_as_directory(tmp_path):
+    """Test that is_bag returns False when bagit.txt is a directory, not a file."""
+    bag_dir = tmp_path / "test_bag.zip"
+    bag_dir.mkdir()
+
+    assert is_bag(bag_dir) is False

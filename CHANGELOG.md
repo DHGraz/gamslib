@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.2] - 2025-11-11
 
-  * Improve tests
+  * Add sip.utils.is_bag function
   * Bump magika to 1.0.1
+  * Improve tests
   * Fix .gitlab-ci.yml
    
 ## [0.7.1] - 2025-11-10

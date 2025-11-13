@@ -26,6 +26,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Generator
+import zipfile
 
 import requests
 
@@ -248,3 +249,40 @@ def fetch_json_schema(url: str) -> dict:
         raise BagValidationError(
             f"Schema referenced in 'sip.json' is not valid JSON: {e}"
         ) from e
+
+def is_bag(bag_path: Path) -> bool:
+    """Check if the given path points to a Bag.
+
+    It does not check the validity of the Bag, only if the structure indicates
+    that it looks like a Bag. 
+    
+    To check the validity of the Bag, unpack it using the unpack function 
+    and use the validate_object_dir function. 
+
+    pag_path can be either a directory or a file (zip).
+
+    Args:
+        bag_path (Path): The path to the directory to check.
+
+    Returns:
+        bool: True if the path points to a Bag, False otherwise.
+    """
+    expected_files = [
+        "bagit.txt", 
+        "manifest-md5.txt",
+        "manifest-sha512.txt",
+        "data/meta/sip.json"
+        "data/content/DC.xml"
+    ]
+    if bag_path.is_dir():
+        for needed_file in expected_files:
+            if not (bag_path / needed_file).is_file():
+                return False    
+    elif bag_path.is_file() and bag_path.suffix == ".zip":
+        # Check for bagit.txt file in zip archive
+        with zipfile.ZipFile(bag_path, 'r') as zip_ref:
+            zip_files = zip_ref.namelist()
+            for needed_file in expected_files:
+                if needed_file not in zip_files:
+                    return False
+    return True   
