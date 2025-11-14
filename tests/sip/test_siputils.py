@@ -381,7 +381,8 @@ def test_is_bag_with_valid_directory(bag_dir):
 def test_is_bag_with_incomplete_directory(bag_dir: Path):
     """Test that is_bag returns False for a directory without bagit.txt."""
     (bag_dir / "bagit.txt").unlink()
-    assert is_bag(bag_dir) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(bag_dir) is False 
 
 
 def test_is_bag_with_valid_zip(zipped_bag: Path):
@@ -395,7 +396,8 @@ def test_is_bag_with_valid_zip(zipped_bag: Path):
 )
 def test_is_bag_with_incomplete_zip(incomplete_zipped_bag):
     """Test that is_bag returns False if one of the required files is missing."""
-    assert is_bag(incomplete_zipped_bag) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(incomplete_zipped_bag) is False
 
 
 def test_is_bag_with_non_zip_file(tmp_path):
@@ -403,14 +405,16 @@ def test_is_bag_with_non_zip_file(tmp_path):
     txt_file = tmp_path / "file.txt"
     txt_file.touch()
 
-    assert is_bag(txt_file) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(txt_file) is False
 
 
 def test_is_bag_with_nonexistent_path(tmp_path):
     """Test that is_bag returns False for a nonexistent path."""
     nonexistent = tmp_path / "does_not_exist"
 
-    assert is_bag(nonexistent) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(nonexistent) is False
 
 
 def test_is_bag_with_empty_directory(tmp_path):
@@ -418,7 +422,8 @@ def test_is_bag_with_empty_directory(tmp_path):
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir()
 
-    assert is_bag(empty_dir) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(empty_dir) is False
 
 
 def test_is_bag_with_bagit_as_directory(tmp_path):
@@ -426,4 +431,5 @@ def test_is_bag_with_bagit_as_directory(tmp_path):
     bag_dir = tmp_path / "test_bag.zip"
     bag_dir.mkdir()
 
-    assert is_bag(bag_dir) is False
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(bag_dir) is False
