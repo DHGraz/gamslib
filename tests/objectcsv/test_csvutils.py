@@ -1,9 +1,12 @@
 """Tests for the objectcsv.utils module."""
 
+from pathlib import Path
+from unittest.mock import MagicMock
 from xml.etree import ElementTree as ET
 
 import pytest
 
+from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv import defaultvalues, utils
 
 
@@ -98,3 +101,129 @@ def test_split_entry():
     assert utils.split_entry("foo,bar") == ["foo,bar"]
     assert utils.split_entry("foo , bar") == ["foo , bar"]
     assert utils.split_entry("foo:foo, bar-bar;") == ["foo:foo, bar-bar"]
+
+
+def test_extract_id_from_tei_success(shared_datadir):
+    """Test successful extraction of ID from TEI file."""
+    tei_file = shared_datadir / "obj1" / "xml_tei.xml"
+    result = utils.extract_id_from_tei(tei_file)
+    assert result == "o:hsa.letter.12137"
+
+
+def test_extract_id_from_tei_success_from_str(shared_datadir):
+    """Test successful extraction of ID from TEI file if path is given as str."""
+    tei_file = shared_datadir / "obj1" / "xml_tei.xml"
+    result = utils.extract_id_from_tei(str(tei_file))
+    assert result == "o:hsa.letter.12137"
+
+
+def test_extract_id_from_tei_id_not_found(monkeypatch):
+    """Test extraction when ID node is not found in TEI file."""
+    mock_tree = MagicMock()
+    mock_tree.find.return_value = None
+    monkeypatch.setattr("gamslib.objectcsv.utils.ET.parse", lambda x: mock_tree)
+
+    tei_file = Path("/some/path/tei.xml")
+    result = utils.extract_id_from_tei(tei_file)
+    assert result == ""
+
+
+def test_extract_id_from_tei_empty_text(monkeypatch):
+    """Test extraction when ID node exists but has empty text."""
+    mock_tree = MagicMock()
+    mock_node = MagicMock()
+    mock_node.text = ""
+    mock_tree.find.return_value = mock_node
+    monkeypatch.setattr("gamslib.objectcsv.utils.ET.parse", lambda x: mock_tree)
+
+    tei_file = Path("/some/path/tei.xml")
+    result = utils.extract_id_from_tei(tei_file)
+
+    assert result == ""
+
+
+def test_extract_id_from_lido_success(shared_datadir):
+    """Test successful extraction of ID from LIDO file."""
+    lido_file = shared_datadir / "obj1" / "xml_lido.xml"
+    result = utils.extract_id_from_lido(lido_file)
+    assert result == "o:ges.a-88"
+
+
+def test_extract_id_from_lido_success_with_string_path(shared_datadir):
+    """Test successful extraction of ID from LIDO file as string."""
+    lido_file = shared_datadir / "obj1" / "xml_lido.xml"
+    result = utils.extract_id_from_lido(str(lido_file))
+    assert result == "o:ges.a-88"
+
+
+def test_extract_id_from_lido_not_found(monkeypatch):
+    """Test extraction when ID node is not found in LIDO file."""
+    mock_tree = MagicMock()
+    mock_tree.find.return_value = None
+    monkeypatch.setattr("gamslib.objectcsv.utils.ET.parse", lambda x: mock_tree)
+
+    lido_file = Path("/some/path/lido.xml")
+    result = utils.extract_id_from_lido(lido_file)
+
+    assert result == ""
+
+
+def test_extract_id_from_lido_empty_text(monkeypatch):
+    """Test extraction when ID node exists but has empty text."""
+    mock_tree = MagicMock()
+    mock_node = MagicMock()
+    mock_node.text = ""
+    mock_tree.find.return_value = mock_node
+    monkeypatch.setattr("gamslib.objectcsv.utils.ET.parse", lambda x: mock_tree)
+
+    lido_file = Path("/some/path/lido.xml")
+    result = utils.extract_id_from_lido(lido_file)
+    assert result == ""
+
+
+def test_check_if_object_dir_matches_object_id_no_main_resource_not_raises(shared_datadir):
+    """Test that function returns without error when main_resource is None."""
+    object_dir = shared_datadir / "obj1"
+    utils.check_if_object_dir_matches_object_id(object_dir, main_resource=None)
+
+
+def test_check_if_object_dir_matches_object_id_tei_file_not_raises(shared_datadir, tmp_path):
+    """Test TEI file with matching object ID does not raise."""
+    main_resource = shared_datadir / "obj1" / "xml_tei.xml"
+    object_dir = tmp_path / "o%3Ahsa.letter.12137"
+    utils.check_if_object_dir_matches_object_id(object_dir, main_resource)
+
+def test_check_if_object_dir_non_matching_object_id_tei_file_raises(shared_datadir, tmp_path):
+    """Test TEI file with non-matching object ID does not raise."""
+    main_resource = shared_datadir / "obj1" / "xml_tei.xml"
+    object_dir = tmp_path / "foo"
+    with pytest.raises(ValueError, match="does not match"):
+        utils.check_if_object_dir_matches_object_id(object_dir, main_resource)
+
+
+def test_check_if_object_dir_matches_object_id_lidofile_not_raises(shared_datadir, tmp_path):
+    """Test LIDO file with matching object ID does not raise."""
+    main_resource = shared_datadir / "obj1" / "xml_lido.xml"
+    object_dir = tmp_path / "o%3Ages.a-88"
+    utils.check_if_object_dir_matches_object_id(object_dir, main_resource)
+                                                
+def test_check_if_object_dir_non_matching_object_id_lidofile_not_raises(shared_datadir, tmp_path):
+    """Test TEI file with matching object ID does not raise."""
+    main_resource = shared_datadir / "obj1" / "xml_lido.xml"
+    object_dir = tmp_path / "foo"
+    with pytest.raises(ValueError, match="does not match"): 
+        utils.check_if_object_dir_matches_object_id(object_dir, main_resource)
+
+
+
+
+def test_non_tei_non_lido_file_does_not_check(monkeypatch):
+    """Test that non-TEI/LIDO files are not checked."""
+    object_dir = Path("/some/path/object789")
+    main_resource = Path("/some/path/object789/main.txt")
+
+    mock_format = MagicMock()
+    mock_format.subtype = formatinfo.SubType.SVG
+    monkeypatch.setattr("gamslib.formatdetect.detect_format", lambda x: mock_format)
+    utils.check_if_object_dir_matches_object_id(object_dir, main_resource)
+    
