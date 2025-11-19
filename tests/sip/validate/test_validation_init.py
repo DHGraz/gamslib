@@ -307,6 +307,7 @@ def test_validate_pid_percent_encoded_colon():
 def test_validate_datastream_id_valid(datastream_id):
     "Test valid datastream IDs"
     assert validate_datastream_id(datastream_id) is None
+    assert validate_datastream_id(datastream_id.upper()) is None
 
 
 @pytest.mark.parametrize(
@@ -315,7 +316,7 @@ def test_validate_datastream_id_valid(datastream_id):
         ("", "empty"),  # empty string
         ("..abc", "consecutive dots"),  # starts with consecutive dots
         ("abc..def", "consecutive dots"),  # consecutive dots
-        ("abc__def", "lowercase letters"),  # consecutive underscores
+        ("abc__def", "letters, numbers"),  # consecutive underscores
         ("abc--def", "consecutive dashes"),  # consecutive dashes
         (".abc", "contain only"),  # starts with dot
         ("_abc", "contain only"),  # starts with underscore

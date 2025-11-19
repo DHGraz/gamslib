@@ -234,10 +234,10 @@ def validate_datastream_id(datastream_id: str) -> None:
             "Datastream identifier (after dot) must not contain consecutive dashes"
         )
 
-    if not re.match(r"^[a-z0-9][a-z0-9.-]*$", datastream_id):
+    if not re.match(r"^[a-z0-9][a-z0-9.-]*$", datastream_id, re.IGNORECASE):
         raise ValueError(
-            "Datastream identifier (after dot) must start with a letter or number and "
-            "contain only lowercase letters, numbers, dots or dashes"
+            "Datastream identifier must start with a letter or number and "
+            "contain only letters, numbers, dots or dashes"
         )
 
 
