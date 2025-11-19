@@ -6,6 +6,7 @@ import pytest
 
 from gamslib.sip import BagValidationError
 from gamslib.sip.validation import (
+    _validate_object_id,
     validate_project_name,
     _validate_type_prefix,
     validate_bag,
@@ -230,6 +231,12 @@ def test_validate_pid_valid(pid):
     else:
         validate_pid(pid)
 
+def testvalidate_object_id_fails():
+    "Test that _validate_object_id raises ValueError"
+    with pytest.raises(ValueError):
+        _validate_object_id("")
+    with pytest.raises(ValueError):
+        _validate_object_id("foo--bar")
 
 @pytest.mark.parametrize(
     "pid,reason",
