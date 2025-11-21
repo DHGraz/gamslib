@@ -25,6 +25,7 @@ def objdata_fixture() -> ObjectData:
         source="The source",
         objectType="The objectType",
         mainResource="TEI.xml",
+        tags="tag1; tag2",
     )
 
 

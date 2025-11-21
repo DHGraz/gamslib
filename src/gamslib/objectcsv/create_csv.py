@@ -161,7 +161,9 @@ def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
     return delimiter.join(languages) if languages else ""
 
 
-def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> ObjectData:
+def collect_object_data(
+    pid: str, config: Configuration, dc: DublinCore, use_subjects_as_tags=False
+) -> ObjectData:
     """
     Collect metadata for an object to populate object.csv.
 
@@ -171,11 +173,13 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
         pid (str): Object identifier.
         config (Configuration): Project configuration.
         dc (DublinCore): Dublin Core metadata object.
+        use_subjects_as_tags (bool): Whether to use dc:subjects as tags. (Default: False)
 
     Returns:
         ObjectData: Populated object metadata.
     """
     title = "; ".join(dc.get_en_element("title", default=pid))
+    tags = ";".join(dc.get_element_all_langs("subject")) if use_subjects_as_tags else ""
     # description = "; ".join(dc.get_element("description", default=""))
 
     return ObjectData(
@@ -189,6 +193,7 @@ def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -> Obje
         objectType=defaultvalues.DEFAULT_OBJECT_TYPE,
         publisher=config.metadata.publisher,
         funder=config.metadata.funder,
+        tags=tags,
     )
 
 

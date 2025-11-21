@@ -32,7 +32,7 @@ def test_init(datadir):
     ]
     assert dc._data["subject"]["unspecified"] == ["Subject 1"]
     assert dc._data["subject"]["de"] == ["Subject 2 de", "Subject 3 de"]
-    assert dc._data["subject"]["en"] == ["Subject 2 en"]
+    assert dc._data["subject"]["en"] == ["Subject 2 en", "Subject 3 en"]
 
 
 def test_get_element(datadir):

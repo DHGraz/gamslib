@@ -11,6 +11,7 @@ from pytest import fixture
 
 from gamslib.objectcsv import defaultvalues
 from gamslib.objectcsv.create_csv import (
+    collect_object_data,
     create_csv,
     create_csv_files,
     detect_languages,
@@ -162,7 +163,9 @@ def test_create_csv_force_overwrite(datadir, test_config):
     assert len(read_csv(ds_csv)) == len(["DC.xml", "SOURCE.xml"])
 
 
-def test_create_csv_files_existing_csvs(datadir, test_config, objcsvfile: Path, dscsvfile: Path):
+def test_create_csv_files_existing_csvs(
+    datadir, test_config, objcsvfile: Path, dscsvfile: Path
+):
     """Test the create_csv_files function.
 
     If the csv files already exist, they should not be overwritten.
@@ -199,7 +202,7 @@ def test_create_csv_files(datadir, test_config):
     )
     assert len(ds_data) == len(["DC.xml", "SOURCE.xml"])
     assert ds_data["DC.xml"]["title"] == "XML Dublin Core metadata: DC.xml"
-    assert ds_data["SOURCE.xml"]["title"] =="XML TEI document: SOURCE.xml"
+    assert ds_data["SOURCE.xml"]["title"] == "XML TEI document: SOURCE.xml"
 
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"
@@ -234,7 +237,7 @@ def test_create_csv_files_with_update_flag(datadir, test_config):
     write_csv_file(
         objects_root_dir / "obj1" / "datastreams.csv", list(ds_data.values())
     )
-    #change title of the DC.xml datastream in obj2/datastreams.csv
+    # change title of the DC.xml datastream in obj2/datastreams.csv
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"
     )
@@ -415,7 +418,7 @@ def test_update_csv_metadata_changes(datadir, tmp_path, test_config):
     assert "Manual Edit Title" not in updated_obj_txt  # Manual edit preserved
     assert "Updated Rights" in updated_obj_txt  # Source change applied
 
-    
+
 def test_is_datastream_file_excludes_object_and_datastream_csv(tmp_path, test_config):
     """is_datastream_file should exclude object.csv and datastreams.csv files."""
     obj_dir = tmp_path
@@ -426,11 +429,13 @@ def test_is_datastream_file_excludes_object_and_datastream_csv(tmp_path, test_co
     assert not is_datastream_file(obj_csv, test_config)
     assert not is_datastream_file(ds_csv, test_config)
 
+
 def test_is_datastream_file_excludes_non_files(tmp_path, test_config):
     """is_datastream_file should return False for non-files (directories)."""
     obj_dir = tmp_path / "folder"
     obj_dir.mkdir()
     assert not is_datastream_file(obj_dir, test_config)
+
 
 def test_is_datastream_file_excludes_by_ignore_pattern(tmp_path, test_config):
     """is_datastream_file should exclude files matching ignore patterns."""
@@ -440,11 +445,13 @@ def test_is_datastream_file_excludes_by_ignore_pattern(tmp_path, test_config):
     log_file.write_text("log content")
     assert not is_datastream_file(log_file, test_config)
 
+
 def test_is_datastream_file_includes_normal_file(tmp_path, test_config):
     """is_datastream_file should include normal files not matching ignore patterns."""
     normal_file = tmp_path / "data.txt"
     normal_file.write_text("some data")
     assert is_datastream_file(normal_file, test_config)
+
 
 def test_is_datastream_file_multiple_ignore_patterns(tmp_path, test_config):
     """is_datastream_file should handle multiple ignore patterns."""
@@ -459,3 +466,85 @@ def test_is_datastream_file_multiple_ignore_patterns(tmp_path, test_config):
     assert not is_datastream_file(ignore_file, test_config)
     assert is_datastream_file(ok_file, test_config)
 
+
+def test_collect_object_data_basic(test_config, test_dc):
+    """Test collect_object_data with basic DC metadata."""
+    obj_data = collect_object_data(
+        "obj1", test_config, test_dc, use_subjects_as_tags=True
+    )
+
+    assert obj_data.recid == "obj1"
+    assert obj_data.title == "Object 1"
+    assert obj_data.project == "Test Project"
+    assert obj_data.description == ""
+    assert obj_data.creator == "GAMS Test Project"
+    assert obj_data.rights == "Rights from DC.xml"
+    assert obj_data.source == defaultvalues.DEFAULT_SOURCE
+    assert obj_data.objectType == defaultvalues.DEFAULT_OBJECT_TYPE
+    assert obj_data.publisher == "GAMS"
+    assert obj_data.funder == "The funder"
+    assert obj_data.tags == "Subject1;Subject2"
+
+    obj_data = collect_object_data("obj1", test_config, test_dc)
+    assert obj_data.tags == ""
+
+    obj_data = collect_object_data(
+        "obj1", test_config, test_dc, use_subjects_as_tags=False
+    )
+    assert obj_data.tags == ""
+
+
+def test_collect_object_data_no_title_uses_pid(test_config, test_dc):
+    """Test that PID is used as title when no title in DC."""
+    test_dc._data["title"] = {}
+    obj_data = collect_object_data("test_pid", test_config, test_dc)
+
+    assert obj_data.title == "test_pid"
+    assert obj_data.recid == "test_pid"
+
+
+def test_collect_object_data_multiple_titles(test_config, test_dc):
+    """Test that multiple titles are joined with semicolon."""
+    test_dc._data["title"] = {"en": ["Title 1", "Title 2", "Title 3"]}
+    obj_data = collect_object_data("obj1", test_config, test_dc)
+
+    assert obj_data.title == "Title 1; Title 2; Title 3"
+
+
+def test_collect_object_data_rights_from_config(test_config, test_dc):
+    """Test that rights fall back to config when not in DC."""
+    test_dc._data["rights"] = {"unspecified": [""]}
+    obj_data = collect_object_data("obj1", test_config, test_dc)
+
+    assert obj_data.rights == "Rights from project.toml"
+
+
+def test_collect_object_data_rights_default(test_config, test_dc):
+    """Test that rights use default when not in DC or config."""
+    test_dc._data["rights"] = {"unspecified": [""]}
+    test_config.metadata.rights = ""
+    obj_data = collect_object_data("obj1", test_config, test_dc)
+
+    assert obj_data.rights == defaultvalues.DEFAULT_RIGHTS
+
+
+def test_collect_object_data_with_subject_tags(test_config, test_dc):
+    """Test that subject tags are properly collected."""
+    test_dc._data["subject"] = {"en": ["Subject1", "Subject2"]}
+    obj_data = collect_object_data(
+        "obj1", test_config, test_dc, use_subjects_as_tags=False
+    )
+    assert obj_data.tags == ""
+
+    obj_data = collect_object_data(
+        "obj1", test_config, test_dc, use_subjects_as_tags=True
+    )
+    assert obj_data.tags == "Subject1;Subject2"
+
+
+def test_collect_object_data_empty_subject(test_config, test_dc):
+    """Test with no subject tags."""
+    test_dc._data["subject"] = {}
+    obj_data = collect_object_data("obj1", test_config, test_dc)
+
+    assert obj_data.tags == "" or obj_data.tags is None

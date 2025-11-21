@@ -27,6 +27,7 @@ class ObjectData:
       - objectType (str): Type of the object.
       - mainResource (str): Main datastream identifier.
       - funder (str): Funder information.
+      - tags (str): Additional tags for the object.
     """
 
     recid: str
@@ -40,6 +41,7 @@ class ObjectData:
     objectType: str = ""
     mainResource: str = ""  # main datastream
     funder: str = ""
+    tags: str = ""
 
     @classmethod
     def fieldnames(cls) -> list[str]:
@@ -55,8 +57,14 @@ class ObjectData:
         """
         Merge the object data with another ObjectData instance.
 
-        Overwrites fields with non-empty values from the other instance.
         Both objects must have the same recid.
+
+        Some field are always replacd by the new value if the new value is non-empty
+        ('title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType',
+        'mainResource', 'funder').
+         
+        Other fields are only updated if they are empty in the current instance and
+        non-empty in the other instance.
 
         Args:
             other (ObjectData): Another ObjectData instance to merge from.
@@ -66,8 +74,10 @@ class ObjectData:
         """
         if self.recid != other.recid:
             raise ValueError("Cannot merge objects with different recid values")
-        # These are the fields which are possibly set automatically set in the new object data
-        fields_to_merge = [
+
+        # These fields might have been set automatically from eg. the
+        # configuration file. So a changed value should overwrite the old one.
+        fields_to_replace = [
             "title",
             "project",
             "creator",
@@ -78,9 +88,17 @@ class ObjectData:
             "mainResource",
             "funder",
         ]
-        for field in fields_to_merge:
-            if getattr(other, field).strip():
-                setattr(self, field, getattr(other, field))
+        # for field in fields_to_replace:
+        #     if getattr(other, field).strip():
+        #         setattr(self, field, getattr(other, field))
+        for field in self.fieldnames():  
+            new_value = getattr(other, field).strip()
+            if field in fields_to_replace and new_value:
+                if new_value:
+                    setattr(self, field, new_value)
+            # only update if the current value is empty
+            elif not getattr(self, field).strip() and new_value:
+                setattr(self, field, new_value)
 
     def validate(self):
         """
