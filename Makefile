@@ -20,6 +20,9 @@ test-versions:
 # 3.14 depencies currently have some wheel issues: magicka require 1.20, which is rather old
 	# @uv run --python 3.14 --isolated --with-editable '.[test]' pytest
 
+lint:
+	@uv run ruff check src  
+
 coverage:
 	@uv run pytest tests --cov-report term-missing --cov=gamslib 
 
