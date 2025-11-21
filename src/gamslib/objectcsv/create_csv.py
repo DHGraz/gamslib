@@ -271,7 +271,10 @@ def collect_datastream_data(
 
 
 def create_csv(
-    object_directory: Path, configuration: Configuration, force_overwrite: bool = False
+    object_directory: Path,
+    configuration: Configuration,
+    force_overwrite: bool = False,
+    use_subjects_as_tags: bool = False,
 ) -> ObjectCSVManager | None:
     """
     Generate object.csv and datastreams.csv for a single object directory.
@@ -304,7 +307,12 @@ def create_csv(
         return None
 
     dc = DublinCore(object_directory / "DC.xml")
-    obj = collect_object_data(objectcsv.object_id, configuration, dc)
+    obj = collect_object_data(
+        objectcsv.object_id,
+        configuration,
+        dc,
+        use_subjects_as_tags=use_subjects_as_tags,
+    )
     objectcsv.set_object(obj)
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
@@ -318,7 +326,9 @@ def create_csv(
 
 
 def update_csv(
-    object_directory: Path, configuration: Configuration
+    object_directory: Path,
+    configuration: Configuration,
+    use_subjects_as_tags: bool = False,
 ) -> ObjectCSVManager | None:
     """
     Update existing CSV files for an object directory with new metadata.
@@ -346,10 +356,10 @@ def update_csv(
         )
     dc = DublinCore(object_directory / "DC.xml")
 
-    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc))
+    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc, use_subjects_as_tags=use_subjects_as_tags))
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
-            dsdata = collect_datastream_data(ds_file, configuration, dc)
+            #dsdata = collect_datastream_data(ds_file, configuration, dc)
             objectcsv.merge_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )
@@ -364,6 +374,7 @@ def create_csv_files(
     config: Configuration,
     force_overwrite: bool = False,
     update: bool = False,
+    use_subjects_as_tags: bool = False,
 ) -> list[ObjectCSVManager]:
     """
     Create or update CSV files for all objects under the given root folder.
@@ -376,6 +387,7 @@ def create_csv_files(
         config (Configuration): Project configuration.
         force_overwrite (bool): If True, overwrite existing CSV files.
         update (bool): If True, update existing CSV files instead of creating new ones.
+        use_subjects_as_tags (bool): If True, insert all dc:subject entries as tags in object.csv
 
     Returns:
         list[ObjectCSVManager]: List of managers for the processed object directories.
@@ -383,9 +395,13 @@ def create_csv_files(
     extended_objects: list[ObjectCSVManager] = []
     for path in find_object_folders(root_folder):
         if update:
-            extended_obj = update_csv(path, config)
+            extended_obj = update_csv(
+                path, config, use_subjects_as_tags=use_subjects_as_tags
+            )
         else:
-            extended_obj = create_csv(path, config, force_overwrite)
+            extended_obj = create_csv(
+                path, config, force_overwrite, use_subjects_as_tags=use_subjects_as_tags
+            )
 
         if extended_obj is not None:
             extended_objects.append(extended_obj)
