@@ -65,22 +65,6 @@ NAMESPACES = {
     "oai_dc": "http://www.openarchives.org/OAI/2.0/oai_dc/",
 }
 
-
-# class DublinCoreWarning(UserWarning):
-#     """Warning for missing Dublin Core elements.
-
-#     This warning is raised when a requested element is not found
-#     in the Dublin Core data and a default value is used instead.
-#     """
-
-# class MissingLangWarning(DublinCoreWarning):
-#     """Warning for missing language in Dublin Core elements.
-
-#     This warning is raised when a requested language (xml:lang) is not
-#     found in the Dublin Core data.
-#     """
-
-
 class DublinCore:
     """Represents data from DC.xml and provides methods to access it."""
 
@@ -134,6 +118,7 @@ class DublinCore:
     def get_en_element(self, name: str, default="") -> list[str]:
         """
         Return the value(s) of a Dublin Core element in English.
+        If no English value is found, return the default value.
 
         Args:
             name (str): The name of the element without namespace (e.g. "title").
@@ -155,7 +140,11 @@ class DublinCore:
 
     def get_en_element_as_str(self, name: str, default="") -> str:
         """
-        Return the joined value(s) of a Dublin Core element in English.
+        Return all entries of a Dublin Core element in English as string. 
+        
+        Entries are separated by '; '. 
+
+        Delimi
 
         Args:
             name (str): The name of the element without namespace (e.g. "title").
@@ -175,6 +164,12 @@ class DublinCore:
         """
         Return the value(s) of a Dublin Core element as a list of strings.
 
+        If no entry in the preferred language is available, the function will search
+        for entries in another language, depending on the lookup_order set during
+        object creation. If no entry is found with a specified language, the function
+        checks for an entry with no 'xml:lang' attribute. If still no value is found,
+        the default value will be returned (as a list).
+
         Args:
             name (str): The name of the element without namespace (e.g. "title").
             preferred_lang (str): The preferred language of the element (e.g. "de").
@@ -186,12 +181,6 @@ class DublinCore:
         Raises:
             ValueError: If the element name is not a valid Dublin Core element.
 
-        Notes:
-            - If no entry in the preferred language is available, the function will search
-              for entries in another language, depending on the lookup_order set during
-              object creation. If no entry is found with a specified language, the function
-              checks for an entry with no 'xml:lang' attribute. If still no value is found,
-              the default value will be returned (as a list).
         """
         if name not in DC_ELEMENTS:
             raise ValueError(f"Element {name} is not a Dublin Core element.")
@@ -257,3 +246,26 @@ class DublinCore:
         else:
             str_value = "; ".join(values)
         return str_value
+
+
+    def get_element_all_langs(self, name: str) -> list[str]:
+        """
+        Return all values of a Dublin Core element for all languages (and also if lang attribute is missing).
+
+        Args:
+            name (str): The name of the element without namespace (e.g. "title").
+
+        Returns:
+            list[str]: A list of all values for the element in all available languages (including unspecified).
+            If the element is not found, an empty list is returned.
+
+        Raises:
+            ValueError: If the element name is not a valid Dublin Core element.
+        """
+        if name not in DC_ELEMENTS:
+            raise ValueError(f"Element {name} is not a Dublin Core element.")
+
+        result: list[str] = []
+        for values in self._data.get(name, {}).values():
+            result.extend([self.remove_linebreaks(value) for value in values])
+        return result
