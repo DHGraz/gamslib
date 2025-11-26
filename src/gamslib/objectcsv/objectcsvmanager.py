@@ -76,6 +76,7 @@ class ObjectCSVManager:
         else:
             self._object_data.merge(object_data)
 
+    
     def get_object(self) -> ObjectData:
         """
         Return the object metadata.
@@ -150,6 +151,17 @@ class ObjectCSVManager:
                 languages.extend(dlangs)
         langcounter = Counter(languages)
         return [entry[0] for entry in langcounter.most_common()]
+
+    def get_mainresource(self)->DSData|None:
+        """
+        Return the main resource (datastream) of the object if set or None.
+
+        Returns:
+            DSData: The main resource datastream, or None if not set.
+        """
+        for ds in self._datastream_data:
+            if ds.dsid == self._object_data.mainResource:
+                return ds
 
     def is_empty(self) -> bool:
         """

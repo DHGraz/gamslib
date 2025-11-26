@@ -2,11 +2,9 @@ import copy
 import csv
 import dataclasses
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 
-from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectcsvmanager import (
     DS_CSV_FILENAME,
@@ -487,3 +485,31 @@ def test_write_object_csv_overwrites_if_ignore_flag(tmp_path, objdata):
         assert len(rows) == 1
         assert rows[0] == dataclasses.asdict(objdata)
 
+def test_get_mainresource(objcsvfile: Path, dscsvfile: Path):
+    """Test the get_mainresource method."""
+    # we need dscsvfile fixture because the datastream files must exist
+    
+    obj_dir = objcsvfile.parent 
+
+    # Create an ObjectCSVManager instance
+    obj_mgr= ObjectCSVManager(obj_dir)
+
+    # Get the main resource
+    main_resource = obj_mgr.get_mainresource()
+    assert main_resource.dspath == "obj1/TEI.xml"
+
+
+def test_get_mainresource_no_mainresource(objcsvfile: Path, dscsvfile: Path):
+    """Test the get_mainresource method if no mainresource is set."""
+    # we need dscsvfile fixture because the datastream files must exist
+    
+    obj_dir = objcsvfile.parent 
+
+
+    # Create an ObjectCSVManager instance
+    obj_mgr= ObjectCSVManager(obj_dir)
+    obj_mgr.get_object().mainResource = ""
+
+    # Get the main resource
+    main_resource = obj_mgr.get_mainresource()
+    assert main_resource is None
