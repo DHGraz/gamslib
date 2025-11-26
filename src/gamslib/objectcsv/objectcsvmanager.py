@@ -193,7 +193,7 @@ class ObjectCSVManager:
             ValueError: If metadata is missing or invalid.
         """
         if self.is_empty():
-            raise ValueError("Object metadata (csv) is not set.")
+            raise ValueError("Required files object.csv and dadatastreams.csv are missing or empty.")
         self._object_data.validate()
         for dsdata in self._datastream_data:
             dsdata.validate()

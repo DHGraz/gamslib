@@ -2,9 +2,11 @@ import copy
 import csv
 import dataclasses
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
+from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectcsvmanager import (
     DS_CSV_FILENAME,
@@ -215,7 +217,7 @@ def test_validate(tmp_path, objdata, dsdata):
 def test_validate_empty(tmp_path):
     """Test validation of empty object manager."""
     manager = ObjectCSVManager(tmp_path)
-    with pytest.raises(ValueError, match="is not set"):
+    with pytest.raises(ValueError, match="missing or empty"):
         manager.validate()
 
 
@@ -225,7 +227,7 @@ def test_validate_invalid_object(tmp_path, objdata, dsdata):
 
     manager = ObjectCSVManager(tmp_path)
 
-    with pytest.raises(ValueError, match="Object metadata .* is not set"):
+    with pytest.raises(ValueError, match="missing or empty"):
         manager.validate()
 
 
@@ -484,7 +486,4 @@ def test_write_object_csv_overwrites_if_ignore_flag(tmp_path, objdata):
         rows = list(reader)
         assert len(rows) == 1
         assert rows[0] == dataclasses.asdict(objdata)
-
-
-
 

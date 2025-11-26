@@ -14,15 +14,16 @@ from pathlib import Path
 
 from gamslib import formatdetect
 from gamslib.formatdetect.formatinfo import FormatInfo
+
+#from .utils import find_object_folders
+from gamslib.objectdir import find_object_folders
 from gamslib.projectconfiguration import Configuration
 
 from . import defaultvalues
 from .dsdata import DSData
 from .dublincore import DublinCore
-from .objectcsvmanager import ObjectCSVManager, OBJ_CSV_FILENAME, DS_CSV_FILENAME
-
+from .objectcsvmanager import DS_CSV_FILENAME, OBJ_CSV_FILENAME, ObjectCSVManager
 from .objectdata import ObjectData
-from .utils import find_object_folders
 
 logger = logging.getLogger()
 

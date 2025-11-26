@@ -21,19 +21,17 @@ Usage:
 import hashlib
 import json
 import logging
-import os
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Generator
 import warnings
 import zipfile
 
 import requests
 
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 
-from . import BagValidationError, ObjectDirectoryValidationError
+
+from . import BagValidationError
 from .validation import validate_pid
 
 logger = logging.getLogger(__name__)
@@ -42,62 +40,6 @@ GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json"
 
 # This is the path were the schema is stored in the package
 SCHEMA_PATH = Path(__file__).parent / "resources" / "sip-schema-d1.json"
-
-
-def validate_object_dir(object_path: Path) -> None:
-    """
-    Check if everything needed is present in the object directory.
-
-    Args:
-        object_path (Path): Path to the object directory.
-
-    Raises:
-        ObjectDirectoryValidationError: If the directory or required files are missing,
-            or if object.csv is invalid.
-    """
-    if not object_path.is_dir():
-        raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not exist or is not a directory."
-        )
-
-    if not (object_path / "DC.xml").exists():
-        raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does contain a DC.xml file."
-        )
-
-    # TODO: validate the DC.xml file? Do we require some fields?
-
-    # Check the object.csv file
-    objfile = object_path / "object.csv"
-    if not objfile.exists():
-        raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not contain an object.csv file."
-        )
-    # use the ObjectCSVFile class to validate contents of the object.csv file
-    csv_mgr = ObjectCSVManager(object_path)
-    csv_mgr.validate()
-
-
-def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
-    """
-    Find all object folders in the root folder or below.
-
-    Args:
-        root_folder (Path): Root directory to search for object folders.
-
-    Yields:
-        Path: Path to each object folder containing a DC.xml file.
-
-    Notes:
-        - Skips folders that do not contain a DC.xml file and logs a warning.
-    """
-    for root, _, files in os.walk(root_folder):
-        if "DC.xml" in files:
-            yield Path(root)
-        elif not files or "project.toml" not in files:
-            logger.warning(
-                "Skipping folder %s as it does not contain a DC.xml file.", root
-            )
 
 
 # def extract_object_id_from_path(path: Path | str) -> str:
@@ -295,3 +237,5 @@ def is_bag(bag_path: Path) -> bool:
         )
         looks_like_a_bag = False
     return looks_like_a_bag
+
+

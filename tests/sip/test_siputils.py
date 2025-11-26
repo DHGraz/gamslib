@@ -8,33 +8,18 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from gamslib.sip import BagValidationError, ObjectDirectoryValidationError, utils
+from gamslib.sip import BagValidationError, utils
 
 from gamslib.sip.utils import (
     GAMS_SIP_SCHEMA_URL,
     count_bytes,
     count_files,
     fetch_json_schema,
-    find_object_folders,
     is_bag,
     md5hash,
     read_sip_schema_from_package,
     sha512hash,
-    validate_object_dir,
 )
-
-
-class DummyCSVManager:
-    """A dummy CSV manager for testing purposes.
-    # This class is a placeholder to simulate the ObjectCSVManager in tests.
-    # It should have the same interface as ObjectCSVManager.
-    """
-
-    def __init__(self, path):
-        self.path = path
-
-    def validate(self):
-        pass
 
 
 @pytest.fixture(name="bag_dir")
@@ -75,20 +60,6 @@ def incomplete_zipped_bag_fixture(request, tmp_path, bag_dir):
     (bag_dir / request.param).unlink()
     zip_path = shutil.make_archive(str(tmp_path / "test_bag"), "zip", bag_dir)
     return Path(zip_path)
-
-
-def test_find_project_folders(datadir):
-    """Test if the find_object_folders function return all folder containing a DC.xml."""
-    project_folders = list(find_object_folders(datadir))
-    assert len(project_folders) == len(
-        ["folder1", "folder2", "folder3", "folder3/folder_a"]
-    )
-
-    assert datadir in project_folders
-    assert datadir / "folder1" in project_folders
-    assert datadir / "folder2" in project_folders
-    assert datadir / "folder3" / "folder_a" in project_folders
-    assert datadir / "folder3" not in project_folders
 
 
 # I removed the extract_id function as it is no longer needed.
@@ -197,58 +168,6 @@ def test_count_files(datadir):
     assert count_files(datadir / "folder1") == 1
     assert count_files(datadir / "folder2") == len(["DC.xml", "foo.txt"])
     assert count_files(datadir / "folder3") == len(["DC.xml", "foo.txt", "folder_a"])
-
-
-def test_validate_object_dir_valid(monkeypatch, tmp_path):
-    """Test the validate_object_dir function with a valid object directory."""
-    # Patch ObjectCSVManager to DummyCSVManager
-    monkeypatch.setattr("gamslib.sip.utils.ObjectCSVManager", DummyCSVManager)
-    obj_dir = tmp_path
-    (obj_dir / "DC.xml").write_text("<dc></dc>")
-    (obj_dir / "object.csv").write_text("id,name\n1,test")
-    # Should not raise
-    validate_object_dir(obj_dir)
-
-
-def test_validate_object_dir_missing_dir(tmp_path):
-    """Test the validate_object_dir function with a missing directory."""
-    non_dir = tmp_path / "not_a_dir"
-    with pytest.raises(ObjectDirectoryValidationError):
-        validate_object_dir(non_dir)
-
-
-def test_validate_object_dir_missing_dcxml(tmp_path):
-    """Test the validate_object_dir function with a missing DC.xml file."""
-    obj_dir = tmp_path
-    (obj_dir / "object.csv").write_text("id,name\n1,test")
-    with pytest.raises(ObjectDirectoryValidationError):
-        validate_object_dir(obj_dir)
-
-
-def test_validate_object_dir_missing_object_csv(tmp_path):
-    """Test the validate_object_dir function with a missing object.csv file."""
-    obj_dir = tmp_path
-    (obj_dir / "DC.xml").write_text("<dc></dc>")
-    with pytest.raises(ObjectDirectoryValidationError):
-        validate_object_dir(obj_dir)
-
-
-def test_validate_object_dir_csv_manager_raises(monkeypatch, tmp_path):
-    """Test the validate_object_dir function with a CSV manager that raises an error."""
-
-    class FailingCSVManager:
-        def __init__(self, path):
-            pass
-
-        def validate(self):
-            raise Exception("CSV error")
-
-    monkeypatch.setattr("gamslib.sip.utils.ObjectCSVManager", FailingCSVManager)
-    obj_dir = tmp_path
-    (obj_dir / "DC.xml").write_text("<dc></dc>")
-    (obj_dir / "object.csv").write_text("id,name\n1,test")
-    with pytest.raises(Exception, match="CSV error"):
-        validate_object_dir(obj_dir)
 
 
 def test_read_sip_schema_from_package_reads_json(monkeypatch, tmp_path):

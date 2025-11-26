@@ -14,7 +14,8 @@ from gamslib.objectcsv import xlsx
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
-from gamslib.objectcsv.utils import find_object_folders
+#from gamslib.objectcsv.utils import find_object_folders
+from gamslib.objectdir import find_object_folders
 
 ALL_OBJECTS_CSV = "all_objects.csv"
 ALL_DATASTREAMS_CSV = "all_datastreams.csv"
