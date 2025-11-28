@@ -23,84 +23,114 @@ from gamslib.objectdir import (
 # from gamslib.sip import ObjectDirectoryValidationError
 
 
-def make_valid_object_dir(obj_path: Path, id_suffix: int) -> ObjectCSVManager:
-    """Create a valid object.csv and a datastreams.csv file for testing."""
-    # object_dir = obj_path / "object"
-    (obj_path / "DC.xml").touch()
+def create_test_object_dir(
+    tmp_path: Path,
+    object_dir: str,
+    datastreams: list[tuple],
+    main_resource: str | None = None,
+) -> Path:
+    """Create a dummy object directory with csv files and datatream files for testing.#
 
-    mgr = ObjectCSVManager(obj_path)
+    Parameters
+    ----------
+    object_path : Path
+        Object directory path relative to tmp_path
+    datastreams : list[tuple]
+        List of tuples containing the datastream file name, content type, and content
+    main_resource : str
+        The filename of the main resource of the object
+
+    Returns
+    -------
+    Path
+        The path to the created object directory
+    """
+    escaped_dir_name = object_dir.replace(":", "%3A")
+    object_dir = tmp_path / escaped_dir_name
+    object_id = object_dir.name.replace("%3A", ":")
+    object_dir.mkdir(parents=True, exist_ok=True)
+    mgr = ObjectCSVManager(object_dir)
     obj_dict = {}
     for field in gamslib.objectcsv.objectdata.ObjectData.fieldnames():
         if field == "recid":
-            obj_dict[field] = f"{obj_path.name}"
+            obj_dict[field] = object_id
+        elif field == "mainResource" and main_resource is not None:
+            obj_dict[field] = main_resource
         else:
-            obj_dict[field] = f"{field}_{id_suffix}"
-    csv_obj = gamslib.objectcsv.objectdata.ObjectData(**obj_dict)
-    mgr.set_object(csv_obj)
-
-    files = [
-        ("foo.pdf", "application/pdf"),
-        ("DC.xml", "application/xml"),
-        ("baz.png", "image/png"),
-    ]
-    for fname, contentype in files:
+            obj_dict[field] = field
+    mgr.set_object(gamslib.objectcsv.objectdata.ObjectData(**obj_dict))
+    for i, (ds_file_name, content_type, content) in enumerate(datastreams, start=1):
         ds_dict = {}
         for field in gamslib.objectcsv.dsdata.DSData.fieldnames():
             if field == "dspath":
-                ds_dict[field] = fname
-                (obj_path / fname).touch()
+                ds_dict[field] = f"{object_id}/{ds_file_name}"
             elif field == "dsid":
-                ds_dict[field] = f"{fname}_id_{id_suffix}"
+                ds_dict[field] = ds_file_name
             elif field == "mimetype":
-                ds_dict[field] = contentype
+                ds_dict[field] = content_type
             else:
-                ds_dict[field] = f"{field}_{id_suffix}"
-
-        ds = gamslib.objectcsv.dsdata.DSData(**ds_dict)
-        mgr.add_datastream(ds)
+                ds_dict[field] = f"{field}_{i}"
+            ds_path = object_dir / ds_file_name
+            ds_path.write_text(content, encoding="utf-8")
+        mgr.add_datastream(gamslib.objectcsv.dsdata.DSData(**ds_dict))
     mgr.save()
-    return mgr
+    return object_dir
 
 
 @pytest.fixture(name="object_dir")
 def valid_object_dir_fixture(tmp_path: Path) -> Path:
     """Create a valid object directory for testing."""
-    obj_dir = tmp_path / "valid_object"
-    obj_dir.mkdir()
-    return make_valid_object_dir(obj_dir, 1).obj_dir
+    dir_name = "valid_object"
+    datastreams = [
+        ("foo.pdf", "application/pdf", ""),
+        ("DC.xml", "application/xml", ""),
+        ("baz.png", "image/png", ""),
+    ]
+    yield create_test_object_dir(tmp_path, dir_name, datastreams)
 
 
 @pytest.fixture(name="tei_content")
 def tei_content_fixture(request: pytest.FixtureRequest) -> str:
     """Return full and valid TEI file as string."""
-    tei_path = Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_tei.xml"
+    tei_path = (
+        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_tei.xml"
+    )
     return tei_path.read_text(encoding="utf-8")
+
 
 @pytest.fixture(name="lido_content")
 def lido_content_fixture(request: pytest.FixtureRequest) -> str:
     """Return full and valid LDIO file as string."""
-    lido_path = Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_lido.xml"
+    lido_path = (
+        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_lido.xml"
+    )
     return lido_path.read_text(encoding="utf-8")
+
 
 @pytest.fixture(name="tei_object_dir")
 def tei_object_dir_fixture(tmp_path: Path, tei_content: str) -> Path:
     """Create a minimal TEI Object dir and return path to it."""
-    obj_dir = tmp_path / "o%3Ahsa.letter.12137" # "o:hsa.letter.12137"
-    obj_dir.mkdir()
-    tei_path = obj_dir / "tei.xml"
-    tei_path.write_text(tei_content, encoding="utf-8")
-    #(obj_dir / "DC.xml").touch()
-    yield obj_dir
+
+    dir_name = "o%3Ahsa.letter.12137"  # "o:hsa.letter.12137"
+    datastreams = [
+        ("DC.xml", "application/xml", ""),
+        ("tei.xml", "application/xml", tei_content),
+        ("baz.png", "image/png", ""),
+    ]
+    yield create_test_object_dir(tmp_path, dir_name, datastreams)
+
 
 @pytest.fixture(name="lido_object_dir")
 def lido_object_dir_fixture(tmp_path: Path, lido_content: str) -> Path:
     """Create a minimal TEI Object dir and return path to it."""
-    obj_dir = tmp_path / "o%3Ages.a-88" # "o:ges.a-88"
-    obj_dir.mkdir()
-    tei_path = obj_dir / "lido.xml"
-    tei_path.write_text(lido_content, encoding="utf-8")
-    (obj_dir / "DC.xml").touch()
-    yield obj_dir
+    dir_name = "o%3Ages.a-88"  # "o:ges.a-88"
+    datastreams = [
+        ("DC.xml", "application/xml", ""),
+        ("lido.xml", "application/xml", lido_content),
+        ("baz.png", "image/png", ""),
+    ]
+    yield create_test_object_dir(tmp_path, dir_name, datastreams)
+
 
 # ------------- basic functionality tests ---------
 def test_find_object_folders(tmp_path: Path):
@@ -110,16 +140,19 @@ def test_find_object_folders(tmp_path: Path):
         "object2",
         "object3/subobject1",
         "object3/subobject2",
+        "object3/objectx/subobject3",
     ]
     object_folders: list[ObjectCSVManager] = []
-    for i, folder_name in enumerate(object_folder_names):
-        folder_path = tmp_path / folder_name
-        folder_path.mkdir(parents=True, exist_ok=True)
-        object_folders.append(make_valid_object_dir(folder_path, i))
+    for folder_name in object_folder_names:
+        object_folders.append(
+            create_test_object_dir(
+                tmp_path, folder_name, [["DC.xml", "application/xml", ""]]
+            )
+        )
 
     found_folders = list(find_object_folders(tmp_path))
     assert len(found_folders) == len(object_folder_names)
-    assert set(found_folders) == {obj.obj_dir for obj in object_folders}
+    assert set(found_folders) == set(object_folders)
 
 
 # ---- directory structure validation tests ----
@@ -231,7 +264,7 @@ def test_validate_csv_files_missing_datastream_file(object_dir: Path):
 
     with pytest.raises(
         ObjectDirectoryValidationError,
-        match=r"Datastream file 'foo\.pdf'.*does not exist",
+        match=r"Datastream file 'foo.pdf'.*does not exist",
     ):
         validate_csv_files(object_dir)
 
@@ -251,7 +284,7 @@ def test_validate_csv_files_recid_mismatch(object_dir: Path):
 def test_validate_csv_files_csv_manager_validation_error(object_dir: Path):
     """Test that validation fails when ObjectCSVManager.validate() raises ValueError."""
 
-    with patch.object(
+    with patch.object(  # noqa: SIM117
         ObjectCSVManager, "validate", side_effect=ValueError("Invalid data")
     ):
         with pytest.raises(ObjectDirectoryValidationError, match="Invalid data"):
@@ -348,9 +381,10 @@ def test_validate_csv_files_type_error_fallback(
     ):
         validate_csv_files(obj_dir)
 
+
 def test_extract_id_from_tei_success(tei_object_dir):
     """Test successful extraction of ID from TEI file."""
-    tei_path  = tei_object_dir / "tei.xml"
+    tei_path = tei_object_dir / "tei.xml"
     result = gamslib.objectdir._extract_id_from_tei(tei_path)  # pylint: disable=protected-access
     assert result == "o:hsa.letter.12137"
 
@@ -364,7 +398,7 @@ def test_extract_id_from_tei_success_from_str(tei_object_dir):
 
 def test_extract_id_from_tei_id_node_missing(tei_object_dir):
     """Test extraction when ID node is not found in TEI file."""
-    tei_file = tei_object_dir / "tei.xml" 
+    tei_file = tei_object_dir / "tei.xml"
     tree = ET.parse(tei_file)  # pylint: disable=c-extension-no-member
     # remove the idno element
     root = tree.getroot()
@@ -373,19 +407,21 @@ def test_extract_id_from_tei_id_node_missing(tei_object_dir):
         namespaces=defaultvalues.NAMESPACES,
     )
     root.find(
-        "tei:teiHeader/tei:fileDesc/tei:publicationStmt", namespaces=defaultvalues.NAMESPACES
+        "tei:teiHeader/tei:fileDesc/tei:publicationStmt",
+        namespaces=defaultvalues.NAMESPACES,
     ).remove(idno)
     tree.write(tei_file)
     result = gamslib.objectdir._extract_id_from_tei(tei_file)  # pylint: disable=protected-access
     assert result is None
 
+
 def test_extract_id_from_tei_empty_text(tei_object_dir):
     """Test extraction when ID node exists but has empty text."""
 
-    tei_file = tei_object_dir / "tei.xml" 
+    tei_file = tei_object_dir / "tei.xml"
     xml = tei_file.read_text(encoding="utf-8")
     xml = xml.replace("o:hsa.letter.12137", "")
-    tei_file.write_text(xml, encoding="utf-8")  
+    tei_file.write_text(xml, encoding="utf-8")
     result = gamslib.objectdir._extract_id_from_tei(tei_file)  # pylint: disable=protected-access
     assert result is None
 
@@ -409,10 +445,11 @@ def test_extract_id_from_lido_node_missing(lido_object_dir):
     lido_file = lido_object_dir / "lido.xml"
     # remove the LidoRecID node from XML
     root = ET.parse(lido_file).getroot()
-    id_node = root.find('lido:lidoRecID[@lido:type="PID"]',
+    id_node = root.find(
+        'lido:lidoRecID[@lido:type="PID"]',
         namespaces=defaultvalues.NAMESPACES,
     )
-    root.remove(id_node)    
+    root.remove(id_node)
     ET.ElementTree(root).write(lido_file)  # pylint: disable=c-extension-no-member
     result = gamslib.objectdir._extract_id_from_lido(lido_file)  # pylint: disable=protected-access
     assert result is None
@@ -423,20 +460,25 @@ def test_extract_id_from_lido_empty_text(lido_object_dir):
     lido_file = lido_object_dir / "lido.xml"
     xml = lido_file.read_text(encoding="utf-8")
     xml = xml.replace("o:ges.a-88", "")
-    lido_file.write_text(xml, encoding="utf-8") 
+    lido_file.write_text(xml, encoding="utf-8")
     result = gamslib.objectdir._extract_id_from_lido(lido_file)  # pylint: disable=protected-access
     assert result == None
 
 
 def test_check_if_object_dir_matches_object_id_no_main_resource(tei_object_dir):
     "If object dir does not define a main resource it should not raise."
-    gamslib.objectdir.check_if_object_dir_matches_object_id(tei_object_dir, main_resource=None)
+    gamslib.objectdir.check_if_object_dir_matches_object_id(
+        tei_object_dir, main_resource=None
+    )
 
 
 def test_check_if_object_dir_matches_object_id_tei_file_not_raises(tei_object_dir):
     """Test TEI file with matching object ID does not raise."""
-    main_resource = tei_object_dir / "tei.xml" 
-    gamslib.objectdir.check_if_object_dir_matches_object_id(tei_object_dir, main_resource)
+    main_resource = tei_object_dir / "tei.xml"
+    gamslib.objectdir.check_if_object_dir_matches_object_id(
+        tei_object_dir, main_resource
+    )
+
 
 def test_check_if_object_dir_non_matching_object_id_tei_file_raises(tei_object_dir):
     """Test TEI file with non-matching object ID does not raise."""
@@ -444,27 +486,36 @@ def test_check_if_object_dir_non_matching_object_id_tei_file_raises(tei_object_d
     xml = main_resource.read_text(encoding="utf-8")
     xml = xml.replace("o:hsa.letter.12137", "o:hsa.letter.12138")
     main_resource.write_text(xml, encoding="utf-8")
-    
+
     with pytest.raises(ValueError, match="does not match"):
-        gamslib.objectdir.check_if_object_dir_matches_object_id(tei_object_dir, main_resource)
+        gamslib.objectdir.check_if_object_dir_matches_object_id(
+            tei_object_dir, main_resource
+        )
 
 
 def test_check_if_object_dir_matches_object_id_lidofile_not_raises(lido_object_dir):
     """Test LIDO file with matching object ID does not raise."""
     main_resource = lido_object_dir / "lido.xml"
-    gamslib.objectdir.check_if_object_dir_matches_object_id(lido_object_dir, main_resource)
-                                                
-def test_check_if_object_dir_non_matching_object_id_lidofile_not_raises(lido_object_dir):
+    gamslib.objectdir.check_if_object_dir_matches_object_id(
+        lido_object_dir, main_resource
+    )
+
+
+def test_check_if_object_dir_non_matching_object_id_lidofile_not_raises(
+    lido_object_dir,
+):
     """Test TEI file with matching object ID does not raise."""
     main_resource = lido_object_dir / "lido.xml"
     xml = main_resource.read_text(encoding="utf-8")
     xml = xml.replace("o:ges.a-88", "o:ges.a-89")
-    main_resource.write_text(xml, encoding="utf-8") 
-    with pytest.raises(ValueError, match="does not match"): 
-        gamslib.objectdir.check_if_object_dir_matches_object_id(lido_object_dir, main_resource)
+    main_resource.write_text(xml, encoding="utf-8")
+    with pytest.raises(ValueError, match="does not match"):
+        gamslib.objectdir.check_if_object_dir_matches_object_id(
+            lido_object_dir, main_resource
+        )
+
 
 def test_non_tei_non_lido_file_does_not_check(monkeypatch):
-
     """Test that non-TEI/LIDO files are not checked."""
     object_dir = Path("/some/path/object789")
     main_resource = Path("/some/path/object789/main.txt")
