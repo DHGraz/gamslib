@@ -151,6 +151,40 @@ def check_if_object_dir_matches_object_id(
             )
 
 
+def validate_main_resource_id(object_dir: Path):
+    """Validate if the main resource file has the same ID as the object directory
+
+    Raise a ObjectDirectoryValidationError if the main resource is a TEI or LIDO file and
+    the ID in this file does not have the same ID as the object directory. 
+    
+    In all other cases, this function does not raise an error.
+
+    Args:
+        object_dir (Path): Path to the object directory.
+    Raises:
+        ObjectDirectoryValidationError: If the main resource file has the same ID as the object directory
+    """
+    csv_mgr = ObjectCSVManager(object_dir)
+    main_resource = csv_mgr.get_mainresource()
+    if main_resource is not None:
+        object_id = None
+        main_resource_path = object_dir / main_resource.dspath
+        main_format = formatdetect.detect_format(main_resource_path)
+        if main_format.subtype == formatinfo.SubType.TEI:
+            object_id = _extract_id_from_tei(main_resource)
+        elif main_format.subtype == formatinfo.SubType.LIDO:
+            object_id = _extract_id_from_lido(main_resource)
+        dir_id = object_dir.name.replace("%3A", ":")
+        if object_id is not None and dir_id != object_id:
+            raise ValueError(
+                f"Object directory name '{object_dir.name}' does not match "
+                f"the object ID '{object_id}' extracted from the main resource "
+                f"file '{main_resource_path.name}'."
+            )
+
+    # TODO: integrate this function with the check_if_object_dir_matches_object_id function.
+    #       This will affect some tests!
+
 def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
     """
     Create an ObjectCSVManager with readable error messages.
@@ -216,10 +250,10 @@ def validate_csv_files(object_path: Path) -> None:
             )
         # check if all datastream files exist
         for dsdata in csv_mgr.get_datastreamdata():
-            ds_file_path = object_path / dsdata.dspath
+            ds_file_path = object_path / dsdata.dsid
             if not ds_file_path.is_file():
                 raise ObjectDirectoryValidationError(
-                    f"Object directory '{object_path}': Datastream file '{dsdata.dspath}' "
+                    f"Object directory '{object_path}': Datastream file '{dsdata.dspath.split('/')[-1]}' "
                     f"referenced in datastreams.csv does not exist."
                 )
     except ValueError as e:
@@ -239,6 +273,8 @@ def validate_object_dir(object_path: Path) -> None:
     """
     validate_directory_structure(object_path)
     validate_csv_files(object_path)
+
+        
     # TODO: validate the DC.xml file? Do we require some fields?
 
     # TODO

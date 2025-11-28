@@ -280,9 +280,82 @@ def test_get_element_all_langs_with_linebreaks(datadir, tmp_path):
     )
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
+
+def test_validate_success(datadir):
+    """Test validate succeeds with valid DC.xml."""
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    # Should not raise any exception
+    dc.validate()
+
+
+def test_validate_missing_required_element(datadir):
+    """Test validate raises ValueError when required element is missing."""
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    del dc._data["identifier"]
+    with pytest.raises(ValueError, match="Required Dublin Core element 'identifier' is missing"):
+        dc.validate()
+
+
+def test_validate_missing_title(datadir):
+    """Test validate raises ValueError when title is missing."""
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    del dc._data["title"]
+    with pytest.raises(ValueError, match="Required Dublin Core element 'title' is missing"):
+        dc.validate()
+
+
+def test_validate_missing_creator(datadir):
+    """Test validate raises ValueError when creator is missing."""
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    del dc._data["creator"]
+    with pytest.raises(ValueError, match="Required Dublin Core element 'creator' is missing"):
+        dc.validate()
+
+
+def test_validate_missing_rights(datadir):
+    """Test validate raises ValueError when rights is missing."""
+    path = datadir / "DC.xml"
+    dc = DublinCore(path)
+    del dc._data["rights"]
+    with pytest.raises(ValueError, match="Required Dublin Core element 'rights' is missing"):
+        dc.validate()
+
+
+def test_validate_no_english_title(datadir, tmp_path):
+    """Test validate raises ValueError when no English title is present."""
+    path = datadir / "DC.xml"
+    xml = path.read_text(encoding="utf-8")
+    # Remove English title, keep only German
+    xml = xml.replace('<dc:title xml:lang="en">Person description 1</dc:title>', '')
+    new_path = tmp_path / "DC.xml"
+    new_path.write_text(xml, encoding="utf-8")
     dc = DublinCore(new_path)
-    
-    title_values = dc.get_element_all_langs("title")
-    assert "Person description 1" in title_values
+    with pytest.raises(ValueError, match="A <title xml:lang=\"en\"> element is required"):
+        dc.validate()
 
 
+def test_validate_unknown_element(datadir, tmp_path):
+    """Test validate raises ValueError when unknown element is present."""
+    path = datadir / "DC.xml"
+    xml = path.read_text(encoding="utf-8")
+    # Add an unknown element
+    xml = xml.replace("</dc:creator>", 
+                      '</dc:creator><dc:unknown>Unknown element</dc:unknown>')
+    new_path = tmp_path / "DC.xml"
+    new_path.write_text(xml, encoding="utf-8")
+    dc = DublinCore(new_path)
+    with pytest.raises(ValueError, match="Unknown Dublin Core element"):
+        dc.validate()
+
+
+def test_validate_malformed_xml(tmp_path):
+    """Test validate raises ValueError when XML is malformed."""
+    new_path = tmp_path / "DC.xml"
+    new_path.write_text("<dc:title>Missing closing tag", encoding="utf-8")
+    with pytest.raises(ValueError, match="Error parsing"):
+        dc = DublinCore(new_path)
+        dc.validate()        

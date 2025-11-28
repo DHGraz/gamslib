@@ -15,10 +15,11 @@ import logging
 from pathlib import Path
 import re
 from typing import Any
-from xml.etree import ElementTree as ET
+from lxml import etree as ET
 
 logger = logging.getLogger(__name__)
 
+# DC_ELEMENTS: List of supported Dublin Core elements.
 DC_ELEMENTS = [
     "contributor",
     "coverage",
@@ -36,8 +37,12 @@ DC_ELEMENTS = [
     "title",
     "type",
 ]
-# DC_ELEMENTS: List of supported Dublin Core elements.
 
+
+
+
+
+# DCMI_TYPES: List of DCMI type values.
 DCMI_TYPES = [
     "Collection",
     "Dataset",
@@ -52,7 +57,6 @@ DCMI_TYPES = [
     "StillImage",
     "Text",
 ]
-# DCMI_TYPES: List of DCMI type values.
 
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
@@ -65,8 +69,16 @@ NAMESPACES = {
     "oai_dc": "http://www.openarchives.org/OAI/2.0/oai_dc/",
 }
 
+# The following elements are required by GAMS we add the namespace to avoid confusion
+REQUIRED_GAMS_ELEMENTS = ["identifier", "title", "creator", "rights"]
+
+
 class DublinCore:
-    """Represents data from DC.xml and provides methods to access it."""
+    """Represents data from DC.xml.
+
+    Provides methods to access DC data with language support, and to validate the minimal
+    GAMS requirements for the DX.XML file.
+    """
 
     UNSPECIFIED_LANG = "unspecified"
 
@@ -86,21 +98,25 @@ class DublinCore:
         self._parse(path)
 
     def _parse(self, path: Path):
-        tree = ET.parse(path)
-        root = tree.getroot()
+        try:
+            tree = ET.parse(path)
+            root = tree.getroot()
 
-        for elem in DC_ELEMENTS:
-            for child in root.findall(f"dc:{elem}", namespaces=NAMESPACES):
-                lang = child.attrib.get(
-                    f"{{{NAMESPACES['xml']}}}lang", self.UNSPECIFIED_LANG
-                )
-                element = self._data.get(elem, {})
-                values = element.get(lang, [])
-                if child.text is not None:
-                    values.append(child.text)
-                element[lang] = values
-                self._data[elem] = element
-        # TODO: Add DC_TERMS and DCMI_TYPES?
+            for elem in DC_ELEMENTS:
+                for child in root.findall(f"dc:{elem}", namespaces=NAMESPACES):
+                    lang = child.attrib.get(
+                        f"{{{NAMESPACES['xml']}}}lang", self.UNSPECIFIED_LANG
+                    )
+                    element = self._data.get(elem, {})
+                    values = element.get(lang, [])
+                    if child.text is not None:
+                        values.append(child.text)
+                    element[lang] = values
+                    self._data[elem] = element
+            # TODO: Add DC_TERMS and DCMI_TYPES?
+        except ET.ParseError as e:  # pylint: disable=c-extension-no-member
+            logger.error(f"Error parsing XML file %s: %s", self.path, e)
+            raise ValueError(f"Error parsing {self.path}: {e}") from e
 
     @classmethod
     def remove_linebreaks(cls, text: str) -> str:
@@ -140,9 +156,9 @@ class DublinCore:
 
     def get_en_element_as_str(self, name: str, default="") -> str:
         """
-        Return all entries of a Dublin Core element in English as string. 
-        
-        Entries are separated by '; '. 
+        Return all entries of a Dublin Core element in English as string.
+
+        Entries are separated by '; '.
 
         Delimi
 
@@ -247,10 +263,11 @@ class DublinCore:
             str_value = "; ".join(values)
         return str_value
 
-
     def get_element_all_langs(self, name: str) -> list[str]:
         """
-        Return all values of a Dublin Core element for all languages (and also if lang attribute is missing).
+        Return all values of a Dublin Core element for all languages.
+         
+        This includes unspecified languages.
 
         Args:
             name (str): The name of the element without namespace (e.g. "title").
@@ -269,3 +286,43 @@ class DublinCore:
         for values in self._data.get(name, {}).values():
             result.extend([self.remove_linebreaks(value) for value in values])
         return result
+
+    def _check_for_unkown_elements(self):
+        """
+        Check if any unknown elements are present in the Dublin Core file.
+
+        Raises:
+            ValueError: If an unknown element is found.
+        """
+        dc_elements_with_ns = [f"{{{NAMESPACES['dc']}}}{element}" for element in DC_ELEMENTS]
+        root = ET.parse(self.path).getroot()  # pylint: disable=c-extension-no-member
+        for child in root:
+            if child.tag not in dc_elements_with_ns:
+                # replace the clark notation by the common ns prefix for better readability
+                short_ns_prefix = child.tag.replace(f'{{{NAMESPACES["dc"]}}}', "dc:")
+                logger.error(
+                    "Unknown Dublin Core element '%s' found in %s.",
+                    short_ns_prefix,
+                    self.path,
+                )
+                raise ValueError(
+                    f"Unknown Dublin Core element '{short_ns_prefix}' found in {self.path}"
+                )
+
+    def validate(self):
+        """
+        Validate the Dublin Core file.
+
+        Raises:
+            ValueError: If the Dublin Core file is invalid.
+        """
+        if self._data is None:
+            raise ValueError("{self.path}: No data found in DC.xml.")
+        self._check_for_unkown_elements()
+        for name in REQUIRED_GAMS_ELEMENTS:
+            if name not in self._data:
+                raise ValueError(f"{self.path}: Required Dublin Core element '{name}' is missing in DC.xml.")
+        if self.get_en_element('title') == []:
+            raise ValueError(f'{self.path}: A <title xml:lang="en"> element is required in DC.xml.')
+
+
