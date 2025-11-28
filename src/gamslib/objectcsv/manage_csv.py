@@ -23,8 +23,10 @@ def collect_csv_data(
 
     Args:
         object_root_dir (Path): Root directory containing all object folders.
-        object_csv_path (Path | None): Path to save combined object metadata CSV. Defaults to 'object.csv' in CWD.
-        datastream_csv_path (Path | None): Path to save combined datastream metadata CSV. Defaults to 'datastreams.csv' in CWD.
+        object_csv_path (Path | None): Path to save combined object metadata CSV. 
+        Defaults to 'object.csv' in CWD.
+        datastream_csv_path (Path | None): Path to save combined datastream metadata CSV. 
+        Defaults to 'datastreams.csv' in CWD.
 
     Returns:
         ObjectCollection: Collection containing all object and datastream metadata.
@@ -79,8 +81,10 @@ def split_from_csv(
 
     Args:
         object_root_dir (Path): Root directory containing all object folders.
-        object_csv_path (Path | None): Path to combined object metadata CSV. Defaults to 'object.csv' in CWD.
-        ds_csv_path (Path | None): Path to combined datastream metadata CSV. Defaults to 'datastreams.csv' in CWD.
+        object_csv_path (Path | None): Path to combined object metadata CSV. 
+        Defaults to 'object.csv' in CWD.
+        ds_csv_path (Path | None): Path to combined datastream metadata CSV. 
+        Defaults to 'datastreams.csv' in CWD.
 
     Returns:
         tuple[int, int]: Number of updated objects and number of updated datastreams.

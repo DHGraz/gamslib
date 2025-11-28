@@ -141,8 +141,9 @@ def _validate_object_id(object_id: str) -> None:
 
     Args:
         object_id (str): The object identifier to validate.
-        allow_uppercase (bool, optional): If True, allow uppercase letters in object identifier. Defaults to False.
-            Object identifiers should normally be lowercase only.
+        allow_uppercase (bool, optional): If True, allow uppercase letters in object 
+        identifier. Defaults to False.
+        Object identifiers should normally be lowercase only.
 
     Raises:
         ValueError: If the object identifier is invalid.
@@ -177,8 +178,8 @@ def validate_pid(pid: str) -> None:
      - The part after the dot must start with a letter or a number, followed by any
        number of ASCII letters, numbers, dots, and dashes.
      - For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
-       but we discourage the use of this prefix for new objects. Only lowercase letters are allowed as
-       type prefix.
+       but we discourage the use of this prefix for new objects. Only lowercase letters 
+       and numbers are allowed as type prefix.
 
     Invalid ids are for example:
 
@@ -191,8 +192,6 @@ def validate_pid(pid: str) -> None:
 
     Args:
         pid (str): The ID to validate.
-        allow_uppercase (bool, optional): If True, allow uppercase letters in pid. Defaults to False.
-            Object IDs (PIDs) should normally be lowercase only, but datastream id can be uppercase too.
 
     Raises:
         ValueError: If the ID is invalid. The error message will indicate the reason.
@@ -215,7 +214,7 @@ def validate_datastream_id(datastream_id: str) -> None:
     """Validate a given datastream ID.
 
     A valid datastream is must start with a letter or a number, followed by any
-    number of ASCII letters, numbers, dots, and dashes. 
+    number of ASCII letters, numbers, dots, and dashes.
 
     Args:
         datastream_id (str): The datastream ID to validate.
@@ -226,9 +225,7 @@ def validate_datastream_id(datastream_id: str) -> None:
     if not datastream_id:
         raise ValueError("Object identifier (after dot) is empty")
     if ".." in datastream_id:
-        raise ValueError(
-            "Datastream identifier must not contain consecutive dots"
-        )
+        raise ValueError("Datastream identifier must not contain consecutive dots")
     if "--" in datastream_id or "__" in datastream_id:
         raise ValueError(
             "Datastream identifier  must not contain consecutive underscores or dashes"
@@ -239,8 +236,6 @@ def validate_datastream_id(datastream_id: str) -> None:
             "Datastream identifier must start with a letter or number and "
             "contain only letters, numbers, dots or dashes"
         )
-
-
 
 
 def validate_bag(bag_dir: Path) -> None:
@@ -254,7 +249,8 @@ def validate_bag(bag_dir: Path) -> None:
         BagValidationError: If the bag directory does not exist or any validation check fails.
 
     Notes:
-        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, and bag-info.txt.
+        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, 
+          and bag-info.txt.
         - Raises an error immediately if any check fails.
     """
     if not bag_dir.is_dir():

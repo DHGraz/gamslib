@@ -13,6 +13,3 @@ of Bagit directories, including checks for required files, manifests, and SIP JS
 
 class BagValidationError(Exception):
     """Exception raised when a bag is invalid."""
-
-
-

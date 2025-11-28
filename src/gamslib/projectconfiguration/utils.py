@@ -22,7 +22,8 @@ def find_project_toml(start_dir: Path) -> Path:
         Path: The path to the first 'project.toml' file found.
 
     Raises:
-        FileNotFoundError: If no 'project.toml' file is found in the start_dir, its parents, or the current working directory.
+        FileNotFoundError: If no 'project.toml' file is found in the start_dir, its
+        parents, or the current working directory.
 
     The function checks each parent directory of start_dir for a 'project.toml' file.
     If none is found, it checks the current working directory as a fallback.
@@ -45,8 +46,9 @@ def create_gitignore(project_dir: Path) -> None:
     """
     Create a '.gitignore' file in the specified project directory.
 
-    If a '.gitignore' file already exists in the directory, a warning is issued and the file is not overwritten.
-    Otherwise, a template '.gitignore' is copied from the package resources to the project directory.
+    If a '.gitignore' file already exists in the directory, a warning is issued and the
+    file is not overwritten. Otherwise, a template '.gitignore' is copied from the
+    package resources to the project directory.
 
     Args:
         project_dir (Path): The target directory for the '.gitignore' file.
@@ -73,8 +75,10 @@ def create_project_toml(project_dir: Path) -> None:
     """
     Create a template 'project.toml' file in the specified project directory.
 
-    If a 'project.toml' file already exists in the directory, a warning is issued and the file is not overwritten.
-    Otherwise, a template file is copied from the package resources to the project directory.
+    If a 'project.toml' file already exists in the directory, a warning is issued
+    and the file is not overwritten.
+    Otherwise, a template file is copied from the package resources to the project
+    directory.
 
     Args:
         project_dir (Path): The target directory for the 'project.toml' file.
@@ -122,7 +126,8 @@ def read_path_from_dotenv(dotenv_file: Path, fieldname: str) -> Path | None:
     """
     Read and normalize a path value from a dotenv file.
 
-    This function searches for the specified field name in the dotenv file and returns its value as a Path object.
+    This function searches for the specified field name in the dotenv file and
+    returns its value as a Path object.
     Windows-style backslashes are converted to forward slashes for cross-platform compatibility.
     If the field is not found, returns None.
 
@@ -183,9 +188,10 @@ def configuration_needs_update(config_file: Path) -> bool:
     """
     Check if the given configuration file is missing required keys compared to the template.
 
-    This function compares the structure of the provided config file against the template 'project.toml'
-    included with the package. It returns True if any required keys from the template are missing in the
-    config file, and False if all required keys are present.
+    This function compares the structure of the provided config file against the
+    template 'project.toml' included with the package. It returns True if any required
+    keys from the template are missing in the config file, and False if all required
+    keys are present.
 
     Args:
         config_file (Path): Path to the configuration file to check.
@@ -231,7 +237,8 @@ def update_configuration(config_file: Path):
     Update the configuration file by adding missing entries from the template.
 
     Compares the provided config file to the template 'project.toml' included with the package.
-    Any keys present in the template but missing from the config file are added, preserving existing values and comments.
+    Any keys present in the template but missing from the config file are added, preserving 
+    existing values and comments.
     The function does not remove or modify existing entries—only additions are handled.
 
     A backup of the original config file is created before any changes are made.

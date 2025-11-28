@@ -54,14 +54,17 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
     The configuration is determined in the following order:
 
       1. If `config_file` is provided, use it.
-      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value as the path.
-      3. If a `.env` file exists in the current directory and contains a `project_toml` field, use that.
+      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value 
+         as the path.
+      3. If a `.env` file exists in the current directory and contains a `project_toml` 
+         field, use that.
 
     Raises:
         MissingConfigurationException: If no configuration file is found.
 
     Note:
-        Values from `project.toml` are overridden by those in `.env`, which are further overridden by environment variables.
+        Values from `project.toml` are overridden by those in `.env`, which are further 
+        overridden by environment variables.
         For example:
 
           - `project.toml` sets `metadata.publisher = "foo"` → used by default.

@@ -14,7 +14,6 @@ from gamslib.objectcsv import xlsx
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
-#from gamslib.objectcsv.utils import find_object_folders
 from gamslib.objectdir import find_object_folders
 
 ALL_OBJECTS_CSV = "all_objects.csv"
@@ -119,7 +118,8 @@ class ObjectCollection:
 
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
-            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 
+            'all_datastreams.csv'.
         """
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
         ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
@@ -157,7 +157,8 @@ class ObjectCollection:
 
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
-            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 
+            'all_datastreams.csv'.
 
         Raises:
             FileNotFoundError: If either CSV file does not exist.

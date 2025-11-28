@@ -9,6 +9,7 @@ import dataclasses
 
 # pylint: disable=too-many-instance-attributes,invalid-name
 
+
 @dataclass
 class ObjectData:
     """
@@ -62,7 +63,7 @@ class ObjectData:
         Some field are always replacd by the new value if the new value is non-empty
         ('title', 'project', 'creator', 'rights', 'publisher', 'source', 'objectType',
         'mainResource', 'funder').
-         
+
         Other fields are only updated if they are empty in the current instance and
         non-empty in the other instance.
 
@@ -91,7 +92,7 @@ class ObjectData:
         # for field in fields_to_replace:
         #     if getattr(other, field).strip():
         #         setattr(self, field, getattr(other, field))
-        for field in self.fieldnames():  
+        for field in self.fieldnames():
             new_value = getattr(other, field).strip()
             if field in fields_to_replace and new_value:
                 if new_value:

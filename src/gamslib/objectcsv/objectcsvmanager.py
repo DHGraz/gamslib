@@ -1,9 +1,9 @@
 """
 Manage CSV metadata for GAMS objects and their datastreams.
 
-This module provides the ObjectCSVManager class, which manages the metadata 
-of an object and its datastreams. It reads and writes the metadata to CSV files named 
-`object.csv` and `datastreams.csv` respectively. It also provides methods to validate, 
+This module provides the ObjectCSVManager class, which manages the metadata
+of an object and its datastreams. It reads and writes the metadata to CSV files named
+`object.csv` and `datastreams.csv` respectively. It also provides methods to validate,
 merge, and manipulate the object and datastream metadata.
 """
 
@@ -35,7 +35,7 @@ class ObjectCSVManager:
         Args:
             obj_dir (Path): Path to the object directory.
             ignore_existing_csv_files (bool): If True, ignore existing CSV files when writing.
-        
+
         Raises:
             FileNotFoundError: If the object directory does not exist.
         """
@@ -76,7 +76,6 @@ class ObjectCSVManager:
         else:
             self._object_data.merge(object_data)
 
-    
     def get_object(self) -> ObjectData:
         """
         Return the object metadata.
@@ -152,7 +151,7 @@ class ObjectCSVManager:
         langcounter = Counter(languages)
         return [entry[0] for entry in langcounter.most_common()]
 
-    def get_mainresource(self)->DSData|None:
+    def get_mainresource(self) -> DSData | None:
         """
         Return the main resource (datastream) of the object if set or None.
 
@@ -162,6 +161,7 @@ class ObjectCSVManager:
         for ds in self._datastream_data:
             if ds.dsid == self._object_data.mainResource:
                 return ds
+        return None
 
     def is_empty(self) -> bool:
         """
@@ -205,7 +205,9 @@ class ObjectCSVManager:
             ValueError: If metadata is missing or invalid.
         """
         if self.is_empty():
-            raise ValueError("Required files object.csv and dadatastreams.csv are missing or empty.")
+            raise ValueError(
+                "Required files object.csv and dadatastreams.csv are missing or empty."
+            )
         self._object_data.validate()
         for dsdata in self._datastream_data:
             dsdata.validate()

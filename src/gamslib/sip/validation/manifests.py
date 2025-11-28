@@ -76,8 +76,9 @@ def validate_manifest_sha512(bag_dir: Path) -> None:
         bag_dir (Path): Path to the Bagit directory.
 
     Raises:
-        BagValidationError: If the manifest-sha512.txt file is missing, empty, contains invalid lines,
-            has checksum mismatches, or does not list all payload files.
+        BagValidationError: If the manifest-sha512.txt file is missing,
+        empty, contains invalid lines, has checksum mismatches, or does not
+        list all payload files.
 
     Notes:
         - Checks that all files in the data directory are listed in the manifest.
@@ -116,4 +117,3 @@ def validate_manifest_sha512(bag_dir: Path) -> None:
                 raise BagValidationError(
                     f"File '{file_path}' is not listed in manifest-sha512.txt"
                 )
-

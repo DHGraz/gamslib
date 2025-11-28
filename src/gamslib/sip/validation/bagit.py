@@ -64,7 +64,8 @@ def validate_bagit_txt(bag_dir: Path) -> None:
         BagValidationError: If the bagit.txt file is missing or invalid.
 
     Notes:
-        - Checks for exactly two lines: 'BagIt-Version: 1.0' and 'Tag-File-Character-Encoding: UTF-8'.
+        - Checks for exactly two lines: 'BagIt-Version: 1.0' and 
+          'Tag-File-Character-Encoding: UTF-8'.
         - Raises an error if the format or values are incorrect.
     """
     bagit_txt_file = bag_dir / "bagit.txt"

@@ -21,7 +21,6 @@ Usage:
 import hashlib
 import json
 import logging
-import re
 from functools import lru_cache
 from pathlib import Path
 import warnings
@@ -30,9 +29,8 @@ import zipfile
 import requests
 
 
-
 from . import BagValidationError
-from .validation import validate_pid
+# from .validation import validate_pid
 
 logger = logging.getLogger(__name__)
 
@@ -40,44 +38,6 @@ GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json"
 
 # This is the path were the schema is stored in the package
 SCHEMA_PATH = Path(__file__).parent / "resources" / "sip-schema-d1.json"
-
-
-# def extract_object_id_from_path(path: Path | str) -> str:
-#     """
-#     Extract the object ID (PID) from a path (pointing to the object directory).
-
-#     Args:
-#         path (Path | str): Path or filename of the object.
-
-#     Returns:
-#         str: The extracted ID.
-#     """
-#     if isinstance(path, str):
-#         path = Path(path)
-#     pid = path.name
-
-#     if remove_extension:
-#         # not everything after the last dot is an extension :-(
-#         parts = pid.split(".")
-#         if re.match(r"^[a-zA-Z]+\w?$", parts[-1]):
-#             pid = ".".join(parts[:-1])
-#             logger.debug("Removed extension for ID: %s", parts[0])
-#         else:
-#             logger.warning(
-#                 "'%s' does not look like an extension. Keeping it in PID.", pid[-1]
-#             )
-#     logger.debug(
-#         "Extracted PID: %s from %s (remove_extension=%s)",
-#         pid,
-#         path,
-#         remove_extension,
-#     )
-#     # TODO: is this the right place to validate the ID?
-#     try:
-#         validate_pid(pid)
-#         return pid
-#     except ValueError as exp:
-#         raise ValueError(f"Invalid PID: '{pid}: {exp}'") from exp
 
 
 def md5hash(file: Path) -> str:
@@ -237,5 +197,3 @@ def is_bag(bag_path: Path) -> bool:
         )
         looks_like_a_bag = False
     return looks_like_a_bag
-
-

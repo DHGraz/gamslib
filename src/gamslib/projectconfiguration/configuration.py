@@ -8,7 +8,8 @@ Features:
 
   - Strongly-typed configuration models using Pydantic.
   - Automatic loading and validation of configuration files.
-  - Layered override system: `.env` values override `project.toml`, environment variables override both.
+  - Layered override system: `.env` values override `project.toml`, environment
+    variables override both.
   - Helpful error messages for validation issues.
   - Support for updating configuration values at runtime.
 
@@ -45,7 +46,7 @@ class Metadata(BaseModel, validate_assignment=True):
     creator: Annotated[str, StringConstraints(min_length=3)]
     publisher: Annotated[str, StringConstraints(min_length=3)]
     rights: str = ""
-    funder:str = ""
+    funder: str = ""
 
 
 class General(BaseModel, validate_assignment=True):
@@ -77,7 +78,8 @@ class Configuration(BaseModel):
 
       1. Values from `project.toml`.
       2. Values from `.env` (fields in the format `metadata.field` or `general.field`).
-      3. Values from environment variables prefixed with `GAMSCFG_` (e.g., `GAMSCFG_METADATA_PUBLISHER`).
+      3. Values from environment variables prefixed with `GAMSCFG_`
+         (e.g., `GAMSCFG_METADATA_PUBLISHER`).
 
     Example usage:
 
@@ -87,6 +89,7 @@ class Configuration(BaseModel):
         print(config.general.loglevel)
     ```
     """
+
     toml_file: Path
     metadata: Metadata
     general: General
@@ -124,8 +127,10 @@ class Configuration(BaseModel):
         """
         Load configuration from a TOML file and return a Configuration object.
 
-        Reads the specified TOML file, validates its structure, and constructs a Configuration instance.
-        Automatically sets the `toml_file` attribute and applies overrides from `.env` and environment variables.
+        Reads the specified TOML file, validates its structure, and constructs a
+        Configuration instance.
+        Automatically sets the `toml_file` attribute and applies overrides from `.env`
+        and environment variables.
 
         Args:
             toml_file (Path): Path to the TOML configuration file.

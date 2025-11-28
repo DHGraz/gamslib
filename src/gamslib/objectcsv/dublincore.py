@@ -110,7 +110,6 @@ class DublinCore:
                         values.append(child.text)
                     element[lang] = values
                     self._data[elem] = element
-            # TODO: Add DC_TERMS and DCMI_TYPES?
         except ET.ParseError as e:  # pylint: disable=c-extension-no-member
             logger.error("Error parsing XML file %s: %s", self.path, e)
             raise ValueError(f"Error parsing {self.path}: {e}") from e

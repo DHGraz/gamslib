@@ -15,7 +15,7 @@ from pathlib import Path
 from gamslib import formatdetect
 from gamslib.formatdetect.formatinfo import FormatInfo
 
-#from .utils import find_object_folders
+# from .utils import find_object_folders
 from gamslib.objectdir import find_object_folders
 from gamslib.projectconfiguration import Configuration
 
@@ -143,7 +143,7 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
     return pid
 
 
-def detect_languages(ds_file: Path, delimiter: str = " ") -> str:
+def detect_languages(ds_file: Path, delimiter: str = " ") -> str:  # pylint: disable=unused-argument
     """
     Detect the language(s) of a file.
 
@@ -357,10 +357,17 @@ def update_csv(
         )
     dc = DublinCore(object_directory / "DC.xml")
 
-    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc, use_subjects_as_tags=use_subjects_as_tags))
+    objectcsv.merge_object(
+        collect_object_data(
+            objectcsv.object_id,
+            configuration,
+            dc,
+            use_subjects_as_tags=use_subjects_as_tags,
+        )
+    )
     for ds_file in object_directory.glob("*"):
         if is_datastream_file(ds_file, configuration):
-            #dsdata = collect_datastream_data(ds_file, configuration, dc)
+            # dsdata = collect_datastream_data(ds_file, configuration, dc)
             objectcsv.merge_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )
