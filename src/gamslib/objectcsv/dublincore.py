@@ -39,9 +39,6 @@ DC_ELEMENTS = [
 ]
 
 
-
-
-
 # DCMI_TYPES: List of DCMI type values.
 DCMI_TYPES = [
     "Collection",
@@ -266,7 +263,7 @@ class DublinCore:
     def get_element_all_langs(self, name: str) -> list[str]:
         """
         Return all values of a Dublin Core element for all languages.
-         
+
         This includes unspecified languages.
 
         Args:
@@ -294,12 +291,14 @@ class DublinCore:
         Raises:
             ValueError: If an unknown element is found.
         """
-        dc_elements_with_ns = [f"{{{NAMESPACES['dc']}}}{element}" for element in DC_ELEMENTS]
+        dc_elements_with_ns = [
+            f"{{{NAMESPACES['dc']}}}{element}" for element in DC_ELEMENTS
+        ]
         root = ET.parse(self.path).getroot()  # pylint: disable=c-extension-no-member
         for child in root:
             if child.tag not in dc_elements_with_ns:
                 # replace the clark notation by the common ns prefix for better readability
-                short_ns_prefix = child.tag.replace(f'{{{NAMESPACES["dc"]}}}', "dc:")
+                short_ns_prefix = child.tag.replace(f"{{{NAMESPACES['dc']}}}", "dc:")
                 logger.error(
                     "Unknown Dublin Core element '%s' found in %s.",
                     short_ns_prefix,
@@ -316,13 +315,17 @@ class DublinCore:
         Raises:
             ValueError: If the Dublin Core file is invalid.
         """
-        if self._data is None:
-            raise ValueError("{self.path}: No data found in DC.xml.")
         self._check_for_unkown_elements()
         for name in REQUIRED_GAMS_ELEMENTS:
             if name not in self._data:
-                raise ValueError(f"{self.path}: Required Dublin Core element '{name}' is missing in DC.xml.")
-        if self.get_en_element('title') == []:
-            raise ValueError(f'{self.path}: A <title xml:lang="en"> element is required in DC.xml.')
-
-
+                raise ValueError(
+                    f"{self.path}: Required Dublin Core element '{name}' is missing in DC.xml."
+                )
+            if not self.get_element_all_langs(name):
+                raise ValueError(
+                    f"{self.path}: Required Dublin Core element '{name}' has no value in DC.xml."
+                )
+        if self.get_en_element("title") == []:
+            raise ValueError(
+                f'{self.path}: A <title xml:lang="en"> element is required in DC.xml.'
+            )
