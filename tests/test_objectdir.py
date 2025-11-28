@@ -35,7 +35,7 @@ def create_test_object_dir(
     ----------
     object_path : Path
         Object directory path relative to tmp_path
-    datastreams : list[tuple]
+    datastreams : list[tuple[str, str, bytes]]
         List of tuples containing the datastream file name, content type, and content
     main_resource : str
         The filename of the main resource of the object
@@ -71,69 +71,101 @@ def create_test_object_dir(
             else:
                 ds_dict[field] = f"{field}_{i}"
             ds_path = object_dir / ds_file_name
-            ds_path.write_text(content, encoding="utf-8")
+            ds_path.write_bytes(content)
+            #ds_path.write_text(content, encoding="utf-8")
         mgr.add_datastream(gamslib.objectcsv.dsdata.DSData(**ds_dict))
     mgr.save()
     return object_dir
 
+@pytest.fixture(name="tei_content")
+def tei_content_fixture(request: pytest.FixtureRequest) -> bytes:
+    """Return full and valid TEI file as bytestring."""
+    tei_path = (
+        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_tei.xml"
+    )
+    return tei_path.read_text(encoding="utf-8").encode("utf-8")
+
+
+@pytest.fixture(name="lido_content")
+def lido_content_fixture(request: pytest.FixtureRequest) -> bytes:
+    """Return full and valid LDIO file as bytestring."""
+    lido_path = (
+        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_lido.xml"
+    )
+    return lido_path.read_text(encoding="utf-8").encode("utf-8")
+
+@pytest.fixture(name="pdf_content")
+def pdf_content_fixture() -> bytes:
+    """Return dummy PDF content as bytes."""
+    return "%PDF-1.4\n%âãÏÓ\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n".encode("utf-8")
+
+@pytest.fixture(name="png_content")
+def png_content_fixture() -> bytes:
+    """Return dummy PNG content as bytes."""
+    return (
+        "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
+        "\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\nIDATx\xdac\xf8\x0f"
+        "\x00\x01\x01\x01\x00\x18\xdd\x03\xe2\x00\x00\x00\x00IEND\xaeB`\x82"
+    ).encode("latin1")
+
+@pytest.fixture(name="dc_content")
+def dc_content_fixture() -> bytes:
+    """Return dummy DC XML content as bytes."""
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" '
+        'xmlns:dc="http://purl.org/dc/elements/1.1/" '
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        'xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ '
+        'http://www.openarchives.org/OAI/2.0/oai_dc.xsd">\n'
+        '  <dc:title>Test Object</dc:title>\n'
+        '  <dc:creator>Test Creator</dc:creator>\n'
+        '  <dc:subject>Test Subject</dc:subject>\n'
+        '  <dc:description>This is a test description.</dc:description>\n'
+        '</oai_dc:dc>\n'
+    ).encode("utf-8")
 
 @pytest.fixture(name="object_dir")
-def valid_object_dir_fixture(tmp_path: Path) -> Path:
+def valid_object_dir_fixture(tmp_path: Path, pdf_content, png_content, dc_content) -> Path:
     """Create a valid object directory for testing."""
     dir_name = "valid_object"
     datastreams = [
-        ("foo.pdf", "application/pdf", ""),
-        ("DC.xml", "application/xml", ""),
-        ("baz.png", "image/png", ""),
+        ("foo.pdf", "application/pdf", pdf_content),
+        ("DC.xml", "application/xml", dc_content),
+        ("baz.png", "image/png", png_content),
     ]
     yield create_test_object_dir(tmp_path, dir_name, datastreams)
 
 
-@pytest.fixture(name="tei_content")
-def tei_content_fixture(request: pytest.FixtureRequest) -> str:
-    """Return full and valid TEI file as string."""
-    tei_path = (
-        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_tei.xml"
-    )
-    return tei_path.read_text(encoding="utf-8")
-
-
-@pytest.fixture(name="lido_content")
-def lido_content_fixture(request: pytest.FixtureRequest) -> str:
-    """Return full and valid LDIO file as string."""
-    lido_path = (
-        Path(request.fspath.dirname) / "objectcsv" / "data" / "obj1" / "xml_lido.xml"
-    )
-    return lido_path.read_text(encoding="utf-8")
 
 
 @pytest.fixture(name="tei_object_dir")
-def tei_object_dir_fixture(tmp_path: Path, tei_content: str) -> Path:
+def tei_object_dir_fixture(tmp_path: Path, tei_content: bytes, dc_content: bytes, png_content: bytes) -> Path:
     """Create a minimal TEI Object dir and return path to it."""
 
     dir_name = "o%3Ahsa.letter.12137"  # "o:hsa.letter.12137"
     datastreams = [
-        ("DC.xml", "application/xml", ""),
+        ("DC.xml", "application/xml", dc_content),
         ("tei.xml", "application/xml", tei_content),
-        ("baz.png", "image/png", ""),
+        ("baz.png", "image/png", png_content),
     ]
-    yield create_test_object_dir(tmp_path, dir_name, datastreams)
+    yield create_test_object_dir(tmp_path, dir_name, datastreams, 'tei.xml')
 
 
 @pytest.fixture(name="lido_object_dir")
-def lido_object_dir_fixture(tmp_path: Path, lido_content: str) -> Path:
+def lido_object_dir_fixture(tmp_path: Path, lido_content: str, dc_content: bytes, png_content: bytes) -> Path:
     """Create a minimal TEI Object dir and return path to it."""
     dir_name = "o%3Ages.a-88"  # "o:ges.a-88"
     datastreams = [
-        ("DC.xml", "application/xml", ""),
+        ("DC.xml", "application/xml", dc_content),
         ("lido.xml", "application/xml", lido_content),
-        ("baz.png", "image/png", ""),
+        ("baz.png", "image/png", png_content),
     ]
-    yield create_test_object_dir(tmp_path, dir_name, datastreams)
+    yield create_test_object_dir(tmp_path, dir_name, datastreams, 'lido.xml')
 
 
 # ------------- basic functionality tests ---------
-def test_find_object_folders(tmp_path: Path):
+def test_find_object_folders(tmp_path: Path, dc_content: bytes):
     """Test if the find_object_folders function returns all folder containing a DC.xml."""
     object_folder_names = [
         "object1",
@@ -146,7 +178,7 @@ def test_find_object_folders(tmp_path: Path):
     for folder_name in object_folder_names:
         object_folders.append(
             create_test_object_dir(
-                tmp_path, folder_name, [["DC.xml", "application/xml", ""]]
+                tmp_path, folder_name, [["DC.xml", "application/xml", dc_content]]
             )
         )
 
@@ -465,62 +497,53 @@ def test_extract_id_from_lido_empty_text(lido_object_dir):
     assert result == None
 
 
-def test_check_if_object_dir_matches_object_id_no_main_resource(tei_object_dir):
-    "If object dir does not define a main resource it should not raise."
-    gamslib.objectdir.check_if_object_dir_matches_object_id(
-        tei_object_dir, main_resource=None
-    )
+def test_validate_main_resource_id_tei_file_no_raises(tei_object_dir):
+    """Mke sure TEI file with matching object ID does not raise."""
+    gamslib.objectdir.validate_main_resource_id(tei_object_dir)
 
-
-def test_check_if_object_dir_matches_object_id_tei_file_not_raises(tei_object_dir):
-    """Test TEI file with matching object ID does not raise."""
-    main_resource = tei_object_dir / "tei.xml"
-    gamslib.objectdir.check_if_object_dir_matches_object_id(
-        tei_object_dir, main_resource
-    )
-
-
-def test_check_if_object_dir_non_matching_object_id_tei_file_raises(tei_object_dir):
-    """Test TEI file with non-matching object ID does not raise."""
+#def test_check_if_object_dir_non_matching_object_id_tei_file_raises(tei_object_dir):
+def test_validate_main_resource_id_tei_file_raises(tei_object_dir):
+    """Test TEI file with non-matching object ID raises."""
+    # change id in TEI file
     main_resource = tei_object_dir / "tei.xml"
     xml = main_resource.read_text(encoding="utf-8")
     xml = xml.replace("o:hsa.letter.12137", "o:hsa.letter.12138")
     main_resource.write_text(xml, encoding="utf-8")
 
     with pytest.raises(ValueError, match="does not match"):
-        gamslib.objectdir.check_if_object_dir_matches_object_id(
-            tei_object_dir, main_resource
-        )
+        gamslib.objectdir.validate_main_resource_id(tei_object_dir)
 
 
-def test_check_if_object_dir_matches_object_id_lidofile_not_raises(lido_object_dir):
+def test_validate_main_resource_id_lido_file_no_raises(lido_object_dir):
     """Test LIDO file with matching object ID does not raise."""
-    main_resource = lido_object_dir / "lido.xml"
-    gamslib.objectdir.check_if_object_dir_matches_object_id(
-        lido_object_dir, main_resource
-    )
+    # if ids match should not raise
+    gamslib.objectdir.validate_main_resource_id(lido_object_dir)
+   
 
-
-def test_check_if_object_dir_non_matching_object_id_lidofile_not_raises(
-    lido_object_dir,
-):
-    """Test TEI file with matching object ID does not raise."""
+def test_validate_main_resource_id_lidofile_raises(lido_object_dir):
+    """Asure LIDO file with non matching object ID raises."""
     main_resource = lido_object_dir / "lido.xml"
     xml = main_resource.read_text(encoding="utf-8")
     xml = xml.replace("o:ges.a-88", "o:ges.a-89")
     main_resource.write_text(xml, encoding="utf-8")
+
     with pytest.raises(ValueError, match="does not match"):
-        gamslib.objectdir.check_if_object_dir_matches_object_id(
-            lido_object_dir, main_resource
-        )
+        gamslib.objectdir.validate_main_resource_id(lido_object_dir)
 
 
-def test_non_tei_non_lido_file_does_not_check(monkeypatch):
-    """Test that non-TEI/LIDO files are not checked."""
-    object_dir = Path("/some/path/object789")
-    main_resource = Path("/some/path/object789/main.txt")
+def test_validate_main_resource_id_non_tei_non_lido_file_does_not_check(object_dir, monkeypatch):
+    """Make sure that non-TEI/LIDO files are not checked."""
+    
+    object_csv = object_dir / "object.csv"
+    lines = object_csv.read_text().splitlines()
 
-    mock_format = MagicMock()
-    mock_format.subtype = formatinfo.SubType.SVG
-    monkeypatch.setattr("gamslib.formatdetect.detect_format", lambda x: mock_format)
-    gamslib.objectdir.check_if_object_dir_matches_object_id(object_dir, main_resource)
+    # change main resource to foo.pdf
+    header = lines[0].split(",")
+    main_res_index = header.index("mainResource")
+    line1 = lines[1].split(",")
+    line1[main_res_index] = "foo.pdf"
+    lines = [",".join(header)]
+    lines.append(",".join(line1))
+    object_csv.write_text("\n".join(lines))
+    # should not raise
+    gamslib.objectdir.validate_main_resource_id(object_dir)

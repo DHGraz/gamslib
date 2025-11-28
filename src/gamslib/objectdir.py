@@ -77,7 +77,7 @@ def validate_directory_structure(object_path: Path) -> None:
         )
 
 
-def _extract_id_from_tei(tei_file: Path | str) -> str|None:
+def _extract_id_from_tei(tei_file: Path | str) -> str | None:
     """
     Extract the identifier from a TEI file.
 
@@ -97,7 +97,7 @@ def _extract_id_from_tei(tei_file: Path | str) -> str|None:
     return id_node.text if id_node is not None else None
 
 
-def _extract_id_from_lido(lido_file: Path | str) -> str|None:
+def _extract_id_from_lido(lido_file: Path | str) -> str | None:
     """
     Extract the identifier from a LIDO file.
 
@@ -110,53 +110,18 @@ def _extract_id_from_lido(lido_file: Path | str) -> str|None:
     # This is very specific to GAMS(3) LIDO but as we only use this to compare IDs,
     # getting None is fine if there is no PID
     id_node = lido.find(
-       'lido:lidoRecID[@lido:type="PID"]', 
+        'lido:lidoRecID[@lido:type="PID"]',
         namespaces=NAMESPACES,
     )
     return id_node.text if id_node is not None else None
-
-
-def check_if_object_dir_matches_object_id(
-    object_dir: Path, main_resource: Path | None = None
-) -> None:
-    """
-    Check if the object directory name matches the given object identifier.
-
-    Currently this only checks TEI and LIDO files if they are set as main resource.
-
-    Raises:
-        ValueError: If the object directory name does not match the object identifier.
-
-    Args:
-        object_dir (Path): Path to the object directory.
-        object_id (str): Object identifier to compare against.
-
-    Returns:
-        None
-    """
-    # If we do not have a main resource, there is nothing to check
-    object_id = None
-    if main_resource is not None:
-        main_format = formatdetect.detect_format(main_resource)
-        if main_format.subtype == formatinfo.SubType.TEI:
-            object_id = _extract_id_from_tei(main_resource)
-        elif main_format.subtype == formatinfo.SubType.LIDO:
-            object_id = _extract_id_from_lido(main_resource)
-        dir_id = object_dir.name.replace("%3A", ":")
-        if object_id is not None and dir_id != object_id:
-            raise ValueError(
-                f"Object directory name '{object_dir.name}' does not match "
-                f"the object ID '{object_id}' extracted from the main resource "
-                f"file '{main_resource.name}'."
-            )
 
 
 def validate_main_resource_id(object_dir: Path):
     """Validate if the main resource file has the same ID as the object directory
 
     Raise a ObjectDirectoryValidationError if the main resource is a TEI or LIDO file and
-    the ID in this file does not have the same ID as the object directory. 
-    
+    the ID in this file does not have the same ID as the object directory.
+
     In all other cases, this function does not raise an error.
 
     Args:
@@ -168,12 +133,12 @@ def validate_main_resource_id(object_dir: Path):
     main_resource = csv_mgr.get_mainresource()
     if main_resource is not None:
         object_id = None
-        main_resource_path = object_dir / main_resource.dspath
+        main_resource_path = object_dir / Path(main_resource.dspath).name
         main_format = formatdetect.detect_format(main_resource_path)
         if main_format.subtype == formatinfo.SubType.TEI:
-            object_id = _extract_id_from_tei(main_resource)
+            object_id = _extract_id_from_tei(main_resource_path)
         elif main_format.subtype == formatinfo.SubType.LIDO:
-            object_id = _extract_id_from_lido(main_resource)
+            object_id = _extract_id_from_lido(main_resource_path)
         dir_id = object_dir.name.replace("%3A", ":")
         if object_id is not None and dir_id != object_id:
             raise ValueError(
@@ -182,8 +147,6 @@ def validate_main_resource_id(object_dir: Path):
                 f"file '{main_resource_path.name}'."
             )
 
-    # TODO: integrate this function with the check_if_object_dir_matches_object_id function.
-    #       This will affect some tests!
 
 def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
     """
@@ -274,7 +237,6 @@ def validate_object_dir(object_path: Path) -> None:
     validate_directory_structure(object_path)
     validate_csv_files(object_path)
 
-        
     # TODO: validate the DC.xml file? Do we require some fields?
 
     # TODO
