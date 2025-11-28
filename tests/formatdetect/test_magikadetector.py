@@ -1,10 +1,11 @@
+"""Tests for the magika detector."""
 import shutil
-import pytest
 from pathlib import Path
 
-from gamslib.formatdetect.magikadetector import MagikaDetector
-
+import pytest
 from conftest import get_testfiles
+
+from gamslib.formatdetect.magikadetector import MagikaDetector
 
 
 @pytest.fixture(name="detector")

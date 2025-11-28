@@ -227,14 +227,14 @@ def validate_datastream_id(datastream_id: str) -> None:
         raise ValueError("Object identifier (after dot) is empty")
     if ".." in datastream_id:
         raise ValueError(
-            "Datastream identifier (after dot) must not contain consecutive dots"
+            "Datastream identifier must not contain consecutive dots"
         )
-    if "--" in datastream_id:
+    if "--" in datastream_id or "__" in datastream_id:
         raise ValueError(
-            "Datastream identifier (after dot) must not contain consecutive dashes"
+            "Datastream identifier  must not contain consecutive underscores or dashes"
         )
 
-    if not re.match(r"^[a-z0-9][a-z0-9.-]*$", datastream_id, re.IGNORECASE):
+    if not re.match(r"^[a-z0-9][a-z0-9._\-]*$", datastream_id, re.IGNORECASE):
         raise ValueError(
             "Datastream identifier must start with a letter or number and "
             "contain only letters, numbers, dots or dashes"

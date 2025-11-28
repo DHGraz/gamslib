@@ -309,6 +309,8 @@ def test_validate_pid_percent_encoded_colon():
         "abc.def",
         "abc-def",
         "a.b.c",
+        "TEI_SOURCE",
+        "TEI_SOURCE.1",
     ],
 )
 def test_validate_datastream_id_valid(datastream_id):
@@ -323,8 +325,8 @@ def test_validate_datastream_id_valid(datastream_id):
         ("", "empty"),  # empty string
         ("..abc", "consecutive dots"),  # starts with consecutive dots
         ("abc..def", "consecutive dots"),  # consecutive dots
-        ("abc__def", "letters, numbers"),  # consecutive underscores
-        ("abc--def", "consecutive dashes"),  # consecutive dashes
+        ("abc__def", "consecutive underscores or dashes"),  # consecutive underscores
+        ("abc--def", "consecutive underscores or dashes"),  # consecutive dashes
         (".abc", "contain only"),  # starts with dot
         ("_abc", "contain only"),  # starts with underscore
         ("-abc", "contain only"),  # starts with dash
