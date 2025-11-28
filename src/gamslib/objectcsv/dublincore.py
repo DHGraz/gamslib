@@ -96,7 +96,7 @@ class DublinCore:
 
     def _parse(self, path: Path):
         try:
-            tree = ET.parse(path)
+            tree = ET.parse(path)  # pylint: disable=c-extension-no-member
             root = tree.getroot()
 
             for elem in DC_ELEMENTS:
@@ -112,7 +112,7 @@ class DublinCore:
                     self._data[elem] = element
             # TODO: Add DC_TERMS and DCMI_TYPES?
         except ET.ParseError as e:  # pylint: disable=c-extension-no-member
-            logger.error(f"Error parsing XML file %s: %s", self.path, e)
+            logger.error("Error parsing XML file %s: %s", self.path, e)
             raise ValueError(f"Error parsing {self.path}: {e}") from e
 
     @classmethod
@@ -164,7 +164,8 @@ class DublinCore:
             default (str): Default value if element is missing.
 
         Returns:
-            str: The joined value(s) of the element as a string. Multiple values are separated by ';'.
+            str: The joined value(s) of the element as a string. Multiple values 
+            are separated by ';'.
 
         Raises:
             ValueError: If the element name is not a valid Dublin Core element.
@@ -250,7 +251,8 @@ class DublinCore:
             default (str): The default value to return if no value is found.
 
         Returns:
-            str: The value(s) as a single string. For 'rights', formats as "name (url)" if two values are present; otherwise, values are joined with ';'.
+            str: The value(s) as a single string. For 'rights', formats as "name (url)" 
+            if two values are present; otherwise, values are joined with ';'.
         """
         values = self.get_element(name, preferred_lang, default)
         if name == "rights":
@@ -270,7 +272,8 @@ class DublinCore:
             name (str): The name of the element without namespace (e.g. "title").
 
         Returns:
-            list[str]: A list of all values for the element in all available languages (including unspecified).
+            list[str]: A list of all values for the element in all available 
+            languages (including unspecified).
             If the element is not found, an empty list is returned.
 
         Raises:

@@ -1,3 +1,5 @@
+"""Tests for the ObjectCollection class."""
+
 import copy
 import csv
 from dataclasses import asdict
@@ -47,8 +49,8 @@ def populated_objcollection_fixture(objdata, dsdata):
     return objcollection
 
 
-@pytest.fixture
-def populated_dir(tmp_path, populated_objcollection):
+@pytest.fixture(name="populated_dir")
+def populated_dir_fixture(tmp_path, populated_objcollection):
     """Fixture for a populated directory with object and datastream csv files.
 
 
@@ -219,8 +221,8 @@ def test_distribute_to_objects_updates_files(tmp_path, populated_objcollection):
     updated_objects, updated_datastreams = (
         populated_objcollection.distribute_to_objects(tmp_path)
     )
-    assert updated_objects == 2
-    assert updated_datastreams == 3
+    assert updated_objects == 2  # noqa: PLR2004
+    assert updated_datastreams == 3  # noqa: PLR2004
 
     # Check object.csv for obj1
     with (obj1_dir / "object.csv").open("r", encoding="utf-8") as f:
@@ -305,7 +307,9 @@ def test_load_from_csv_clears_existing_data(populated_objcollection, tmp_path):
     # Save current data to CSV
     populated_objcollection.save_to_csv(obj_csv, ds_csv)
     # Add extra data to collection
-    populated_objcollection.objects["extra"] = ObjectData(**{k: "" for k in ObjectData.fieldnames()})
+    populated_objcollection.objects["extra"] = ObjectData(
+        **{k: "" for k in ObjectData.fieldnames()}
+    )
     populated_objcollection.datastreams["extra"] = []
     assert "extra" in populated_objcollection.objects
     # Load from CSV, should clear "extra"
@@ -314,7 +318,9 @@ def test_load_from_csv_clears_existing_data(populated_objcollection, tmp_path):
     assert "extra" not in populated_objcollection.datastreams
 
 
-def test_load_from_csv_populates_objects_and_datastreams(tmp_path, objcollection, populated_objcollection):
+def test_load_from_csv_populates_objects_and_datastreams(
+    tmp_path, objcollection, populated_objcollection
+):
     """Test that load_from_csv correctly populates objects and datastreams from CSV files."""
     obj_csv = tmp_path / ALL_OBJECTS_CSV
     ds_csv = tmp_path / ALL_DATASTREAMS_CSV
@@ -323,12 +329,18 @@ def test_load_from_csv_populates_objects_and_datastreams(tmp_path, objcollection
     # Load into empty collection
     objcollection.load_from_csv(obj_csv, ds_csv)
     assert objcollection.count_objects() == populated_objcollection.count_objects()
-    assert objcollection.count_datastreams() == populated_objcollection.count_datastreams()
+    assert (
+        objcollection.count_datastreams() == populated_objcollection.count_datastreams()
+    )
     for obj_id in populated_objcollection.objects:
         assert obj_id in objcollection.objects
     for obj_id in populated_objcollection.datastreams:
         assert obj_id in objcollection.datastreams
-        assert len(objcollection.datastreams[obj_id]) == len(populated_objcollection.datastreams[obj_id])
+        assert len(objcollection.datastreams[obj_id]) == len(
+            populated_objcollection.datastreams[obj_id]
+        )
+
+
 def test_load_from_xlsx_missing_file(objcollection, tmp_path):
     """Test that load_from_xlsx raises FileNotFoundError if XLSX file does not exist."""
     missing_xlsx = tmp_path / "nonexistent.xlsx"
@@ -345,12 +357,16 @@ def test_load_from_xlsx_populates_data(tmp_path, populated_objcollection):
     objcollection = ObjectCollection()
     objcollection.load_from_xlsx(xlsx_file)
     assert objcollection.count_objects() == populated_objcollection.count_objects()
-    assert objcollection.count_datastreams() == populated_objcollection.count_datastreams()
+    assert (
+        objcollection.count_datastreams() == populated_objcollection.count_datastreams()
+    )
     for obj_id in populated_objcollection.objects:
         assert obj_id in objcollection.objects
     for obj_id in populated_objcollection.datastreams:
         assert obj_id in objcollection.datastreams
-        assert len(objcollection.datastreams[obj_id]) == len(populated_objcollection.datastreams[obj_id])
+        assert len(objcollection.datastreams[obj_id]) == len(
+            populated_objcollection.datastreams[obj_id]
+        )
 
 
 def test_load_from_xlsx_clears_existing_data(tmp_path, populated_objcollection):
@@ -358,12 +374,12 @@ def test_load_from_xlsx_clears_existing_data(tmp_path, populated_objcollection):
     xlsx_file = tmp_path / "all_objects.xlsx"
     populated_objcollection.save_to_xlsx(xlsx_file)
     # Add extra data
-    populated_objcollection.objects["extra"] = ObjectData(**{k: "" for k in ObjectData.fieldnames()})
+    populated_objcollection.objects["extra"] = ObjectData(
+        **{k: "" for k in ObjectData.fieldnames()}
+    )
     populated_objcollection.datastreams["extra"] = []
     assert "extra" in populated_objcollection.objects
     # Load from XLSX, should clear "extra"
     populated_objcollection.load_from_xlsx(xlsx_file)
     assert "extra" not in populated_objcollection.objects
     assert "extra" not in populated_objcollection.datastreams
-
-

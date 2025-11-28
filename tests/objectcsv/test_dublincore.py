@@ -2,7 +2,6 @@
 
 # pylint: disable=W0212 # access to ._data
 import pytest
-from lxml import etree as ET
 
 from gamslib.objectcsv.dublincore import DublinCore
 
@@ -64,6 +63,7 @@ def test_get_element_with_preferred_lang(datadir):
     # in order of lookup order
     assert dc.get_element("title", "it") == ["Person description 1"]
 
+
 def test_get_element_with_changed_preferred_order(datadir):
     "When we change the order of lookup, the result should change accordingly."
     path = datadir / "DC.xml"
@@ -72,6 +72,7 @@ def test_get_element_with_changed_preferred_order(datadir):
     # we changed lookup order to 'de' first. As we do not have an entry for 'fr',
     # the german title should be returned
     assert dc.get_element("title", "fr") == ["Personenbeschreibung 1"]
+
 
 def test_get_non_dc_element(datadir):
     "Accessing an element that is not a Dublin Core element should raise an ValueError."
@@ -238,17 +239,18 @@ def test_get_en_element_as_str(datadir):
         dc.get_en_element_as_str("foo")
     assert dc.get_en_element_as_str("publisher", default="foo") == "foo"
 
+
 def test_get_element_all_langs(datadir):
     """Test get_element_all_langs: Return all values for all languages."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
-    
+
     # title has both english and german entries
     title_values = dc.get_element_all_langs("title")
     assert "Person description 1" in title_values
     assert "Personenbeschreibung 1" in title_values
-    assert len(title_values) == 2
-    
+    assert len(title_values) == 2  # noqa: PLR2004
+
     # subject has multiple entries in different languages
     subject_values = dc.get_element_all_langs("subject")
     assert "Subject 1" in subject_values
@@ -256,15 +258,15 @@ def test_get_element_all_langs(datadir):
     assert "Subject 3 de" in subject_values
     assert "Subject 2 en" in subject_values
     assert "Subject 3 en" in subject_values
-    assert len(subject_values) == 5
-    
+    assert len(subject_values) == 5  # noqa: PLR2004
+
     # creator only has unspecified language
     assert dc.get_element_all_langs("creator") == ["Foo, Bar"]
-    
+
     # non-existing element should return empty list
     del dc._data["creator"]
-    assert dc.get_element_all_langs("creator") == []
-    
+    assert not dc.get_element_all_langs("creator")
+
     # invalid element should raise ValueError
     with pytest.raises(ValueError):
         dc.get_element_all_langs("foo")
@@ -275,11 +277,12 @@ def test_get_element_all_langs_with_linebreaks(datadir, tmp_path):
     path = datadir / "DC.xml"
     xml = path.read_text(encoding="utf-8")
     xml = xml.replace(
-        "<dc:title xml:lang=\"en\">Person description 1</dc:title>",
-        "<dc:title xml:lang=\"en\">Person\ndescription\r\n1</dc:title>"
+        '<dc:title xml:lang="en">Person description 1</dc:title>',
+        '<dc:title xml:lang="en">Person\ndescription\r\n1</dc:title>',
     )
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
+
 
 def test_validate_success(datadir):
     """Test validate succeeds with valid DC.xml."""
@@ -294,55 +297,75 @@ def test_validate_missing_identifier(datadir):
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["identifier"]
-    with pytest.raises(ValueError, match="Required Dublin Core element 'identifier' is missing"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'identifier' is missing"
+    ):
         dc.validate()
+
 
 def test_validate_empty_identifier(datadir):
     """Test validate raises ValueError when identifier is empty."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     dc._data["identifier"] = {}
-    with pytest.raises(ValueError, match="Required Dublin Core element 'identifier' has no value"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'identifier' has no value"
+    ):
         dc.validate()
+
 
 def test_validate_missing_title(datadir):
     """Test validate raises ValueError when title is missing."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["title"]
-    with pytest.raises(ValueError, match="Required Dublin Core element 'title' is missing"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'title' is missing"
+    ):
         dc.validate()
+
 
 def test_validate_empty_title(datadir):
     """Test validate raises ValueError when title is empty."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     dc._data["title"] = {}
-    with pytest.raises(ValueError, match="Required Dublin Core element 'title' has no value"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'title' has no value"
+    ):
         dc.validate()
+
 
 def test_validate_missing_creator(datadir):
     """Test validate raises ValueError when creator is missing."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["creator"]
-    with pytest.raises(ValueError, match="Required Dublin Core element 'creator' is missing"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'creator' is missing"
+    ):
         dc.validate()
+
 
 def test_validate_empty_creator(datadir):
     """Test validate raises ValueError when creator is empty."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     dc._data["creator"] = {}
-    with pytest.raises(ValueError, match="Required Dublin Core element 'creator' has no value"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'creator' has no value"
+    ):
         dc.validate()
+
 
 def test_validate_missing_rights(datadir):
     """Test validate raises ValueError when rights is missing."""
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     del dc._data["rights"]
-    with pytest.raises(ValueError, match="Required Dublin Core element 'rights' is missing"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'rights' is missing"
+    ):
         dc.validate()
 
 
@@ -351,19 +374,22 @@ def test_validate_empty_rights(datadir):
     path = datadir / "DC.xml"
     dc = DublinCore(path)
     dc._data["rights"] = {}
-    with pytest.raises(ValueError, match="Required Dublin Core element 'rights' has no value"):
+    with pytest.raises(
+        ValueError, match="Required Dublin Core element 'rights' has no value"
+    ):
         dc.validate()
+
 
 def test_validate_no_english_title(datadir, tmp_path):
     """Test validate raises ValueError when no English title is present."""
     path = datadir / "DC.xml"
     xml = path.read_text(encoding="utf-8")
     # Remove English title, keep only German
-    xml = xml.replace('<dc:title xml:lang="en">Person description 1</dc:title>', '')
+    xml = xml.replace('<dc:title xml:lang="en">Person description 1</dc:title>', "")
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
     dc = DublinCore(new_path)
-    with pytest.raises(ValueError, match="A <title xml:lang=\"en\"> element is required"):
+    with pytest.raises(ValueError, match='A <title xml:lang="en"> element is required'):
         dc.validate()
 
 
@@ -372,8 +398,9 @@ def test_validate_unknown_element(datadir, tmp_path):
     path = datadir / "DC.xml"
     xml = path.read_text(encoding="utf-8")
     # Add an unknown element
-    xml = xml.replace("</dc:creator>", 
-                      '</dc:creator><dc:unknown>Unknown element</dc:unknown>')
+    xml = xml.replace(
+        "</dc:creator>", "</dc:creator><dc:unknown>Unknown element</dc:unknown>"
+    )
     new_path = tmp_path / "DC.xml"
     new_path.write_text(xml, encoding="utf-8")
     dc = DublinCore(new_path)
@@ -387,4 +414,4 @@ def test_validate_malformed_xml(tmp_path):
     new_path.write_text("<dc:title>Missing closing tag", encoding="utf-8")
     with pytest.raises(ValueError, match="Error parsing"):
         dc = DublinCore(new_path)
-        dc.validate()        
+        dc.validate()

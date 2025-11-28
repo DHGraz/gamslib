@@ -10,6 +10,7 @@ from gamslib import formatdetect
 from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv.defaultvalues import NAMESPACES
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
+from gamslib.objectcsv.dublincore import DublinCore
 from gamslib.sip.utils import logger
 
 
@@ -127,7 +128,8 @@ def validate_main_resource_id(object_dir: Path):
     Args:
         object_dir (Path): Path to the object directory.
     Raises:
-        ObjectDirectoryValidationError: If the main resource file has the same ID as the object directory
+        ObjectDirectoryValidationError: If the main resource file has the same ID as
+        the object directory
     """
     csv_mgr = ObjectCSVManager(object_dir)
     main_resource = csv_mgr.get_mainresource()
@@ -216,11 +218,32 @@ def validate_csv_files(object_path: Path) -> None:
             ds_file_path = object_path / dsdata.dsid
             if not ds_file_path.is_file():
                 raise ObjectDirectoryValidationError(
-                    f"Object directory '{object_path}': Datastream file '{dsdata.dspath.split('/')[-1]}' "
+                    f"Object directory '{object_path}': Datastream file "
+                    f"'{dsdata.dspath.split('/')[-1]}' "
                     f"referenced in datastreams.csv does not exist."
                 )
     except ValueError as e:
         raise ObjectDirectoryValidationError(str(e)) from e
+
+
+def validate_dc_file(object_path: Path) -> None:
+    """
+    Validate the DC.xml file in the object directory.
+
+    Args:
+        object_path (Path): Path to the object directory.
+
+    Raises:
+        ObjectDirectoryValidationError: If the DC.xml file is invalid.
+    """
+    dc_file = object_path / "DC.xml"
+    try:
+        dc = DublinCore(dc_file)
+        dc.validate()
+    except ValueError as e:
+        raise ObjectDirectoryValidationError(
+            f"Object directory '{object_path}': DC.xml file is invalid: {e}"
+        ) from e
 
 
 def validate_object_dir(object_path: Path) -> None:
@@ -235,10 +258,6 @@ def validate_object_dir(object_path: Path) -> None:
             or if object.csv is invalid.
     """
     validate_directory_structure(object_path)
+    validate_dc_file(object_path)
     validate_csv_files(object_path)
-
-    # TODO: validate the DC.xml file? Do we require some fields?
-
-    # TODO
-    # This function also checks
-    #  * if the directory matches the object id set in TEI or LIDO files
+    validate_main_resource_id(object_path)
