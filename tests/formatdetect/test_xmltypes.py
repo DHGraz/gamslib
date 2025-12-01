@@ -39,7 +39,7 @@ def test_guess_xml_subtype_unknown_namespace(tmp_path):
         assert guess_xml_subtype(xml_file) is None
         assert len(w) == 1
         assert issubclass(w[-1].category, UserWarning)
-        assert "xml format detection failed because of unknown namespace" in str(w[-1].message)
+        assert "XML format detection failed due to unknown namespace" in str(w[-1].message)
 
 def test_guess_xml_subtype_no_namespace(tmp_path):
     xml_content = """<?xml version="1.0" encoding="UTF-8"?>

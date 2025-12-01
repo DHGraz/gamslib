@@ -215,7 +215,7 @@ def test_validate(tmp_path, objdata, dsdata):
 def test_validate_empty(tmp_path):
     """Test validation of empty object manager."""
     manager = ObjectCSVManager(tmp_path)
-    with pytest.raises(ValueError, match="is not set"):
+    with pytest.raises(ValueError, match="missing or empty"):
         manager.validate()
 
 
@@ -225,7 +225,7 @@ def test_validate_invalid_object(tmp_path, objdata, dsdata):
 
     manager = ObjectCSVManager(tmp_path)
 
-    with pytest.raises(ValueError, match="Object metadata .* is not set"):
+    with pytest.raises(ValueError, match="missing or empty"):
         manager.validate()
 
 
@@ -359,4 +359,157 @@ def test_guess_mainresource_no_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DS
     
     # Verify object data mainResource was not set
     assert not oc.get_object().mainResource  # Should be empty
+def test_count_datastreams_empty(tmp_path):
+    """Test count_datastreams returns 0 when no datastreams are present."""
+    manager = ObjectCSVManager(tmp_path)
+    assert manager.count_datastreams() == 0
 
+def test_count_datastreams_single(tmp_path, dsdata):
+    """Test count_datastreams returns 1 after adding one datastream."""
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(dsdata)
+    assert manager.count_datastreams() == 1
+
+def test_count_datastreams_multiple(tmp_path, dsdata):
+    """Test count_datastreams returns correct count after adding multiple datastreams."""
+    manager = ObjectCSVManager(tmp_path)
+    ds1 = copy.deepcopy(dsdata)
+    ds2 = copy.deepcopy(dsdata)
+    ds2.dsid = "DS2"
+    ds2.dspath = "obj1/DS2.xml"
+    manager.add_datastream(ds1)
+    manager.add_datastream(ds2)
+    assert manager.count_datastreams() == 2
+
+def test_count_datastreams_after_clear(tmp_path, dsdata):
+    """Test count_datastreams returns 0 after clearing datastreams."""
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(dsdata)
+    manager.clear()
+    assert manager.count_datastreams() == 0
+
+def test_get_languages_empty(tmp_path):
+    """Test get_languages returns empty list when there are no datastreams."""
+    manager = ObjectCSVManager(tmp_path)
+    assert manager.get_languages() == []
+
+def test_get_languages_single_language(tmp_path, dsdata, monkeypatch):
+    """Test get_languages returns the correct language for a single datastream."""
+    # Patch utils.split_entry to just split on ';'
+    monkeypatch.setattr("gamslib.objectcsv.utils.split_entry", lambda x: x.split(";"))
+    ds = copy.deepcopy(dsdata)
+    ds.lang = "deu"
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(ds)
+    assert manager.get_languages() == ["deu"]
+
+def test_get_languages_multiple_languages_single_ds(tmp_path, dsdata, monkeypatch):
+    """Test get_languages returns all languages from a single datastream with multiple languages."""
+    monkeypatch.setattr("gamslib.objectcsv.utils.split_entry", lambda x: x.split(";"))
+    ds = copy.deepcopy(dsdata)
+    ds.lang = "deu;eng"
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(ds)
+    # Both languages should be present, order doesn't matter for single count
+    langs = manager.get_languages()
+    assert set(langs) == {"deu", "eng"}
+    assert langs[0] in {"deu", "eng"}
+
+def test_get_languages_multiple_datastreams(tmp_path, dsdata, monkeypatch):
+    """Test get_languages returns languages ordered by frequency across datastreams."""
+    monkeypatch.setattr("gamslib.objectcsv.utils.split_entry", lambda x: x.split(";"))
+    ds1 = copy.deepcopy(dsdata)
+    ds1.lang = "deu"
+    ds2 = copy.deepcopy(dsdata)
+    ds2.dsid = "DS2"
+    ds2.dspath = "obj1/DS2.xml"
+    ds2.lang = "eng"
+    ds3 = copy.deepcopy(dsdata)
+    ds3.dsid = "DS3"
+    ds3.dspath = "obj1/DS3.xml"
+    ds3.lang = "deu"
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(ds1)
+    manager.add_datastream(ds2)
+    manager.add_datastream(ds3)
+    # "deu" appears twice, "eng" once, so "deu" should come first
+    assert manager.get_languages() == ["deu", "eng"]
+
+def test_get_languages_ignores_empty_lang(tmp_path, dsdata, monkeypatch):
+    """Test get_languages ignores datastreams with empty lang."""
+    monkeypatch.setattr("gamslib.objectcsv.utils.split_entry", lambda x: x.split(";"))
+    ds1 = copy.deepcopy(dsdata)
+    ds1.lang = ""
+    ds2 = copy.deepcopy(dsdata)
+    ds2.dsid = "DS2"
+    ds2.dspath = "obj1/DS2.xml"
+    ds2.lang = "eng"
+    manager = ObjectCSVManager(tmp_path)
+    manager.add_datastream(ds1)
+    manager.add_datastream(ds2)
+    assert manager.get_languages() == ["eng"]
+
+def test_write_object_csv_creates_file(tmp_path, objdata):
+    """Test that _write_object_csv creates object.csv with correct content."""
+    manager = ObjectCSVManager(tmp_path)
+    manager.set_object(objdata)
+    manager._write_object_csv()
+    csv_file = tmp_path / OBJ_CSV_FILENAME
+    assert csv_file.is_file()
+    with csv_file.open(encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        assert len(rows) == 1
+        assert rows[0] == dataclasses.asdict(objdata)
+
+def test_write_object_csv_raises_if_exists(tmp_path, objdata):
+    """Test that _write_object_csv raises FileExistsError if file exists and not ignoring."""
+    manager = ObjectCSVManager(tmp_path)
+    manager.set_object(objdata)
+    # Create file first
+    (tmp_path / OBJ_CSV_FILENAME).write_text("dummy", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        manager._write_object_csv()
+
+def test_write_object_csv_overwrites_if_ignore_flag(tmp_path, objdata):
+    """Test that _write_object_csv overwrites file if ignore_existing_csv_files is True."""
+    manager = ObjectCSVManager(tmp_path, ignore_existing_csv_files=True)
+    manager.set_object(objdata)
+    csv_file = tmp_path / OBJ_CSV_FILENAME
+    csv_file.write_text("dummy", encoding="utf-8")
+    # Should not raise
+    manager._write_object_csv()
+    with csv_file.open(encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        assert len(rows) == 1
+        assert rows[0] == dataclasses.asdict(objdata)
+
+def test_get_mainresource(objcsvfile: Path, dscsvfile: Path):
+    """Test the get_mainresource method."""
+    # we need dscsvfile fixture because the datastream files must exist
+    
+    obj_dir = objcsvfile.parent 
+
+    # Create an ObjectCSVManager instance
+    obj_mgr= ObjectCSVManager(obj_dir)
+
+    # Get the main resource
+    main_resource = obj_mgr.get_mainresource()
+    assert main_resource.dspath == "obj1/TEI.xml"
+
+
+def test_get_mainresource_no_mainresource(objcsvfile: Path, dscsvfile: Path):
+    """Test the get_mainresource method if no mainresource is set."""
+    # we need dscsvfile fixture because the datastream files must exist
+    
+    obj_dir = objcsvfile.parent 
+
+
+    # Create an ObjectCSVManager instance
+    obj_mgr= ObjectCSVManager(obj_dir)
+    obj_mgr.get_object().mainResource = ""
+
+    # Get the main resource
+    main_resource = obj_mgr.get_mainresource()
+    assert main_resource is None

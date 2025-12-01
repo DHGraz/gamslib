@@ -1,36 +1,25 @@
-"""Handle object and datastream metadata in csv files.
+"""Tools for managing object and datastream metadata in CSV files for GAMS projects.
 
-When creating bags for GAMS, we provide some metadata in csv
-files (which are not part of the bag, btw).
+This package provides utilities to read, write, validate, and manipulate metadata stored in
+`object.csv` and `datastreams.csv` files, which accompany GAMS bags but are not part of the 
+bag itself.
 
-The objectcsv package provides tools to handle this metadata.
+Main components:
 
-  * The ObjectCSVManager class is used to manage the metadata
-    of a single object and its datastreams. It reads and writes the
-    metadata to CSV files named `object.csv` and `datastreams.csv`
-    respectively. It also provides methods to validate, merge, and manipulate
-    the object and datastream metadata.
-  * The ObjectCollection class is used to collect metadata from multiple
-    objects into a single csv file. It can also distribute the collected data
-    back to the individual object directories. This is useful for managing
-    metadata for a large number of objects, as it allows to edit the data in
-    a single file and then distribute the changes back to the individual objects.
-  * The dublincore_csv module represents the object metadata stored in
-    the objects 'DC.xml' file. It provides useful functions for acessing
-    DC data e.g. for prefered languages etc.
-  * The create_csv module can be used to initally create the csv files for
-    all objects
-  * The manage_csv module can be used collect csv data from all objects
-    into a single file, which makes editing the data more efficient.
-    It also has a function to update the csv files in the object directories
-    based on the collected data.
-  * The xlsx module can be used to convert the csv files to xlsx files
-    and vice versa. This is useful for editing the data in a spreadsheet
-    without the hassles of importing and exporting the csv files, which
-    led to encoding problems in the past.
+  - ObjectCSVManager: Manages metadata for a single object and its datastreams. Handles 
+    reading, writing, validating, merging, and updating CSV files.
+  - ObjectCollection: Aggregates metadata from multiple objects into a single CSV file and 
+    distributes updates back to individual object directories. Useful for batch editing and 
+    synchronization.
+  - dublincore: Functions for accessing and processing Dublin Core metadata from 'DC.xml' files,
+    including language preference utilities.
+  - create_csv: Initializes CSV files for all objects in a project.
+  - manage_csv: Collects metadata from all objects into a single CSV for efficient editing, 
+    and updates individual object directories from the aggregated data.
+  - xlsx: Converts CSV files to XLSX format and vice versa, enabling spreadsheet-based editing and
+    avoiding encoding issues common with CSV imports/exports.
 
-The "public" functions and classes from the submodules are directly
-available in the objectcsv:
+Public API:
 
     DSData
     ObjectCSVManager
@@ -42,6 +31,8 @@ available in the objectcsv:
     split_from_csv()
     split_from_xlsx()
     xlsx_to_csv()
+
+These classes and functions are imported into the package namespace for direct use.
 """
 
 from .dsdata import DSData

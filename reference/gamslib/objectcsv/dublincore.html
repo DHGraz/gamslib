@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.objectcsv.dublincore API documentation</title>
+<meta name="description" content="Dublin Core metadata access for GAMS objects …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.objectcsv.dublincore</code></h1>
+</header>
+<section id="section-intro">
+<p>Dublin Core metadata access for GAMS objects.</p>
+<p>Provides the DublinCore class for parsing DC.xml files and accessing metadata elements
+with language preference and fallback logic. Includes utility methods for retrieving
+element values as lists or strings, and for removing linebreaks from text.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Parse DC.xml and extract Dublin Core elements with language support.</li>
+<li>Retrieve metadata values in preferred language, with fallback to alternatives.</li>
+<li>Utility for joining multiple values and formatting rights statements.</li>
+<li>Configurable lookup order for language fallback.</li>
+</ul>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.objectcsv.dublincore.DublinCore"><code class="flex name class">
+<span>class <span class="ident">DublinCore</span></span>
+<span>(</span><span>path: pathlib._local.Path,<br>lookup_order: tuple = ('en', 'de', 'fr', 'es', 'it'))</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DublinCore:
+    &#34;&#34;&#34;Represents data from DC.xml and provides methods to access it.&#34;&#34;&#34;
+
+    UNSPECIFIED_LANG = &#34;unspecified&#34;
+
+    def __init__(
+        self, path: Path, lookup_order: tuple = (&#34;en&#34;, &#34;de&#34;, &#34;fr&#34;, &#34;es&#34;, &#34;it&#34;)
+    ):
+        &#34;&#34;&#34;
+        Initialize and parse the DC.xml file.
+
+        Args:
+            path (Path): Path to the DC.xml file.
+            lookup_order (tuple): Preferred language order for fallback.
+        &#34;&#34;&#34;
+        self.path: Path = path
+        self.lookup_order: list[str] = list(lookup_order)
+        self._data: dict[str, Any] = {}  # [element][lang] = text
+        self._parse(path)
+
+    def _parse(self, path: Path):
+        tree = ET.parse(path)
+        root = tree.getroot()
+
+        for elem in DC_ELEMENTS:
+            for child in root.findall(f&#34;dc:{elem}&#34;, namespaces=NAMESPACES):
+                lang = child.attrib.get(
+                    f&#34;{{{NAMESPACES[&#39;xml&#39;]}}}lang&#34;, self.UNSPECIFIED_LANG
+                )
+                element = self._data.get(elem, {})
+                values = element.get(lang, [])
+                if child.text is not None:
+                    values.append(child.text)
+                element[lang] = values
+                self._data[elem] = element
+        # TODO: Add DC_TERMS and DCMI_TYPES?
+
+    @classmethod
+    def remove_linebreaks(cls, text: str) -&gt; str:
+        &#34;&#34;&#34;
+        Remove linebreaks from a string.
+
+        Args:
+            text (str): The string to remove linebreaks from.
+
+        Returns:
+            str: The string without linebreaks.
+        &#34;&#34;&#34;
+        return re.sub(r&#34;[\r\n]+&#34;, &#34; &#34;, text).strip()
+
+    def get_en_element(self, name: str, default=&#34;&#34;) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Return the value(s) of a Dublin Core element in English.
+
+        Args:
+            name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+            default (str): Default value if element is missing.
+
+        Returns:
+            list[str]: The value(s) of the element as a list of strings.
+
+        Raises:
+            ValueError: If the element name is not a valid Dublin Core element.
+        &#34;&#34;&#34;
+        if name not in DC_ELEMENTS:
+            raise ValueError(f&#34;Element {name} is not a Dublin Core element.&#34;)
+
+        values = self._data[name].get(&#34;en&#34;, [])
+        if not values and default != &#34;&#34;:
+            values = [default]
+        return [self.remove_linebreaks(value) for value in values]
+
+    def get_en_element_as_str(self, name: str, default=&#34;&#34;) -&gt; str:
+        &#34;&#34;&#34;
+        Return the joined value(s) of a Dublin Core element in English.
+
+        Args:
+            name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+            default (str): Default value if element is missing.
+
+        Returns:
+            str: The joined value(s) of the element as a string. Multiple values are separated by &#39;;&#39;.
+
+        Raises:
+            ValueError: If the element name is not a valid Dublin Core element.
+        &#34;&#34;&#34;
+        return &#34;; &#34;.join(self.get_en_element(name, default=default))
+
+    def get_element(
+        self, name: str, preferred_lang: str = &#34;en&#34;, default: str = &#34;&#34;
+    ) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Return the value(s) of a Dublin Core element as a list of strings.
+
+        Args:
+            name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+            preferred_lang (str): The preferred language of the element (e.g. &#34;de&#34;).
+            default (str): The default value to return if no value is found.
+
+        Returns:
+            list[str]: The value(s) of the element as a list of strings.
+
+        Raises:
+            ValueError: If the element name is not a valid Dublin Core element.
+
+        Notes:
+            - If no entry in the preferred language is available, the function will search
+              for entries in another language, depending on the lookup_order set during
+              object creation. If no entry is found with a specified language, the function
+              checks for an entry with no &#39;xml:lang&#39; attribute. If still no value is found,
+              the default value will be returned (as a list).
+        &#34;&#34;&#34;
+        if name not in DC_ELEMENTS:
+            raise ValueError(f&#34;Element {name} is not a Dublin Core element.&#34;)
+        # element not in DC.xml
+        if name not in self._data:
+            logger.debug(
+                &#34;Element &#39;%s{name}&#39; not found in %s{self.path}. Returning default value: [%s]&#34;,
+                name,
+                self.path,
+                default,
+            )
+            return [default]
+
+        # search for an entry in desired language
+        if preferred_lang not in self._data[name]:
+            # search for another language in defined lookup order
+            alternative_lang = self.UNSPECIFIED_LANG
+            for lang in self.lookup_order:
+                if lang in self._data[name]:
+                    alternative_lang = lang
+                    break
+            if alternative_lang == self.UNSPECIFIED_LANG:
+                # no entry for any lang in lookup_order, so we use the first entry without lang
+                logger.debug(
+                    &#34;Preferred language &#39;%s{preferred_lang}&#39; not found in %s{self.path}. &#34;
+                    &#34;Using first entry without xml:lang attribute instead.&#34;,
+                    preferred_lang,
+                    self.path,
+                )
+            # we found an alternative lang
+            else:
+                logger.debug(
+                    &#34;Preferred language &#39;%s{preferred_lang}&#39; not found in %s{self.path}. &#34;
+                    &#34;Using value for language &#39;%s{alternative_lang}&#39; instead.&#34;,
+                    preferred_lang,
+                    self.path,
+                    alternative_lang,
+                )
+            preferred_lang = alternative_lang
+
+        return [
+            self.remove_linebreaks(value) for value in self._data[name][preferred_lang]
+        ]
+
+    def get_element_as_str(
+        self, name: str, preferred_lang: str = &#34;en&#34;, default: str = &#34;&#34;
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Return the value(s) of a Dublin Core element as a string.
+
+        Args:
+            name (str): The name of the element without namespace.
+            preferred_lang (str): The preferred language of the element.
+            default (str): The default value to return if no value is found.
+
+        Returns:
+            str: The value(s) as a single string. For &#39;rights&#39;, formats as &#34;name (url)&#34; if two values are present; otherwise, values are joined with &#39;;&#39;.
+        &#34;&#34;&#34;
+        values = self.get_element(name, preferred_lang, default)
+        if name == &#34;rights&#34;:
+            # we expect the licence name first, followed by the url in brackets
+            str_value = values[0] if len(values) == 1 else f&#34;{values[0]} ({values[1]})&#34;
+        else:
+            str_value = &#34;; &#34;.join(values)
+        return str_value</code></pre>
+</details>
+<div class="desc"><p>Represents data from DC.xml and provides methods to access it.</p>
+<p>Initialize and parse the DC.xml file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the DC.xml file.</dd>
+<dt><strong><code>lookup_order</code></strong> :&ensp;<code>tuple</code></dt>
+<dd>Preferred language order for fallback.</dd>
+</dl></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.UNSPECIFIED_LANG"><code class="name">var <span class="ident">UNSPECIFIED_LANG</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.remove_linebreaks"><code class="name flex">
+<span>def <span class="ident">remove_linebreaks</span></span>(<span>text: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove linebreaks from a string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong> :&ensp;<code>str</code></dt>
+<dd>The string to remove linebreaks from.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The string without linebreaks.</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self, name: str, preferred_lang: str = 'en', default: str = '') ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(
+    self, name: str, preferred_lang: str = &#34;en&#34;, default: str = &#34;&#34;
+) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Return the value(s) of a Dublin Core element as a list of strings.
+
+    Args:
+        name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+        preferred_lang (str): The preferred language of the element (e.g. &#34;de&#34;).
+        default (str): The default value to return if no value is found.
+
+    Returns:
+        list[str]: The value(s) of the element as a list of strings.
+
+    Raises:
+        ValueError: If the element name is not a valid Dublin Core element.
+
+    Notes:
+        - If no entry in the preferred language is available, the function will search
+          for entries in another language, depending on the lookup_order set during
+          object creation. If no entry is found with a specified language, the function
+          checks for an entry with no &#39;xml:lang&#39; attribute. If still no value is found,
+          the default value will be returned (as a list).
+    &#34;&#34;&#34;
+    if name not in DC_ELEMENTS:
+        raise ValueError(f&#34;Element {name} is not a Dublin Core element.&#34;)
+    # element not in DC.xml
+    if name not in self._data:
+        logger.debug(
+            &#34;Element &#39;%s{name}&#39; not found in %s{self.path}. Returning default value: [%s]&#34;,
+            name,
+            self.path,
+            default,
+        )
+        return [default]
+
+    # search for an entry in desired language
+    if preferred_lang not in self._data[name]:
+        # search for another language in defined lookup order
+        alternative_lang = self.UNSPECIFIED_LANG
+        for lang in self.lookup_order:
+            if lang in self._data[name]:
+                alternative_lang = lang
+                break
+        if alternative_lang == self.UNSPECIFIED_LANG:
+            # no entry for any lang in lookup_order, so we use the first entry without lang
+            logger.debug(
+                &#34;Preferred language &#39;%s{preferred_lang}&#39; not found in %s{self.path}. &#34;
+                &#34;Using first entry without xml:lang attribute instead.&#34;,
+                preferred_lang,
+                self.path,
+            )
+        # we found an alternative lang
+        else:
+            logger.debug(
+                &#34;Preferred language &#39;%s{preferred_lang}&#39; not found in %s{self.path}. &#34;
+                &#34;Using value for language &#39;%s{alternative_lang}&#39; instead.&#34;,
+                preferred_lang,
+                self.path,
+                alternative_lang,
+            )
+        preferred_lang = alternative_lang
+
+    return [
+        self.remove_linebreaks(value) for value in self._data[name][preferred_lang]
+    ]</code></pre>
+</details>
+<div class="desc"><p>Return the value(s) of a Dublin Core element as a list of strings.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the element without namespace (e.g. "title").</dd>
+<dt><strong><code>preferred_lang</code></strong> :&ensp;<code>str</code></dt>
+<dd>The preferred language of the element (e.g. "de").</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>str</code></dt>
+<dd>The default value to return if no value is found.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>The value(s) of the element as a list of strings.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the element name is not a valid Dublin Core element.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>If no entry in the preferred language is available, the function will search
+for entries in another language, depending on the lookup_order set during
+object creation. If no entry is found with a specified language, the function
+checks for an entry with no 'xml:lang' attribute. If still no value is found,
+the default value will be returned (as a list).</li>
+</ul></div>
+</dd>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.get_element_as_str"><code class="name flex">
+<span>def <span class="ident">get_element_as_str</span></span>(<span>self, name: str, preferred_lang: str = 'en', default: str = '') ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element_as_str(
+    self, name: str, preferred_lang: str = &#34;en&#34;, default: str = &#34;&#34;
+) -&gt; str:
+    &#34;&#34;&#34;
+    Return the value(s) of a Dublin Core element as a string.
+
+    Args:
+        name (str): The name of the element without namespace.
+        preferred_lang (str): The preferred language of the element.
+        default (str): The default value to return if no value is found.
+
+    Returns:
+        str: The value(s) as a single string. For &#39;rights&#39;, formats as &#34;name (url)&#34; if two values are present; otherwise, values are joined with &#39;;&#39;.
+    &#34;&#34;&#34;
+    values = self.get_element(name, preferred_lang, default)
+    if name == &#34;rights&#34;:
+        # we expect the licence name first, followed by the url in brackets
+        str_value = values[0] if len(values) == 1 else f&#34;{values[0]} ({values[1]})&#34;
+    else:
+        str_value = &#34;; &#34;.join(values)
+    return str_value</code></pre>
+</details>
+<div class="desc"><p>Return the value(s) of a Dublin Core element as a string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the element without namespace.</dd>
+<dt><strong><code>preferred_lang</code></strong> :&ensp;<code>str</code></dt>
+<dd>The preferred language of the element.</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>str</code></dt>
+<dd>The default value to return if no value is found.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The value(s) as a single string. For 'rights', formats as "name (url)" if two values are present; otherwise, values are joined with ';'.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.get_en_element"><code class="name flex">
+<span>def <span class="ident">get_en_element</span></span>(<span>self, name: str, default='') ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_en_element(self, name: str, default=&#34;&#34;) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Return the value(s) of a Dublin Core element in English.
+
+    Args:
+        name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+        default (str): Default value if element is missing.
+
+    Returns:
+        list[str]: The value(s) of the element as a list of strings.
+
+    Raises:
+        ValueError: If the element name is not a valid Dublin Core element.
+    &#34;&#34;&#34;
+    if name not in DC_ELEMENTS:
+        raise ValueError(f&#34;Element {name} is not a Dublin Core element.&#34;)
+
+    values = self._data[name].get(&#34;en&#34;, [])
+    if not values and default != &#34;&#34;:
+        values = [default]
+    return [self.remove_linebreaks(value) for value in values]</code></pre>
+</details>
+<div class="desc"><p>Return the value(s) of a Dublin Core element in English.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the element without namespace (e.g. "title").</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>str</code></dt>
+<dd>Default value if element is missing.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>The value(s) of the element as a list of strings.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the element name is not a valid Dublin Core element.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.dublincore.DublinCore.get_en_element_as_str"><code class="name flex">
+<span>def <span class="ident">get_en_element_as_str</span></span>(<span>self, name: str, default='') ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_en_element_as_str(self, name: str, default=&#34;&#34;) -&gt; str:
+    &#34;&#34;&#34;
+    Return the joined value(s) of a Dublin Core element in English.
+
+    Args:
+        name (str): The name of the element without namespace (e.g. &#34;title&#34;).
+        default (str): Default value if element is missing.
+
+    Returns:
+        str: The joined value(s) of the element as a string. Multiple values are separated by &#39;;&#39;.
+
+    Raises:
+        ValueError: If the element name is not a valid Dublin Core element.
+    &#34;&#34;&#34;
+    return &#34;; &#34;.join(self.get_en_element(name, default=default))</code></pre>
+</details>
+<div class="desc"><p>Return the joined value(s) of a Dublin Core element in English.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the element without namespace (e.g. "title").</dd>
+<dt><strong><code>default</code></strong> :&ensp;<code>str</code></dt>
+<dd>Default value if element is missing.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The joined value(s) of the element as a string. Multiple values are separated by ';'.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the element name is not a valid Dublin Core element.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.objectcsv" href="index.html">gamslib.objectcsv</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.objectcsv.dublincore.DublinCore" href="#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a></code></h4>
+<ul class="">
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.UNSPECIFIED_LANG" href="#gamslib.objectcsv.dublincore.DublinCore.UNSPECIFIED_LANG">UNSPECIFIED_LANG</a></code></li>
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.get_element" href="#gamslib.objectcsv.dublincore.DublinCore.get_element">get_element</a></code></li>
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.get_element_as_str" href="#gamslib.objectcsv.dublincore.DublinCore.get_element_as_str">get_element_as_str</a></code></li>
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.get_en_element" href="#gamslib.objectcsv.dublincore.DublinCore.get_en_element">get_en_element</a></code></li>
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.get_en_element_as_str" href="#gamslib.objectcsv.dublincore.DublinCore.get_en_element_as_str">get_en_element_as_str</a></code></li>
+<li><code><a title="gamslib.objectcsv.dublincore.DublinCore.remove_linebreaks" href="#gamslib.objectcsv.dublincore.DublinCore.remove_linebreaks">remove_linebreaks</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

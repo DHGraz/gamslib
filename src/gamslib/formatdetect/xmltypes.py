@@ -1,4 +1,8 @@
-"""This module contains data and functions to detect XML types and subtypes."""
+"""Functions and data for detecting XML file types and subtypes.
+
+Provides utilities to identify XML formats based on MIME types and XML namespaces.
+Maps supported subtypes to MIME types and offers helpers for format detection.
+"""
 
 from enum import StrEnum
 import warnings
@@ -10,16 +14,13 @@ from .formatinfo import SubType
 # pylint: disable=c-extension-no-member
 
 # These are additional MIME Types not contained in MIMETYPES (as returned
-# by a detection tool are handled as XML files.)
+# by a detection tool) that are handled as XML files.
 XML_MIME_TYPES = [
     "application/xml",
     "text/xml",
 ]
 
-# pylint: disable=invalid-name
-
-
-# Mapping of XML namspaces to SubType
+# Mapping of XML namespaces to SubType
 NAMESPACES = {
     "http://datacite.org/schema/kernel-4": SubType.DataCite,
     "http://docbook.org/ns/docbook": SubType.DocBook,
@@ -62,7 +63,7 @@ NAMESPACES = {
     "urn:oasis:names:tc:opendocument:xmlns:office:1.0": SubType.ODF,
 }
 
-# map SuubType Values to MIME Types
+# Maps SubType values to MIME types for XML formats.
 MIMETYPES = {
     SubType.DataCite: "application/datacite+xml",
     SubType.DocBook: "application/docbook+xml",
@@ -108,45 +109,63 @@ MIMETYPES = {
 
 
 def is_xml_type(mimetype: str) -> StrEnum | None:
-    "Return True if mimetype is a known XML type."
+    """
+    Check if a MIME type is recognized as an XML type.
+
+    Args:
+        mimetype (str): MIME type to check.
+
+    Returns:
+        StrEnum | None: True if the MIME type is a known XML type, otherwise None.
+    """
     return mimetype in MIMETYPES.values() or mimetype in XML_MIME_TYPES
 
 
 def guess_xml_subtype(filepath: Path) -> str:
-    """This is a custom way to find out what kind of xml we are dealing with.
+    """
+    Guess the XML subtype of a file by inspecting its namespaces.
 
-    This tool uses a registry of namespaces to find out what kind of xml
-    we are dealing with. If the file has a namespace that is not in the registry,
-    the function will raise a Warning and return None.
+    Iterates through the XML file and checks for known namespaces to determine the subtype.
+    If the namespace is not recognized, a warning is issued and None is returned.
 
-    Tools like FITS are capable of detecting subtypes (at least some of them)
-    so this function might be especially useful for simpler detectors or
-    exotic formats.
+    Args:
+        filepath (Path): Path to the XML file.
+
+    Returns:
+        str: SubType value if detected, otherwise None.
+
+    Notes:
+        - Useful for simple detectors or exotic formats.
+        - Tools like FITS may also detect subtypes, but this function is for custom logic.
     """
     for _, elem in ET.iterparse(filepath, events=["start-ns"]):
-        # the second item of the tuple is the qualified namespace
         namespace = elem[1]
         try:
             return NAMESPACES[namespace]
         except KeyError:
             warnings.warn(
-                f"xml format detection failed because of unknown namespace: {namespace}"
+                f"XML format detection failed due to unknown namespace: {namespace}"
             )
     return None
 
 
 def get_format_info(filepath: Path, mime_type: str) -> tuple[str, StrEnum | None]:
-    """Get the format info for an XML file.
+    """
+    Get the format info for an XML file, including fixed MIME type and detected subtype.
 
     Args:
-        filepath: The path to the file.
-        mimetype: The mimetype of the file as detected by another tool.
+        filepath (Path): Path to the XML file.
+        mime_type (str): MIME type detected by another tool.
 
     Returns:
-        A tuple containing the (probably fixed) mimetype and subtype of the file.
+        tuple[str, StrEnum | None]: (MIME type, detected subtype) for the file.
+
+    Notes:
+        - If the subtype cannot be detected, returns the original MIME type and None.
+        - If detected, returns the mapped MIME type and subtype.
     """
     xmltype = guess_xml_subtype(filepath)
-    if xmltype is None:  # cannot detect a subtype
+    if xmltype is None:
         subtype = None
     else:
         subtype = xmltype

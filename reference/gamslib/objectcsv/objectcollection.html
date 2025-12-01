@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.objectcsv.objectcollection API documentation</title>
+<meta name="description" content="Aggregate and manage CSV/XLSX metadata for multiple GAMS objects …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.objectcsv.objectcollection</code></h1>
+</header>
+<section id="section-intro">
+<p>Aggregate and manage CSV/XLSX metadata for multiple GAMS objects.</p>
+<p>This module provides the ObjectCollection class to collect, save, load, and distribute
+object and datastream metadata across multiple GAMS object directories. Supports
+aggregation to CSV and XLSX formats and updating individual object folders from
+centralized metadata files.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection"><code class="flex name class">
+<span>class <span class="ident">ObjectCollection</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ObjectCollection:
+    &#34;&#34;&#34;
+    Represents a collection of metadata for multiple GAMS objects and their datastreams.
+
+    Used to aggregate, save, load, and distribute object and datastream metadata
+    between individual object directories and combined CSV/XLSX files.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;
+        Initialize an empty ObjectCollection.
+        &#34;&#34;&#34;
+        self.objects: dict[str, ObjectData] = {}  # keys are recids (pid)
+        self.datastreams: dict[str, list[DSData]] = {}  # keys are object ids (recids)
+
+    def collect_from_objects(self, root_dir: Path) -&gt; None:
+        &#34;&#34;&#34;
+        Collect metadata from all object directories below root_dir.
+
+        Args:
+            root_dir (Path): Directory containing object folders.
+
+        Raises:
+            ValueError: If object metadata (CSV) is missing for any object directory.
+        &#34;&#34;&#34;
+        for obj_dir in find_object_folders(root_dir):
+            object_meta = ObjectCSVManager(obj_dir)
+            if object_meta.is_empty():
+                raise ValueError(
+                    f&#34;Object metadata (csv) is not set for {obj_dir}. &#34;
+                    &#34;Please check the object directory.&#34;
+                )
+            self.objects[obj_dir.name] = object_meta.get_object()
+            for dsdata in object_meta.get_datastreamdata():
+                if obj_dir.name not in self.datastreams:
+                    self.datastreams[obj_dir.name] = []
+                self.datastreams[obj_dir.name].append(dsdata)
+
+    def distribute_to_objects(self, root_dir: Path) -&gt; tuple[int, int]:
+        &#34;&#34;&#34;
+        Distribute aggregated metadata to individual object directories.
+
+        Updates object.csv and datastreams.csv files in each object directory.
+
+        Args:
+            root_dir (Path): Directory containing object folders.
+
+        Returns:
+            tuple[int, int]: Number of updated objects and datastreams.
+
+        Raises:
+            UserWarning: If an object directory does not exist.
+        &#34;&#34;&#34;
+        updated_objects_counter = 0
+        updated_datastreams_counter = 0
+        for obj_id, obj_data in self.objects.items():
+            obj_dir = root_dir / obj_id
+            if obj_dir.is_dir():
+                obj_mgr = ObjectCSVManager(obj_dir, ignore_existing_csv_files=True)
+                obj_mgr.set_object(obj_data, replace=True)
+                updated_objects_counter += 1
+                for dsdata in self.datastreams.get(obj_id, []):
+                    obj_mgr.add_datastream(dsdata, replace=True)
+                    updated_datastreams_counter += 1
+                obj_mgr.save()
+            else:
+                raise UserWarning(
+                    f&#34;Object directory {obj_dir} does not exist. Skipping.&#34;
+                )
+        return updated_objects_counter, updated_datastreams_counter
+
+    def count_objects(self) -&gt; int:
+        &#34;&#34;&#34;
+        Return the number of objects in the collection.
+
+        Returns:
+            int: Number of objects.
+        &#34;&#34;&#34;
+        return len(self.objects)
+
+    def count_datastreams(self) -&gt; int:
+        &#34;&#34;&#34;
+        Return the total number of datastreams in the collection.
+
+        Returns:
+            int: Number of datastreams.
+        &#34;&#34;&#34;
+        return sum(len(ds) for ds in self.datastreams.values())
+
+    def save_to_csv(
+        self, obj_file: Path | None = None, ds_file: Path | None = None
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Save object and datastream metadata to two CSV files.
+
+        Args:
+            obj_file (Path | None): Path for object metadata CSV. Defaults to &#39;all_objects.csv&#39;.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to &#39;all_datastreams.csv&#39;.
+        &#34;&#34;&#34;
+        obj_file = obj_file or Path(ALL_OBJECTS_CSV)
+        ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
+        with obj_file.open(&#34;w&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+            writer = csv.DictWriter(f, fieldnames=ObjectData.fieldnames())
+            writer.writeheader()
+            for obj in self.objects.values():
+                writer.writerow(asdict(obj))
+        with ds_file.open(&#34;w&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+            writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
+            writer.writeheader()
+            for datastreams in self.datastreams.values():
+                for dsdata in datastreams:
+                    writer.writerow(asdict(dsdata))
+
+    def save_to_xlsx(self, xlsx_file: Path | None = None) -&gt; None:
+        &#34;&#34;&#34;
+        Save object and datastream metadata to a single XLSX file with two sheets.
+
+        Args:
+            xlsx_file (Path | None): Path for XLSX file. Defaults to &#39;all_objects.xlsx&#39;.
+        &#34;&#34;&#34;
+        xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            obj_file = Path(tmpdir) / ALL_OBJECTS_CSV
+            ds_file = Path(tmpdir) / ALL_DATASTREAMS_CSV
+            self.save_to_csv(obj_file, ds_file)
+            xlsx.csv_to_xlsx(obj_file, ds_file, xlsx_file)
+
+    def load_from_csv(
+        self, obj_file: Path | None = None, ds_file: Path | None = None
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Load object and datastream metadata from two CSV files.
+
+        Args:
+            obj_file (Path | None): Path for object metadata CSV. Defaults to &#39;all_objects.csv&#39;.
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to &#39;all_datastreams.csv&#39;.
+
+        Raises:
+            FileNotFoundError: If either CSV file does not exist.
+        &#34;&#34;&#34;
+        obj_file = obj_file or Path(ALL_OBJECTS_CSV)
+        ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
+        if not obj_file.is_file():
+            raise FileNotFoundError(f&#34;Required csv file {obj_file} does not exist.&#34;)
+        if not ds_file.is_file():
+            raise FileNotFoundError(f&#34;Required csv file {ds_file} does not exist.&#34;)
+        self.objects.clear()
+        self.datastreams.clear()
+
+        with obj_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                obj_data = ObjectData(**row)
+                self.objects[obj_data.recid] = obj_data
+
+        with ds_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                ds_data = DSData(**row)
+                obj_id = ds_data.dspath.split(&#34;/&#34;)[0]  # Extract object id from dspath
+                if obj_id not in self.datastreams:
+                    self.datastreams[obj_id] = []
+                self.datastreams[obj_id].append(ds_data)
+
+    def load_from_xlsx(self, xlsx_file: Path | None = None) -&gt; None:
+        &#34;&#34;&#34;
+        Load object and datastream metadata from a single XLSX file with two sheets.
+
+        Args:
+            xlsx_file (Path | None): Path for XLSX file. Defaults to &#39;all_objects.xlsx&#39;.
+
+        Raises:
+            FileNotFoundError: If the XLSX file does not exist.
+        &#34;&#34;&#34;
+        xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
+
+        if not xlsx_file.is_file():
+            raise FileNotFoundError(f&#34;File {xlsx_file} does not exist.&#34;)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            obj_file = Path(tmpdir) / ALL_OBJECTS_CSV
+            ds_file = Path(tempfile.tempdir) / ALL_DATASTREAMS_CSV
+            xlsx.xlsx_to_csv(xlsx_file, obj_file, ds_file)
+            self.load_from_csv(obj_file, ds_file)</code></pre>
+</details>
+<div class="desc"><p>Represents a collection of metadata for multiple GAMS objects and their datastreams.</p>
+<p>Used to aggregate, save, load, and distribute object and datastream metadata
+between individual object directories and combined CSV/XLSX files.</p>
+<p>Initialize an empty ObjectCollection.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.collect_from_objects"><code class="name flex">
+<span>def <span class="ident">collect_from_objects</span></span>(<span>self, root_dir: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def collect_from_objects(self, root_dir: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Collect metadata from all object directories below root_dir.
+
+    Args:
+        root_dir (Path): Directory containing object folders.
+
+    Raises:
+        ValueError: If object metadata (CSV) is missing for any object directory.
+    &#34;&#34;&#34;
+    for obj_dir in find_object_folders(root_dir):
+        object_meta = ObjectCSVManager(obj_dir)
+        if object_meta.is_empty():
+            raise ValueError(
+                f&#34;Object metadata (csv) is not set for {obj_dir}. &#34;
+                &#34;Please check the object directory.&#34;
+            )
+        self.objects[obj_dir.name] = object_meta.get_object()
+        for dsdata in object_meta.get_datastreamdata():
+            if obj_dir.name not in self.datastreams:
+                self.datastreams[obj_dir.name] = []
+            self.datastreams[obj_dir.name].append(dsdata)</code></pre>
+</details>
+<div class="desc"><p>Collect metadata from all object directories below root_dir.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>root_dir</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Directory containing object folders.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If object metadata (CSV) is missing for any object directory.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.count_datastreams"><code class="name flex">
+<span>def <span class="ident">count_datastreams</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def count_datastreams(self) -&gt; int:
+    &#34;&#34;&#34;
+    Return the total number of datastreams in the collection.
+
+    Returns:
+        int: Number of datastreams.
+    &#34;&#34;&#34;
+    return sum(len(ds) for ds in self.datastreams.values())</code></pre>
+</details>
+<div class="desc"><p>Return the total number of datastreams in the collection.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of datastreams.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.count_objects"><code class="name flex">
+<span>def <span class="ident">count_objects</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def count_objects(self) -&gt; int:
+    &#34;&#34;&#34;
+    Return the number of objects in the collection.
+
+    Returns:
+        int: Number of objects.
+    &#34;&#34;&#34;
+    return len(self.objects)</code></pre>
+</details>
+<div class="desc"><p>Return the number of objects in the collection.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of objects.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.distribute_to_objects"><code class="name flex">
+<span>def <span class="ident">distribute_to_objects</span></span>(<span>self, root_dir: pathlib._local.Path) ‑> tuple[int, int]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def distribute_to_objects(self, root_dir: Path) -&gt; tuple[int, int]:
+    &#34;&#34;&#34;
+    Distribute aggregated metadata to individual object directories.
+
+    Updates object.csv and datastreams.csv files in each object directory.
+
+    Args:
+        root_dir (Path): Directory containing object folders.
+
+    Returns:
+        tuple[int, int]: Number of updated objects and datastreams.
+
+    Raises:
+        UserWarning: If an object directory does not exist.
+    &#34;&#34;&#34;
+    updated_objects_counter = 0
+    updated_datastreams_counter = 0
+    for obj_id, obj_data in self.objects.items():
+        obj_dir = root_dir / obj_id
+        if obj_dir.is_dir():
+            obj_mgr = ObjectCSVManager(obj_dir, ignore_existing_csv_files=True)
+            obj_mgr.set_object(obj_data, replace=True)
+            updated_objects_counter += 1
+            for dsdata in self.datastreams.get(obj_id, []):
+                obj_mgr.add_datastream(dsdata, replace=True)
+                updated_datastreams_counter += 1
+            obj_mgr.save()
+        else:
+            raise UserWarning(
+                f&#34;Object directory {obj_dir} does not exist. Skipping.&#34;
+            )
+    return updated_objects_counter, updated_datastreams_counter</code></pre>
+</details>
+<div class="desc"><p>Distribute aggregated metadata to individual object directories.</p>
+<p>Updates object.csv and datastreams.csv files in each object directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>root_dir</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Directory containing object folders.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple[int, int]</code></dt>
+<dd>Number of updated objects and datastreams.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>UserWarning</code></dt>
+<dd>If an object directory does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.load_from_csv"><code class="name flex">
+<span>def <span class="ident">load_from_csv</span></span>(<span>self,<br>obj_file: pathlib._local.Path | None = None,<br>ds_file: pathlib._local.Path | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_from_csv(
+    self, obj_file: Path | None = None, ds_file: Path | None = None
+) -&gt; None:
+    &#34;&#34;&#34;
+    Load object and datastream metadata from two CSV files.
+
+    Args:
+        obj_file (Path | None): Path for object metadata CSV. Defaults to &#39;all_objects.csv&#39;.
+        ds_file (Path | None): Path for datastream metadata CSV. Defaults to &#39;all_datastreams.csv&#39;.
+
+    Raises:
+        FileNotFoundError: If either CSV file does not exist.
+    &#34;&#34;&#34;
+    obj_file = obj_file or Path(ALL_OBJECTS_CSV)
+    ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
+    if not obj_file.is_file():
+        raise FileNotFoundError(f&#34;Required csv file {obj_file} does not exist.&#34;)
+    if not ds_file.is_file():
+        raise FileNotFoundError(f&#34;Required csv file {ds_file} does not exist.&#34;)
+    self.objects.clear()
+    self.datastreams.clear()
+
+    with obj_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            obj_data = ObjectData(**row)
+            self.objects[obj_data.recid] = obj_data
+
+    with ds_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            ds_data = DSData(**row)
+            obj_id = ds_data.dspath.split(&#34;/&#34;)[0]  # Extract object id from dspath
+            if obj_id not in self.datastreams:
+                self.datastreams[obj_id] = []
+            self.datastreams[obj_id].append(ds_data)</code></pre>
+</details>
+<div class="desc"><p>Load object and datastream metadata from two CSV files.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for object metadata CSV. Defaults to 'all_objects.csv'.</dd>
+<dt><strong><code>ds_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If either CSV file does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.load_from_xlsx"><code class="name flex">
+<span>def <span class="ident">load_from_xlsx</span></span>(<span>self, xlsx_file: pathlib._local.Path | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_from_xlsx(self, xlsx_file: Path | None = None) -&gt; None:
+    &#34;&#34;&#34;
+    Load object and datastream metadata from a single XLSX file with two sheets.
+
+    Args:
+        xlsx_file (Path | None): Path for XLSX file. Defaults to &#39;all_objects.xlsx&#39;.
+
+    Raises:
+        FileNotFoundError: If the XLSX file does not exist.
+    &#34;&#34;&#34;
+    xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
+
+    if not xlsx_file.is_file():
+        raise FileNotFoundError(f&#34;File {xlsx_file} does not exist.&#34;)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        obj_file = Path(tmpdir) / ALL_OBJECTS_CSV
+        ds_file = Path(tempfile.tempdir) / ALL_DATASTREAMS_CSV
+        xlsx.xlsx_to_csv(xlsx_file, obj_file, ds_file)
+        self.load_from_csv(obj_file, ds_file)</code></pre>
+</details>
+<div class="desc"><p>Load object and datastream metadata from a single XLSX file with two sheets.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>xlsx_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for XLSX file. Defaults to 'all_objects.xlsx'.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the XLSX file does not exist.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.save_to_csv"><code class="name flex">
+<span>def <span class="ident">save_to_csv</span></span>(<span>self,<br>obj_file: pathlib._local.Path | None = None,<br>ds_file: pathlib._local.Path | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_to_csv(
+    self, obj_file: Path | None = None, ds_file: Path | None = None
+) -&gt; None:
+    &#34;&#34;&#34;
+    Save object and datastream metadata to two CSV files.
+
+    Args:
+        obj_file (Path | None): Path for object metadata CSV. Defaults to &#39;all_objects.csv&#39;.
+        ds_file (Path | None): Path for datastream metadata CSV. Defaults to &#39;all_datastreams.csv&#39;.
+    &#34;&#34;&#34;
+    obj_file = obj_file or Path(ALL_OBJECTS_CSV)
+    ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
+    with obj_file.open(&#34;w&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+        writer = csv.DictWriter(f, fieldnames=ObjectData.fieldnames())
+        writer.writeheader()
+        for obj in self.objects.values():
+            writer.writerow(asdict(obj))
+    with ds_file.open(&#34;w&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+        writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
+        writer.writeheader()
+        for datastreams in self.datastreams.values():
+            for dsdata in datastreams:
+                writer.writerow(asdict(dsdata))</code></pre>
+</details>
+<div class="desc"><p>Save object and datastream metadata to two CSV files.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for object metadata CSV. Defaults to 'all_objects.csv'.</dd>
+<dt><strong><code>ds_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for datastream metadata CSV. Defaults to 'all_datastreams.csv'.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectcsv.objectcollection.ObjectCollection.save_to_xlsx"><code class="name flex">
+<span>def <span class="ident">save_to_xlsx</span></span>(<span>self, xlsx_file: pathlib._local.Path | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_to_xlsx(self, xlsx_file: Path | None = None) -&gt; None:
+    &#34;&#34;&#34;
+    Save object and datastream metadata to a single XLSX file with two sheets.
+
+    Args:
+        xlsx_file (Path | None): Path for XLSX file. Defaults to &#39;all_objects.xlsx&#39;.
+    &#34;&#34;&#34;
+    xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        obj_file = Path(tmpdir) / ALL_OBJECTS_CSV
+        ds_file = Path(tmpdir) / ALL_DATASTREAMS_CSV
+        self.save_to_csv(obj_file, ds_file)
+        xlsx.csv_to_xlsx(obj_file, ds_file, xlsx_file)</code></pre>
+</details>
+<div class="desc"><p>Save object and datastream metadata to a single XLSX file with two sheets.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>xlsx_file</code></strong> :&ensp;<code>Path | None</code></dt>
+<dd>Path for XLSX file. Defaults to 'all_objects.xlsx'.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.objectcsv" href="index.html">gamslib.objectcsv</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection" href="#gamslib.objectcsv.objectcollection.ObjectCollection">ObjectCollection</a></code></h4>
+<ul class="">
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.collect_from_objects" href="#gamslib.objectcsv.objectcollection.ObjectCollection.collect_from_objects">collect_from_objects</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.count_datastreams" href="#gamslib.objectcsv.objectcollection.ObjectCollection.count_datastreams">count_datastreams</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.count_objects" href="#gamslib.objectcsv.objectcollection.ObjectCollection.count_objects">count_objects</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.distribute_to_objects" href="#gamslib.objectcsv.objectcollection.ObjectCollection.distribute_to_objects">distribute_to_objects</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.load_from_csv" href="#gamslib.objectcsv.objectcollection.ObjectCollection.load_from_csv">load_from_csv</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.load_from_xlsx" href="#gamslib.objectcsv.objectcollection.ObjectCollection.load_from_xlsx">load_from_xlsx</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.save_to_csv" href="#gamslib.objectcsv.objectcollection.ObjectCollection.save_to_csv">save_to_csv</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcollection.ObjectCollection.save_to_xlsx" href="#gamslib.objectcsv.objectcollection.ObjectCollection.save_to_xlsx">save_to_xlsx</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

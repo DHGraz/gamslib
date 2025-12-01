@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.sip.validation.baginfo API documentation</title>
+<meta name="description" content="Validation functions for the bag-info.txt file in GAMS Bagit directories …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.sip.validation.baginfo</code></h1>
+</header>
+<section id="section-intro">
+<p>Validation functions for the bag-info.txt file in GAMS Bagit directories.</p>
+<p>This module provides functions to validate the contents of the bag-info.txt file
+and ensure that all required entries are present and correctly formatted.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Checks for required fields in bag-info.txt.</li>
+<li>Validates date, time, payload oxum, email, and description fields.</li>
+<li>Reads bag-info.txt as a list of (key, value) tuples to support duplicate keys.</li>
+<li>Raises BagValidationError for any validation failures.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>Call <code><a title="gamslib.sip.validation.baginfo.validate_baginfo_text" href="#gamslib.sip.validation.baginfo.validate_baginfo_text">validate_baginfo_text()</a>(bag_dir)</code> to validate the bag-info.txt file in a Bagit directory.
+Individual validation functions are also available for more granular checks.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.sip.validation.baginfo.read_baginfo_txt"><code class="name flex">
+<span>def <span class="ident">read_baginfo_txt</span></span>(<span>baginfo_txt_file: pathlib._local.Path) ‑> list[tuple[str, str]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_baginfo_txt(baginfo_txt_file: Path) -&gt; list[tuple[str, str]]:
+    &#34;&#34;&#34;
+    Read the bag-info.txt file and return a list of tuples (key, value) with its entries.
+
+    Args:
+        baginfo_txt_file (Path): Path to the bag-info.txt file.
+
+    Returns:
+        list[tuple[str, str]]: List of (key, value) tuples from the file.
+
+    Notes:
+        - Uses a list of tuples instead of a dict, because the same key can appear multiple times.
+        - Raises BagValidationError if a line is invalid or missing a colon.
+    &#34;&#34;&#34;
+    entries = []
+
+    with baginfo_txt_file.open(&#34;r&#34;, encoding=&#34;utf-8&#34;, newline=&#34;&#34;) as f:
+        for i, line in enumerate(f, start=1):
+            try:
+                stripped_line = line.rstrip()
+                if line:
+                    key, value = [x.strip() for x in stripped_line.split(&#34;:&#34;, 1)]
+                    entries.append((key, value))
+            except ValueError as e:  # missing colon
+                raise BagValidationError(
+                    f&#34;Invalid line {i} in &#39;{baginfo_txt_file}&#39;: &#39;{stripped_line}&#39;&#34;
+                ) from e
+    return entries</code></pre>
+</details>
+<div class="desc"><p>Read the bag-info.txt file and return a list of tuples (key, value) with its entries.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>baginfo_txt_file</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the bag-info.txt file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[tuple[str, str]]</code></dt>
+<dd>List of (key, value) tuples from the file.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Uses a list of tuples instead of a dict, because the same key can appear multiple times.</li>
+<li>Raises BagValidationError if a line is invalid or missing a colon.</li>
+</ul></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_bagging_date"><code class="name flex">
+<span>def <span class="ident">validate_bagging_date</span></span>(<span>value: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_bagging_date(value: str) -&gt; None:
+    &#34;&#34;&#34;
+    Check if the value for &#39;Bagging-Date&#39; is a valid date.
+
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is not a valid date.
+    &#34;&#34;&#34;
+    try:
+        datetime.strptime(value, &#34;%Y-%m-%d&#34;)
+    except ValueError as e:
+        raise BagValidationError(
+            f&#34;Value for &#39;Bagging-Date&#39; is not a valid date: {value}&#34;
+        ) from e
+    return True</code></pre>
+</details>
+<div class="desc"><p>Check if the value for 'Bagging-Date' is a valid date.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>str</code></dt>
+<dd>Value to validate.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If the value is not a valid date.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_baginfo_text"><code class="name flex">
+<span>def <span class="ident">validate_baginfo_text</span></span>(<span>bag_dir: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_baginfo_text(bag_dir: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Validate the bag-info.txt file in a Bagit directory.
+
+    Args:
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the bag-info.txt file is missing or invalid.
+
+    Notes:
+        - Checks for required entries and validates their values.
+        - Raises an error immediately if any check fails.
+    &#34;&#34;&#34;
+    baginfo_txt_file = bag_dir / &#34;bag-info.txt&#34;
+
+    if not baginfo_txt_file.is_file():
+        raise BagValidationError(&#34;bag-info.txt file does not exist&#34;)
+
+    # read the bag-info.txt file
+    entries = read_baginfo_txt(baginfo_txt_file)
+
+    # check if all required entries are present
+    validate_required_baginfo_entries(entries)
+
+    # check the values of the required entries
+    for key, value in entries:
+        if key == &#34;Bagging-Date&#34;:
+            validate_bagging_date(value)
+        elif key == &#34;Payload-Oxum&#34;:
+            validate_payload_oxum(value, bag_dir)
+        elif key == &#34;Contact-Email&#34;:
+            validate_contact_email(value)
+        elif key == &#34;External-Description&#34;:
+            validate_external_description(value)</code></pre>
+</details>
+<div class="desc"><p>Validate the bag-info.txt file in a Bagit directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>bag_dir</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the Bagit directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If the bag-info.txt file is missing or invalid.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Checks for required entries and validates their values.</li>
+<li>Raises an error immediately if any check fails.</li>
+</ul></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_contact_email"><code class="name flex">
+<span>def <span class="ident">validate_contact_email</span></span>(<span>value: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_contact_email(value: str) -&gt; None:
+    &#34;&#34;&#34;
+    Check the value for &#39;Contact-Email&#39;.
+
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is not a valid email address.
+    &#34;&#34;&#34;
+    pattern = r&#34;^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}$&#34;
+    if not re.match(pattern, value):
+        raise BagValidationError(
+            f&#34;Value for &#39;Contact-Email&#39; is not a valid email address: {value}&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>Check the value for 'Contact-Email'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>str</code></dt>
+<dd>Value to validate.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If the value is not a valid email address.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_external_description"><code class="name flex">
+<span>def <span class="ident">validate_external_description</span></span>(<span>value: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_external_description(value: str) -&gt; None:
+    &#34;&#34;&#34;
+    Check the value for &#39;External-Description&#39;.
+
+    Args:
+        value (str): Value to validate.
+
+    Raises:
+        BagValidationError: If the value is empty.
+    &#34;&#34;&#34;
+    if not value.strip():
+        raise BagValidationError(&#34;Value for &#39;External-Description&#39; must not be empty&#34;)</code></pre>
+</details>
+<div class="desc"><p>Check the value for 'External-Description'.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>str</code></dt>
+<dd>Value to validate.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If the value is empty.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_payload_oxum"><code class="name flex">
+<span>def <span class="ident">validate_payload_oxum</span></span>(<span>value: str, bag_dir: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_payload_oxum(value: str, bag_dir: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Check the value for &#39;Payload-Oxum&#39;.
+
+    The value must be in the format &#39;size.file_count&#39;.
+    The size must match the actual size of the payload.
+    The file_count must match the actual number of files in the payload.
+
+    Args:
+        value (str): Value to validate.
+        bag_dir (Path): Path to the Bagit directory.
+
+    Raises:
+        BagValidationError: If the value is not valid or does not match the payload.
+    &#34;&#34;&#34;
+    parts = value.split(&#34;.&#34;)
+    if len(parts) != len([&#34;size&#34;, &#34;file_count&#34;]):
+        raise BagValidationError(
+            f&#34;Value for &#39;Payload-Oxum&#39; is not valid: {value}. &#34;
+            &#34;It must be in the format &#39;size.file_count&#39;.&#34;
+        )
+    if not all(part.isdigit() for part in parts):
+        raise BagValidationError(
+            f&#34;Value for &#39;Payload-Oxum&#39; is not valid: {value}. &#34;
+            &#34;Both size and file_count must be integers.&#34;
+        )
+    size, file_count = value.split(&#34;.&#34;)
+    size = int(size)
+    real_size = utils.count_bytes(bag_dir / &#34;data&#34;)
+    if real_size != size:
+        raise BagValidationError(
+            (
+                f&#34;{bag_dir}: &#34;
+                f&#34;Value for &#39;Payload-Oxum&#39; ({size}) does not match &#34;
+                f&#34;the actual payload size: {real_size}&#34;
+            )
+        )
+    real_file_count = utils.count_files(bag_dir / &#34;data&#34;)
+    if real_file_count != int(file_count):
+        raise BagValidationError(
+            (
+                f&#34;{bag_dir}: &#34;
+                f&#34;Value for &#39;Payload-Oxum&#39; ({file_count}) does not match &#34;
+                f&#34;the actual number of files: {real_file_count}&#34;
+            )
+        )</code></pre>
+</details>
+<div class="desc"><p>Check the value for 'Payload-Oxum'.</p>
+<p>The value must be in the format 'size.file_count'.
+The size must match the actual size of the payload.
+The file_count must match the actual number of files in the payload.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>str</code></dt>
+<dd>Value to validate.</dd>
+<dt><strong><code>bag_dir</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the Bagit directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If the value is not valid or does not match the payload.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.sip.validation.baginfo.validate_required_baginfo_entries"><code class="name flex">
+<span>def <span class="ident">validate_required_baginfo_entries</span></span>(<span>entries: list[tuple[str, str]]) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_required_baginfo_entries(entries: list[tuple[str, str]]) -&gt; None:
+    &#34;&#34;&#34;
+    Check if all required values are present in the bag-info.txt file.
+
+    Args:
+        entries (list[tuple[str, str]]): List of (key, value) tuples from bag-info.txt.
+
+    Raises:
+        BagValidationError: If a required entry is missing.
+    &#34;&#34;&#34;
+    required_keys = [
+        &#34;Bagging-Date&#34;,
+        &#34;Payload-Oxum&#34;,
+        &#34;Contact-Email&#34;,
+        &#34;External-Description&#34;,
+    ]
+
+    existing_keys = [key for key, _ in entries]
+    for key in required_keys:
+        if key not in existing_keys:
+            raise BagValidationError(f&#34;Missing required entry &#39;{key}&#39; in bag-info.txt&#34;)</code></pre>
+</details>
+<div class="desc"><p>Check if all required values are present in the bag-info.txt file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>entries</code></strong> :&ensp;<code>list[tuple[str, str]]</code></dt>
+<dd>List of (key, value) tuples from bag-info.txt.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>BagValidationError</code></dt>
+<dd>If a required entry is missing.</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.sip.validation" href="index.html">gamslib.sip.validation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.sip.validation.baginfo.read_baginfo_txt" href="#gamslib.sip.validation.baginfo.read_baginfo_txt">read_baginfo_txt</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_bagging_date" href="#gamslib.sip.validation.baginfo.validate_bagging_date">validate_bagging_date</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_baginfo_text" href="#gamslib.sip.validation.baginfo.validate_baginfo_text">validate_baginfo_text</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_contact_email" href="#gamslib.sip.validation.baginfo.validate_contact_email">validate_contact_email</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_external_description" href="#gamslib.sip.validation.baginfo.validate_external_description">validate_external_description</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_payload_oxum" href="#gamslib.sip.validation.baginfo.validate_payload_oxum">validate_payload_oxum</a></code></li>
+<li><code><a title="gamslib.sip.validation.baginfo.validate_required_baginfo_entries" href="#gamslib.sip.validation.baginfo.validate_required_baginfo_entries">validate_required_baginfo_entries</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

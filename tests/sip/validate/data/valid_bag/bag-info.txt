@@ -1,0 +1,5 @@
+Bagging-Date: 2024-08-22
+Payload-Oxum: 78221.3
+Contact-Email: dh@uni-graz.at
+Contact-Email: foo@example.com
+External-Description: Test SIP

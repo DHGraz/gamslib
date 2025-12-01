@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.formatdetect.formatinfo API documentation</title>
+<meta name="description" content="Describes the format of a file …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.formatdetect.formatinfo</code></h1>
+</header>
+<section id="section-intro">
+<p>Describes the format of a file.</p>
+<p>FormatInfo objects are returned by format detectors.</p>
+<p>It also defines the SubType enum, which contains all supported subtypes
+of formats.</p>
+<p>The subtype data is fetched from CSV files located in the resources directory
+of the formatdetect package.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.formatdetect.formatinfo.extract_subtype_info_from_csv"><code class="name flex">
+<span>def <span class="ident">extract_subtype_info_from_csv</span></span>(<span>) ‑> dict[str, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_subtype_info_from_csv() -&gt; dict[str, str]:
+    &#34;&#34;&#34;
+    Extract data needed for the SubType enum.
+
+    Loads subtype information from all CSV files in the resources directory.
+
+    Returns:
+        dict[str, str]: Mapping of subformat to full name for the SubType enum.
+    &#34;&#34;&#34;
+    return {item[&#34;subformat&#34;]: item[&#34;full name&#34;] for item in load_subtypes_from_csv()}</code></pre>
+</details>
+<div class="desc"><p>Extract data needed for the SubType enum.</p>
+<p>Loads subtype information from all CSV files in the resources directory.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>Mapping of subformat to full name for the SubType enum.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.find_subtype_csv_files"><code class="name flex">
+<span>def <span class="ident">find_subtype_csv_files</span></span>(<span>) ‑> list[pathlib._local.Path]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_subtype_csv_files() -&gt; list[Path]:
+    &#34;&#34;&#34;
+    Find all CSV files in the resources directory that contain subtype definitions.
+
+    Returns:
+        list[Path]: List of Path objects pointing to the CSV files.
+    &#34;&#34;&#34;
+    resource_dir = impresources.files(&#34;gamslib&#34;) / &#34;formatdetect&#34; / &#34;resources&#34;
+    return list(resource_dir.glob(&#34;*.csv&#34;))</code></pre>
+</details>
+<div class="desc"><p>Find all CSV files in the resources directory that contain subtype definitions.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[Path]</code></dt>
+<dd>List of Path objects pointing to the CSV files.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.load_subtypes_from_csv"><code class="name flex">
+<span>def <span class="ident">load_subtypes_from_csv</span></span>(<span>) ‑> list[dict[str, str]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_subtypes_from_csv() -&gt; list[dict[str, str]]:
+    &#34;&#34;&#34;
+    Load subtypes from all CSV files in the resources directory.
+
+    Returns:
+        list[dict[str, str]]: List of dictionaries, each containing keys:
+            &#39;subformat&#39;, &#39;full name&#39;, &#39;ds name&#39;, &#39;mimetype&#39;, and &#39;maintype&#39;.
+    &#34;&#34;&#34;
+    subtypes = []
+    for csvfile in find_subtype_csv_files():
+        maintype = csvfile.stem.split(&#34;_&#34;, 1)[0]  # Extract the main type from the filename
+        with csvfile.open(&#34;r&#34;, encoding=&#34;utf-8&#34;) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                row[&#34;maintype&#34;] = maintype  # Add the main type to each row
+                # Strip whitespace from keys and values
+                stripped_row = {k.strip(): v.strip() for k, v in row.items()}
+                subtypes.append(stripped_row)
+    return subtypes</code></pre>
+</details>
+<div class="desc"><p>Load subtypes from all CSV files in the resources directory.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[dict[str, str]]</code></dt>
+<dd>List of dictionaries, each containing keys:
+'subformat', 'full name', 'ds name', 'mimetype', and 'maintype'.</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo"><code class="flex name class">
+<span>class <span class="ident">FormatInfo</span></span>
+<span>(</span><span>detector: str,<br>mimetype: str,<br>subtype: <a title="gamslib.formatdetect.formatinfo.SubType" href="#gamslib.formatdetect.formatinfo.SubType">SubType</a> | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class FormatInfo:
+    &#34;&#34;&#34;
+    Object containing basic information about the format of a file.
+
+    FormatInfo objects are returned by format detectors.
+
+    Attributes:
+        detector (str): Name of the detector that detected the format.
+        mimetype (str): MIME type of the file (e.g., &#39;text/xml&#39;).
+        subtype (SubType | None): Subtype of the format, if detected.
+    &#34;&#34;&#34;
+
+    detector: str  # name of the detector that detected the format
+    mimetype: str  # eg. text/xml
+    subtype: SubType | None = None  # type: ignore
+
+    def is_xml_type(self) -&gt; bool:  # type: ignore
+        &#34;&#34;&#34;
+        Check if the subtype is an XML type.
+
+        Returns:
+            bool: True if the subtype&#39;s maintype is &#39;xml&#39;, False otherwise.
+        &#34;&#34;&#34;
+        subtype_info = self._get_subtype_info()
+        if subtype_info is not None:
+            return (
+                subtype_info[&#34;subformat&#34;] == self.subtype.name
+                and subtype_info[&#34;maintype&#34;] == &#34;xml&#34;
+            )
+        return False
+
+    def is_json_type(self) -&gt; bool:  # type: ignore
+        &#34;&#34;&#34;
+        Check if the subtype is a JSON type.
+
+        Returns:
+            bool: True if the subtype&#39;s maintype is &#39;json&#39;, False otherwise.
+        &#34;&#34;&#34;
+        subtype_info = self._get_subtype_info()
+        if subtype_info is not None:
+            return (
+                subtype_info[&#34;subformat&#34;] == self.subtype.name
+                and subtype_info[&#34;maintype&#34;] == &#34;json&#34;
+            )
+        return False
+
+    @property
+    def description(self) -&gt; str:
+        &#34;&#34;&#34;
+        Return a human-friendly description of the format.
+
+        Returns:
+            str: Description based on subtype info, MIME type, or defaults.
+        &#34;&#34;&#34;
+        mime_prefix_map = {
+            &#34;text/&#34;: &#34;Text document&#34;,
+            &#34;image/&#34;: &#34;Image document&#34;,
+            &#34;audio/&#34;: &#34;Audio document&#34;,
+            &#34;video/&#34;: &#34;Video document&#34;,
+            &#34;application/&#34;: &#34;Application document&#34;,
+        }
+        desc = &#34;&#34;
+        subtype_info = self._get_subtype_info()
+        if subtype_info is not None:
+            desc = subtype_info[&#34;ds name&#34;]
+        elif self.mimetype == &#34;application/octet-stream&#34;:
+            desc = &#34;Binary document&#34;
+        else:
+            for prefix, description in mime_prefix_map.items():
+                if self.mimetype.startswith(prefix):
+                    desc = description
+                    break
+        return desc
+
+    def _get_subtype_info(self) -&gt; dict[str, str] | None:
+        &#34;&#34;&#34;
+        Get the full subtype information from the CSV files for this format.
+
+        Returns:
+            dict[str, str] | None: Subtype info dictionary, or None if not found.
+        &#34;&#34;&#34;
+        subtype_info = None
+        if self.subtype is not None:
+            for subtype in load_subtypes_from_csv():
+                if subtype[&#34;subformat&#34;] == self.subtype.name:
+                    subtype_info = subtype
+        return subtype_info</code></pre>
+</details>
+<div class="desc"><p>Object containing basic information about the format of a file.</p>
+<p>FormatInfo objects are returned by format detectors.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>detector</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the detector that detected the format.</dd>
+<dt><strong><code>mimetype</code></strong> :&ensp;<code>str</code></dt>
+<dd>MIME type of the file (e.g., 'text/xml').</dd>
+<dt><strong><code>subtype</code></strong> :&ensp;<code>SubType | None</code></dt>
+<dd>Subtype of the format, if detected.</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.description"><code class="name">prop <span class="ident">description</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def description(self) -&gt; str:
+    &#34;&#34;&#34;
+    Return a human-friendly description of the format.
+
+    Returns:
+        str: Description based on subtype info, MIME type, or defaults.
+    &#34;&#34;&#34;
+    mime_prefix_map = {
+        &#34;text/&#34;: &#34;Text document&#34;,
+        &#34;image/&#34;: &#34;Image document&#34;,
+        &#34;audio/&#34;: &#34;Audio document&#34;,
+        &#34;video/&#34;: &#34;Video document&#34;,
+        &#34;application/&#34;: &#34;Application document&#34;,
+    }
+    desc = &#34;&#34;
+    subtype_info = self._get_subtype_info()
+    if subtype_info is not None:
+        desc = subtype_info[&#34;ds name&#34;]
+    elif self.mimetype == &#34;application/octet-stream&#34;:
+        desc = &#34;Binary document&#34;
+    else:
+        for prefix, description in mime_prefix_map.items():
+            if self.mimetype.startswith(prefix):
+                desc = description
+                break
+    return desc</code></pre>
+</details>
+<div class="desc"><p>Return a human-friendly description of the format.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Description based on subtype info, MIME type, or defaults.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.detector"><code class="name">var <span class="ident">detector</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.mimetype"><code class="name">var <span class="ident">mimetype</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.subtype"><code class="name">var <span class="ident">subtype</span> : <a title="gamslib.formatdetect.formatinfo.SubType" href="#gamslib.formatdetect.formatinfo.SubType">SubType</a> | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.is_json_type"><code class="name flex">
+<span>def <span class="ident">is_json_type</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_json_type(self) -&gt; bool:  # type: ignore
+    &#34;&#34;&#34;
+    Check if the subtype is a JSON type.
+
+    Returns:
+        bool: True if the subtype&#39;s maintype is &#39;json&#39;, False otherwise.
+    &#34;&#34;&#34;
+    subtype_info = self._get_subtype_info()
+    if subtype_info is not None:
+        return (
+            subtype_info[&#34;subformat&#34;] == self.subtype.name
+            and subtype_info[&#34;maintype&#34;] == &#34;json&#34;
+        )
+    return False</code></pre>
+</details>
+<div class="desc"><p>Check if the subtype is a JSON type.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the subtype's maintype is 'json', False otherwise.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.FormatInfo.is_xml_type"><code class="name flex">
+<span>def <span class="ident">is_xml_type</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_xml_type(self) -&gt; bool:  # type: ignore
+    &#34;&#34;&#34;
+    Check if the subtype is an XML type.
+
+    Returns:
+        bool: True if the subtype&#39;s maintype is &#39;xml&#39;, False otherwise.
+    &#34;&#34;&#34;
+    subtype_info = self._get_subtype_info()
+    if subtype_info is not None:
+        return (
+            subtype_info[&#34;subformat&#34;] == self.subtype.name
+            and subtype_info[&#34;maintype&#34;] == &#34;xml&#34;
+        )
+    return False</code></pre>
+</details>
+<div class="desc"><p>Check if the subtype is an XML type.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the subtype's maintype is 'xml', False otherwise.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType"><code class="flex name class">
+<span>class <span class="ident">SubType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum where members are also (and must be) strings</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="gamslib.formatdetect.formatinfo.SubType.ATOM"><code class="name">var <span class="ident">ATOM</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.Collada"><code class="name">var <span class="ident">Collada</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.DCMI"><code class="name">var <span class="ident">DCMI</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.DataCite"><code class="name">var <span class="ident">DataCite</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.DocBook"><code class="name">var <span class="ident">DocBook</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.EAD"><code class="name">var <span class="ident">EAD</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.GML"><code class="name">var <span class="ident">GML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.JSON"><code class="name">var <span class="ident">JSON</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.JSONL"><code class="name">var <span class="ident">JSONL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.JSONLD"><code class="name">var <span class="ident">JSONLD</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.JSONSCHEMA"><code class="name">var <span class="ident">JSONSCHEMA</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.KML"><code class="name">var <span class="ident">KML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.LIDO"><code class="name">var <span class="ident">LIDO</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.MARC21"><code class="name">var <span class="ident">MARC21</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.METS"><code class="name">var <span class="ident">METS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.MODS"><code class="name">var <span class="ident">MODS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.MathML"><code class="name">var <span class="ident">MathML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.ODF"><code class="name">var <span class="ident">ODF</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.OWL"><code class="name">var <span class="ident">OWL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.PREMIS"><code class="name">var <span class="ident">PREMIS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.PresentationML"><code class="name">var <span class="ident">PresentationML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.RDF"><code class="name">var <span class="ident">RDF</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.RDFS"><code class="name">var <span class="ident">RDFS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.RSS"><code class="name">var <span class="ident">RSS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.RelaxNG"><code class="name">var <span class="ident">RelaxNG</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.SMIL"><code class="name">var <span class="ident">SMIL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.SOAP"><code class="name">var <span class="ident">SOAP</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.SVG"><code class="name">var <span class="ident">SVG</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.SVG_Animation"><code class="name">var <span class="ident">SVG_Animation</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.Schematron"><code class="name">var <span class="ident">Schematron</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.SpreadsheetML"><code class="name">var <span class="ident">SpreadsheetML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.TEI"><code class="name">var <span class="ident">TEI</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.VoiceXML"><code class="name">var <span class="ident">VoiceXML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.WSDL"><code class="name">var <span class="ident">WSDL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.WordprocessingML"><code class="name">var <span class="ident">WordprocessingML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.X3D"><code class="name">var <span class="ident">X3D</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XBRL"><code class="name">var <span class="ident">XBRL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XForms"><code class="name">var <span class="ident">XForms</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XHTML"><code class="name">var <span class="ident">XHTML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XHTML_RDFa"><code class="name">var <span class="ident">XHTML_RDFa</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XML"><code class="name">var <span class="ident">XML</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XSD"><code class="name">var <span class="ident">XSD</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.XSLT"><code class="name">var <span class="ident">XSLT</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="gamslib.formatdetect.formatinfo.SubType.Xlink"><code class="name">var <span class="ident">Xlink</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.formatdetect" href="index.html">gamslib.formatdetect</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.formatdetect.formatinfo.extract_subtype_info_from_csv" href="#gamslib.formatdetect.formatinfo.extract_subtype_info_from_csv">extract_subtype_info_from_csv</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.find_subtype_csv_files" href="#gamslib.formatdetect.formatinfo.find_subtype_csv_files">find_subtype_csv_files</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.load_subtypes_from_csv" href="#gamslib.formatdetect.formatinfo.load_subtypes_from_csv">load_subtypes_from_csv</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.formatdetect.formatinfo.FormatInfo" href="#gamslib.formatdetect.formatinfo.FormatInfo">FormatInfo</a></code></h4>
+<ul class="two-column">
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.description" href="#gamslib.formatdetect.formatinfo.FormatInfo.description">description</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.detector" href="#gamslib.formatdetect.formatinfo.FormatInfo.detector">detector</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.is_json_type" href="#gamslib.formatdetect.formatinfo.FormatInfo.is_json_type">is_json_type</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.is_xml_type" href="#gamslib.formatdetect.formatinfo.FormatInfo.is_xml_type">is_xml_type</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.mimetype" href="#gamslib.formatdetect.formatinfo.FormatInfo.mimetype">mimetype</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.FormatInfo.subtype" href="#gamslib.formatdetect.formatinfo.FormatInfo.subtype">subtype</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="gamslib.formatdetect.formatinfo.SubType" href="#gamslib.formatdetect.formatinfo.SubType">SubType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.ATOM" href="#gamslib.formatdetect.formatinfo.SubType.ATOM">ATOM</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.Collada" href="#gamslib.formatdetect.formatinfo.SubType.Collada">Collada</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.DCMI" href="#gamslib.formatdetect.formatinfo.SubType.DCMI">DCMI</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.DataCite" href="#gamslib.formatdetect.formatinfo.SubType.DataCite">DataCite</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.DocBook" href="#gamslib.formatdetect.formatinfo.SubType.DocBook">DocBook</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.EAD" href="#gamslib.formatdetect.formatinfo.SubType.EAD">EAD</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.GML" href="#gamslib.formatdetect.formatinfo.SubType.GML">GML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.JSON" href="#gamslib.formatdetect.formatinfo.SubType.JSON">JSON</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.JSONL" href="#gamslib.formatdetect.formatinfo.SubType.JSONL">JSONL</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.JSONLD" href="#gamslib.formatdetect.formatinfo.SubType.JSONLD">JSONLD</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.JSONSCHEMA" href="#gamslib.formatdetect.formatinfo.SubType.JSONSCHEMA">JSONSCHEMA</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.KML" href="#gamslib.formatdetect.formatinfo.SubType.KML">KML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.LIDO" href="#gamslib.formatdetect.formatinfo.SubType.LIDO">LIDO</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.MARC21" href="#gamslib.formatdetect.formatinfo.SubType.MARC21">MARC21</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.METS" href="#gamslib.formatdetect.formatinfo.SubType.METS">METS</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.MODS" href="#gamslib.formatdetect.formatinfo.SubType.MODS">MODS</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.MathML" href="#gamslib.formatdetect.formatinfo.SubType.MathML">MathML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.ODF" href="#gamslib.formatdetect.formatinfo.SubType.ODF">ODF</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.OWL" href="#gamslib.formatdetect.formatinfo.SubType.OWL">OWL</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.PREMIS" href="#gamslib.formatdetect.formatinfo.SubType.PREMIS">PREMIS</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.PresentationML" href="#gamslib.formatdetect.formatinfo.SubType.PresentationML">PresentationML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.RDF" href="#gamslib.formatdetect.formatinfo.SubType.RDF">RDF</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.RDFS" href="#gamslib.formatdetect.formatinfo.SubType.RDFS">RDFS</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.RSS" href="#gamslib.formatdetect.formatinfo.SubType.RSS">RSS</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.RelaxNG" href="#gamslib.formatdetect.formatinfo.SubType.RelaxNG">RelaxNG</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.SMIL" href="#gamslib.formatdetect.formatinfo.SubType.SMIL">SMIL</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.SOAP" href="#gamslib.formatdetect.formatinfo.SubType.SOAP">SOAP</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.SVG" href="#gamslib.formatdetect.formatinfo.SubType.SVG">SVG</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.SVG_Animation" href="#gamslib.formatdetect.formatinfo.SubType.SVG_Animation">SVG_Animation</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.Schematron" href="#gamslib.formatdetect.formatinfo.SubType.Schematron">Schematron</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.SpreadsheetML" href="#gamslib.formatdetect.formatinfo.SubType.SpreadsheetML">SpreadsheetML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.TEI" href="#gamslib.formatdetect.formatinfo.SubType.TEI">TEI</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.VoiceXML" href="#gamslib.formatdetect.formatinfo.SubType.VoiceXML">VoiceXML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.WSDL" href="#gamslib.formatdetect.formatinfo.SubType.WSDL">WSDL</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.WordprocessingML" href="#gamslib.formatdetect.formatinfo.SubType.WordprocessingML">WordprocessingML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.X3D" href="#gamslib.formatdetect.formatinfo.SubType.X3D">X3D</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XBRL" href="#gamslib.formatdetect.formatinfo.SubType.XBRL">XBRL</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XForms" href="#gamslib.formatdetect.formatinfo.SubType.XForms">XForms</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XHTML" href="#gamslib.formatdetect.formatinfo.SubType.XHTML">XHTML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XHTML_RDFa" href="#gamslib.formatdetect.formatinfo.SubType.XHTML_RDFa">XHTML_RDFa</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XML" href="#gamslib.formatdetect.formatinfo.SubType.XML">XML</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XSD" href="#gamslib.formatdetect.formatinfo.SubType.XSD">XSD</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.XSLT" href="#gamslib.formatdetect.formatinfo.SubType.XSLT">XSLT</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo.SubType.Xlink" href="#gamslib.formatdetect.formatinfo.SubType.Xlink">Xlink</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

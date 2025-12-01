@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.formatdetect API documentation</title>
+<meta name="description" content="File format detection utilities for GAMS projects …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.formatdetect</code></h1>
+</header>
+<section id="section-intro">
+<p>File format detection utilities for GAMS projects.</p>
+<p>This submodule provides functions and classes to detect the format of files and return
+a FormatInfo object describing the detected format.</p>
+<p>Currently these Detectors are available:</p>
+<ul>
+<li>MimeDetector: Uses the <code>mimetypes</code> library to identify
+file formats based on file extensions. This is a minimal detector
+and should be used as a fallback only.</li>
+<li>MagikaDetector: Uses the Google Magika library to identify
+file formats based on file content. This is the preferred
+detector and should be used by default.</li>
+</ul>
+<p>All detectors implement the FormatDetector abstract base class
+and return FormatInfo objects with the detected format information.
+The FormatInfo object includes the MIME type, detector name, and the
+subformat name if applicable. The subformat is determined by heuristics
+based on the MIME type and file content. </p>
+<p>Currently supported subformats include:</p>
+<ul>
+<li>XML subformats</li>
+<li>JSON subformats</li>
+</ul>
+<h2 id="features">Features</h2>
+<ul>
+<li><code><a title="gamslib.formatdetect.detect_format" href="#gamslib.formatdetect.detect_format">detect_format()</a></code>: Main function to detect the format of a file.</li>
+<li>Detector selection based on configuration ('general.format_detector').</li>
+<li>Support for multiple detectors (e.g., Magika, MinimalDetector).</li>
+<li>Extensible for future REST-based detectors (e.g., FITS).</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>Use <code><a title="gamslib.formatdetect.detect_format" href="#gamslib.formatdetect.detect_format">detect_format()</a>(filepath)</code> to get format information for a file.
+Detector is chosen automatically based on configuration, but can be set explicitly for testing.</p>
+<h2 id="configuration">Configuration</h2>
+<ul>
+<li>'general.format_detector': Name of the detector to use (default: 'magika').</li>
+<li>'general.format_detector_url': Optional URL for REST-based detectors.</li>
+</ul>
+<h2 id="future">Future</h2>
+<p>Additional detectors and REST-based services may be supported.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="gamslib.formatdetect.formatdetector" href="formatdetector.html">gamslib.formatdetect.formatdetector</a></code></dt>
+<dd>
+<div class="desc"><p>Abstract base class for format detectors …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.formatdetect.formatinfo" href="formatinfo.html">gamslib.formatdetect.formatinfo</a></code></dt>
+<dd>
+<div class="desc"><p>Describes the format of a file …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.formatdetect.jsontypes" href="jsontypes.html">gamslib.formatdetect.jsontypes</a></code></dt>
+<dd>
+<div class="desc"><p>Module to inspect and classify JSON files …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.formatdetect.magikadetector" href="magikadetector.html">gamslib.formatdetect.magikadetector</a></code></dt>
+<dd>
+<div class="desc"><p>A detector that uses the Google Magika library to detect file formats …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.formatdetect.minimaldetector" href="minimaldetector.html">gamslib.formatdetect.minimaldetector</a></code></dt>
+<dd>
+<div class="desc"><p>A detector that uses the mimetypes module to detect file formats …</p></div>
+</dd>
+<dt><code class="name"><a title="gamslib.formatdetect.xmltypes" href="xmltypes.html">gamslib.formatdetect.xmltypes</a></code></dt>
+<dd>
+<div class="desc"><p>Functions and data for detecting XML file types and subtypes …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.formatdetect.detect_format"><code class="name flex">
+<span>def <span class="ident">detect_format</span></span>(<span>filepath: pathlib._local.Path) ‑> <a title="gamslib.formatdetect.formatinfo.FormatInfo" href="formatinfo.html#gamslib.formatdetect.formatinfo.FormatInfo">FormatInfo</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_format(filepath: Path) -&gt; FormatInfo:
+    &#34;&#34;&#34;
+    Detect the format of a file and return a FormatInfo object describing the format.
+
+    Args:
+        filepath (Path): Path to the file to detect format for.
+
+    Returns:
+        FormatInfo: Object containing format information for the file.
+
+    Notes:
+        - Detector is chosen based on the configuration setting &#39;general.format_detector&#39;.
+        - If no configuration is found, the default detector is used.
+        - Explicit detector selection is only needed for testing or special cases.
+    &#34;&#34;&#34;
+    try:
+        config = get_configuration()
+        detector = make_detector(
+            config.general.format_detector, config.general.format_detector_url
+        )
+        return detector.guess_file_type(filepath)
+    except MissingConfigurationException:
+        # if no configuration is found, we use the default  detector
+        detector = make_detector(DEFAULT_DETECTOR_NAME)
+        return  make_detector(DEFAULT_DETECTOR_NAME).guess_file_type(filepath)</code></pre>
+</details>
+<div class="desc"><p>Detect the format of a file and return a FormatInfo object describing the format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filepath</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the file to detect format for.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>FormatInfo</code></dt>
+<dd>Object containing format information for the file.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Detector is chosen based on the configuration setting 'general.format_detector'.</li>
+<li>If no configuration is found, the default detector is used.</li>
+<li>Explicit detector selection is only needed for testing or special cases.</li>
+</ul></div>
+</dd>
+<dt id="gamslib.formatdetect.make_detector"><code class="name flex">
+<span>def <span class="ident">make_detector</span></span>(<span>detector_name: str, detector_url: str = '') ‑> <a title="gamslib.formatdetect.formatdetector.FormatDetector" href="formatdetector.html#gamslib.formatdetect.formatdetector.FormatDetector">FormatDetector</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@lru_cache
+def make_detector(detector_name: str, detector_url: str = &#34;&#34;) -&gt; FormatDetector:
+    &#34;&#34;&#34;
+    Return a detector object based on the given name and optional URL.
+
+    Args:
+        detector_name (str): Name of the detector to use (&#39;base&#39;, &#39;magika&#39;, etc.).
+        detector_url (str): Optional URL for REST-based detectors.
+
+    Returns:
+        FormatDetector: An instance of the selected detector.
+
+    Raises:
+        ValueError: If the detector name is unknown.
+
+    Notes:
+        - If no detector name is provided, the default detector is used.
+        - Future detectors may require checking for software or service availability.
+    &#34;&#34;&#34;
+    # TODO: as soon we have detector which depend on installed software or available services,
+    #       we must check for availability if no explicit detector is given
+    detector = None
+    if detector_name == &#34;&#34;:
+        detector_name = DEFAULT_DETECTOR_NAME
+    if detector_name == &#34;base&#34;:
+        detector = MinimalDetector()
+    elif detector_name == &#34;magika&#34;:
+        detector = MagikaDetector()
+    # TODO: add more detectors
+    if detector is None:
+        raise ValueError(f&#34;Unknown detector &#39;{detector_name}&#39;&#34;)
+    return detector</code></pre>
+</details>
+<div class="desc"><p>Return a detector object based on the given name and optional URL.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>detector_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the detector to use ('base', 'magika', etc.).</dd>
+<dt><strong><code>detector_url</code></strong> :&ensp;<code>str</code></dt>
+<dd>Optional URL for REST-based detectors.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>FormatDetector</code></dt>
+<dd>An instance of the selected detector.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the detector name is unknown.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>If no detector name is provided, the default detector is used.</li>
+<li>Future detectors may require checking for software or service availability.</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib" href="../index.html">gamslib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="gamslib.formatdetect.formatdetector" href="formatdetector.html">gamslib.formatdetect.formatdetector</a></code></li>
+<li><code><a title="gamslib.formatdetect.formatinfo" href="formatinfo.html">gamslib.formatdetect.formatinfo</a></code></li>
+<li><code><a title="gamslib.formatdetect.jsontypes" href="jsontypes.html">gamslib.formatdetect.jsontypes</a></code></li>
+<li><code><a title="gamslib.formatdetect.magikadetector" href="magikadetector.html">gamslib.formatdetect.magikadetector</a></code></li>
+<li><code><a title="gamslib.formatdetect.minimaldetector" href="minimaldetector.html">gamslib.formatdetect.minimaldetector</a></code></li>
+<li><code><a title="gamslib.formatdetect.xmltypes" href="xmltypes.html">gamslib.formatdetect.xmltypes</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.formatdetect.detect_format" href="#gamslib.formatdetect.detect_format">detect_format</a></code></li>
+<li><code><a title="gamslib.formatdetect.make_detector" href="#gamslib.formatdetect.make_detector">make_detector</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

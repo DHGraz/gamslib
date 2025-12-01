@@ -1,0 +1,207 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://gams.uni-graz.at/OAIS/sip-schema-d1.json",
+    "title": "SIP metadata for GAMS",
+    "description": "JSON Schema for GAMS SIPs.",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "The title of the object."
+        },
+        "project": {
+            "type": "string",
+            "description": "The name of the project."
+        },
+        "description": {
+            "type": "string",
+            "description": "A description of the object."
+        },
+        "creator": {
+            "type": "string",
+            "description": "The creator of the object."
+        },
+        "rights": {
+            "type": "string",
+            "description": "Rights and licensing information."
+        },
+        "publisher": {
+            "type": "string",
+            "description": "The publisher of the object."
+        },
+        "source": {
+            "type": "string",
+            "description": "A unique string identifying the upstream source digital repository (producer). `local` means the package was created from a local file system."
+        },
+        "recid": {
+            "type": "string",
+            "description": "The record ID of the object. This is typically the identifier of the object in the source repository."
+        },
+        "objectType": {
+            "type": "string",
+            "description": "The type of the object, e.g. 'text' or 'image'."
+        },
+        "created_by": {
+            "type": "string",
+            "description": "The creator of the package (typically a software)."
+        },
+        "mainResource": {
+            "type": "string",
+            "description": "The main resource id link of the object."
+        },
+        "sip_creation_timestamp": {
+            "description": "Date time timestamp of SIP creation",
+            "type": "integer"
+        },
+        "contenFiles": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/contenFile"
+            }
+        },
+        "audit": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/step"
+            }
+        },
+        "usr-meta": {
+            "$ref": "#/$defs/usr-meta"
+        }
+    },
+    "$defs": {
+        "usr-meta": {
+            "type": "object",
+            "description": "This field can be used by the user to provide additional information about the SIP or the payload: an embargo timestamp, a comment and a free text describing the collection of the harvested record",
+            "properties": {
+                "collection": {
+                    "type": "string"
+                },
+                "embargo_timestamp": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string"
+                }
+            }
+        },
+        "step": {
+            "type": "object",
+            "description": "A step in the SIP lifetime",
+            "properties": {
+                "tool": {
+                    "type": "object",
+                    "description": "Details on the tool responsible for this action"
+                },
+                "action": {
+                    "description": "Descriptive name for the action",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "contentFile": {
+            "description": "Object describing a single File with informations from its origin, checksums and bag location",
+            "type": "object",
+            "properties": {
+                "dsid": {
+                    "type": "string",
+                    "description": "The datastream ID of the file."
+                },
+                "mimetype": {
+                    "type": "string",
+                    "description": "The MIME type of the file."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "The title of the file."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "A description of the file."
+                },
+                "creator": {
+                    "type": "string",
+                    "description": "The creator of the file."
+                },
+                "rights": {
+                    "type": "string",
+                    "description": "Rights and licensing information."
+                },
+                "size": {
+                    "type": "integer",
+                    "description": "The size of the file in bytes."
+                },
+                "bagpath": {
+                    "description": "Path where the file can be found inside the SIP",
+                    "type": "string"
+                },
+                "lang": {
+                    "type": "array",
+                    "description": "The language(s) of the file."
+                },
+                "tags": {
+                    "type": "array",
+                    "description": "A list of tags associated with the file."
+                },
+                "origin": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "oneOf": [
+                                {
+                                    "type": "array"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "filename": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "url",
+                        "filename",
+                        "path"
+                    ]
+                },
+                "metadata": {
+                    "description": "Describes if the file is to be considered metadata",
+                    "type": "boolean"
+                },
+                "downloaded": {
+                    "description": "Describes if the file is included in the bag or not",
+                    "type": "boolean"
+                },
+                "checksum": {
+                    "description": "Available checksums for the file. Formatted as '<algorithm> <checksum>', e.g. 'md5 d41d8cd98f00b204e9800998ecf8427e'",
+                    "oneOf": [
+                        {
+                            "type": "array"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "dsid",
+                "mimetype",
+                "title",
+                "size",
+                "bagpath"
+            ]
+        }
+    }
+}
