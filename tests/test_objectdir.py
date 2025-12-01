@@ -24,7 +24,7 @@ from gamslib.objectdir import (
 
 def create_test_object_dir(
     tmp_path: Path,
-    object_dir: str,
+    object_id: str,
     datastreams: list[tuple],
     main_resource: str | None = None,
 ) -> Path:
@@ -44,11 +44,9 @@ def create_test_object_dir(
     Path
         The path to the created object directory
     """
-    escaped_dir_name = object_dir.replace(":", "%3A")
-    object_dir = tmp_path / escaped_dir_name
-    object_id = object_dir.name.replace("%3A", ":")
-    object_dir.mkdir(parents=True, exist_ok=True)
-    mgr = ObjectCSVManager(object_dir)
+    object_path: Path = tmp_path / object_id.replace(":", "%3A")
+    object_path.mkdir(parents=True, exist_ok=True)  
+    mgr = ObjectCSVManager(object_path)
     obj_dict = {}
     for field in gamslib.objectcsv.objectdata.ObjectData.fieldnames():
         if field == "recid":
@@ -69,12 +67,12 @@ def create_test_object_dir(
                 ds_dict[field] = content_type
             else:
                 ds_dict[field] = f"{field}_{i}"
-            ds_path = object_dir / ds_file_name
+            ds_path = object_path / ds_file_name
             ds_path.write_bytes(content)
             # ds_path.write_text(content, encoding="utf-8")
         mgr.add_datastream(gamslib.objectcsv.dsdata.DSData(**ds_dict))
     mgr.save()
-    return object_dir
+    return object_path
 
 
 @pytest.fixture(name="tei_content")
@@ -140,7 +138,7 @@ def valid_object_dir_fixture(
     tmp_path: Path, pdf_content, png_content, dc_content
 ) -> Generator[Path, None, None]:
     """Create a valid object directory for testing."""
-    dir_name = "valid_object"
+    dir_name = "o%3Atest.object.001"  
     datastreams = [
         ("foo.pdf", "application/pdf", pdf_content),
         ("DC.xml", "application/xml", dc_content),
@@ -581,4 +579,37 @@ def test_validate_dc_file_invalid(object_dir: Path):
     dc_file.write_text("<invalid<xml>>")
 
     with pytest.raises(ObjectDirectoryValidationError, match=r"DC.xml file is invalid"):
+        validate_dc_file(object_dir)
+
+
+def test_validate_dc_file_identifier_with_colon(tmp_path: Path, dc_content: bytes):
+    """Test validate_dc_file passes when directory name contains %3A and identifier uses colon."""
+    dir_name = "o%3Atest.object.001"
+    obj_dir = tmp_path / dir_name
+    obj_dir.mkdir()
+    (obj_dir / "DC.xml").write_bytes(dc_content)
+    (obj_dir / "object.csv").write_text(
+        "recid,mainResource\n" + dir_name.replace("%3A", ":") + ",foo.pdf"
+    )
+    (obj_dir / "datastreams.csv").write_text(
+        "dspath,dsid,mimetype\nfoo.pdf,foo.pdf,application/pdf"
+    )
+    # Should not raise
+    validate_dc_file(obj_dir)
+
+
+def test_validate_dc_file_identifier_mismatch(object_dir: Path):
+    """Test validate_dc_file raises if DC.xml identifier does not match directory name."""
+    dc_file = object_dir / "DC.xml"
+    # Change identifier in DC.xml to something else
+    xml = dc_file.read_text(encoding="utf-8")
+    xml = xml.replace(
+        "<dc:identifier>o:test.object.001</dc:identifier>",
+        "<dc:identifier>some.other.id</dc:identifier>",
+    )
+    dc_file.write_text(xml, encoding="utf-8")
+
+    with pytest.raises(
+        ObjectDirectoryValidationError, match=r"DC.xml identifier value does not match"
+    ):
         validate_dc_file(object_dir)

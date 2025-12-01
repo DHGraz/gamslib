@@ -1,18 +1,19 @@
 """Module for object directory management and validation in GAMS library."""
 
+import logging
 import os
 import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Generator
-import xml.etree.ElementTree as ET
 
 from gamslib import formatdetect
 from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv.defaultvalues import NAMESPACES
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 from gamslib.objectcsv.dublincore import DublinCore
-from gamslib.sip.utils import logger
+from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 
+logger = logging.getLogger(__name__)
 
 class ObjectDirectoryValidationError(Exception):
     """Exception raised when an object directory is invalid."""
@@ -59,22 +60,22 @@ def validate_directory_structure(object_path: Path) -> None:
     """
     if not object_path.is_dir():
         raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not exist or is not a directory."
+            f"Object directory '{object_path.name}' does not exist or is not a directory."
         )
 
     if not (object_path / "DC.xml").exists():
         raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not contain a DC.xml file."
+            f"Object directory '{object_path.name}' does not contain a DC.xml file."
         )
 
     # Check the object.csv file
     if not (object_path / "object.csv").is_file():
         raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not contain an object.csv file."
+            f"Object directory '{object_path.name}' does not contain an object.csv file."
         )
     if not (object_path / "datastreams.csv").is_file():
         raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}' does not contain a datastreams.csv file."
+            f"Object directory '{object_path.name}' does not contain a datastreams.csv file."
         )
 
 
@@ -178,19 +179,18 @@ def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
             csv_file = (
                 "object.csv" if match.group(1) == "ObjectData" else "datastreams.csv"
             )
-            # reason = 'unexpected' if 'unexpected' in match.group(2) else 'missing'
             if "unexpected" in match.group(2):
                 raise ObjectDirectoryValidationError(
-                    f"Object directory '{object_path}': {csv_file} contains an unexpected "
+                    f"Object directory '{object_path.name}': {csv_file} contains an unexpected "
                     f"field '{missing_field}'."
                 ) from e
             if "missing" in match.group(2):
                 raise ObjectDirectoryValidationError(
-                    f"Object directory '{object_path}': {csv_file} is missing a required "
+                    f"Object directory '{object_path.name}': {csv_file} is missing a required "
                     f"field '{missing_field}'."
                 ) from e
         # fallback for unexpected error messages
-        raise ObjectDirectoryValidationError(str(e)) from e
+        raise ObjectDirectoryValidationError(f"Object directory '{object_path.name}': {e}") from e
 
 
 def validate_csv_files(object_path: Path) -> None:
@@ -210,7 +210,7 @@ def validate_csv_files(object_path: Path) -> None:
         # check if recid matches directory name
         if csv_mgr.object_id != csv_mgr.get_object().recid:
             raise ObjectDirectoryValidationError(
-                f"Object directory '{object_path}': Directory name '{csv_mgr.object_id}' "
+                f"Object directory '{object_path.name}': Directory name '{csv_mgr.object_id}' "
                 f"does not match recid '{csv_mgr.get_object().recid}' in object.csv."
             )
         # check if all datastream files exist
@@ -218,12 +218,12 @@ def validate_csv_files(object_path: Path) -> None:
             ds_file_path = object_path / dsdata.dsid
             if not ds_file_path.is_file():
                 raise ObjectDirectoryValidationError(
-                    f"Object directory '{object_path}': Datastream file "
+                    f"Object directory '{object_path.name}': Datastream file "
                     f"'{dsdata.dspath.split('/')[-1]}' "
                     f"referenced in datastreams.csv does not exist."
                 )
     except ValueError as e:
-        raise ObjectDirectoryValidationError(str(e)) from e
+        raise ObjectDirectoryValidationError(f"Object directory '{object_path.name}': {e}") from e
 
 
 def validate_dc_file(object_path: Path) -> None:
@@ -240,9 +240,15 @@ def validate_dc_file(object_path: Path) -> None:
     try:
         dc = DublinCore(dc_file)
         dc.validate()
+        identifiers = dc.get_element_all_langs("identifier")
+        if object_path.name.replace("%3A", ":") not in identifiers:
+            raise ObjectDirectoryValidationError(
+                f"Object directory '{object_path.name}': DC.xml identifier value does not match "
+                f"the object directory name."
+            )
     except ValueError as e:
         raise ObjectDirectoryValidationError(
-            f"Object directory '{object_path}': DC.xml file is invalid: {e}"
+            f"Object directory '{object_path.name}': DC.xml file is invalid: {e}"
         ) from e
 
 
