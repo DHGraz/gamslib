@@ -16,9 +16,24 @@ from typing import Generator
 from gamslib.objectcsv import utils
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectdata import ObjectData
+from ..projectconfiguration import get_configuration,  MissingConfigurationException
 
 OBJ_CSV_FILENAME = "object.csv"
 DS_CSV_FILENAME = "datastreams.csv"
+
+# Files to ignore when searching for datastream files.
+DATASTREAM_FILES_TO_IGNORE = {
+    OBJ_CSV_FILENAME,
+    DS_CSV_FILENAME,
+    ".DS_Store",
+    "Thumbs.db",
+}
+# Extend ignore list from configuration, if available
+try:
+    cfg = get_configuration()
+    DATASTREAM_FILES_TO_IGNORE.update(cfg.general.ds_ignore_files)
+except MissingConfigurationException:
+    pass  # ignore configuration errors here
 
 
 class ObjectCSVManager:
@@ -96,6 +111,11 @@ class ObjectCSVManager:
         Raises:
             ValueError: If datastream with the same dsid exists and replace is False.
         """
+
+        # Datastreams from DATASTREAM_FILES_TO_IGNORE must not be added
+        if dsdata.dsid in DATASTREAM_FILES_TO_IGNORE:
+            raise ValueError(f"Datastream ID '{dsdata.dsid}' is not allowed.")
+        
         if dsdata.dsid in [ds.dsid for ds in self._datastream_data]:
             if replace:
                 self._datastream_data = [
@@ -209,6 +229,11 @@ class ObjectCSVManager:
                 "Required files object.csv and dadatastreams.csv are missing or empty."
             )
         self._object_data.validate()
+        # Make sure datastream IDs are unique
+        dsids = [dsdata.dsid for dsdata in self._datastream_data]
+        if len(dsids) != len(set(dsids)):
+            raise ValueError("Datastream IDs must be unique within an object.")
+        # Validate each datastream
         for dsdata in self._datastream_data:
             dsdata.validate()
 

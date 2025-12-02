@@ -22,7 +22,7 @@ from gamslib.projectconfiguration import Configuration
 from . import defaultvalues
 from .dsdata import DSData
 from .dublincore import DublinCore
-from .objectcsvmanager import DS_CSV_FILENAME, OBJ_CSV_FILENAME, ObjectCSVManager
+from .objectcsvmanager import DATASTREAM_FILES_TO_IGNORE, ObjectCSVManager
 from .objectdata import ObjectData
 
 logger = logging.getLogger()
@@ -31,6 +31,7 @@ logger = logging.getLogger()
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
 }
+
 
 
 def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
@@ -49,12 +50,7 @@ def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
     """
     if not ds_file.is_file():
         return False
-    if ds_file.name in (
-        OBJ_CSV_FILENAME,
-        DS_CSV_FILENAME,
-        ".DS_Store",
-        "Thumbs.db",
-    ):
+    if ds_file.name in DATASTREAM_FILES_TO_IGNORE:
         return False
     for pattern in configuration.general.ds_ignore_files:
         if fnmatch.fnmatch(ds_file.name, pattern):

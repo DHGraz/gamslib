@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.9] - 2025-12-02
+
+## Changed
+
+  - Adding datastreams to CSVManager now leads to a Value Error if they are in the list of ids 
+    to be ignored. This is a more generic way to avoid unwanted data streams, which also works, 
+    if the forbidden ids are included in the datastreams.csv file by accident.
+  - The list of illegal datastream ids can be extended via confuguration.
 
 ## [0.7.8] - 2025-12-02
 
