@@ -146,8 +146,9 @@ has checksum mismatches, or does not list all payload files.</dd>
         bag_dir (Path): Path to the Bagit directory.
 
     Raises:
-        BagValidationError: If the manifest-sha512.txt file is missing, empty, contains invalid lines,
-            has checksum mismatches, or does not list all payload files.
+        BagValidationError: If the manifest-sha512.txt file is missing,
+        empty, contains invalid lines, has checksum mismatches, or does not
+        list all payload files.
 
     Notes:
         - Checks that all files in the data directory are listed in the manifest.
@@ -196,9 +197,10 @@ has checksum mismatches, or does not list all payload files.</dd>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>BagValidationError</code></dt>
-<dd>If the manifest-sha512.txt file is missing, empty, contains invalid lines,
-has checksum mismatches, or does not list all payload files.</dd>
+<dd>If the manifest-sha512.txt file is missing,</dd>
 </dl>
+<p>empty, contains invalid lines, has checksum mismatches, or does not
+list all payload files.</p>
 <h2 id="notes">Notes</h2>
 <ul>
 <li>Checks that all files in the data directory are listed in the manifest.</li>

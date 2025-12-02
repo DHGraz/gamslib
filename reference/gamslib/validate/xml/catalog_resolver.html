@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.validate.xml.catalog_resolver API documentation</title>
+<meta name="description" content="This module implements a catalog resolver for XML schema validation …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.validate.xml.catalog_resolver</code></h1>
+</header>
+<section id="section-intro">
+<p>This module implements a catalog resolver for XML schema validation.</p>
+<p>libxml2 version 2.14.0 started to enforce the use of XML catalogs for
+resolving external entities. This class provides a resolver that uses
+a specified catalog file to resolve schema locations.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.validate.xml.catalog_resolver.CatalogResolver"><code class="flex name class">
+<span>class <span class="ident">CatalogResolver</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CatalogResolver(etree.Resolver):
+    &#34;&#34;&#34;A dynamic XML catalog resolver for lxml to resolve external entities.
+
+    This class extends `etree.Resolver` to provide custom resolution of external XML entities
+    using a local catalog. It intercepts requests for external resources (such as DTDs or schemas)
+    and attempts to resolve them to local files, improving performance and reliability.
+
+    The local schema files are mapped in the `SCHEMA_MAP` dictionary defined in this module.
+
+    &#34;&#34;&#34;
+
+    def resolve(self, system_url: str, public_id: str | None, context: Any) -&gt; str | None:
+        &#34;&#34;&#34;Resolve the system ID using the catalog.
+
+        Args:
+            url (str): The system ID (URL) to resolve.
+            public_id (str | None): The public ID (not used, kept for compatibility).
+            context (Any): The parser context (not used, kept for compatibility).
+
+        Returns:
+            str | None: The resolved local filename, or None if not found.
+            url: The system ID (url) to resolve.
+            public_id: The public ID (not used - kept for compatibility).
+            context: The parser context (not used - kept for compatibility).
+        &#34;&#34;&#34;
+        # load from file
+        schema_path = self.get_local_schema_path(system_url)
+        if schema_path is not None:
+            return self.resolve_filename(schema_path, context)
+        
+        # locally not found, check if loading from internet is allowed
+        if self.is_allowed_schema_url(system_url): 
+            try:
+                response = requests.get(system_url, timeout=10)
+                response.raise_for_status()
+                return self.resolve_string(response.content, context)
+            except requests.RequestException as e:
+                    logger.warning(&#34;Fehler beim Herunterladen der Ressource %s: %s&#34;, system_url, e)    
+                    return None
+        return None
+
+    def resolve_string(self, data: bytes, context: Any) -&gt; Any:  # etree._InputDocument:
+        &#34;&#34;&#34;Resolve the data from a byte string.
+
+        :param data: The byte string containing the XML data.
+        :param context: The parser context.
+        :return: An _InputDocument containing the XML data.
+        &#34;&#34;&#34;
+        return self.resolve_file(BytesIO(data), context)
+
+    @classmethod
+    def is_allowed_schema_url(cls, schema_url: str) -&gt; bool:
+        &#34;&#34;&#34;Check if the schema URL is allowed to be loaded directly from the internet.
+
+        :param schema_url: The URL of the schema.
+        :return: True if the URL is allowed, False otherwise.
+        &#34;&#34;&#34;
+        return any(re.match(pattern, schema_url) for pattern in ALLOWD_SCHEMA_URLS)
+
+    @classmethod
+    def get_local_schema_path(cls, schema_url: str) -&gt; str | None:
+        &#34;&#34;&#34;Get the local schema file path for a given schema URL.
+
+        :param schema_url: The URL of the schema.
+        :return: The local file path of the schema, or None if not found.
+        &#34;&#34;&#34;
+        if schema_url in SCHEMA_MAP:
+            with impresources.path(
+                &#34;gamslib.validate.xml&#34;, SCHEMA_MAP[schema_url]
+            ) as schema_path:
+                return schema_path.as_posix()   
+        return None</code></pre>
+</details>
+<div class="desc"><p>A dynamic XML catalog resolver for lxml to resolve external entities.</p>
+<p>This class extends <code>etree.Resolver</code> to provide custom resolution of external XML entities
+using a local catalog. It intercepts requests for external resources (such as DTDs or schemas)
+and attempts to resolve them to local files, improving performance and reliability.</p>
+<p>The local schema files are mapped in the <code>SCHEMA_MAP</code> dictionary defined in this module.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>lxml.etree.Resolver</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="gamslib.validate.xml.catalog_resolver.CatalogResolver.get_local_schema_path"><code class="name flex">
+<span>def <span class="ident">get_local_schema_path</span></span>(<span>schema_url: str) ‑> str | None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the local schema file path for a given schema URL.</p>
+<p>:param schema_url: The URL of the schema.
+:return: The local file path of the schema, or None if not found.</p></div>
+</dd>
+<dt id="gamslib.validate.xml.catalog_resolver.CatalogResolver.is_allowed_schema_url"><code class="name flex">
+<span>def <span class="ident">is_allowed_schema_url</span></span>(<span>schema_url: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the schema URL is allowed to be loaded directly from the internet.</p>
+<p>:param schema_url: The URL of the schema.
+:return: True if the URL is allowed, False otherwise.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve"><code class="name flex">
+<span>def <span class="ident">resolve</span></span>(<span>self, system_url: str, public_id: str | None, context: Any) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resolve(self, system_url: str, public_id: str | None, context: Any) -&gt; str | None:
+    &#34;&#34;&#34;Resolve the system ID using the catalog.
+
+    Args:
+        url (str): The system ID (URL) to resolve.
+        public_id (str | None): The public ID (not used, kept for compatibility).
+        context (Any): The parser context (not used, kept for compatibility).
+
+    Returns:
+        str | None: The resolved local filename, or None if not found.
+        url: The system ID (url) to resolve.
+        public_id: The public ID (not used - kept for compatibility).
+        context: The parser context (not used - kept for compatibility).
+    &#34;&#34;&#34;
+    # load from file
+    schema_path = self.get_local_schema_path(system_url)
+    if schema_path is not None:
+        return self.resolve_filename(schema_path, context)
+    
+    # locally not found, check if loading from internet is allowed
+    if self.is_allowed_schema_url(system_url): 
+        try:
+            response = requests.get(system_url, timeout=10)
+            response.raise_for_status()
+            return self.resolve_string(response.content, context)
+        except requests.RequestException as e:
+                logger.warning(&#34;Fehler beim Herunterladen der Ressource %s: %s&#34;, system_url, e)    
+                return None
+    return None</code></pre>
+</details>
+<div class="desc"><p>Resolve the system ID using the catalog.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>url</code></strong> :&ensp;<code>str</code></dt>
+<dd>The system ID (URL) to resolve.</dd>
+<dt><strong><code>public_id</code></strong> :&ensp;<code>str | None</code></dt>
+<dd>The public ID (not used, kept for compatibility).</dd>
+<dt><strong><code>context</code></strong> :&ensp;<code>Any</code></dt>
+<dd>The parser context (not used, kept for compatibility).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str | None</code></dt>
+<dd>The resolved local filename, or None if not found.</dd>
+<dt><code>url</code></dt>
+<dd>The system ID (url) to resolve.</dd>
+<dt><code>public_id</code></dt>
+<dd>The public ID (not used - kept for compatibility).</dd>
+<dt><code>context</code></dt>
+<dd>The parser context (not used - kept for compatibility).</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve_string"><code class="name flex">
+<span>def <span class="ident">resolve_string</span></span>(<span>self, data: bytes, context: Any) ‑> Any</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resolve_string(self, data: bytes, context: Any) -&gt; Any:  # etree._InputDocument:
+    &#34;&#34;&#34;Resolve the data from a byte string.
+
+    :param data: The byte string containing the XML data.
+    :param context: The parser context.
+    :return: An _InputDocument containing the XML data.
+    &#34;&#34;&#34;
+    return self.resolve_file(BytesIO(data), context)</code></pre>
+</details>
+<div class="desc"><p>Resolve the data from a byte string.</p>
+<p>:param data: The byte string containing the XML data.
+:param context: The parser context.
+:return: An _InputDocument containing the XML data.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib.validate.xml" href="index.html">gamslib.validate.xml</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.validate.xml.catalog_resolver.CatalogResolver" href="#gamslib.validate.xml.catalog_resolver.CatalogResolver">CatalogResolver</a></code></h4>
+<ul class="">
+<li><code><a title="gamslib.validate.xml.catalog_resolver.CatalogResolver.get_local_schema_path" href="#gamslib.validate.xml.catalog_resolver.CatalogResolver.get_local_schema_path">get_local_schema_path</a></code></li>
+<li><code><a title="gamslib.validate.xml.catalog_resolver.CatalogResolver.is_allowed_schema_url" href="#gamslib.validate.xml.catalog_resolver.CatalogResolver.is_allowed_schema_url">is_allowed_schema_url</a></code></li>
+<li><code><a title="gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve" href="#gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve">resolve</a></code></li>
+<li><code><a title="gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve_string" href="#gamslib.validate.xml.catalog_resolver.CatalogResolver.resolve_string">resolve_string</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

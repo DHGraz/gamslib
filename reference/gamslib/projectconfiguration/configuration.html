@@ -43,7 +43,8 @@ data from multiple sources: <code>project.toml</code>, <code>.env</code>, and en
 <ul>
 <li>Strongly-typed configuration models using Pydantic.</li>
 <li>Automatic loading and validation of configuration files.</li>
-<li>Layered override system: <code>.env</code> values override <code>project.toml</code>, environment variables override both.</li>
+<li>Layered override system: <code>.env</code> values override <code>project.toml</code>, environment
+variables override both.</li>
 <li>Helpful error messages for validation issues.</li>
 <li>Support for updating configuration values at runtime.</li>
 </ul>
@@ -94,7 +95,8 @@ Overrides from <code>.env</code> and environment variables are applied automatic
 
       1. Values from `project.toml`.
       2. Values from `.env` (fields in the format `metadata.field` or `general.field`).
-      3. Values from environment variables prefixed with `GAMSCFG_` (e.g., `GAMSCFG_METADATA_PUBLISHER`).
+      3. Values from environment variables prefixed with `GAMSCFG_`
+         (e.g., `GAMSCFG_METADATA_PUBLISHER`).
 
     Example usage:
 
@@ -104,6 +106,7 @@ Overrides from <code>.env</code> and environment variables are applied automatic
         print(config.general.loglevel)
     ```
     &#34;&#34;&#34;
+
     toml_file: Path
     metadata: Metadata
     general: General
@@ -141,8 +144,10 @@ Overrides from <code>.env</code> and environment variables are applied automatic
         &#34;&#34;&#34;
         Load configuration from a TOML file and return a Configuration object.
 
-        Reads the specified TOML file, validates its structure, and constructs a Configuration instance.
-        Automatically sets the `toml_file` attribute and applies overrides from `.env` and environment variables.
+        Reads the specified TOML file, validates its structure, and constructs a
+        Configuration instance.
+        Automatically sets the `toml_file` attribute and applies overrides from `.env`
+        and environment variables.
 
         Args:
             toml_file (Path): Path to the TOML configuration file.
@@ -222,7 +227,8 @@ Overrides from <code>.env</code> and environment variables are applied automatic
 <ol>
 <li>Values from <code>project.toml</code>.</li>
 <li>Values from <code>.env</code> (fields in the format <code>metadata.field</code> or <code>general.field</code>).</li>
-<li>Values from environment variables prefixed with <code>GAMSCFG_</code> (e.g., <code>GAMSCFG_METADATA_PUBLISHER</code>).</li>
+<li>Values from environment variables prefixed with <code>GAMSCFG_</code>
+(e.g., <code>GAMSCFG_METADATA_PUBLISHER</code>).</li>
 </ol>
 <p>Example usage:</p>
 <pre><code>    config = Configuration.from_toml(Path(&quot;project.toml&quot;))
@@ -263,8 +269,10 @@ validated to form a valid model.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Load configuration from a TOML file and return a Configuration object.</p>
-<p>Reads the specified TOML file, validates its structure, and constructs a Configuration instance.
-Automatically sets the <code>toml_file</code> attribute and applies overrides from <code>.env</code> and environment variables.</p>
+<p>Reads the specified TOML file, validates its structure, and constructs a
+Configuration instance.
+Automatically sets the <code>toml_file</code> attribute and applies overrides from <code>.env</code>
+and environment variables.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>toml_file</code></strong> :&ensp;<code>Path</code></dt>
@@ -376,7 +384,7 @@ validated to form a valid model.</p>
     creator: Annotated[str, StringConstraints(min_length=3)]
     publisher: Annotated[str, StringConstraints(min_length=3)]
     rights: str = &#34;&#34;
-    funder:str = &#34;&#34;</code></pre>
+    funder: str = &#34;&#34;</code></pre>
 </details>
 <div class="desc"><p>Represent the 'metadata' section of the configuration file.</p>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>

@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>gamslib.objectdir API documentation</title>
+<meta name="description" content="Module for object directory management and validation in GAMS library.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>gamslib.objectdir</code></h1>
+</header>
+<section id="section-intro">
+<p>Module for object directory management and validation in GAMS library.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="gamslib.objectdir.find_object_folders"><code class="name flex">
+<span>def <span class="ident">find_object_folders</span></span>(<span>root_folder: pathlib._local.Path) ‑> Generator[pathlib._local.Path, None, None]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_object_folders(root_folder: Path) -&gt; Generator[Path, None, None]:
+    &#34;&#34;&#34;
+    Find all object folders in the root folder or below.
+
+    Args:
+        root_folder (Path): Root directory to search for object folders.
+
+    Yields:
+        Path: Path to each object folder containing a DC.xml file.
+
+    Notes:
+        - Skips folders that do not contain a DC.xml file and logs a warning.
+    &#34;&#34;&#34;
+    # Path.walk() only was introduced in Python 3.12, so we use os.walk() here
+    for root, _, _ in os.walk(root_folder):
+        path = Path(root)
+        if is_object_folder(path):
+            yield path
+        else:
+            logger.debug(
+                &#34;Skipping folder %s as it does not contain a DC.xml file.&#34;, root
+            )</code></pre>
+</details>
+<div class="desc"><p>Find all object folders in the root folder or below.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>root_folder</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Root directory to search for object folders.</dd>
+</dl>
+<h2 id="yields">Yields</h2>
+<dl>
+<dt><code>Path</code></dt>
+<dd>Path to each object folder containing a DC.xml file.</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Skips folders that do not contain a DC.xml file and logs a warning.</li>
+</ul></div>
+</dd>
+<dt id="gamslib.objectdir.is_object_folder"><code class="name flex">
+<span>def <span class="ident">is_object_folder</span></span>(<span>folder_path: pathlib._local.Path) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_object_folder(folder_path: Path) -&gt; bool:
+    &#34;&#34;&#34;
+    Check if the given folder is an object folder.
+
+    An object folder is defined as a folder that contains a DC.xml file.
+
+    Args:
+        folder_path (Path): Path to the folder to check.
+
+    Returns:
+        bool: True if the folder is an object folder, False otherwise.
+    &#34;&#34;&#34;
+    return (folder_path / &#34;DC.xml&#34;).is_file()</code></pre>
+</details>
+<div class="desc"><p>Check if the given folder is an object folder.</p>
+<p>An object folder is defined as a folder that contains a DC.xml file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>folder_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the folder to check.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the folder is an object folder, False otherwise.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectdir.validate_csv_files"><code class="name flex">
+<span>def <span class="ident">validate_csv_files</span></span>(<span>object_path: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_csv_files(object_path: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Validate the CSV files in the object directory.
+
+    Args:
+        object_path (Path): Path to the object directory.
+
+    Raises:
+        ObjectDirectoryValidationError: If any CSV file is invalid.
+    &#34;&#34;&#34;
+    # use the ObjectCSVFile class to validate contents of the object.csv file
+    csv_mgr = _create_csvmgr_with_error_handling(object_path)
+    try:
+        csv_mgr.validate()
+        # check if recid matches directory name
+        if csv_mgr.object_id != csv_mgr.get_object().recid:
+            raise ObjectDirectoryValidationError(
+                f&#34;Object directory &#39;{object_path.name}&#39;: Directory name &#39;{csv_mgr.object_id}&#39; &#34;
+                f&#34;does not match recid &#39;{csv_mgr.get_object().recid}&#39; in object.csv.&#34;
+            )
+        # check if all datastream files exist
+        for dsdata in csv_mgr.get_datastreamdata():
+            ds_file_path = object_path / dsdata.dsid
+            if not ds_file_path.is_file():
+                raise ObjectDirectoryValidationError(
+                    f&#34;Object directory &#39;{object_path.name}&#39;: Datastream file &#34;
+                    f&#34;&#39;{dsdata.dspath.split(&#39;/&#39;)[-1]}&#39; &#34;
+                    f&#34;referenced in datastreams.csv does not exist.&#34;
+                )
+    except ValueError as e:
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39;: {e}&#34;
+        ) from e</code></pre>
+</details>
+<div class="desc"><p>Validate the CSV files in the object directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></dt>
+<dd>If any CSV file is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectdir.validate_dc_file"><code class="name flex">
+<span>def <span class="ident">validate_dc_file</span></span>(<span>object_path: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_dc_file(object_path: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Validate the DC.xml file in the object directory.
+
+    Args:
+        object_path (Path): Path to the object directory.
+
+    Raises:
+        ObjectDirectoryValidationError: If the DC.xml file is invalid.
+    &#34;&#34;&#34;
+    dc_file = object_path / &#34;DC.xml&#34;
+    try:
+        dc = DublinCore(dc_file)
+        dc.validate()
+        identifiers = dc.get_element_all_langs(&#34;identifier&#34;)
+        if object_path.name.replace(&#34;%3A&#34;, &#34;:&#34;) not in identifiers:
+            raise ObjectDirectoryValidationError(
+                f&#34;Object directory &#39;{object_path.name}&#39;: DC.xml identifier value does not match &#34;
+                f&#34;the object directory name.&#34;
+            )
+    except ValueError as e:
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39;: DC.xml file is invalid: {e}&#34;
+        ) from e</code></pre>
+</details>
+<div class="desc"><p>Validate the DC.xml file in the object directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></dt>
+<dd>If the DC.xml file is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectdir.validate_directory_structure"><code class="name flex">
+<span>def <span class="ident">validate_directory_structure</span></span>(<span>object_path: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_directory_structure(object_path: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Validate the structure of the object directory.
+
+    Structure is valid if it contains at least these files:
+      * DC.xml
+      * object.csv
+      * datastreams.csv
+      * all files referenced in datastreams.csv
+
+
+    Args:
+        object_path (Path): Path to the object directory.
+
+    Raises:
+        ObjectDirectoryValidationError: If the directory structure is invalid.
+    &#34;&#34;&#34;
+    if not object_path.is_dir():
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39; does not exist or is not a directory.&#34;
+        )
+
+    if not (object_path / &#34;DC.xml&#34;).exists():
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39; does not contain a DC.xml file.&#34;
+        )
+
+    # Check the object.csv file
+    if not (object_path / &#34;object.csv&#34;).is_file():
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39; does not contain an object.csv file.&#34;
+        )
+    if not (object_path / &#34;datastreams.csv&#34;).is_file():
+        raise ObjectDirectoryValidationError(
+            f&#34;Object directory &#39;{object_path.name}&#39; does not contain a datastreams.csv file.&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>Validate the structure of the object directory.</p>
+<p>Structure is valid if it contains at least these files:
+* DC.xml
+* object.csv
+* datastreams.csv
+* all files referenced in datastreams.csv</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></dt>
+<dd>If the directory structure is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="gamslib.objectdir.validate_main_resource_id"><code class="name flex">
+<span>def <span class="ident">validate_main_resource_id</span></span>(<span>object_dir: pathlib._local.Path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_main_resource_id(object_dir: Path):
+    &#34;&#34;&#34;Validate if the main resource file has the same ID as the object directory
+
+    Raise a ObjectDirectoryValidationError if the main resource is a TEI or LIDO file and
+    the ID in this file does not have the same ID as the object directory.
+
+    In all other cases, this function does not raise an error.
+
+    Args:
+        object_dir (Path): Path to the object directory.
+    Raises:
+        ObjectDirectoryValidationError: If the main resource file has the same ID as
+        the object directory
+    &#34;&#34;&#34;
+    csv_mgr = ObjectCSVManager(object_dir)
+    main_resource = csv_mgr.get_mainresource()
+    if main_resource is not None:
+        object_id = None
+        main_resource_path = object_dir / Path(main_resource.dspath).name
+        main_format = formatdetect.detect_format(main_resource_path)
+        if main_format.subtype == formatinfo.SubType.TEI:
+            object_id = _extract_id_from_tei(main_resource_path)
+        elif main_format.subtype == formatinfo.SubType.LIDO:
+            object_id = _extract_id_from_lido(main_resource_path)
+        dir_id = object_dir.name.replace(&#34;%3A&#34;, &#34;:&#34;)
+        if object_id is not None and dir_id != object_id:
+            raise ValueError(
+                f&#34;Object directory name &#39;{object_dir.name}&#39; does not match &#34;
+                f&#34;the object ID &#39;{object_id}&#39; extracted from the main resource &#34;
+                f&#34;file &#39;{main_resource_path.name}&#39;.&#34;
+            )</code></pre>
+</details>
+<div class="desc"><p>Validate if the main resource file has the same ID as the object directory</p>
+<p>Raise a ObjectDirectoryValidationError if the main resource is a TEI or LIDO file and
+the ID in this file does not have the same ID as the object directory.</p>
+<p>In all other cases, this function does not raise an error.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_dir</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></dt>
+<dd>If the main resource file has the same ID as</dd>
+</dl>
+<p>the object directory</p></div>
+</dd>
+<dt id="gamslib.objectdir.validate_object_dir"><code class="name flex">
+<span>def <span class="ident">validate_object_dir</span></span>(<span>object_path: pathlib._local.Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_object_dir(object_path: Path) -&gt; None:
+    &#34;&#34;&#34;
+    Check if everything needed is present in the object directory.
+
+    Args:
+        object_path (Path): Path to the object directory.
+
+    Raises:
+        ObjectDirectoryValidationError: If the directory or required files are missing,
+            or if object.csv is invalid.
+    &#34;&#34;&#34;
+    validate_directory_structure(object_path)
+    validate_dc_file(object_path)
+    validate_csv_files(object_path)
+    validate_main_resource_id(object_path)</code></pre>
+</details>
+<div class="desc"><p>Check if everything needed is present in the object directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>object_path</code></strong> :&ensp;<code>Path</code></dt>
+<dd>Path to the object directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></dt>
+<dd>If the directory or required files are missing,
+or if object.csv is invalid.</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="gamslib.objectdir.ObjectDirectoryValidationError"><code class="flex name class">
+<span>class <span class="ident">ObjectDirectoryValidationError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ObjectDirectoryValidationError(Exception):
+    &#34;&#34;&#34;Exception raised when an object directory is invalid.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Exception raised when an object directory is invalid.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="gamslib" href="index.html">gamslib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="gamslib.objectdir.find_object_folders" href="#gamslib.objectdir.find_object_folders">find_object_folders</a></code></li>
+<li><code><a title="gamslib.objectdir.is_object_folder" href="#gamslib.objectdir.is_object_folder">is_object_folder</a></code></li>
+<li><code><a title="gamslib.objectdir.validate_csv_files" href="#gamslib.objectdir.validate_csv_files">validate_csv_files</a></code></li>
+<li><code><a title="gamslib.objectdir.validate_dc_file" href="#gamslib.objectdir.validate_dc_file">validate_dc_file</a></code></li>
+<li><code><a title="gamslib.objectdir.validate_directory_structure" href="#gamslib.objectdir.validate_directory_structure">validate_directory_structure</a></code></li>
+<li><code><a title="gamslib.objectdir.validate_main_resource_id" href="#gamslib.objectdir.validate_main_resource_id">validate_main_resource_id</a></code></li>
+<li><code><a title="gamslib.objectdir.validate_object_dir" href="#gamslib.objectdir.validate_object_dir">validate_object_dir</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="gamslib.objectdir.ObjectDirectoryValidationError" href="#gamslib.objectdir.ObjectDirectoryValidationError">ObjectDirectoryValidationError</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

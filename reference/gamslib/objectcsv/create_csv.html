@@ -110,14 +110,16 @@ If information is missing, fields are left blank or filled with default values.<
 </dl></div>
 </dd>
 <dt id="gamslib.objectcsv.create_csv.collect_object_data"><code class="name flex">
-<span>def <span class="ident">collect_object_data</span></span>(<span>pid: str,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>dc: <a title="gamslib.objectcsv.dublincore.DublinCore" href="dublincore.html#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a>) ‑> <a title="gamslib.objectcsv.objectdata.ObjectData" href="objectdata.html#gamslib.objectcsv.objectdata.ObjectData">ObjectData</a></span>
+<span>def <span class="ident">collect_object_data</span></span>(<span>pid: str,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>dc: <a title="gamslib.objectcsv.dublincore.DublinCore" href="dublincore.html#gamslib.objectcsv.dublincore.DublinCore">DublinCore</a>,<br>use_subjects_as_tags=False) ‑> <a title="gamslib.objectcsv.objectdata.ObjectData" href="objectdata.html#gamslib.objectcsv.objectdata.ObjectData">ObjectData</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def collect_object_data(pid: str, config: Configuration, dc: DublinCore) -&gt; ObjectData:
+<pre><code class="python">def collect_object_data(
+    pid: str, config: Configuration, dc: DublinCore, use_subjects_as_tags=False
+) -&gt; ObjectData:
     &#34;&#34;&#34;
     Collect metadata for an object to populate object.csv.
 
@@ -127,11 +129,13 @@ If information is missing, fields are left blank or filled with default values.<
         pid (str): Object identifier.
         config (Configuration): Project configuration.
         dc (DublinCore): Dublin Core metadata object.
+        use_subjects_as_tags (bool): Whether to use dc:subjects as tags. (Default: False)
 
     Returns:
         ObjectData: Populated object metadata.
     &#34;&#34;&#34;
     title = &#34;; &#34;.join(dc.get_en_element(&#34;title&#34;, default=pid))
+    tags = &#34;;&#34;.join(dc.get_element_all_langs(&#34;subject&#34;)) if use_subjects_as_tags else &#34;&#34;
     # description = &#34;; &#34;.join(dc.get_element(&#34;description&#34;, default=&#34;&#34;))
 
     return ObjectData(
@@ -145,6 +149,7 @@ If information is missing, fields are left blank or filled with default values.<
         objectType=defaultvalues.DEFAULT_OBJECT_TYPE,
         publisher=config.metadata.publisher,
         funder=config.metadata.funder,
+        tags=tags,
     )</code></pre>
 </details>
 <div class="desc"><p>Collect metadata for an object to populate object.csv.</p>
@@ -157,6 +162,8 @@ If information is missing, fields are left blank or filled with default values.<
 <dd>Project configuration.</dd>
 <dt><strong><code>dc</code></strong> :&ensp;<code>DublinCore</code></dt>
 <dd>Dublin Core metadata object.</dd>
+<dt><strong><code>use_subjects_as_tags</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether to use dc:subjects as tags. (Default: False)</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -165,7 +172,7 @@ If information is missing, fields are left blank or filled with default values.<
 </dl></div>
 </dd>
 <dt id="gamslib.objectcsv.create_csv.create_csv"><code class="name flex">
-<span>def <span class="ident">create_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
+<span>def <span class="ident">create_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False,<br>use_subjects_as_tags: bool = False) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -173,7 +180,10 @@ If information is missing, fields are left blank or filled with default values.<
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_csv(
-    object_directory: Path, configuration: Configuration, force_overwrite: bool = False
+    object_directory: Path,
+    configuration: Configuration,
+    force_overwrite: bool = False,
+    use_subjects_as_tags: bool = False,
 ) -&gt; ObjectCSVManager | None:
     &#34;&#34;&#34;
     Generate object.csv and datastreams.csv for a single object directory.
@@ -206,7 +216,12 @@ If information is missing, fields are left blank or filled with default values.<
         return None
 
     dc = DublinCore(object_directory / &#34;DC.xml&#34;)
-    obj = collect_object_data(objectcsv.object_id, configuration, dc)
+    obj = collect_object_data(
+        objectcsv.object_id,
+        configuration,
+        dc,
+        use_subjects_as_tags=use_subjects_as_tags,
+    )
     objectcsv.set_object(obj)
     for ds_file in object_directory.glob(&#34;*&#34;):
         if is_datastream_file(ds_file, configuration):
@@ -237,7 +252,7 @@ Metadata is collected from DC.xml and configuration.</p>
 </dl></div>
 </dd>
 <dt id="gamslib.objectcsv.create_csv.create_csv_files"><code class="name flex">
-<span>def <span class="ident">create_csv_files</span></span>(<span>root_folder: pathlib._local.Path,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False,<br>update: bool = False) ‑> list[<a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a>]</span>
+<span>def <span class="ident">create_csv_files</span></span>(<span>root_folder: pathlib._local.Path,<br>config: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>force_overwrite: bool = False,<br>update: bool = False,<br>use_subjects_as_tags: bool = False) ‑> list[<a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a>]</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -249,6 +264,7 @@ Metadata is collected from DC.xml and configuration.</p>
     config: Configuration,
     force_overwrite: bool = False,
     update: bool = False,
+    use_subjects_as_tags: bool = False,
 ) -&gt; list[ObjectCSVManager]:
     &#34;&#34;&#34;
     Create or update CSV files for all objects under the given root folder.
@@ -261,6 +277,7 @@ Metadata is collected from DC.xml and configuration.</p>
         config (Configuration): Project configuration.
         force_overwrite (bool): If True, overwrite existing CSV files.
         update (bool): If True, update existing CSV files instead of creating new ones.
+        use_subjects_as_tags (bool): If True, insert all dc:subject entries as tags in object.csv
 
     Returns:
         list[ObjectCSVManager]: List of managers for the processed object directories.
@@ -268,9 +285,13 @@ Metadata is collected from DC.xml and configuration.</p>
     extended_objects: list[ObjectCSVManager] = []
     for path in find_object_folders(root_folder):
         if update:
-            extended_obj = update_csv(path, config)
+            extended_obj = update_csv(
+                path, config, use_subjects_as_tags=use_subjects_as_tags
+            )
         else:
-            extended_obj = create_csv(path, config, force_overwrite)
+            extended_obj = create_csv(
+                path, config, force_overwrite, use_subjects_as_tags=use_subjects_as_tags
+            )
 
         if extended_obj is not None:
             extended_objects.append(extended_obj)
@@ -289,6 +310,8 @@ their object.csv and datastreams.csv files.</p>
 <dd>If True, overwrite existing CSV files.</dd>
 <dt><strong><code>update</code></strong> :&ensp;<code>bool</code></dt>
 <dd>If True, update existing CSV files instead of creating new ones.</dd>
+<dt><strong><code>use_subjects_as_tags</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, insert all dc:subject entries as tags in object.csv</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -304,7 +327,7 @@ their object.csv and datastreams.csv files.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def detect_languages(ds_file: Path, delimiter: str = &#34; &#34;) -&gt; str:
+<pre><code class="python">def detect_languages(ds_file: Path, delimiter: str = &#34; &#34;) -&gt; str:  # pylint: disable=unused-argument
     &#34;&#34;&#34;
     Detect the language(s) of a file.
 
@@ -494,6 +517,8 @@ Validates the resulting ID format.</p>
     if ds_file.name in (
         OBJ_CSV_FILENAME,
         DS_CSV_FILENAME,
+        &#34;.DS_Store&#34;,
+        &#34;Thumbs.db&#34;,
     ):
         return False
     for pattern in configuration.general.ds_ignore_files:
@@ -602,7 +627,7 @@ specified in the configuration.</p>
 </dl></div>
 </dd>
 <dt id="gamslib.objectcsv.create_csv.update_csv"><code class="name flex">
-<span>def <span class="ident">update_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
+<span>def <span class="ident">update_csv</span></span>(<span>object_directory: pathlib._local.Path,<br>configuration: <a title="gamslib.projectconfiguration.configuration.Configuration" href="../projectconfiguration/configuration.html#gamslib.projectconfiguration.configuration.Configuration">Configuration</a>,<br>use_subjects_as_tags: bool = False) ‑> <a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager" href="objectcsvmanager.html#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager">ObjectCSVManager</a> | None</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -610,7 +635,9 @@ specified in the configuration.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def update_csv(
-    object_directory: Path, configuration: Configuration
+    object_directory: Path,
+    configuration: Configuration,
+    use_subjects_as_tags: bool = False,
 ) -&gt; ObjectCSVManager | None:
     &#34;&#34;&#34;
     Update existing CSV files for an object directory with new metadata.
@@ -638,10 +665,17 @@ specified in the configuration.</p>
         )
     dc = DublinCore(object_directory / &#34;DC.xml&#34;)
 
-    objectcsv.merge_object(collect_object_data(objectcsv.object_id, configuration, dc))
+    objectcsv.merge_object(
+        collect_object_data(
+            objectcsv.object_id,
+            configuration,
+            dc,
+            use_subjects_as_tags=use_subjects_as_tags,
+        )
+    )
     for ds_file in object_directory.glob(&#34;*&#34;):
         if is_datastream_file(ds_file, configuration):
-            dsdata = collect_datastream_data(ds_file, configuration, dc)
+            # dsdata = collect_datastream_data(ds_file, configuration, dc)
             objectcsv.merge_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
             )

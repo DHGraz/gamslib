@@ -74,7 +74,7 @@ merge, and manipulate the object and datastream metadata.</p>
         Args:
             obj_dir (Path): Path to the object directory.
             ignore_existing_csv_files (bool): If True, ignore existing CSV files when writing.
-        
+
         Raises:
             FileNotFoundError: If the object directory does not exist.
         &#34;&#34;&#34;
@@ -190,6 +190,18 @@ merge, and manipulate the object and datastream metadata.</p>
         langcounter = Counter(languages)
         return [entry[0] for entry in langcounter.most_common()]
 
+    def get_mainresource(self) -&gt; DSData | None:
+        &#34;&#34;&#34;
+        Return the main resource (datastream) of the object if set or None.
+
+        Returns:
+            DSData: The main resource datastream, or None if not set.
+        &#34;&#34;&#34;
+        for ds in self._datastream_data:
+            if ds.dsid == self._object_data.mainResource:
+                return ds
+        return None
+
     def is_empty(self) -&gt; bool:
         &#34;&#34;&#34;
         Return True if the object has no CSV metadata.
@@ -232,7 +244,9 @@ merge, and manipulate the object and datastream metadata.</p>
             ValueError: If metadata is missing or invalid.
         &#34;&#34;&#34;
         if self.is_empty():
-            raise ValueError(&#34;Object metadata (csv) is not set.&#34;)
+            raise ValueError(
+                &#34;Required files object.csv and dadatastreams.csv are missing or empty.&#34;
+            )
         self._object_data.validate()
         for dsdata in self._datastream_data:
             dsdata.validate()
@@ -489,6 +503,33 @@ merge, and manipulate the object and datastream metadata.</p>
 <dd>List of language codes ordered by frequency.</dd>
 </dl></div>
 </dd>
+<dt id="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_mainresource"><code class="name flex">
+<span>def <span class="ident">get_mainresource</span></span>(<span>self) ‑> <a title="gamslib.objectcsv.dsdata.DSData" href="dsdata.html#gamslib.objectcsv.dsdata.DSData">DSData</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_mainresource(self) -&gt; DSData | None:
+    &#34;&#34;&#34;
+    Return the main resource (datastream) of the object if set or None.
+
+    Returns:
+        DSData: The main resource datastream, or None if not set.
+    &#34;&#34;&#34;
+    for ds in self._datastream_data:
+        if ds.dsid == self._object_data.mainResource:
+            return ds
+    return None</code></pre>
+</details>
+<div class="desc"><p>Return the main resource (datastream) of the object if set or None.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>DSData</code></dt>
+<dd>The main resource datastream, or None if not set.</dd>
+</dl></div>
+</dd>
 <dt id="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_object"><code class="name flex">
 <span>def <span class="ident">get_object</span></span>(<span>self) ‑> <a title="gamslib.objectcsv.objectdata.ObjectData" href="objectdata.html#gamslib.objectcsv.objectdata.ObjectData">ObjectData</a></span>
 </code></dt>
@@ -712,7 +753,9 @@ merge, and manipulate the object and datastream metadata.</p>
         ValueError: If metadata is missing or invalid.
     &#34;&#34;&#34;
     if self.is_empty():
-        raise ValueError(&#34;Object metadata (csv) is not set.&#34;)
+        raise ValueError(
+            &#34;Required files object.csv and dadatastreams.csv are missing or empty.&#34;
+        )
     self._object_data.validate()
     for dsdata in self._datastream_data:
         dsdata.validate()</code></pre>
@@ -749,6 +792,7 @@ merge, and manipulate the object and datastream metadata.</p>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.count_datastreams" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.count_datastreams">count_datastreams</a></code></li>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_datastreamdata" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_datastreamdata">get_datastreamdata</a></code></li>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_languages" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_languages">get_languages</a></code></li>
+<li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_mainresource" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_mainresource">get_mainresource</a></code></li>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_object" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.get_object">get_object</a></code></li>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.guess_mainresource" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.guess_mainresource">guess_mainresource</a></code></li>
 <li><code><a title="gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.is_empty" href="#gamslib.objectcsv.objectcsvmanager.ObjectCSVManager.is_empty">is_empty</a></code></li>

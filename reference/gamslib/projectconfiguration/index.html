@@ -92,14 +92,17 @@ def get_configuration(config_file: Path | str | None = None) -&gt; Configuration
     The configuration is determined in the following order:
 
       1. If `config_file` is provided, use it.
-      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value as the path.
-      3. If a `.env` file exists in the current directory and contains a `project_toml` field, use that.
+      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value 
+         as the path.
+      3. If a `.env` file exists in the current directory and contains a `project_toml` 
+         field, use that.
 
     Raises:
         MissingConfigurationException: If no configuration file is found.
 
     Note:
-        Values from `project.toml` are overridden by those in `.env`, which are further overridden by environment variables.
+        Values from `project.toml` are overridden by those in `.env`, which are further 
+        overridden by environment variables.
         For example:
 
           - `project.toml` sets `metadata.publisher = &#34;foo&#34;` → used by default.
@@ -119,8 +122,10 @@ def get_configuration(config_file: Path | str | None = None) -&gt; Configuration
 <p>The configuration is determined in the following order:</p>
 <ol>
 <li>If <code>config_file</code> is provided, use it.</li>
-<li>If the environment variable <code>GAMSCFG_PROJECT_TOML</code> is set, use its value as the path.</li>
-<li>If a <code>.env</code> file exists in the current directory and contains a <code>project_toml</code> field, use that.</li>
+<li>If the environment variable <code>GAMSCFG_PROJECT_TOML</code> is set, use its value
+as the path.</li>
+<li>If a <code>.env</code> file exists in the current directory and contains a <code>project_toml</code>
+field, use that.</li>
 </ol>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -128,7 +133,8 @@ def get_configuration(config_file: Path | str | None = None) -&gt; Configuration
 <dd>If no configuration file is found.</dd>
 </dl>
 <h2 id="note">Note</h2>
-<p>Values from <code>project.toml</code> are overridden by those in <code>.env</code>, which are further overridden by environment variables.
+<p>Values from <code>project.toml</code> are overridden by those in <code>.env</code>, which are further
+overridden by environment variables.
 For example:</p>
 <ul>
 <li><code>project.toml</code> sets <code>metadata.publisher = "foo"</code> → used by default.</li>

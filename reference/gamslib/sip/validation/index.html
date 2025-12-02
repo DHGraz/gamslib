@@ -95,7 +95,8 @@ Individual validation functions are also available for more granular checks.</p>
         BagValidationError: If the bag directory does not exist or any validation check fails.
 
     Notes:
-        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, and bag-info.txt.
+        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, 
+          and bag-info.txt.
         - Raises an error immediately if any check fails.
     &#34;&#34;&#34;
     if not bag_dir.is_dir():
@@ -120,7 +121,8 @@ Individual validation functions are also available for more granular checks.</p>
 </dl>
 <h2 id="notes">Notes</h2>
 <ul>
-<li>Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, and bag-info.txt.</li>
+<li>Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON,
+and bag-info.txt.</li>
 <li>Raises an error immediately if any check fails.</li>
 </ul></div>
 </dd>
@@ -136,7 +138,7 @@ Individual validation functions are also available for more granular checks.</p>
     &#34;&#34;&#34;Validate a given datastream ID.
 
     A valid datastream is must start with a letter or a number, followed by any
-    number of ASCII letters, numbers, dots, dashes and underscores.
+    number of ASCII letters, numbers, dots, and dashes.
 
     Args:
         datastream_id (str): The datastream ID to validate.
@@ -144,11 +146,24 @@ Individual validation functions are also available for more granular checks.</p>
     Raises:
         ValueError: If the datastream ID is invalid. The error message will indicate the reason.
     &#34;&#34;&#34;
-    _validate_object_id(datastream_id, allow_uppercase=True)</code></pre>
+    if not datastream_id:
+        raise ValueError(&#34;Object identifier (after dot) is empty&#34;)
+    if &#34;..&#34; in datastream_id:
+        raise ValueError(&#34;Datastream identifier must not contain consecutive dots&#34;)
+    if &#34;--&#34; in datastream_id or &#34;__&#34; in datastream_id:
+        raise ValueError(
+            &#34;Datastream identifier  must not contain consecutive underscores or dashes&#34;
+        )
+
+    if not re.match(r&#34;^[a-z0-9][a-z0-9._\-]*$&#34;, datastream_id, re.IGNORECASE):
+        raise ValueError(
+            &#34;Datastream identifier must start with a letter or number and &#34;
+            &#34;contain only letters, numbers, dots or dashes&#34;
+        )</code></pre>
 </details>
 <div class="desc"><p>Validate a given datastream ID.</p>
 <p>A valid datastream is must start with a letter or a number, followed by any
-number of ASCII letters, numbers, dots, dashes and underscores.</p>
+number of ASCII letters, numbers, dots, and dashes.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>datastream_id</code></strong> :&ensp;<code>str</code></dt>
@@ -180,8 +195,8 @@ number of ASCII letters, numbers, dots, dashes and underscores.</p>
      - The part after the dot must start with a letter or a number, followed by any
        number of ASCII letters, numbers, dots, and dashes.
      - For legacy reasons, the project prefix can be proceeded by a type prefix like &#39;o:&#39;
-       but we discourage the use of this prefix for new objects. Only lowercase letters are allowed as
-       type prefix.
+       but we discourage the use of this prefix for new objects. Only lowercase letters 
+       and numbers are allowed as type prefix.
 
     Invalid ids are for example:
 
@@ -194,16 +209,14 @@ number of ASCII letters, numbers, dots, dashes and underscores.</p>
 
     Args:
         pid (str): The ID to validate.
-        allow_uppercase (bool, optional): If True, allow uppercase letters in pid. Defaults to False.
-            Object IDs (PIDs) should normally be lowercase only, but datastream id can be uppercase too.
 
     Raises:
         ValueError: If the ID is invalid. The error message will indicate the reason.
     &#34;&#34;&#34;
-    MAX_ID_LENGTH = 64
+    max_id_length = 64
     # Check if the PID is a valid URI
-    if len(pid) &gt; MAX_ID_LENGTH:
-        raise ValueError(f&#34;ID must not be longer than {MAX_ID_LENGTH} characters&#34;)
+    if len(pid) &gt; max_id_length:
+        raise ValueError(f&#34;ID must not be longer than {max_id_length} characters&#34;)
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
     validate_project_name(project_prefix)
@@ -223,8 +236,8 @@ of letters and numbers.</li>
 <li>The part after the dot must start with a letter or a number, followed by any
 number of ASCII letters, numbers, dots, and dashes.</li>
 <li>For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
-but we discourage the use of this prefix for new objects. Only lowercase letters are allowed as
-type prefix.</li>
+but we discourage the use of this prefix for new objects. Only lowercase letters
+and numbers are allowed as type prefix.</li>
 </ul>
 <p>Invalid ids are for example:</p>
 <pre><code>- .abcdef  (starts with a dot)
@@ -238,9 +251,6 @@ type prefix.</li>
 <dl>
 <dt><strong><code>pid</code></strong> :&ensp;<code>str</code></dt>
 <dd>The ID to validate.</dd>
-<dt><strong><code>allow_uppercase</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>If True, allow uppercase letters in pid. Defaults to False.
-Object IDs (PIDs) should normally be lowercase only, but datastream id can be uppercase too.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -256,9 +266,7 @@ Object IDs (PIDs) should normally be lowercase only, but datastream id can be up
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def validate_project_name(
-    value: str
-) -&gt; None:
+<pre><code class="python">def validate_project_name(value: str) -&gt; None:
     &#34;&#34;&#34;
     Validate the project name. Can also be used to validate the project prefix of a PID.
 

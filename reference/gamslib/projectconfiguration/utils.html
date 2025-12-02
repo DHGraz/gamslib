@@ -57,9 +57,10 @@ el.replaceWith(d);
     &#34;&#34;&#34;
     Check if the given configuration file is missing required keys compared to the template.
 
-    This function compares the structure of the provided config file against the template &#39;project.toml&#39;
-    included with the package. It returns True if any required keys from the template are missing in the
-    config file, and False if all required keys are present.
+    This function compares the structure of the provided config file against the
+    template &#39;project.toml&#39; included with the package. It returns True if any required
+    keys from the template are missing in the config file, and False if all required
+    keys are present.
 
     Args:
         config_file (Path): Path to the configuration file to check.
@@ -100,9 +101,10 @@ el.replaceWith(d);
     return not deep_compare(config_toml_document, template_toml_document)</code></pre>
 </details>
 <div class="desc"><p>Check if the given configuration file is missing required keys compared to the template.</p>
-<p>This function compares the structure of the provided config file against the template 'project.toml'
-included with the package. It returns True if any required keys from the template are missing in the
-config file, and False if all required keys are present.</p>
+<p>This function compares the structure of the provided config file against the
+template 'project.toml' included with the package. It returns True if any required
+keys from the template are missing in the config file, and False if all required
+keys are present.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>config_file</code></strong> :&ensp;<code>Path</code></dt>
@@ -132,8 +134,9 @@ config file, and False if all required keys are present.</p>
     &#34;&#34;&#34;
     Create a &#39;.gitignore&#39; file in the specified project directory.
 
-    If a &#39;.gitignore&#39; file already exists in the directory, a warning is issued and the file is not overwritten.
-    Otherwise, a template &#39;.gitignore&#39; is copied from the package resources to the project directory.
+    If a &#39;.gitignore&#39; file already exists in the directory, a warning is issued and the
+    file is not overwritten. Otherwise, a template &#39;.gitignore&#39; is copied from the
+    package resources to the project directory.
 
     Args:
         project_dir (Path): The target directory for the &#39;.gitignore&#39; file.
@@ -156,8 +159,9 @@ config file, and False if all required keys are present.</p>
         shutil.copy(gitignore_src, gitignore_target)</code></pre>
 </details>
 <div class="desc"><p>Create a '.gitignore' file in the specified project directory.</p>
-<p>If a '.gitignore' file already exists in the directory, a warning is issued and the file is not overwritten.
-Otherwise, a template '.gitignore' is copied from the package resources to the project directory.</p>
+<p>If a '.gitignore' file already exists in the directory, a warning is issued and the
+file is not overwritten. Otherwise, a template '.gitignore' is copied from the
+package resources to the project directory.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>project_dir</code></strong> :&ensp;<code>Path</code></dt>
@@ -181,8 +185,10 @@ Otherwise, a template '.gitignore' is copied from the package resources to the p
     &#34;&#34;&#34;
     Create a template &#39;project.toml&#39; file in the specified project directory.
 
-    If a &#39;project.toml&#39; file already exists in the directory, a warning is issued and the file is not overwritten.
-    Otherwise, a template file is copied from the package resources to the project directory.
+    If a &#39;project.toml&#39; file already exists in the directory, a warning is issued
+    and the file is not overwritten.
+    Otherwise, a template file is copied from the package resources to the project
+    directory.
 
     Args:
         project_dir (Path): The target directory for the &#39;project.toml&#39; file.
@@ -208,8 +214,10 @@ Otherwise, a template '.gitignore' is copied from the package resources to the p
         shutil.copy(toml_template_file, toml_file_)</code></pre>
 </details>
 <div class="desc"><p>Create a template 'project.toml' file in the specified project directory.</p>
-<p>If a 'project.toml' file already exists in the directory, a warning is issued and the file is not overwritten.
-Otherwise, a template file is copied from the package resources to the project directory.</p>
+<p>If a 'project.toml' file already exists in the directory, a warning is issued
+and the file is not overwritten.
+Otherwise, a template file is copied from the package resources to the project
+directory.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>project_dir</code></strong> :&ensp;<code>Path</code></dt>
@@ -242,7 +250,8 @@ Otherwise, a template file is copied from the package resources to the project d
         Path: The path to the first &#39;project.toml&#39; file found.
 
     Raises:
-        FileNotFoundError: If no &#39;project.toml&#39; file is found in the start_dir, its parents, or the current working directory.
+        FileNotFoundError: If no &#39;project.toml&#39; file is found in the start_dir, its
+        parents, or the current working directory.
 
     The function checks each parent directory of start_dir for a &#39;project.toml&#39; file.
     If none is found, it checks the current working directory as a fallback.
@@ -274,9 +283,10 @@ Otherwise, a template file is copied from the package resources to the project d
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>FileNotFoundError</code></dt>
-<dd>If no 'project.toml' file is found in the start_dir, its parents, or the current working directory.</dd>
+<dd>If no 'project.toml' file is found in the start_dir, its</dd>
 </dl>
-<p>The function checks each parent directory of start_dir for a 'project.toml' file.
+<p>parents, or the current working directory.
+The function checks each parent directory of start_dir for a 'project.toml' file.
 If none is found, it checks the current working directory as a fallback.</p></div>
 </dd>
 <dt id="gamslib.projectconfiguration.utils.get_config_file_from_env"><code class="name flex">
@@ -368,7 +378,8 @@ Also creates a directory 'objects' in the project_dir directory.</p></div>
     &#34;&#34;&#34;
     Read and normalize a path value from a dotenv file.
 
-    This function searches for the specified field name in the dotenv file and returns its value as a Path object.
+    This function searches for the specified field name in the dotenv file and
+    returns its value as a Path object.
     Windows-style backslashes are converted to forward slashes for cross-platform compatibility.
     If the field is not found, returns None.
 
@@ -398,7 +409,8 @@ Also creates a directory 'objects' in the project_dir directory.</p></div>
     return Path(value) if value else None</code></pre>
 </details>
 <div class="desc"><p>Read and normalize a path value from a dotenv file.</p>
-<p>This function searches for the specified field name in the dotenv file and returns its value as a Path object.
+<p>This function searches for the specified field name in the dotenv file and
+returns its value as a Path object.
 Windows-style backslashes are converted to forward slashes for cross-platform compatibility.
 If the field is not found, returns None.</p>
 <h2 id="args">Args</h2>
@@ -427,7 +439,8 @@ If the field is not found, returns None.</p>
     Update the configuration file by adding missing entries from the template.
 
     Compares the provided config file to the template &#39;project.toml&#39; included with the package.
-    Any keys present in the template but missing from the config file are added, preserving existing values and comments.
+    Any keys present in the template but missing from the config file are added, preserving 
+    existing values and comments.
     The function does not remove or modify existing entries—only additions are handled.
 
     A backup of the original config file is created before any changes are made.
@@ -473,7 +486,8 @@ If the field is not found, returns None.</p>
 </details>
 <div class="desc"><p>Update the configuration file by adding missing entries from the template.</p>
 <p>Compares the provided config file to the template 'project.toml' included with the package.
-Any keys present in the template but missing from the config file are added, preserving existing values and comments.
+Any keys present in the template but missing from the config file are added, preserving
+existing values and comments.
 The function does not remove or modify existing entries—only additions are handled.</p>
 <p>A backup of the original config file is created before any changes are made.</p>
 <h2 id="args">Args</h2>
