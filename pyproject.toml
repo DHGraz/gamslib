@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.7.7"
+version = "0.7.8"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -53,6 +53,8 @@ dev = [
     "pylint>=4.0.1",
     "pyright>=1.1.406",
     "pdoc3>=0.11.6",
+    "importchecker>=3.0",
+    "networkx>=3.6",
 ]
 
 [tool.hatch.metadata]
