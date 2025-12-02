@@ -336,28 +336,6 @@ def test_validate_empty_title(datadir):
         dc.validate()
 
 
-def test_validate_missing_creator(datadir):
-    """Test validate raises ValueError when creator is missing."""
-    path = datadir / "DC.xml"
-    dc = DublinCore(path)
-    del dc._data["creator"]
-    with pytest.raises(
-        ValueError, match="Required Dublin Core element 'creator' is missing"
-    ):
-        dc.validate()
-
-
-def test_validate_empty_creator(datadir):
-    """Test validate raises ValueError when creator is empty."""
-    path = datadir / "DC.xml"
-    dc = DublinCore(path)
-    dc._data["creator"] = {}
-    with pytest.raises(
-        ValueError, match="Required Dublin Core element 'creator' has no value"
-    ):
-        dc.validate()
-
-
 def test_validate_missing_rights(datadir):
     """Test validate raises ValueError when rights is missing."""
     path = datadir / "DC.xml"

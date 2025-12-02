@@ -67,7 +67,7 @@ NAMESPACES = {
 }
 
 # The following elements are required by GAMS we add the namespace to avoid confusion
-REQUIRED_GAMS_ELEMENTS = ["identifier", "title", "creator", "rights"]
+REQUIRED_GAMS_ELEMENTS = ["identifier", "title", "rights"]
 
 
 class DublinCore:
