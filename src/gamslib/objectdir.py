@@ -53,7 +53,7 @@ def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
         if is_object_folder(path):
             yield path
         else:
-            logger.warning(
+            logger.debug(
                 "Skipping folder %s as it does not contain a DC.xml file.", root
             )
 
