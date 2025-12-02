@@ -19,6 +19,20 @@ class ObjectDirectoryValidationError(Exception):
     """Exception raised when an object directory is invalid."""
 
 
+def is_object_folder(folder_path: Path) -> bool:
+    """
+    Check if the given folder is an object folder.
+
+    An object folder is defined as a folder that contains a DC.xml file.
+
+    Args:
+        folder_path (Path): Path to the folder to check.
+
+    Returns:    
+        bool: True if the folder is an object folder, False otherwise.
+    """
+    return (folder_path / "DC.xml").is_file()
+
 def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
     """
     Find all object folders in the root folder or below.
@@ -32,10 +46,13 @@ def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
     Notes:
         - Skips folders that do not contain a DC.xml file and logs a warning.
     """
-    for root, _, files in os.walk(root_folder):
-        if "DC.xml" in files:
-            yield Path(root)
-        elif not files or "project.toml" not in files:
+
+    # Path.walk() only was introduced in Python 3.12, so we use os.walk() here
+    for root, _, _ in os.walk(root_folder):
+        path = Path(root)
+        if is_object_folder(path):
+            yield path
+        else:
             logger.warning(
                 "Skipping folder %s as it does not contain a DC.xml file.", root
             )

@@ -177,6 +177,19 @@ def lido_object_dir_fixture(
 
 
 # ------------- basic functionality tests ---------
+
+def test_is_object_folder(tmp_path: Path, dc_content: bytes):
+    """Test if the is_object_folder function correctly identifies object folders."""
+    object_folder = tmp_path / "object1"
+    object_folder.mkdir()
+    (object_folder / "DC.xml").write_bytes(dc_content)
+
+    non_object_folder = tmp_path / "not_an_object"
+    non_object_folder.mkdir()
+
+    assert gamslib.objectdir.is_object_folder(object_folder) is True
+    assert gamslib.objectdir.is_object_folder(non_object_folder) is False
+
 def test_find_object_folders(tmp_path: Path, dc_content: bytes):
     """Test if the find_object_folders function returns all folder containing a DC.xml."""
     object_folder_names = [
