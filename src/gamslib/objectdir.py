@@ -15,6 +15,7 @@ from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 
 logger = logging.getLogger(__name__)
 
+
 class ObjectDirectoryValidationError(Exception):
     """Exception raised when an object directory is invalid."""
 
@@ -28,10 +29,11 @@ def is_object_folder(folder_path: Path) -> bool:
     Args:
         folder_path (Path): Path to the folder to check.
 
-    Returns:    
+    Returns:
         bool: True if the folder is an object folder, False otherwise.
     """
     return (folder_path / "DC.xml").is_file()
+
 
 def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
     """
@@ -46,7 +48,6 @@ def find_object_folders(root_folder: Path) -> Generator[Path, None, None]:
     Notes:
         - Skips folders that do not contain a DC.xml file and logs a warning.
     """
-
     # Path.walk() only was introduced in Python 3.12, so we use os.walk() here
     for root, _, _ in os.walk(root_folder):
         path = Path(root)
@@ -168,7 +169,8 @@ def validate_main_resource_id(object_dir: Path):
             )
 
 
-def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
+# def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
+def _create_csvmgr_with_error_handling(object_path: Path) -> None:
     """
     Create an ObjectCSVManager with readable error messages.
 
@@ -207,7 +209,9 @@ def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
                     f"field '{missing_field}'."
                 ) from e
         # fallback for unexpected error messages
-        raise ObjectDirectoryValidationError(f"Object directory '{object_path.name}': {e}") from e
+        raise ObjectDirectoryValidationError(
+            f"Object directory '{object_path.name}': {e}"
+        ) from e
 
 
 def validate_csv_files(object_path: Path) -> None:
@@ -240,7 +244,9 @@ def validate_csv_files(object_path: Path) -> None:
                     f"referenced in datastreams.csv does not exist."
                 )
     except ValueError as e:
-        raise ObjectDirectoryValidationError(f"Object directory '{object_path.name}': {e}") from e
+        raise ObjectDirectoryValidationError(
+            f"Object directory '{object_path.name}': {e}"
+        ) from e
 
 
 def validate_dc_file(object_path: Path) -> None:
