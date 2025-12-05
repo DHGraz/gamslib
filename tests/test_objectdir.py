@@ -408,16 +408,25 @@ def test_validate_csv_files_unexpected_field_in_datastreams_csv(object_dir: Path
     """Test that validation fails with proper error when datastreams.csv has an unexpected field."""
     ds_csv_path = object_dir / "datastreams.csv"
     lines = ds_csv_path.read_text().splitlines()
+    new_lines = [f"{line},unexpected" for line in lines]
     # Add an unexpected field to the header
-    lines[0] += ",unexpected_field"
-    for i, line in enumerate(lines[1:]):
-        lines[i] = line + ",unexpected_value"
-    ds_csv_path.write_text("\n".join(lines))
+    #lines[0] += ",unexpected_field"
+    #for i, line in enumerate(lines[1:]):
+    #    lines[i] = line + ",unexpected_value"
+    ds_csv_path.write_text("\n".join(new_lines))
+    content = ds_csv_path.read_text()
     with pytest.raises(
         ObjectDirectoryValidationError,
         match=r"datastreams.csv contains an unexpected field",
     ):
         validate_csv_files(object_dir)
+
+# o%3Atest.object.001/DC.xml,DC.xml,title_2,description_2,application/xml,creator_2,rights_2,lang_2,tags_2,unexpected_value
+# o%3Atest.object.001/baz.png,baz.png,title_3,description_3,image/png,creator_3,rights_3,lang_3,tags_3,unexpected_value
+# o%3Atest.object.001/foo.pdf,foo.pdf,title_1,description_1,application/pdf,creator_1,rights_1,lang_1,tags_1,unexpected_value
+# o%3Atest.object.001/foo.pdf,foo.pdf,title_1,description_1,application/pdf,creator_1,rights_1,lang_1,tags_1
+
+
 
 
 def test_validate_csv_files_type_error_fallback(

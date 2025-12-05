@@ -11,7 +11,7 @@ from gamslib import formatdetect
 from gamslib.formatdetect import formatinfo
 from gamslib.objectcsv.defaultvalues import NAMESPACES
 from gamslib.objectcsv.dublincore import DublinCore
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
+from gamslib.objectcsv.objectcsvmanager import InvalidCSVFileError, ObjectCSVManager
 
 logger = logging.getLogger(__name__)
 
@@ -169,7 +169,6 @@ def validate_main_resource_id(object_dir: Path):
             )
 
 
-# def _create_csvmgr_with_error_handling(object_path: Path) -> ObjectCSVManager:
 def _create_csvmgr_with_error_handling(object_path: Path) -> None:
     """
     Create an ObjectCSVManager with readable error messages.
@@ -212,6 +211,10 @@ def _create_csvmgr_with_error_handling(object_path: Path) -> None:
         raise ObjectDirectoryValidationError(
             f"Object directory '{object_path.name}': {e}"
         ) from e
+    except InvalidCSVFileError as e:
+        raise ObjectDirectoryValidationError(
+            f"Object directory '{object_path.name}': {e}"
+        ) from e    
 
 
 def validate_csv_files(object_path: Path) -> None:
