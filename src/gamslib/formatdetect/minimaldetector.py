@@ -36,6 +36,37 @@ class MinimalDetector(FormatDetector):
         mimetypes.add_type("text/csv", ".csv")
         super().__init__()
 
+    @staticmethod
+    def _fix_mimetype(
+        file_to_validate: Path, encoding: str, mime_type: str
+    ) -> str:
+        """
+        Fix common misclassifications as far as we can.
+
+        Args:
+            file_to_validate (Path): Path to the file being validated.
+            encoding (str): Encoding returned by mimetypes. This is the name of the encoder (e.g. gzip) or None.
+            mime_type (str): MIME type returned by Magika. Might be None, too
+
+        Returns:
+            tuple[str, str]: Corrected (label, mime_type).
+
+        Notes:
+            - Changes 'javascript' label to 'json' for .jsonld/.json files.
+            - Converts 'text/xml' MIME type to 'application/xml'.
+        """
+        if encoding == "gzip":
+            # mimetypes returns 'gzip' as encoding for .tgz files, we don't want that
+            mime_type = "application/gzip"
+        elif encoding == "bzip2":
+            mime_type = "application/x-bzip2"
+        elif encoding == "xz":
+            mime_type = "application/x-xz"
+        elif str(file_to_validate).endswith('.tar.lzma'):
+            mime_type = "application/x-tar"
+        return mime_type
+
+
     def guess_file_type(self, filepath: Path) -> FormatInfo:
         """
         Detect the format of a file using the mimetypes module.
@@ -50,7 +81,8 @@ class MinimalDetector(FormatDetector):
             - Uses DEFAULT_TYPE if MIME type cannot be determined.
             - Integrates with xmltypes and jsontypes for subtype detection.
         """
-        mime_type, _ = mimetypes.guess_type(filepath)
+        mime_type, encoding = mimetypes.guess_type(filepath)
+        mime_type = self._fix_mimetype(filepath, encoding, mime_type)
         detector_name = str(self)
         subtype = None
 
