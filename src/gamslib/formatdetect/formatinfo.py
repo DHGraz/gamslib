@@ -24,7 +24,7 @@ def find_subtype_csv_files() -> list[Path]:
         list[Path]: List of Path objects pointing to the CSV files.
     """
     resource_dir = impresources.files("gamslib") / "formatdetect" / "resources"
-    return list(resource_dir.glob("*.csv"))
+    return list(resource_dir.glob("*subformats*.csv"))
 
 
 def load_subtypes_from_csv() -> list[dict[str, str]]:
@@ -82,7 +82,8 @@ class FormatInfo:
 
     detector: str  # name of the detector that detected the format
     mimetype: str  # eg. text/xml
-    subtype: SubType | None = None  # type: ignore
+    subtype: SubType | None = None  # only for xml and json types
+    pronom_id: str | None = None  # PRONOM identifier, if available
 
     def is_xml_type(self) -> bool:  # type: ignore
         """

@@ -85,9 +85,6 @@ def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
         assert f_info.mimetype == "application/octet-stream"
 
 
-def test_repr(detector):
-    assert repr(detector) == "MagikaDetector"
-
 def test_fix_result():
     """Test the _fix_result method."""
     # Test for javascript with .jsonld extension

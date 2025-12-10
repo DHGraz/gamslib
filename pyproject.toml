@@ -17,6 +17,7 @@ dependencies = [
     "rnc2rng>=2.7.0",
     "jsonschema>=4.25.1",
     "magika>=1.0.1",
+    "pygfried>=0.12.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

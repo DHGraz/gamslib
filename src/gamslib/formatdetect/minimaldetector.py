@@ -98,7 +98,7 @@ class MinimalDetector(FormatDetector):
 
         return FormatInfo(detector=detector_name, mimetype=mime_type, subtype=subtype)
 
-    def __repr__(self):
+    def __str__(self):
         """
         Return a string representation of the MinimalDetector.
 

@@ -70,7 +70,6 @@ class MagikaDetector(FormatDetector):
             - Uses DEFAULT_TYPE if Magika cannot determine the MIME type.
             - Integrates with xmltypes and jsontypes for subtype detection.
         """
-        detector_name = self.__class__.__name__
         subtype = None
         try:
             result = self._magika_object.identify_path(filepath)
@@ -88,9 +87,9 @@ class MagikaDetector(FormatDetector):
             mime_type, subtype = xmltypes.get_format_info(filepath, mime_type)
         elif jsontypes.is_json_type(mime_type):
             mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
-        return FormatInfo(detector=detector_name, mimetype=mime_type, subtype=subtype)
+        return FormatInfo(detector=str(self), mimetype=mime_type, subtype=subtype)
 
-    def __repr__(self):
+    def __str__(self):
         """
         Return a string representation of the MagikaDetector.
 

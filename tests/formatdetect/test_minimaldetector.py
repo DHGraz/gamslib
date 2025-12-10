@@ -1,10 +1,10 @@
+"""Tests for the minimal detector."""
 import shutil
 import pytest
-from pathlib import Path
-
-from gamslib.formatdetect.minimaldetector import MinimalDetector
-from gamslib.formatdetect.formatdetector import DEFAULT_TYPE
 from conftest import get_testfiles
+
+from gamslib.formatdetect.formatdetector import DEFAULT_TYPE
+from gamslib.formatdetect.minimaldetector import MinimalDetector
 
 
 @pytest.fixture(name="detector")
