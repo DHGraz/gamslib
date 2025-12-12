@@ -1,4 +1,5 @@
 """Tests for the magika detector."""
+
 import re
 import shutil
 from pathlib import Path
@@ -23,17 +24,6 @@ param_ids = [f.filepath.name for f in files_to_try]
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_file_type(detector, testfile):
     """Test that the detector can guess the file type of a file."""
-    # # We have to fix some parts as Siegfried detects some things other than eg. Magika 
-    # # (but still not wrongly)
-    # if testfile.filepath.name in ("csv.csv", "markdown.md"):
-    #     testfile.mimetype = "text/plain"
-    # elif testfile.filepath.name in ("json_schema.json", "jsonl.json"):
-    #     testfile.subtype = SubType.JSON
-    # # Siegfried is confused by a plain text file with extension jpg. 
-    # elif testfile.filepath.name == "text.txt": 
-    #     testfile.mimetype = "application/octet-stream"
-    # elif testfile.filepath.name == "xml_lido.xml":
-    #     testfile.mimetype = "application/xml"
     result = detector.guess_file_type(testfile.filepath)
     assert result.mimetype == testfile.mimetype, (
         f"{detector}: Expected '{testfile.mimetype}', got '{result.mimetype}' for file {testfile.filepath.name}"
@@ -50,7 +40,7 @@ def test_get_file_type(detector, testfile):
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
     """Test that the detector can guess the file type of a file with now extension."""
-    # We have to fix some parts as Siegfried detects some things other than eg. Magika 
+    # We have to fix some parts as Siegfried detects some things other than eg. Magika
     # (but still not wrongly)
     if testfile.filepath.name in ("csv.csv", "markdown.md"):
         testfile.mimetype = "text/plain"
@@ -75,20 +65,22 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
         extension = ".jpg"
     file_to_test = tmp_path / ("foo" + extension)
 
-    # We have to fix some parts as Siegfried detects some things other than eg. Magika 
+    # We have to fix some parts as Siegfried detects some things other than eg. Magika
     # (but still not wrongly)
     if testfile.filepath.name in ("csv.csv", "markdown.md"):
         testfile.mimetype = "text/plain"
     elif testfile.filepath.name in ("json_schema.json", "jsonl.json"):
         testfile.subtype = SubType.JSON
-    # Siegfried is confused by a plain text file with extension jpg. 
-    elif testfile.filepath.name == "text.txt": 
+    # Siegfried is confused by a plain text file with extension jpg.
+    elif testfile.filepath.name == "text.txt":
         testfile.mimetype = "application/octet-stream"
         testfile.subtype = None
     elif testfile.filepath.name == "xml_lido.xml":
         testfile.mimetype = "application/xml"
     shutil.copy(testfile.filepath, file_to_test)
-    if testfile.filepath.name == "text.txt": # this one (with wrong extension) is always detected wrong
+    if (
+        testfile.filepath.name == "text.txt"
+    ):  # this one (with wrong extension) is always detected wrong
         with pytest.warns(UserWarning):
             result = detector.guess_file_type(file_to_test)
     else:
@@ -108,38 +100,222 @@ def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
 
 
 def test_str(detector):
-    assert re.match(r"^SiegfriedDetector \(Siegfried \d+\.\d+\.\d+", str(detector)) is not None
+    assert (
+        re.match(r"^SiegfriedDetector \(Siegfried \d+\.\d+\.\d+", str(detector))
+        is not None
+    )
 
-# def test_fix_result():
-#     """Test the _fix_result method."""
-#     # Test for javascript with .jsonld extension
-#     path = Path("/path/to/file.jsonld")
-#     label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
-#     assert label == "json"
-#     assert mime_type == "application/json"
 
-#     # Test for javascript with .json extension
-#     path = Path("/path/to/file.json")
-#     label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
-#     assert label == "json"
-#     assert mime_type == "application/json"
+def test_looks_like_xml(detector, shared_datadir):
+    "Test the _looks_like_xml method."
+    assert detector._looks_like_xml(shared_datadir / "xml_lido.xml")  # pylint: disable=protected-access
+    assert not detector._looks_like_xml(shared_datadir / "text.txt")  # pylint: disable=protected-access
 
-#     # Test for javascript with other extension
-#     path = Path("/path/to/file.js")
-#     label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
-#     assert label == "javascript"
-#     assert mime_type == "application/javascript"
 
-#     # Test for text/xml conversion
-#     path = Path("/path/to/file.xml")
-#     label, mime_type = MagikaDetector._fix_result(path, "xml", "text/xml")
-#     assert label == "xml"
-#     assert mime_type == "application/xml"
+def test_extract_pronom_info_with_pronom_match(detector):
+    """Test _extract_pronom_info returns pronom match when present."""
+    matches = [
+        {"ns": "other", "id": "fmt/1"},
+        {"ns": "pronom", "id": "fmt/817", "mime": "application/json"},
+    ]
+    result = detector._extract_pronom_info(matches)  # pylint: disable=protected-access
+    assert result == {"ns": "pronom", "id": "fmt/817", "mime": "application/json"}
 
-#     # Test for non-special case
-#     path = Path("/path/to/file.txt")
-#     label, mime_type = MagikaDetector._fix_result(path, "text", "text/plain")
-#     assert label == "text"
-#     assert mime_type == "text/plain"
 
+def test_extract_pronom_info_no_pronom_match(detector):
+    """Test _extract_pronom_info returns None when no pronom match."""
+    matches = [
+        {"ns": "other", "id": "fmt/1"},
+        {"ns": "different", "id": "fmt/2"},
+    ]
+    result = detector._extract_pronom_info(matches)  # pylint: disable=protected-access
+    assert result is None
+
+
+def test_extract_pronom_info_empty_list(detector):
+    """Test _extract_pronom_info returns None for empty matches list."""
+    result = detector._extract_pronom_info([])  # pylint: disable=protected-access
+    assert result is None
+
+
+def test_extract_pronom_info_first_pronom_match(detector):
+    """Test _extract_pronom_info returns first pronom match."""
+    matches = [
+        {"ns": "pronom", "id": "fmt/100"},
+        {"ns": "pronom", "id": "fmt/200"},
+    ]
+    result = detector._extract_pronom_info(matches)  # pylint: disable=protected-access
+    assert result == {"ns": "pronom", "id": "fmt/100"}
+
+
+def test_fix_xml_info_xhtml(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns correct PRONOM ID for XHTML."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.XHTML),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.XHTML, "fmt/103")
+
+def test_fix_xml_info_xhtml_rdfa(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns correct PRONOM ID for XHTML with RDFa."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.XHTML_RDFa),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.XHTML_RDFa, "fmt/103")
+
+def test_fix_xml_info_gml(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns correct PRONOM ID for GML."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.GML),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.GML, "fmt/1047")
+
+def test_fix_xml_info_kml(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns correct PRONOM ID for KML."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.KML),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.KML, "fmt/244")
+
+def test_fix_xml_info_svg(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns correct PRONOM ID for SVG."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.SVG),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.SVG, "fmt/92")
+
+def test_fix_xml_info_generic_xml(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns default PRONOM ID for generic XML."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.XML),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.XML, "fmt/101")
+
+def test_fix_xml_info_none_detected_format(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns None when detection fails."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: None,
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result is None
+
+def test_fix_xml_info_exception_handling(detector, tmp_path, monkeypatch):
+    """Test _fix_xml_info returns None on exception."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: (_ for _ in ()).throw(ValueError("test error")),
+    )
+    result = detector._fix_xml_info(file_to_test)  # pylint: disable=protected-access
+    assert result is None
+
+def test_fix_result_jsonld_subtype(detector, tmp_path):
+    """Test _fix_result returns correct format for JSONLD subtype."""
+    file_to_test = tmp_path / "test.json"
+    file_to_test.touch()
+    result = detector._fix_result(file_to_test, "application/json", SubType.JSONLD)  # pylint: disable=protected-access
+    assert result == ("application/ld+json", SubType.JSONLD, "fmt/880")
+
+
+def test_fix_result_jsonld_extension(detector, tmp_path):
+    """Test _fix_result returns correct format for .jsonld extension."""
+    file_to_test = tmp_path / "test.jsonld"
+    file_to_test.touch()
+    result = detector._fix_result(file_to_test, "application/json", SubType.JSON)  # pylint: disable=protected-access
+    assert result == ("application/ld+json", SubType.JSONLD, "fmt/880")
+
+
+def test_fix_result_xz_file(detector, tmp_path):
+    """Test _fix_result returns correct format for XZ files."""
+    file_to_test = tmp_path / "test.xz"
+    file_to_test.touch()
+    result = detector._fix_result(file_to_test, "", SubType.JSON, "fmt/1098")  # pylint: disable=protected-access
+    assert result == ("application/x-xz", SubType.JSON, "fmt/1098")
+
+
+def test_fix_result_text_plain_json_detected(detector, tmp_path, monkeypatch):
+    """Test _fix_result detects JSON from text/plain."""
+    file_to_test = tmp_path / "test.txt"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.SiegfriedDetector._fix_json_info",
+        lambda *args: ("application/json", SubType.JSON, "fmt/817"),
+    )
+    result = detector._fix_result(file_to_test, "text/plain", None, "x-fmt/111")  # pylint: disable=protected-access
+    assert result == ("application/json", SubType.JSON, "fmt/817")
+
+
+def test_fix_result_text_plain_xml_detected(detector, tmp_path, monkeypatch):
+    """Test _fix_result detects XML from text/plain when JSON detection fails."""
+    file_to_test = tmp_path / "test.txt"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.SiegfriedDetector._fix_json_info",
+        lambda *args: None,
+    )
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.SiegfriedDetector._fix_xml_info",
+        lambda *args: ("application/xml", SubType.XML, "fmt/101"),
+    )
+    result = detector._fix_result(file_to_test, "text/plain", None, "x-fmt/111")  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.XML, "fmt/101")
+
+
+def test_fix_result_unknown_with_xml_warning(detector, tmp_path, monkeypatch):
+    """Test _fix_result handles UNKNOWN pronom_id with XML warning."""
+    file_to_test = tmp_path / "test.xml"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.xmltypes.get_format_info",
+        lambda *args: ("application/xml", SubType.XML),
+    )
+    result = detector._fix_result(file_to_test, "text/plain", None, "UNKNOWN", "fmt/101")  # pylint: disable=protected-access
+    assert result == ("application/xml", SubType.XML, "fmt/101")
+
+
+def test_fix_result_unknown_with_json_warning(detector, tmp_path, monkeypatch):
+    """Test _fix_result handles UNKNOWN pronom_id with JSON warning."""
+    file_to_test = tmp_path / "test.json"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.jsontypes.get_format_info",
+        lambda *args: ("application/json", SubType.JSON),
+    )
+    result = detector._fix_result(file_to_test, "text/plain", None, "UNKNOWN", "fmt/817")  # pylint: disable=protected-access
+    assert result == ("application/json", SubType.JSON, "UNKNOWN")
+
+
+def test_fix_result_no_modification(detector, tmp_path):
+    """Test _fix_result returns original values when no conditions match."""
+    file_to_test = tmp_path / "test.pdf"
+    file_to_test.touch()
+    result = detector._fix_result(file_to_test, "application/pdf", SubType.ODF, "fmt/20")  # pylint: disable=protected-access
+    assert result == ("application/pdf", SubType.ODF, "fmt/20")
 

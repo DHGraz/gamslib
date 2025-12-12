@@ -156,7 +156,7 @@ def validate_main_resource_id(object_dir: Path):
         object_id = None
         main_resource_path = object_dir / Path(main_resource.dspath).name
         main_format = formatdetect.detect_format(main_resource_path)
-        if main_format.subtype == formatinfo.SubType.TEI:
+        if main_format.subtype in (formatinfo.SubType.TEIP5, formatinfo.SubType.TEIP4):
             object_id = _extract_id_from_tei(main_resource_path)
         elif main_format.subtype == formatinfo.SubType.LIDO:
             object_id = _extract_id_from_lido(main_resource_path)

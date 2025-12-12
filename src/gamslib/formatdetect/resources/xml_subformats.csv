@@ -5,7 +5,7 @@ DataCite,DataCite Metadata Schema,XML DataCite Metadata,application/xml,fmt/101
 DCMI,Dublin Core Metadata Initiative,XML Dublin Core metadata,application/xml,fmt/101
 DocBook,DocBook,XML DocBook metadata,application/xml,fmt/101
 EAD,Encoded Archival Description,XML EAD document,application/xml,fmt/101
-GML,Geography Markup Language,XML GML document,application/gml+xml,x-fmt/227
+GML,Geography Markup Language,XML GML document,application/gml+xml,fmt/1047
 KML,Keyhole Markup Language,XML KML document,application/vnd.google-earth.kml+xml,fmt/244
 LIDO,Lightweight Information Describing Objects Schema,XML LIDO document,application/xml,fmt/101
 MARC21,MARC 21 XML Schema,XML MARC21 document,application/xml,fmt/101
@@ -34,8 +34,8 @@ WSDL,Web Services Description Language,XML WSDL document,application/wsdl+xml,fm
 X3D,Extensible 3D,XML X3D document,model/x3d+xml,fmt/579
 XBRL,eXtensible Business Reporting Language,XML XBRL document,application/xml,fmt/101
 XForms,XForms,XML XForms document,application/xml,fmt/101
-XHTML,Extensible Hypertext Markup Language,XML XHTML document,application/xhtml+xml,fmt/101
-XHTML_RDFa,XHTML+RDFa,XML XHTML RDFa document,application/xhtml+xml,fmt/101
+XHTML,Extensible Hypertext Markup Language,XML XHTML document,application/xhtml+xml,fmt/103
+XHTML_RDFa,XHTML+RDFa,XML XHTML RDFa document,application/xhtml+xml,fmt/103
 Xlink,XML Linking Language,XML Xlink document,application/xml,fmt/101
 XML,Extensible Markup Language,XML document,application/xml,fmt/101
 XSD,XML Schema Definition,XML XSD schema,application/xml,x-fmt/280

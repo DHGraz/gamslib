@@ -58,7 +58,7 @@ def test_ds_data_guess_missing_values(detector, shared_datadir, monkeypatch):
     dsdata = DSData(dspath="obj1/xml_tei.xml", dsid="xml_tei.xml")
     dsdata.guess_missing_values(shared_datadir / "obj1")
     assert dsdata.mimetype == "application/tei+xml"
-    assert "XML TEI document" in dsdata.title
+    assert "XML TEI P5 document" in dsdata.title
 
     dsdata = DSData(dspath="obj1/xml_lido.xml", dsid="xml_lido.xml")
     dsdata.guess_missing_values(shared_datadir / "obj1")

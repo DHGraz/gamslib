@@ -202,7 +202,7 @@ def test_create_csv_files(datadir, test_config):
     )
     assert len(ds_data) == len(["DC.xml", "SOURCE.xml"])
     assert ds_data["DC.xml"]["title"] == "XML Dublin Core metadata: DC.xml"
-    assert ds_data["SOURCE.xml"]["title"] == "XML TEI document: SOURCE.xml"
+    assert ds_data["SOURCE.xml"]["title"] == "XML TEI P5 document: SOURCE.xml"
 
     ds_data = read_csv_file_to_dict(
         objects_root_dir / "obj2" / "datastreams.csv", "dsid"

@@ -17,6 +17,7 @@ from . import jsontypes, xmltypes
 from .formatdetector import DEFAULT_TYPE, FormatDetector
 from .formatinfo import FormatInfo
 from gamslib.formatdetect.formatinfo import SubType
+from lxml import etree as ET
 
 PRONOM_IDS = {
     "JSON": "fmt/817",
@@ -70,6 +71,13 @@ class SiegfriedDetector(FormatDetector):
         except Exception:
             return None
 
+    def _looks_like_xml(self, filepath):
+        "Return True if the file looks like an XML file."
+        try:
+            ET.parse(filepath)
+            return True
+        except Exception:
+            return False
 
     def _fix_xml_info(self, filepath):
         """Try to fix XML files that pygfried misidentifies.
@@ -84,22 +92,7 @@ class SiegfriedDetector(FormatDetector):
             detected_format = xmltypes.get_format_info(filepath, "application/xml")
             if detected_format is not None:
                 mime_type, subtype = detected_format
-                # we do not differentiate between some xml formatslike TEI, yet. (xml is better than text/plain)
-                match subtype:
-                    case SubType.XHTML:
-                        puid = "fmt/103"
-                    case SubType.XHTML_RDFa:
-                        puid = "fmt/103"
-                    case SubType.TEI:
-                        puid = "fmt/1476"
-                    case SubType.GML:
-                        puid = "fmt/227"
-                    case SubType.KML:
-                        puid = "fmt/244"
-                    case SubType.SVG:
-                        puid = "fmt/92"
-                    case _:
-                        puid = "fmt/101"
+                puid = xmltypes.subformats.get_puid_for_format_type(subtype)
                 return mime_type, subtype, puid
             return None
         except Exception:
@@ -126,8 +119,6 @@ class SiegfriedDetector(FormatDetector):
             result = self._fix_xml_info(filepath)
             if result is not None:
                 return result
-                #mime_type, subtype, pronom_id = result
-            #mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
 
         # xml files without doctype are not recognized by pygfried
         if pronom_id in ("UNKNOWN", "x-fmt/111"):
@@ -160,6 +151,10 @@ class SiegfriedDetector(FormatDetector):
             mime_type = pronom_info.get("mime", DEFAULT_TYPE)
             pronom_id = pronom_info.get("id")
             pronom_warning = pronom_info.get("warning", "")
+            # Siegfried identifies XML files without xml declaration as plain text. I'll try to fix that here.
+            if pronom_id == "x-fmt/111" and self._looks_like_xml(filepath):
+                mime_type = "application/xml"
+                pronom_id = "fmt/101"
         else:
             warnings.warn(
                 f"Could not determine mimetype for {filepath}. Using default type."

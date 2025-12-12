@@ -57,7 +57,7 @@ def extract_subtype_info_from_csv() -> dict[str, str]:
     Returns:
         dict[str, str]: Mapping of subformat to full name for the SubType enum.
     """
-    return {item["subformat"]: item["full name"] for item in load_subtypes_from_csv()}
+    return {item["subformat"]: item["fullname"] for item in load_subtypes_from_csv()}
 
 
 # SubType: Enum for all supported subtypes of formats.
@@ -133,7 +133,7 @@ class FormatInfo:
         desc = ""
         subtype_info = self._get_subtype_info()
         if subtype_info is not None:
-            desc = subtype_info["ds name"]
+            desc = subtype_info["dsname"]
         elif self.mimetype == "application/octet-stream":
             desc = "Binary document"
         else:

@@ -54,7 +54,8 @@ def get_testfiles():
         TestFormatFile(formatdatadir_ / "text.txt", "text/plain", "x-fmt/111"),
         TestFormatFile(formatdatadir_ / "xml_lido.xml", "application/xml", "fmt/101",SubType.LIDO),
         TestFormatFile(formatdatadir_ / "xml_no_ns.xml", "application/xml", "fmt/101"),        
-        TestFormatFile(formatdatadir_ / "xml_tei.xml", "application/tei+xml", "fmt/1476",SubType.TEI),  
-        TestFormatFile(formatdatadir_ / "xml_tei_with_rng.xml", "application/tei+xml", "fmt/1476",SubType.TEI),
+        TestFormatFile(formatdatadir_ / "xml_tei.xml", "application/tei+xml", "fmt/1476",SubType.TEIP5),  
+        TestFormatFile(formatdatadir_ / "xml_tei_p4.xml", "application/tei+xml", "fmt/1474",SubType.TEIP4),  
+        TestFormatFile(formatdatadir_ / "xml_tei_with_rng.xml", "application/tei+xml", "fmt/1476",SubType.TEIP5),
         TestFormatFile(formatdatadir_ / "zip.zip", "application/zip", "x-fmt/263"),
     ]
