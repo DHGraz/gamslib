@@ -54,7 +54,7 @@ class General(BaseModel, validate_assignment=True):
 
     dsid_keep_extension: bool = True
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
-    format_detector: Literal["magika", "base", ""] = "magika"
+    format_detector: Literal["siegfried", "magika", "base", ""] = "siegfried"
     format_detector_url: str = ""
     ds_ignore_files: list[str] = []
 
