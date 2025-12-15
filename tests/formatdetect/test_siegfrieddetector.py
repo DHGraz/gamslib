@@ -1,14 +1,17 @@
 """Tests for the magika detector."""
 
+import copy
 import re
 import shutil
 from pathlib import Path
 
 import pytest
 from conftest import get_testfiles
-
+import pygfried
 from gamslib.formatdetect.formatinfo import SubType
+from gamslib.formatdetect import siegfrieddetector
 from gamslib.formatdetect.siegfrieddetector import SiegfriedDetector
+
 
 
 @pytest.fixture(name="detector")
@@ -90,13 +93,82 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
     )
 
 
-def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
+
+
+@pytest.fixture(name="multifile_test_data")
+def multifile_test_data_fixture(shared_datadir):
+    "Return a dict with a pygfried result as second file added."
+    testdata = pygfried.identify(str(shared_datadir / "xml_tei_p4.xml"), True)
+    second_file = copy.deepcopy(testdata["files"][0])
+    second_file["name"] = "foo2.xml"
+    testdata["files"].append(second_file)
+    return testdata
+
+def test_guess_file_type_multiple_files(detector, shared_datadir, multifile_test_data, monkeypatch):
+    "Test the unlikely case that pygried detects multiple files."
+
+    monkeypatch.setattr(pygfried, "identify", lambda *args, **kwargs: multifile_test_data)
+    testfile = shared_datadir / "xml_tei_p4.xml"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+    assert f_info.mimetype == "application/octet-stream"
+
+@pytest.fixture(name="empty_test_data")
+def empty_test_data_fixture(shared_datadir):
+    "Return a dict with a pygfried result without files."
+    testdata = pygfried.identify(str(shared_datadir / "xml_tei_p4.xml"), True)
+    testdata["files"] = []
+    return testdata
+
+def test_guess_file_type_no_files(detector, shared_datadir, empty_test_data, monkeypatch):
+    "Test the very unlikely case that pygried detects no files."
+
+    monkeypatch.setattr(pygfried, "identify", lambda *args, **kwargs: empty_test_data)
+    testfile = shared_datadir / "xml_tei_p4.xml"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+    assert f_info.mimetype == "application/octet-stream"
+
+
+@pytest.fixture(name="no_mime_type_test_data")
+def no_mime_type_test_data_fixture(shared_datadir):
+    "Return a dict with a pygfried result without mimetype."
+    testdata = pygfried.identify(str(shared_datadir / "xml_tei_p4.xml"), True)
+    testdata["files"][0]["mimeType"] = None
+    testdata["files"][0]["matches"][0]["mime"] = None
+    return testdata
+
+def test_guess_file_type_no_mimetype(detector, shared_datadir, no_mime_type_test_data, monkeypatch):
+    "Test the unlikely case that pygried detects no mimetype."
+    monkeypatch.setattr(pygfried, "identify", lambda *args, **kwargs: no_mime_type_test_data)
+    testfile = shared_datadir / "xml_tei_p4.xml"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+    assert f_info.mimetype == "application/octet-stream"
+
+def _test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
     file_to_test = tmp_path / "foo.strange_extension"
     file_to_test.touch()
     monkeypatch.setattr(SiegfriedDetector, "_fix_result", lambda *args: ("", None, ""))
     with pytest.warns(UserWarning):
         f_info = detector.guess_file_type(file_to_test)
         assert f_info.mimetype == "application/octet-stream"
+
+@pytest.fixture(name="undefined_mime_types_test_data")
+def undefined_mime_types_test_data_fixture(shared_datadir):
+    "Return a dict with a pygfried result without mimetype."
+    testdata = pygfried.identify(str(shared_datadir / "xml_tei_p4.xml"), True)
+    testdata["files"][0]["mimeType"] = "application/undefined"
+    testdata["files"][0]["matches"][0]["mime"] = "application/undefined"
+    return testdata
+
+def test_guess_file_type_undefined_mimetype(detector, shared_datadir, undefined_mime_types_test_data, monkeypatch):
+    "Test the unlikely case that pygried detects no mimetype."
+    monkeypatch.setattr(pygfried, "identify", lambda *args, **kwargs: undefined_mime_types_test_data)
+    testfile = shared_datadir / "xml_tei_p4.xml"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+    assert f_info.mimetype == "application/octet-stream"
 
 
 def test_str(detector):
@@ -319,3 +391,25 @@ def test_fix_result_no_modification(detector, tmp_path):
     result = detector._fix_result(file_to_test, "application/pdf", SubType.ODF, "fmt/20")  # pylint: disable=protected-access
     assert result == ("application/pdf", SubType.ODF, "fmt/20")
 
+def test_fix_json_info_with_exception(detector, tmp_path, monkeypatch):
+    """Test _fix_json_info if detec_format raises an exception."""
+    file_to_test = tmp_path / "test.json"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.jsontypes.get_format_info",
+        lambda *args: (_ for _ in ()).throw(ValueError("test error")),
+    )
+    result = detector._fix_json_info(file_to_test)  # pylint: disable=protected-access
+    assert result is None
+
+
+def test_fix_json_info_with_none(detector, tmp_path, monkeypatch):
+    """Test _fix_json_info if detec_format returns None."""
+    file_to_test = tmp_path / "test.json"
+    file_to_test.touch()
+    monkeypatch.setattr(
+        "gamslib.formatdetect.siegfrieddetector.jsontypes.get_format_info",
+        lambda *args: None),
+    
+    result = detector._fix_json_info(file_to_test)  # pylint: disable=protected-access
+    assert result is None    

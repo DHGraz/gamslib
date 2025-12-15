@@ -183,10 +183,6 @@ def guess_xml_subtype(filepath: Path) -> str:
         return subtype
     for _, elem in ET.iterparse(filepath, events=["start-ns"]):
         namespace = elem[1]
-        # TEI has more than one format, which cannot always be derived using the namespace
-        tei_subtype = detect_tei_version(filepath, namespace)
-        if tei_subtype is not None:
-            return tei_subtype
         try:
             return NAMESPACES[namespace]
         except KeyError:

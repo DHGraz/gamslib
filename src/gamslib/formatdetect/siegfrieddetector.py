@@ -95,7 +95,7 @@ class SiegfriedDetector(FormatDetector):
                 puid = xmltypes.subformats.get_puid_for_format_type(subtype)
                 return mime_type, subtype, puid
             return None
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return None
 
     def _fix_result(
@@ -151,7 +151,8 @@ class SiegfriedDetector(FormatDetector):
             mime_type = pronom_info.get("mime", DEFAULT_TYPE)
             pronom_id = pronom_info.get("id")
             pronom_warning = pronom_info.get("warning", "")
-            # Siegfried identifies XML files without xml declaration as plain text. I'll try to fix that here.
+            # Siegfried identifies XML files without xml declaration as plain 
+            # text. I'll try to fix that here.
             if pronom_id == "x-fmt/111" and self._looks_like_xml(filepath):
                 mime_type = "application/xml"
                 pronom_id = "fmt/101"

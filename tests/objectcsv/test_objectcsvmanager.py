@@ -2,6 +2,7 @@ import copy
 import csv
 import dataclasses
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -9,10 +10,24 @@ from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectcsvmanager import (
     DS_CSV_FILENAME,
     OBJ_CSV_FILENAME,
+    DATASTREAM_FILES_TO_IGNORE,
     ObjectCSVManager,
 )
 from gamslib.objectcsv.objectdata import ObjectData
+from gamslib.projectconfiguration import MissingConfigurationException
 
+
+# def test_extend_ignore_list(tmp_path, monkeypatch):
+#     """Objectcsv keeps a ist of filenames to ignore when searching for datastream files.
+
+#     This list can be extended via configuration. Test if this works.
+#     """
+#     monkeypatch(gamslib.objectcsv.objectcsvmanager.cfg.general.ds_ignore_files, ["foo.bar", "bar.fo", "*.log"]  )
+#     assert "foo.bar" in gamslib.objectcsv.objectcsvmanager.DATASTREAM_FILES_TO_IGNORE 
+# #     #manager = ObjectCSVManager(tmp_path)
+# #     #assert manager._ignore_files == []
+# #     #manager.extend_ignore_list(["*.log"])
+# #     #assert manager._ignore_files == ["*.log"]
 
 def test_init_empty_objdir(tmp_path):
     """Test initialization with an empty object directory."""
@@ -275,6 +290,21 @@ def test_validate_empty(tmp_path):
     with pytest.raises(ValueError, match="missing or empty"):
         manager.validate()
 
+
+def test_validate_double_ds_id(tmp_path, objdata: ObjectData, dsdata: DSData):
+    """Test if validation detects if a ds is not unique."""
+    manager = ObjectCSVManager(tmp_path)
+    manager.set_object(objdata)
+    manager.add_datastream(dsdata)
+    # as this is already handled in add_datastream, we have to cirumvent the add_datastream validation
+    new_dsdata = copy.deepcopy(dsdata)
+    new_dsdata.dsid = "TEI2.xml"
+    manager.add_datastream(new_dsdata)
+    # change dsid in exsisting datastream
+    manager._datastream_data[1].dsid = "TEI.xml"  # pylint: disable=protected-access
+
+    with pytest.raises(ValueError, match="must be unique"):
+        manager.validate()
 
 def test_validate_invalid_object(tmp_path, objdata, dsdata):
     """Test validation of invalid object data."""
@@ -588,3 +618,31 @@ def test_get_mainresource_no_mainresource(objcsvfile: Path, dscsvfile: Path):
     # Get the main resource
     main_resource = obj_mgr.get_mainresource()
     assert main_resource is None
+
+
+def test_get_ds_ignore_list_nothing_from_config(tmp_path, monkeypatch):
+    """Test the get_ignore_list method with no values from configuration."""
+    mgr = ObjectCSVManager(tmp_path)
+    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE #  pylint: disable=protected-access
+
+
+def test_get_ds_ignore_list_from_config(tmp_path, monkeypatch):
+    """Test the get_ignore_list method with values from configuration."""
+    def get_configuration_mock_cfg():
+        cfg_mock = MagicMock()
+        cfg_mock.general.ds_ignore_files = ["foo.bar", "bar.foo"]
+        return cfg_mock
+
+    mgr = ObjectCSVManager(tmp_path)
+    monkeypatch.setattr("gamslib.objectcsv.objectcsvmanager.get_configuration", get_configuration_mock_cfg)
+    ignorelist = mgr._get_ds_ignore_list()  # pylint: disable=protected-access
+    assert ignorelist == DATASTREAM_FILES_TO_IGNORE.union({"foo.bar", "bar.foo"})
+
+def test_get_ds_ignore_list_with_missing_no_config_error(tmp_path, monkeypatch):    
+    "Test if get_ignore_list raises MissingConfigurationException if no configuration is available."
+    def get_configuration_raises():
+        raise MissingConfigurationException()
+
+    mgr = ObjectCSVManager(tmp_path)
+    monkeypatch.setattr("gamslib.objectcsv.objectcsvmanager.get_configuration", get_configuration_raises)
+    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE #  pylint: disable=protected-access

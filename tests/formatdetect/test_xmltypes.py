@@ -105,6 +105,7 @@ def test_get_format_info_unknown_namespace(tmp_path, shared_datadir):
     assert mimetype == "application/tei+xml"
     assert subtype is SubType.TEIP4
 
+
 def test_get_format_info_no_namespace(tmp_path):
     """A xml file without a namespace should return None."""
     xml_content = """<?xml version="1.0" encoding="UTF-8"?>
@@ -140,6 +141,7 @@ def test_xmlsubformats_init():
     sf = XMLSubFormats()
     assert len(sf.formats) > 0
 
+
 def test_xmlsubformats_mimetypes():
     "Test if the mimetypes property returns a set of all MIME types defined in xml_subformats.csv."
     sf = XMLSubFormats()
@@ -148,7 +150,9 @@ def test_xmlsubformats_mimetypes():
     # the two above are added by default. Make sure there are more (from csv)
     assert len(sf.mimetypes) > 2
 
+
 def test_get_mimetype_for_subtype():
+    "Test get_mimetype_for_subtype"
     sf = XMLSubFormats()
     assert sf.get_mimetype_for_subtype(SubType.TEIP4) == "application/tei+xml"
     assert sf.get_mimetype_for_subtype(SubType.TEIP5) == "application/tei+xml"
@@ -157,4 +161,22 @@ def test_get_mimetype_for_subtype():
 
     # and now with default value: first we drop all formats to enforce default
     sf.formats = []
-    assert sf.get_mimetype_for_subtype(SubType.TEIP4, "application/xml" ) == "application/xml"  
+    assert (
+        sf.get_mimetype_for_subtype(SubType.TEIP4, "application/xml")
+        == "application/xml"
+    )
+
+
+def test_get_puid_for_format_type():
+    "Test get_puid_for_format_type"
+    sf = XMLSubFormats()
+    # Test known format types
+    assert sf.get_puid_for_format_type(SubType.TEIP4) == "fmt/1474"
+    assert sf.get_puid_for_format_type(SubType.TEIP5) == "fmt/1476"
+
+    # Test unknown format type returns default generic XML PUID
+    assert sf.get_puid_for_format_type(SubType.ATOM) == "fmt/101"
+
+    # Test with empty formats list enforces default
+    sf.formats = []
+    assert sf.get_puid_for_format_type(SubType.TEIP4) == "fmt/101"
