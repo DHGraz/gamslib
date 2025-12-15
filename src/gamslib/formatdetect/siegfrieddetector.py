@@ -160,7 +160,7 @@ class SiegfriedDetector(FormatDetector):
             warnings.warn(
                 f"Could not determine mimetype for {filepath}. Using default type."
             )
-        if mime_type is None or mime_type == "application/undefined":
+        if mime_type in {None, "", "application/undefined"}:
             mime_type = DEFAULT_TYPE
             warnings.warn(
                 f"Could not determine mimetype for {filepath}. Using default type."

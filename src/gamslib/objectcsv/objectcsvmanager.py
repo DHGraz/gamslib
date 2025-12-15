@@ -10,13 +10,14 @@ merge, and manipulate the object and datastream metadata.
 from collections import Counter
 import csv
 import dataclasses
+import fnmatch
 from pathlib import Path
 from typing import Generator
 
 from gamslib.objectcsv import utils
 from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectdata import ObjectData
-from ..projectconfiguration import get_configuration,  MissingConfigurationException
+from ..projectconfiguration import get_configuration, MissingConfigurationException
 
 OBJ_CSV_FILENAME = "object.csv"
 DS_CSV_FILENAME = "datastreams.csv"
@@ -28,13 +29,6 @@ DATASTREAM_FILES_TO_IGNORE = {
     ".DS_Store",
     "Thumbs.db",
 }
-# Extend ignore list from configuration, if available
-# try:
-#     cfg = get_configuration()
-#     DATASTREAM_FILES_TO_IGNORE.update(cfg.general.ds_ignore_files)
-# except MissingConfigurationException:
-#     pass  # ignore configuration errors here
-
 
 class ObjectCSVManager:
     """
@@ -54,7 +48,7 @@ class ObjectCSVManager:
         Raises:
             FileNotFoundError: If the object directory does not exist.
         """
-        self._ds_ignore_list: set|None = None  # cached list of datastream file names
+        self._ds_ignore_list: set | None = None  # cached list of datastream file names
         self.obj_dir: Path = obj_dir
         self._ignore_existing_csv_files: bool = ignore_existing_csv_files
         if not self.obj_dir.is_dir():
@@ -116,9 +110,7 @@ class ObjectCSVManager:
         # Datastreams from DATASTREAM_FILES_TO_IGNORE must not be added
         if not self._is_allowed_datastream_file(dsdata.dsid):
             raise ValueError(f"Datastream ID '{dsdata.dsid}' is not allowed.")
-        # if dsdata.dsid in DATASTREAM_FILES_TO_IGNORE:
-        #     raise ValueError(f"Datastream ID '{dsdata.dsid}' is not allowed.")
-        
+
         if dsdata.dsid in [ds.dsid for ds in self._datastream_data]:
             if replace:
                 self._datastream_data = [
@@ -332,17 +324,20 @@ class ObjectCSVManager:
     def _is_allowed_datastream_file(self, dsid: str) -> bool:
         """Check if the datastream is allowed to be added to the object.
 
-        Args:    
+        Args:
             dsid (str): The datastream ID to check.
 
-        Returns:    
+        Returns:
             bool: True if the datastream is allowed, False otherwise.
         """
-        return dsid not in self._get_ds_ignore_list()
+        for pattern in self._get_ds_ignore_list():
+            if fnmatch.fnmatch(dsid, pattern):
+                return False
+        return True
 
     def _get_ds_ignore_list(self):
         """Get the list of datastream files to ignore.
-        
+
         This list is DATASTREAM_FILES_TO_IGNORE extended by values from the configuration.
         """
         if self._ds_ignore_list is not None:

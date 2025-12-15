@@ -48,10 +48,12 @@ from pathlib import Path
 from ..projectconfiguration import MissingConfigurationException, get_configuration
 from .formatdetector import FormatDetector
 from .formatinfo import FormatInfo
+from .siegfrieddetector import SiegfriedDetector
 from .magikadetector import MagikaDetector
 from .minimaldetector import MinimalDetector
 
-DEFAULT_DETECTOR_NAME = "magika"
+DEFAULT_DETECTOR_NAME = "siegfried"
+
 
 
 @lru_cache
@@ -82,6 +84,8 @@ def make_detector(detector_name: str, detector_url: str = "") -> FormatDetector:
         detector = MinimalDetector()
     elif detector_name == "magika":
         detector = MagikaDetector()
+    elif detector_name == "siegfried":
+        detector = SiegfriedDetector()
     # TODO: add more detectors
     if detector is None:
         raise ValueError(f"Unknown detector '{detector_name}'")

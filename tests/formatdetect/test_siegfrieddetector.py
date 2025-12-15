@@ -24,6 +24,7 @@ files_to_try = get_testfiles()
 param_ids = [f.filepath.name for f in files_to_try]
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_file_type(detector, testfile):
     """Test that the detector can guess the file type of a file."""
@@ -40,6 +41,7 @@ def test_get_file_type(detector, testfile):
     )
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
     """Test that the detector can guess the file type of a file with now extension."""
@@ -58,7 +60,7 @@ def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
         f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' for file {testfile.filepath.name}"
     )
 
-
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile):
     """Test that the detector can guess the file type of a file with a wrong extension."""

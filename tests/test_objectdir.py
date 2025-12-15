@@ -542,12 +542,14 @@ def test_validate_main_resource_id_tei_file_raises(tei_object_dir):
         gamslib.objectdir.validate_main_resource_id(tei_object_dir)
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")  
 def test_validate_main_resource_id_lido_file_no_raises(lido_object_dir):
     """Test LIDO file with matching object ID does not raise."""
     # if ids match should not raise
     gamslib.objectdir.validate_main_resource_id(lido_object_dir)
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")  
 def test_validate_main_resource_id_lidofile_raises(lido_object_dir):
     """Asure LIDO file with non matching object ID raises."""
     main_resource = lido_object_dir / "lido.xml"
@@ -558,7 +560,7 @@ def test_validate_main_resource_id_lidofile_raises(lido_object_dir):
     with pytest.raises(ValueError, match="does not match"):
         gamslib.objectdir.validate_main_resource_id(lido_object_dir)
 
-
+@pytest.mark.filterwarnings("ignore::UserWarning")  
 def test_validate_main_resource_id_non_tei_non_lido_file_does_not_check(object_dir):
     """Make sure that non-TEI/LIDO files are not checked."""
 
