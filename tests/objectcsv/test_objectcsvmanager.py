@@ -10,24 +10,10 @@ from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectcsvmanager import (
     DS_CSV_FILENAME,
     OBJ_CSV_FILENAME,
-    DATASTREAM_FILES_TO_IGNORE,
     ObjectCSVManager,
 )
 from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.projectconfiguration import MissingConfigurationException
-
-
-# def test_extend_ignore_list(tmp_path, monkeypatch):
-#     """Objectcsv keeps a ist of filenames to ignore when searching for datastream files.
-
-#     This list can be extended via configuration. Test if this works.
-#     """
-#     monkeypatch(gamslib.objectcsv.objectcsvmanager.cfg.general.ds_ignore_files, ["foo.bar", "bar.fo", "*.log"]  )
-#     assert "foo.bar" in gamslib.objectcsv.objectcsvmanager.DATASTREAM_FILES_TO_IGNORE 
-# #     #manager = ObjectCSVManager(tmp_path)
-# #     #assert manager._ignore_files == []
-# #     #manager.extend_ignore_list(["*.log"])
-# #     #assert manager._ignore_files == ["*.log"]
 
 def test_init_empty_objdir(tmp_path):
     """Test initialization with an empty object directory."""
@@ -128,6 +114,107 @@ def test_add_datastream_with_ignored_filename(tmp_path, dsdata, filename):
     dsdata.dsid = filename
     with pytest.raises(ValueError, match="not allowed"):
         manager.add_datastream(dsdata)
+
+
+def test_datastream_csv_with_missing_column(tmp_path):
+    """Creation of ObjectCSVManager should fail if in datastreams.csv a column is missing."""
+    # make dicts with all fields as keys and <fieldname>_value as values
+    dsdata = {name: f"name: {name}_value" for name in DSData.fieldnames()}
+    objdata = {name: f"name: {name}_value" for name in ObjectData.fieldnames()}
+    # remove one column from the dcsv file 
+    del dsdata['mimetype']
+    obj_ds_file = tmp_path / "object.csv"
+    ds_csv_files = tmp_path / "datastreams.csv"
+    # write the invalid datastreams.csv file
+    ds_csv_files_content = [
+        ",".join(DSData.fieldnames()),   
+        ",".join(dsdata.values()),
+    ]
+    ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
+    # write the valid object.csv file
+    obj_ds_file_content = [
+        ",".join(ObjectData.fieldnames()),   
+        ",".join(objdata.values()),
+    ]
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+
+    with pytest.raises(InvalidCSVFileError, match=r"Missing comma in line 2."):
+        ObjectCSVManager(tmp_path)
+
+def test_datastream_csv_with_extra_column(tmp_path):
+    """Creation of ObjectCSVManager should fail if in datastreams.csv has an extra column."""
+    # make dicts with all fields as keys and <fieldname>_value as values
+    dsdata = {name: f"name: {name}_value" for name in DSData.fieldnames()}
+    objdata = {name: f"name: {name}_value" for name in ObjectData.fieldnames()}
+    # add one column to the ds.csv file
+    dsdata["extra_column"] = "extra_value"
+    obj_ds_file = tmp_path / "object.csv"
+    ds_csv_files = tmp_path / "datastreams.csv"
+    # write the invalid datastreams.csv file
+    ds_csv_files_content = [
+        ",".join(DSData.fieldnames()),   
+        ",".join(dsdata.values()),
+    ]
+    ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
+    # write the valid object.csv file
+    obj_ds_file_content = [
+        ",".join(ObjectData.fieldnames()),   
+        ",".join(objdata.values()),
+    ]
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+
+    with pytest.raises(InvalidCSVFileError, match=r"Extra comma in line 2."):
+        ObjectCSVManager(tmp_path)
+
+def test_object_csv_with_missing_column(tmp_path):
+    """Creation of ObjectCSVManager should fail if in object.csv a column is missing."""
+    # make dicts with all fields as keys and <fieldname>_value as values
+    dsdata = {name: f"name: {name}_value" for name in DSData.fieldnames()}
+    objdata = {name: f"name: {name}_value" for name in ObjectData.fieldnames()}
+    # remove one column from the object.csv file
+    del objdata["source"]
+    obj_ds_file = tmp_path / "object.csv"
+    ds_csv_files = tmp_path / "datastreams.csv"
+    # write the invalid csv files
+    ds_csv_files_content = [
+        ",".join(DSData.fieldnames()),   
+        ",".join(dsdata.values()),
+    ]
+    ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
+    # write the valid object.csv file
+    obj_ds_file_content = [
+        ",".join(ObjectData.fieldnames()),   
+        ",".join(objdata.values()),
+    ]
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+
+    with pytest.raises(InvalidCSVFileError, match=r"Missing comma in line 2."):
+        ObjectCSVManager(tmp_path)
+
+def test_object_csv_with_extra_column(tmp_path):
+    """Creation of ObjectCSVManager should fail if in object.csv has an extra column."""
+    # make dicts with all fields as keys and <fieldname>_value as values
+    dsdata = {name: f"name: {name}_value" for name in DSData.fieldnames()}
+    objdata = {name: f"name: {name}_value" for name in ObjectData.fieldnames()}
+    # add one column to the object.csv file
+    objdata["extra_column"] = "extra_value"
+    obj_ds_file = tmp_path / "object.csv"
+    ds_csv_files = tmp_path / "datastreams.csv"
+    # write the invalid csv files
+    ds_csv_files_content = [
+        ",".join(DSData.fieldnames()),   
+        ",".join(dsdata.values()),
+    ]
+    ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
+    # write the valid object.csv file
+    obj_ds_file_content = [
+        ",".join(ObjectData.fieldnames()),   
+        ",".join(objdata.values()),
+    ]
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+
+    with pytest.raises(InvalidCSVFileError, match=r"Extra comma in line 2."):
+        ObjectCSVManager(tmp_path)
 
 
 def test_add_datastream_replace_false_raises_on_duplicate(tmp_path, dsdata):

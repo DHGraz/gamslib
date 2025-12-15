@@ -29,6 +29,8 @@ DATASTREAM_FILES_TO_IGNORE = {
     ".DS_Store",
     "Thumbs.db",
 }
+class InvalidCSVFileError(Exception):
+    """Exception raised when a CSV file (objects.csv or datastreams.csv) is invalid."""
 
 class ObjectCSVManager:
     """
@@ -47,6 +49,7 @@ class ObjectCSVManager:
 
         Raises:
             FileNotFoundError: If the object directory does not exist.
+            InvalidCSVFileError: If the CSV files are malformed.
         """
         self._ds_ignore_list: set | None = None  # cached list of datastream file names
         self.obj_dir: Path = obj_dir
@@ -261,16 +264,26 @@ class ObjectCSVManager:
 
         Returns:
             ObjectData | None: Object metadata if present, else None.
+        Raises:
+            InvalidCSVFileError: If the CSV file is malformed.
         """
         csv_file = self.obj_dir / OBJ_CSV_FILENAME
 
         if not csv_file.is_file():
             return None
         with csv_file.open(encoding="utf-8", newline="") as f:
-            for row in csv.DictReader(f):
+            for line_number, row in enumerate(csv.DictReader(f), start=2): # 2: skip header line
+                # Check for malformed CSV rows: header has more columns than the row
+                if None in row.values():
+                    raise InvalidCSVFileError(f"{csv_file}: Malformed CSV file. Missing comma in line {line_number}?")
+                # header has less columns than the row: dictreader adds extra key with None
+                if None in row:
+                    raise InvalidCSVFileError(f"{csv_file}: Malformed CSV file. Extra comma in line {line_number}?")
+                # legacy support: rename 'mainresource' to 'mainResource'
                 if "mainresource" in row:
                     row["mainResource"] = row.pop("mainresource")
                 return ObjectData(**row)
+
 
     def _write_object_csv(self):
         """
@@ -300,7 +313,14 @@ class ObjectCSVManager:
         if not csv_file.is_file():
             return []
         with csv_file.open(encoding="utf-8", newline="") as f:
-            for row in csv.DictReader(f):
+            for line_number, row in enumerate(csv.DictReader(f), start=2): # 2: skip header line
+                # Check for malformed CSV rows
+                # header has more columns than the row (DictReader adds None for missing columns)
+                if None in row.values():
+                    raise InvalidCSVFileError(f"{csv_file}: Malformed CSV file. Missing comma in line {line_number}?")
+                # header has less columns than the row: dictreader adds extra key with None
+                if None in row:
+                    raise InvalidCSVFileError(f"{csv_file}: Malformed CSV file. Extra comma in line {line_number}?")
                 dsdata = DSData(**row)
                 datastreams.append(dsdata)
         return datastreams
