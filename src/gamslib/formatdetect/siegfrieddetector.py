@@ -26,6 +26,7 @@ PRONOM_IDS = {
     "JSONL": "fmt/817",
 }
 
+
 class SiegfriedDetector(FormatDetector):
     """
     Detector that uses the Pygfried library to detect file formats.
@@ -49,11 +50,10 @@ class SiegfriedDetector(FormatDetector):
                 return match
         return None
 
-
     def _fix_json_info(self, filepath):
         """Try to fix JSON files that pygfried misidentifies.
 
-        Returns None if detection failes, else a triple, which can be 
+        Returns None if detection failes, else a triple, which can be
         passed to create a FormatInfo object.
 
         Returns:
@@ -63,7 +63,7 @@ class SiegfriedDetector(FormatDetector):
             detected_format = jsontypes.get_format_info(filepath, "application/json")
             if detected_format is not None:
                 mime_type, subtype = detected_format
-                if 'json' in mime_type:
+                if "json" in mime_type:
                     if subtype == SubType.JSONLD:
                         return mime_type, SubType.JSONLD, "fmt/880"
                     return mime_type, SubType.JSON, "fmt/817"
@@ -82,7 +82,7 @@ class SiegfriedDetector(FormatDetector):
     def _fix_xml_info(self, filepath):
         """Try to fix XML files that pygfried misidentifies.
 
-        Returns None if detection failes, else a triple, which can be 
+        Returns None if detection failes, else a triple, which can be
         passed to create a FormatInfo object.
 
         Returns:
@@ -143,19 +143,23 @@ class SiegfriedDetector(FormatDetector):
         subtype = None
         pronom_id = None
         pronom_warning = ""
-
+        if (
+            not filepath.is_file()
+        ):  # pygfried always returns a dict; only indicates missing file in 'errors'
+            raise FileNotFoundError(f"File {filepath} does not exist.")
         data = pygfried.identify(str(filepath), detailed=True)
         if data and len(data["files"]) == 1:
             result = data["files"][0]
             pronom_info = self._extract_pronom_info(result.get("matches", []))
-            mime_type = pronom_info.get("mime", DEFAULT_TYPE)
-            pronom_id = pronom_info.get("id")
-            pronom_warning = pronom_info.get("warning", "")
-            # Siegfried identifies XML files without xml declaration as plain 
-            # text. I'll try to fix that here.
-            if pronom_id == "x-fmt/111" and self._looks_like_xml(filepath):
-                mime_type = "application/xml"
-                pronom_id = "fmt/101"
+            if pronom_info is not None:
+                mime_type = pronom_info.get("mime", DEFAULT_TYPE)
+                pronom_id = pronom_info.get("id")
+                pronom_warning = pronom_info.get("warning", "")
+                # Siegfried identifies XML files without xml declaration as plain
+                # text. I'll try to fix that here.
+                if pronom_id == "x-fmt/111" and self._looks_like_xml(filepath):
+                    mime_type = "application/xml"
+                    pronom_id = "fmt/101"
         else:
             warnings.warn(
                 f"Could not determine mimetype for {filepath}. Using default type."

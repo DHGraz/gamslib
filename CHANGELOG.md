@@ -5,9 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.11]
+
+### Changed
+
+   - Add the SiegfriedDetector class to formatdetect. This should be the default detector now.
+   - Add a new field 'pronom_id' to FormatInfo
+
 ## [0.7.10]
 
-## Changed
+### Changed
 
   - ObjectCSVManager now checks for missing and extra columns in object.csv and datastream.csv
 

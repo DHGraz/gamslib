@@ -10,7 +10,9 @@ from gamslib.objectcsv.dsdata import DSData
 from gamslib.objectcsv.objectcsvmanager import (
     DS_CSV_FILENAME,
     OBJ_CSV_FILENAME,
+    DATASTREAM_FILES_TO_IGNORE,
     ObjectCSVManager,
+    InvalidCSVFileError
 )
 from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.projectconfiguration import MissingConfigurationException
