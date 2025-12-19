@@ -1,41 +1,42 @@
-subformat,full name,ds name,mimetype
-ATOM,Atom Syndication Format,XML ATOM document,application/atom+xml
-Collada,Collada,XML collada document,application/vnd.collada+xml
-DataCite,DataCite Metadata Schema,XML DataCite Metadata,application/datacite+xml
-DCMI,Dublin Core Metadata Initiative,XML Dublin Core metadata,application/xml
-DocBook,DocBook,XML DocBook metadata,application/docbook+xml
-EAD,Encoded Archival Description,XML EAD document,application/ead+xml
-GML,Geography Markup Language,XML GML document,application/gml+xml
-KML,Keyhole Markup Language,XML KML document,application/vnd.google-earth.kml+xml
-LIDO,Lightweight Information Describing Objects Schema,XML LIDO document,application/xml
-MARC21,MARC 21 XML Schema,XML MARC21 document,application/xml
-MathML,Mathematical Markup Language,XML MathML document,application/marcxml+xml
-METS,Metadata Encoding and Transmission Standard,XML METS documents,application/mets+xml
-MODS,Metadata Object Description Schema,XML MODS document,application/mods+xml
-ODF,OpenDocument Format,XML ODF document,application/vnd.oasis.opendocument.text
-OWL,Web Ontology Language,XML OWL document,application/owl+xml
-PREMIS,Preservation Metadata Implementation Strategies,XML PREMIS document,application/rdf+xml
-PresentationML,Office Open XML PresentationML,XML PresentationML document,application/vnd.openxmlformats-officedocument.presentationml
-RDF,Resource Description Framework,XML RDF document,application/rdf+xml
-RDFS,RDF Schema,XML RDFS schema,application/rdf+xml
-RelaxNG,Relax NG Schema,XML RelaxNG Schema,application/relax-ng+xml
-RSS,Really Simple Syndication,XML RSS document,application/rss+xml
-Schematron,Schematron Schema,XML Schematron schema,application/schematron+xml
-SMIL,Synchronized Multimedia Integration Language,XML SMIL document,application/smil+xml
-SOAP,Simple Object Access Protocol,XML SOAP document,application/soap+xml
-SpreadsheetML,Office Open XML SpreadsheetML,XML SpreadsheetML document,application/vnd.openxmlformats-officedocument.spreadsheetml
-SVG,Scalable Vector Graphics,XML SVG document,image/svg+xml 
-SVG_Animation,SVG Animation (part of SMIL),XML SVG Animation document,application/smil+xml
-TEI,Text Encoding Initiative,XML TEI document,application/tei+xml
-VoiceXML,Voice Extensible Markup Language,XML VOICEXML document,application/voicexml+xml
-WordprocessingML,Office Open XML WordprocessingML,XML WordprocessingML document,application/vnd.openxmlformats-officedocument.wordprocessingml.document
-WSDL,Web Services Description Language,XML WSDL document,application/wsdl+xml
-X3D,Extensible 3D,XML X3D document,model/x3d+xml
-XBRL,eXtensible Business Reporting Language,XML XBRL document,application/xml
-XForms,XForms,XML XForms document,application/xforms+xml
-XHTML,Extensible Hypertext Markup Language,XML XHTML document,application/xhtml+xml
-XHTML_RDFa,XHTML+RDFa,XML XHTML RDFa document,application/xhtml+xml
-Xlink,XML Linking Language,XML Xlink document,application/xlink+xml
-XML,Extensible Markup Language,XML document,application/xml
-XSD,XML Schema Definition,XML XSD schema,application/xml
-XSLT,Extensible Stylesheet Language Transformations,XML XSLT document,application/xslt+xml
+subformat,fullname,dsname,mimetype,puid
+ATOM,Atom Syndication Format,XML ATOM document,application/atom+xml,fmt/101
+Collada,Collada,XML collada document,application/xml,fmt/1209
+DataCite,DataCite Metadata Schema,XML DataCite Metadata,application/xml,fmt/101
+DCMI,Dublin Core Metadata Initiative,XML Dublin Core metadata,application/xml,fmt/101
+DocBook,DocBook,XML DocBook metadata,application/xml,fmt/101
+EAD,Encoded Archival Description,XML EAD document,application/xml,fmt/101
+GML,Geography Markup Language,XML GML document,application/gml+xml,fmt/1047
+KML,Keyhole Markup Language,XML KML document,application/vnd.google-earth.kml+xml,fmt/244
+LIDO,Lightweight Information Describing Objects Schema,XML LIDO document,application/xml,fmt/101
+MARC21,MARC 21 XML Schema,XML MARC21 document,application/xml,fmt/101
+MathML,Mathematical Markup Language,XML MathML document,application/marcxml+xml,fmt/101
+METS,Metadata Encoding and Transmission Standard,XML METS documents,application/mets+xml,fmt/101
+MODS,Metadata Object Description Schema,XML MODS document,application/mods+xml,fmt/101
+ODF,OpenDocument Format,XML ODF document,application/vnd.oasis.opendocument.text,fmt/291
+OWL,Web Ontology Language,XML OWL document,application/xml,fmt/101
+PREMIS,Preservation Metadata Implementation Strategies,XML PREMIS document,application/rdf+xml,fmt/101
+PresentationML,Office Open XML PresentationML,XML PresentationML document,application/vnd.oasis.opendocument.presentation,fmt/293
+RDF,Resource Description Framework,XML RDF document,application/rdf+xml,fmt/875
+RDFS,RDF Schema,XML RDFS schema,application/rdf+xml,fmt/101
+RelaxNG,Relax NG Schema,XML RelaxNG Schema,application/xml,fmt/101
+RSS,Really Simple Syndication,XML RSS document,application/xml,fmt/101
+Schematron,Schematron Schema,XML Schematron schema,application/xml,fmt/101
+SMIL,Synchronized Multimedia Integration Language,XML SMIL document,application/smil+xml,fmt/205
+SOAP,Simple Object Access Protocol,XML SOAP document,application/soap+xml,fmt/293
+SpreadsheetML,Office Open XML SpreadsheetML,XML SpreadsheetML document,application/vnd.oasis.opendocument.spreadsheet,fmt/295
+SVG,Scalable Vector Graphics,XML SVG document,image/svg+xml,fmt/92
+SVG_Animation,SVG Animation (part of SMIL),XML SVG Animation document,application/smil+xml,fmt/92
+TEIP4,Text Encoding Initiative P4 XML,XML TEI P4 document,application/tei+xml,fmt/1474
+TEIP5,Text Encoding Initiative P5 XML,XML TEI P5 document,application/tei+xml,fmt/1476
+VoiceXML,Voice Extensible Markup Language,XML VOICEXML document,application/voicexml+xml,fmt/101
+WordprocessingML,Office Open XML WordprocessingML,XML WordprocessingML document,application/vnd.openxmlformats-officedocument.wordprocessingml.document,fmt/189
+WSDL,Web Services Description Language,XML WSDL document,application/wsdl+xml,fmt/101
+X3D,Extensible 3D,XML X3D document,model/x3d+xml,fmt/579
+XBRL,eXtensible Business Reporting Language,XML XBRL document,application/xml,fmt/101
+XForms,XForms,XML XForms document,application/xml,fmt/101
+XHTML,Extensible Hypertext Markup Language,XML XHTML document,application/xhtml+xml,fmt/103
+XHTML_RDFa,XHTML+RDFa,XML XHTML RDFa document,application/xhtml+xml,fmt/103
+Xlink,XML Linking Language,XML Xlink document,application/xml,fmt/101
+XML,Extensible Markup Language,XML document,application/xml,fmt/101
+XSD,XML Schema Definition,XML XSD schema,application/xml,x-fmt/280
+XSLT,Extensible Stylesheet Language Transformations,XML XSLT document,application/xslt+xml,fmt/101

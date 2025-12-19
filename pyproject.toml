@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.6.0"
+version = "0.7.12"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -8,15 +8,16 @@ authors = [
 ]
 dependencies = [
     "pylightxl>=1.61",
-    "pydantic>=2.10.1",
-    "python-dotenv>=1.0.1",
-    "lxml>=5.3.0",
-    "magika==0.6.1",
-    "requests>=2.32.3",
-    "uritools>=4.0.3",
-    "tomlkit>=0.13.2",
+    "pydantic>=2.12.2",
+    "python-dotenv>=1.1.1",
+    "lxml>=6.0.2",
+    "requests>=2.32.5",
+    "uritools>=5.0.0",
+    "tomlkit>=0.13.3",
     "rnc2rng>=2.7.0",
-
+    "jsonschema>=4.25.1",
+    "magika>=1.0.1",
+    "pygfried>=0.12.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -45,13 +46,14 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.3",
-    "pytest-datadir>=1.5.0",
-    "pytest-cov>=6.0.0",
+    "pytest>=8.4.2",
+    "pytest-datadir>=1.8.0",
+    "pytest-cov>=7.0.0",
     "toml>=0.10.2",
-    "ruff>=0.9.0",
-    "pylint>=3.3.1",
-    "pyright>=1.1.390",
+    "ruff>=0.14.0",
+    "pylint>=4.0.1",
+    "pyright>=1.1.406",
+    "pdoc3>=0.11.6",
 ]
 
 [tool.hatch.metadata]

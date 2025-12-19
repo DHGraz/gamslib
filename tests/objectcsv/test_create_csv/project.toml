@@ -8,3 +8,7 @@ funder = "The funder"
 [general]
 dsid_keep_extension = true
 loglevel = "info"
+
+ds_ignore_files = ["*.log"]
+# fits, magika, base (pythons built in mimetypes) 
+format_detector = "magika"

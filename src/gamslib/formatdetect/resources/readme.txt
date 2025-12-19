@@ -31,3 +31,8 @@ mimetype:
     The official mimetype of the subtype. This will be the mime type of
     the main format (application/xml), but might be a special type, if 
     defined like 'application/tei+xml'.
+
+
+The pronom_formats.csv file is needed to get pronom ids from the 
+default and magika  detector. The list was taken from   
+https://github.com/digital-preservation/PRONOM_Research/tree/main/Resources/All_formats_lists
