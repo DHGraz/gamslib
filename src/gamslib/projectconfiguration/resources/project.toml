@@ -27,9 +27,8 @@ dsid_keep_extension = true
 loglevel = "info"
 
 # A list of filenames/filename patterns, which should be ignored when creating datastreams.csv
-ds_ignore_files = ['*.log',]
-
-# fits, magika, base (pythons built in mimetypes) 
+ds_ignore_files = ["*.log"]
+# siegfried, magika, base (pythons built in mimetypes) 
 format_detector = ""
 # If you want to use a detector service like a FITS Server, set this to the URL
 format_detector_url = ""

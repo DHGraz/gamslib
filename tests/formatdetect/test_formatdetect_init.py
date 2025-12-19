@@ -16,6 +16,7 @@ from gamslib.formatdetect import (
     make_detector,
 )
 from gamslib.formatdetect.magikadetector import MagikaDetector
+from gamslib.formatdetect.siegfrieddetector import SiegfriedDetector
 
 
 @pytest.fixture
@@ -38,13 +39,16 @@ def test_make_detector():
     "Test if the correct detector is created based on the name."
     # create the default detector
     detector = make_detector("")
-    assert isinstance(detector, MagikaDetector)
+    assert isinstance(detector, SiegfriedDetector)
 
     detector = make_detector("base")
     assert isinstance(detector, MinimalDetector)
 
     detector = make_detector("magika")
     assert isinstance(detector, MagikaDetector)
+
+    detector = make_detector("siegfried")
+    assert isinstance(detector, SiegfriedDetector)
 
     # Add more tests when additional detectors are implemented
 
@@ -64,7 +68,7 @@ def test_detect_format_without_config(formatdatadir, monkeypatch):
     monkeypatch.setattr(projectconfiguration, "get_configuration", mock_get_config)
 
     formatinfo = formatdetect.detect_format(formatdatadir / "image.jpg")
-    assert formatinfo.detector == "MagikaDetector"
+    assert formatinfo.detector.startswith("SiegfriedDetector")
 
 
 def test_detect_format_with_config(formatdatadir, tmp_path, monkeypatch):

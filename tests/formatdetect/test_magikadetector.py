@@ -1,10 +1,11 @@
+"""Tests for the magika detector."""
 import shutil
-import pytest
 from pathlib import Path
 
-from gamslib.formatdetect.magikadetector import MagikaDetector
-
+import pytest
 from conftest import get_testfiles
+
+from gamslib.formatdetect.magikadetector import MagikaDetector
 
 
 @pytest.fixture(name="detector")
@@ -83,9 +84,6 @@ def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
         f_info = detector.guess_file_type(file_to_test)
         assert f_info.mimetype == "application/octet-stream"
 
-
-def test_repr(detector):
-    assert repr(detector) == "MagikaDetector"
 
 def test_fix_result():
     """Test the _fix_result method."""

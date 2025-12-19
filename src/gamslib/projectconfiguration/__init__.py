@@ -1,15 +1,26 @@
-"""Provide an manage project configuration.
+"""GAMS Project Configuration Management.
 
-Module configuration provides classes and functions to manage the configuration.
+This module provides tools to locate, validate, and load project configuration files 
+for GAMS projects.
+Supported sources include `project.toml`, `.env`, and environment variables, with a 
+clear precedence order.
 
+Main features:
 
-Module projectconf has a 'config' variable which contains the configuration object.
-The module also g
-The projectconfiguration package contains the classes and functions to
-manage the configuration of a GAMS project.
+  - Automatic discovery of configuration files.
+  - Validation of configuration structure and values.
+  - Access to configuration data as Python objects.
+  - Layered overrides: `.env` values override `project.toml`, environment variables override both.
 
-It tries to find a configuration, validates the configuration and provides
-all configuration inline tables as Python objects.
+Usage:
+    Call `get_configuration()` to retrieve the current project configuration.
+    If no configuration file is found, `MissingConfigurationException` is raised.
+
+Precedence example:
+
+  - `project.toml`: base configuration.
+  - `.env`: overrides values in `project.toml`.
+  - Environment variables: override both `.env` and `project.toml`.
 """
 
 import os
@@ -35,26 +46,30 @@ class MissingConfigurationException(Exception):
         super().__init__(self.message)
 
 
-@lru_cache
+@lru_cache()
 def get_configuration(config_file: Path | str | None = None) -> Configuration:
-    """Read the configuration file and return a configuration object.
+    """
+    Load and return the project configuration.
 
-    If config_file is set, the configuration will be read from this file.
-    If no configuration file is given, the function checks
+    The configuration is determined in the following order:
 
-    1. if the environment variable 'GAMSCFG_PROJECT_TOML' is set and points to a file.
-    2. if a '.env' file exists in the current directory and if it contains
-       a 'project_toml' field.
+      1. If `config_file` is provided, use it.
+      2. If the environment variable `GAMSCFG_PROJECT_TOML` is set, use its value 
+         as the path.
+      3. If a `.env` file exists in the current directory and contains a `project_toml` 
+         field, use that.
 
-    If no configuration file is found, a ValueError is raised.
+    Raises:
+        MissingConfigurationException: If no configuration file is found.
 
-    Be aware, that values from the 'project.toml' file will be overwritten by
-    values in the '.env' file and the environment.
+    Note:
+        Values from `project.toml` are overridden by those in `.env`, which are further 
+        overridden by environment variables.
+        For example:
 
-    E.g.: If 'project.toml' has set 'metatdata.publisher' set to 'foo',
-    this value is used. If '.env' has set 'metadata.publisher' to 'bar',
-    this value is used. If the environment variable 'GAMSCFG_METADATA_PUBLISHER'
-    is set to 'baz', this value is used.
+          - `project.toml` sets `metadata.publisher = "foo"` → used by default.
+          - `.env` sets `metadata.publisher = "bar"` → overrides `project.toml`.
+          - Environment variable `GAMSCFG_METADATA_PUBLISHER = "baz"` → overrides both.
     """
     if config_file is not None:
         config_path = Path(config_file)
@@ -62,5 +77,5 @@ def get_configuration(config_file: Path | str | None = None) -> Configuration:
         config_path = utils.get_config_file_from_env()
 
     if config_path is None:
-        raise MissingConfigurationException
+        raise MissingConfigurationException()
     return Configuration.from_toml(config_path)

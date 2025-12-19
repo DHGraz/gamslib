@@ -3,6 +3,11 @@
   <dc:title xml:lang="en">Person description 1</dc:title>
   <dc:title xml:lang="de">Personenbeschreibung 1</dc:title>
   <dc:creator>Foo, Bar</dc:creator>
+  <dc:subject>Subject 1</dc:subject>
+  <dc:subject xml:lang="de">Subject 2 de</dc:subject>
+  <dc:subject xml:lang="de">Subject 3 de</dc:subject>
+  <dc:subject xml:lang="en">Subject 2 en</dc:subject>
+  <dc:subject xml:lang="en">Subject 3 en</dc:subject>
   <dc:publisher xml:lang="de">Person 1, Karl-Franzens-Universität Graz</dc:publisher>
   <dc:date>2015</dc:date>
   <dc:format>text/xml</dc:format>

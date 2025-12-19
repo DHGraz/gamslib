@@ -1,0 +1,17 @@
+<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>title 1</dc:title>
+  <dc:creator>creator 1</dc:creator>
+  <dc:publisher>publisher 1</dc:publisher>
+  <dc:contributor>contributor 1</dc:contributor>
+  <dc:date>1885-01-20</dc:date>
+  <dc:type>type 1</dc:type>
+  <dc:format>text/xml</dc:format>
+  <dc:identifier>id 1</dc:identifier>
+  <dc:source>source 1</dc:source>
+  <dc:language>language 1</dc:language>
+  <dc:relation>relation 1</dc:relation>
+  <dc:relation>relation 2</dc:relation>
+  <dc:coverage>coverage 1</dc:coverage>
+  <dc:rights>rights 1</dc:rights>
+  <dc:rights>rights url</dc:rights>
+</oai_dc:dc>

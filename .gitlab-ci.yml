@@ -7,6 +7,7 @@ stages:
   - test
   - lint
 
+
 # A hidden job template that can be used by different Python versions
 .test-template:
   stage: test
@@ -49,3 +50,7 @@ lint:
     - python --version
     - echo "Running uv check with ruff"
     - uv run ruff check src
+
+.rules:
+  - if: $CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "develop"
+    when: always

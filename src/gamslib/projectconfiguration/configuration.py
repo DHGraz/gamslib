@@ -1,4 +1,28 @@
-"A Configuration class for gams projects."
+"""
+Configuration management for GAMS projects.
+
+This module defines models and logic for loading, validating, and overriding project configuration
+data from multiple sources: `project.toml`, `.env`, and environment variables.
+
+Features:
+
+  - Strongly-typed configuration models using Pydantic.
+  - Automatic loading and validation of configuration files.
+  - Layered override system: `.env` values override `project.toml`, environment
+    variables override both.
+  - Helpful error messages for validation issues.
+  - Support for updating configuration values at runtime.
+
+Usage:
+    Use `Configuration.from_toml(Path("project.toml"))` to load and validate a configuration.
+    Access configuration sections via `config.metadata` and `config.general`.
+    Overrides from `.env` and environment variables are applied automatically.
+
+Sections:
+
+  - Metadata: Project identification and publishing info.
+  - General: Project-wide settings and options.
+"""
 
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
@@ -22,7 +46,7 @@ class Metadata(BaseModel, validate_assignment=True):
     creator: Annotated[str, StringConstraints(min_length=3)]
     publisher: Annotated[str, StringConstraints(min_length=3)]
     rights: str = ""
-    funder:str = ""
+    funder: str = ""
 
 
 class General(BaseModel, validate_assignment=True):
@@ -30,16 +54,40 @@ class General(BaseModel, validate_assignment=True):
 
     dsid_keep_extension: bool = True
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
-    format_detector: Literal["magika", "base", ""] = "magika"
+    format_detector: Literal["siegfried", "magika", "base", ""] = "siegfried"
     format_detector_url: str = ""
     ds_ignore_files: list[str] = []
 
 
 class Configuration(BaseModel):
-    """Represent the configuration from the project toml file.
+    """
+    Represents the complete configuration for a GAMS project.
 
-    Properties can be accessed as attributes of the object and sub object:
-        eg.: metadata.rights
+    This class aggregates configuration data from multiple sources:
+
+      - `project.toml` file (base configuration)
+      - `.env` file (overrides TOML values)
+      - Environment variables (override both `.env` and TOML)
+
+    Attributes:
+        toml_file (Path): Path to the loaded TOML configuration file.
+        metadata (Metadata): Project metadata section.
+        general (General): General project settings.
+
+    Configuration values are loaded and overridden in the following order:
+
+      1. Values from `project.toml`.
+      2. Values from `.env` (fields in the format `metadata.field` or `general.field`).
+      3. Values from environment variables prefixed with `GAMSCFG_`
+         (e.g., `GAMSCFG_METADATA_PUBLISHER`).
+
+    Example usage:
+
+    ```
+        config = Configuration.from_toml(Path("project.toml"))
+        print(config.metadata.publisher)
+        print(config.general.loglevel)
+    ```
     """
 
     toml_file: Path
@@ -76,7 +124,25 @@ class Configuration(BaseModel):
 
     @classmethod
     def from_toml(cls, toml_file: Path) -> "Configuration":
-        """Create a configuration object from a toml file."""
+        """
+        Load configuration from a TOML file and return a Configuration object.
+
+        Reads the specified TOML file, validates its structure, and constructs a
+        Configuration instance.
+        Automatically sets the `toml_file` attribute and applies overrides from `.env`
+        and environment variables.
+
+        Args:
+            toml_file (Path): Path to the TOML configuration file.
+
+        Returns:
+            Configuration: The loaded and validated configuration object.
+
+        Raises:
+            FileNotFoundError: If the TOML file does not exist.
+            tomllib.TOMLDecodeError: If the TOML file cannot be parsed.
+            ValueError: If validation fails for required fields or types.
+        """
         try:
             with toml_file.open("r", encoding="utf-8", newline="") as tfile:
                 data = tomllib.loads(tfile.read())

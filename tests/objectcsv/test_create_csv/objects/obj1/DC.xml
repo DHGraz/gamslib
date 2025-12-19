@@ -11,4 +11,6 @@
   <dc:relation>Foo Bar Archive</dc:relation>
   <dc:relation>http://example.com</dc:relation>
   <dc:rights>Rights from DC.xml</dc:rights>
+  <dc:subject>Subject1</dc:subject>
+  <dc:subject xml:lang="de">Subject2</dc:subject>
 </oai_dc:dc>

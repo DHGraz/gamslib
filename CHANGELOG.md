@@ -5,6 +5,112 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.12]
+
+# Changed
+
+  - Final switch to Siegfried als default detector
+   
+## [0.7.11]
+
+### Changed
+
+   - Add the SiegfriedDetector class to formatdetect. This should be the default detector now.
+   - Add a new field 'pronom_id' to FormatInfo
+
+## [0.7.10]
+
+### Changed
+
+  - ObjectCSVManager now checks for missing and extra columns in object.csv and datastream.csv
+
+## [0.7.9] - 2025-12-02
+
+## Changed
+
+  - Adding datastreams to CSVManager now leads to a Value Error if they are in the list of ids 
+    to be ignored. This is a more generic way to avoid unwanted data streams, which also works, 
+    if the forbidden ids are included in the datastreams.csv file by accident.
+  - The list of illegal datastream ids can be extended via confuguration.
+
+## [0.7.8] - 2025-12-02
+
+### Changed
+  
+  * Update reference documentation
+    Refactor objectcsv and objectdir modules:
+
+    - dublincore.py: dc:creator is no longer a required element, as sometimes we do not know the creator
+    - Change log level from warning to debug for non-object folder messages in find_object_folders()
+    - clean up comments, improve formatting, and update function signatures for clarity.
+    - Remove potential circular import (not very likely, that somewone imports gamslib that way, but still ...)
+    
+## [0.7.7] - 2025-12-01
+
+### Changed
+
+  * Refactor: New objectdir module now contains all objectdir related code
+  * Add validation for objectdirs:
+    * Check structure
+    * Check if object dir name matches IDs in TEI and LIDO Files
+    * Check if object dir name matches identifier in DC.xml
+  * Underscores now are valid in datastream IDs
+  * ObjectCSVManager now has a get_mainresource method 
+  * Code cleanup  
+  
+
+## [0.7.6] - 2025-11-21
+
+### Changed
+   * Support for use_subjects_as_tags: create_csv, update_csv and create_csv_files have this new parameter
+  
+## [0.7.5] - 2025-11-21
+
+### Changed
+
+  * Add tags to object.csv
+  
+## [0.7.4] - 2025-11-19
+
+### Changed
+
+ * Add extract_id_from_tei() to objectcsv.utils
+ * Add extract_id_from_lido() to objectcsv.utils
+ * Add check_if_object_dir_matches_object_id() to objectcsv.utils
+
+## [0.7.3] - 2025-11-19
+
+### Changed
+
+  * Allow uppercase letters in datastream ids
+   
+## [0.7.2] - 2025-11-11
+
+  * Add sip.utils.is_bag function
+  * Bump magika to 1.0.1
+  * Improve tests
+  * Fix .gitlab-ci.yml
+   
+## [0.7.1] - 2025-11-10
+
+### Changed
+
+  * Add more file names, which should not be treated as datastreams.
+
+## [0.7.0] - 2025-10-16
+
+### Changed
+  * Add sip submodule 
+  * Add Makefile
+  * Add reference (API documentation)
+    
+## [0.6.1] - 2025-07-23
+
+### Changed
+
+  * Code cleanup
+  * line in datastreams.csv are again saved sorted by dsid
+
 ## [0.6.0] - 2025-07-18
 
 ### Changed
