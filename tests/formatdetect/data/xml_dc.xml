@@ -1,0 +1,18 @@
+
+<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title xml:lang="en">Charles Baissac an Hugo Schuchardt (15-00432)</dc:title>
+  <dc:creator>Baissac, Charles</dc:creator>
+  <dc:publisher>Institut für Sprachwissenschaft, Karl-Franzens-Universität Graz</dc:publisher>
+  <dc:contributor>Schuchardt, Hugo</dc:contributor>
+  <dc:date>1885-01-20</dc:date>
+  <dc:type>Brief</dc:type>
+  <dc:format>text/xml</dc:format>
+  <dc:identifier>project1.object1</dc:identifier>
+  <dc:source>Universitätsbibliothek Graz Abteilung für Sondersammlungen 00432</dc:source>
+  <dc:language>fr</dc:language>
+  <dc:relation>Hugo Schuchardt Archiv</dc:relation>
+  <dc:relation>http://schuchardt.uni-graz.at</dc:relation>
+  <dc:coverage>Port Louis</dc:coverage>
+  <dc:rights>Creative Commons BY-NC 4.0</dc:rights>
+  <dc:rights>https://creativecommons.org/licenses/by-nc/4.0</dc:rights>
+</oai_dc:dc>

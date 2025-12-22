@@ -52,6 +52,8 @@ def get_testfiles():
         TestFormatFile(formatdatadir_ / "tar.tar", "application/x-tar", "x-fmt/265"),
         TestFormatFile(formatdatadir_ / "tar_lzma.tar.lzma", "application/x-tar", "x-fmt/265"),    
         TestFormatFile(formatdatadir_ / "text.txt", "text/plain", "x-fmt/111"),
+        TestFormatFile(formatdatadir_ / "xml_dc.xml", "application/xml", "fmt/101", SubType.DCMI),
+        TestFormatFile(formatdatadir_ / "xml_dc_no_decl.xml", "application/xml", "fmt/101", SubType.DCMI),
         TestFormatFile(formatdatadir_ / "xml_lido.xml", "application/xml", "fmt/101",SubType.LIDO),
         TestFormatFile(formatdatadir_ / "xml_no_ns.xml", "application/xml", "fmt/101"),        
         TestFormatFile(formatdatadir_ / "xml_tei.xml", "application/tei+xml", "fmt/1476",SubType.TEIP5),  
