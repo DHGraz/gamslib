@@ -13,13 +13,15 @@ Features:
 import abc
 from pathlib import Path
 
+from lxml import etree as ET
+
 from .formatinfo import FormatInfo
 
+# Default MIME type for unknown or undetectable formats.
 DEFAULT_TYPE = "application/octet-stream"
-# DEFAULT_TYPE: Default MIME type for unknown or undetectable formats.
 
 
-class FormatDetector(abc.ABC):   # pylint: disable=too-few-public-methods
+class FormatDetector(abc.ABC):  # pylint: disable=too-few-public-methods
     """
     Abstract base class for file format detectors.
 
@@ -41,3 +43,19 @@ class FormatDetector(abc.ABC):   # pylint: disable=too-few-public-methods
         Raises:
             NotImplementedError: If not implemented in subclass.
         """
+
+    @staticmethod
+    def looks_like_xml(filepath: Path) -> bool:
+        "Return True if the file looks like an XML file."
+        try:
+            ET.parse(filepath) # pylint: disable=c-extension-no-member
+            return True
+        except Exception:  # pylint: disable=broad-except
+            return False
+
+    @staticmethod
+    def has_xml_declaration(filepath: Path) -> bool:
+        "Return True if filepath contains an xml declaration."
+        with filepath.open("rb") as f:
+            header = f.read(500)
+        return b"<?xml " in header

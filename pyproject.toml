@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.7.12"
+version = "0.8.0a"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -18,6 +18,8 @@ dependencies = [
     "jsonschema>=4.25.1",
     "magika>=1.0.1",
     "pygfried>=0.12.0",
+    "pillow>=12.1.0",
+    "pytest-datadir>=1.8.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -54,6 +56,8 @@ dev = [
     "pylint>=4.0.1",
     "pyright>=1.1.406",
     "pdoc3>=0.11.6",
+    "responses>=0.25.8",
+    "pytest-mock>=3.15.1",
 ]
 
 [tool.hatch.metadata]

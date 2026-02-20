@@ -214,7 +214,7 @@ def _create_csvmgr_with_error_handling(object_path: Path) -> None:
     except InvalidCSVFileError as e:
         raise ObjectDirectoryValidationError(
             f"Object directory '{object_path.name}': {e}"
-        ) from e    
+        ) from e
 
 
 def validate_csv_files(object_path: Path) -> None:

@@ -85,7 +85,7 @@ class XMLSubFormat:
 
 
 class XMLSubFormats:
-    "A container to interact with the xm formats defined in xml_subformats.csv"
+    "A container to interact with the xml formats defined in xml_subformats.csv"
 
     def __init__(self):
         self.formats = []

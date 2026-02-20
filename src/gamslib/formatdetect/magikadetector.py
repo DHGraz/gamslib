@@ -78,11 +78,16 @@ class MagikaDetector(FormatDetector):
             )
         except ValueError:
             mime_type = None
-        if mime_type is None or mime_type == "application/undefined":
+        # known misclassifications
+        if mime_type in ("text/x-twig", "text/x-handlebars-template"):
+            mime_type = "application/xml"
+        if mime_type in (None, "application/undefined"):
             mime_type = DEFAULT_TYPE
             warnings.warn(
                 f"Could not determine mimetype for {filepath}. Using default type."
             )
+        elif mime_type == "application/json":
+            mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
         elif xmltypes.is_xml_type(mime_type):
             mime_type, subtype = xmltypes.get_format_info(filepath, mime_type)
         elif jsontypes.is_json_type(mime_type):

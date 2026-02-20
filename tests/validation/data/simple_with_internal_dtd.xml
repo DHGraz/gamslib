@@ -1,0 +1,16 @@
+<!DOCTYPE products [
+  <!ELEMENT products (product+)>
+  <!ELEMENT product (name, price)>
+  <!ELEMENT name (#PCDATA)>
+  <!ELEMENT price (#PCDATA)>
+]>
+<products>
+  <product>
+    <name>Product 1</name>
+    <price>10.99</price>
+  </product>
+  <product>
+    <name>Product 2</name>
+    <price>5.99</price>
+  </product>
+</products>

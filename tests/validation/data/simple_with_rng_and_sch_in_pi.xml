@@ -1,0 +1,21 @@
+<?xml-model href="schemas/simple.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="./schemas/simple.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<products>
+  <product>
+    <name>Product 1</name>
+    <price>10.99</price>
+  </product>
+  <product>
+    <name>Product 2</name>
+    <price>5.99</price>
+  </product>
+  <product>
+    <name>Product 1</name>
+    <price>10.99</price>
+  </product>
+  <product>
+    <name>Product 2</name>
+    <price>5.99</price>
+  </product>
+</products>
+<?xml-model href="./schemas/simple2.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>

@@ -1,32 +1,29 @@
-from pathlib import Path
+"""Tests for the __init__ module of the formatdetect sub package."""
+
 from unittest.mock import MagicMock, patch
 
 import pytest
-import coverage
 import toml
-from unittest import mock as mocker
 
 from gamslib import formatdetect, projectconfiguration
 from gamslib.formatdetect import (
-    FormatDetector,
-    FormatInfo,
-    MinimalDetector,
     MagikaDetector,
-    detect_format,
+    MinimalDetector,
     make_detector,
 )
-from gamslib.formatdetect.magikadetector import MagikaDetector
 from gamslib.formatdetect.siegfrieddetector import SiegfriedDetector
 
 
-@pytest.fixture
-def mock_config():
-    with patch("gamslib.formatdetect.config") as mock_config:  # pragma: no cover
-        yield mock_config
+@pytest.fixture(name="mock_config")
+def mock_config_fixture():
+    """Mock the gamslib.formatdetect.config module."""
+    with patch("gamslib.formatdetect.config") as mock_cfg:  # pragma: no cover
+        yield mock_cfg
 
 
-@pytest.fixture
-def mock_detector():
+@pytest.fixture(name="mock_detector")
+def mock_detector_fixture():
+    """Mock the gamslib.formatdetect.make_detector function."""
     with patch(
         "gamslib.formatdetect.make_detector"
     ) as mock_make_detector:  # pragma: no cover
@@ -59,7 +56,7 @@ def test_make_detector_with_invalid_name():
         make_detector("invalid")
 
 
-def test_detect_format_without_config(formatdatadir, monkeypatch):
+def test_detect_format_without_config(lazy_shared_datadir, monkeypatch):
     """If no config exists, the default detector should be used."""
 
     def mock_get_config():  # pragma: no cover
@@ -67,11 +64,11 @@ def test_detect_format_without_config(formatdatadir, monkeypatch):
 
     monkeypatch.setattr(projectconfiguration, "get_configuration", mock_get_config)
 
-    formatinfo = formatdetect.detect_format(formatdatadir / "image.jpg")
+    formatinfo = formatdetect.detect_format(lazy_shared_datadir / "image.jpg")
     assert formatinfo.detector.startswith("SiegfriedDetector")
 
 
-def test_detect_format_with_config(formatdatadir, tmp_path, monkeypatch):
+def test_detect_format_with_config(lazy_shared_datadir, tmp_path, monkeypatch):
     "If config exists, the detector configured there should be used."
     toml_data = {
         "metadata": {"project_id": "foo", "creator": "bar", "publisher": "baz"},
@@ -80,5 +77,5 @@ def test_detect_format_with_config(formatdatadir, tmp_path, monkeypatch):
     tomlfile = tmp_path / "project.toml"
     toml.dump(toml_data, tomlfile.open("w", encoding="utf-8"))
     monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(tomlfile))
-    formatinfo = formatdetect.detect_format(formatdatadir / "image.jpg")
+    formatinfo = formatdetect.detect_format(lazy_shared_datadir / "image.jpg")
     assert formatinfo.detector == "MagikaDetector"

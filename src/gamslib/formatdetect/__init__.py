@@ -11,6 +11,8 @@ Currently these Detectors are available:
   - MagikaDetector: Uses the Google Magika library to identify
     file formats based on file content. This is the preferred
     detector and should be used by default.
+  - SiegfriedDetector: Uses the pygfried library to identify
+    file formats based on file content.
     
 All detectors implement the FormatDetector abstract base class
 and return FormatInfo objects with the detected format information.
@@ -48,9 +50,9 @@ from pathlib import Path
 from ..projectconfiguration import MissingConfigurationException, get_configuration
 from .formatdetector import FormatDetector
 from .formatinfo import FormatInfo
-from .siegfrieddetector import SiegfriedDetector
 from .magikadetector import MagikaDetector
 from .minimaldetector import MinimalDetector
+from .siegfrieddetector import SiegfriedDetector
 
 DEFAULT_DETECTOR_NAME = "siegfried"
 
@@ -86,7 +88,7 @@ def make_detector(detector_name: str, detector_url: str = "") -> FormatDetector:
         detector = MagikaDetector()
     elif detector_name == "siegfried":
         detector = SiegfriedDetector()
-    # TODO: add more detectors
+
     if detector is None:
         raise ValueError(f"Unknown detector '{detector_name}'")
     return detector
