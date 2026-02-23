@@ -120,9 +120,9 @@ def test_guess_file_type_multiple_files(
         pygfried, "identify", lambda *args, **kwargs: multifile_test_data
     )
     testfile = shared_datadir / "xml_tei_p4.xml"
-    #with pytest.warns(UserWarning):
-    f_info = detector.guess_file_type(testfile)
-    assert f_info.mimetype == "application/octet-stream"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+        assert f_info.mimetype == "application/octet-stream"
 
 
 @pytest.fixture(name="empty_test_data")
@@ -140,9 +140,9 @@ def test_guess_file_type_no_files(
 
     monkeypatch.setattr(pygfried, "identify", lambda *args, **kwargs: empty_test_data)
     testfile = shared_datadir / "xml_tei_p4.xml"
-    #with pytest.warns(UserWarning):
-    f_info = detector.guess_file_type(testfile)
-    assert f_info.mimetype == "application/octet-stream"
+    with pytest.warns(UserWarning):
+        f_info = detector.guess_file_type(testfile)
+        assert f_info.mimetype == "application/octet-stream"
 
 
 @pytest.fixture(name="no_mime_type_test_data")

@@ -19,7 +19,6 @@ from gamslib.objectdir import (
     validate_dc_file,
     validate_directory_structure,
     validate_object_dir,
-    _create_csvmgr_with_error_handling,
 )
 
 
@@ -643,5 +642,5 @@ def test_create_csvmgr_with_error_handling(mocker):
         side_effect=InvalidCSVFileError("invalid csv file"),
     )
 
-    with pytest.raises(ObjectDirectoryValidationError, match=r""):
+    with pytest.raises(ObjectDirectoryValidationError, match=r"invalid csv file"):
         gamslib.objectdir._create_csvmgr_with_error_handling(Path("invalid csv file"))  # pylint: disable=protected-access
