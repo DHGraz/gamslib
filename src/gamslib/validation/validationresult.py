@@ -49,6 +49,11 @@ class ValidationSubResult:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
+    @property
+    def has_warnings(self):
+        "Return True if there are any warnings."
+        return len(self.warnings) > 0
+
 @dataclass
 class ValidationResult:
     """This is what a Validator object returns when validating a file.
@@ -69,6 +74,11 @@ class ValidationResult:
     def is_valid(self):
         "Return True if all subresults are valid."
         return all(subresult.is_valid for subresult in self._subresults)
+    
+    @property
+    def has_warnings(self):
+        "Return True if there are any warnings."
+        return any(subresult.has_warnings for subresult in self._subresults)
 
     def get_subresults(self) -> Generator[list[ValidationSubResult], None, None]:
         "Yield all subresult objects."
