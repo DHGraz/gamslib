@@ -19,3 +19,4 @@ foo.py
 uv.lock
 *.swp
 tmp/
+bar.py

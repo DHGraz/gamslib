@@ -62,6 +62,7 @@ def test_xsd_validator_valid(xmlschema_validator, lazy_shared_datadir):
         result.message
         == f"Document validates against schema {xmlschema_validator.schema_uri}"
     )
+    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
     assert not result.has_warnings
 
 
@@ -71,6 +72,7 @@ def test_xsd_validator_invalid_document(xmlschema_validator, lazy_shared_datadir
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = xmlschema_validator.validate(tree)
     assert not result.is_valid
+    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
     assert result.message.startswith("Document does not validate against schema")
     assert not result.has_warnings
     assert len(result.errors) == 1
@@ -91,6 +93,7 @@ def test_xsd_validator_with_invalid_schema(lazy_shared_datadir, invalid_schematr
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
+    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -150,9 +153,9 @@ def test_schematron_validator_with_invalid_schema(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert len(result.get_errors()) >= 0
-    messages = result.get_messages()
-    assert messages[0].startswith("Unable to create the Schematron validator")
+    assert result.validator_name == SchematronValidator.LXML_VALIDATOR_NAME
+    assert len(result.errors) >= 0
+    assert result.message.startswith("Unable to create the Schematron validator")
 
 def test_schematron_lxml_validator_valid_document(
     lxml_schematron_validator, lazy_shared_datadir
@@ -189,7 +192,7 @@ def test_schematron_saxon_validator_valid_document(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = saxon_schematron_validator.validate(tree)
     assert result.is_valid
-    assert result.validator_name == SchematronValidator.SAXON_NAME
+    assert result.validator_name == SchematronValidator.SAXON_VALIDATOR_NAME
     assert (
         result.message
         == f"Document validates against schema {saxon_schematron_validator.schema_uri}"
@@ -206,7 +209,7 @@ def test_schematron_saxon_validator_invalid_document(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = saxon_schematron_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == SchematronValidator.SAXON_NAME
+    assert result.validator_name == SchematronValidator.SAXON_VALIDATOR_NAME
 
     assert result.message.startswith("Document does not validate against schema")
     assert not result.has_warnings

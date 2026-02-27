@@ -59,6 +59,7 @@ class SchemaValidator(abc.ABC):
 class XMLSchemaValidator(SchemaValidator):
     """A validator for XML Schema (XSD) schemas using lxml."""
 
+    VALIDATOR_NAME: Final[str] = "XML XSD Validator",
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
         try:
@@ -66,8 +67,7 @@ class XMLSchemaValidator(SchemaValidator):
             self.schema = ET.XMLSchema(schema_tree)
         except Exception as exp:  # pylint: disable=broad-exception-caught
             self._creation_error = ValidationSubResult(
-                False,
-                "XML XSD Validator",
+                False, XMLSchemaValidator.VALIDATOR_NAME,
                 message=f"Unable to create the validator for '{schema_uri}'",
                 errors=[f"XMLSchemaParseError: {exp!s}"],
             )
@@ -88,7 +88,7 @@ class XMLSchemaValidator(SchemaValidator):
 
         # do a normal validation
         result = ValidationSubResult(
-            False, "XML XSD Validator (lxml)", schema_uri=self.schema_uri
+            False, XMLSchemaValidator.VALIDATOR_NAME, schema_uri=self.schema_uri
         )
 
         try:
@@ -123,8 +123,8 @@ class SchematronValidator(SchemaValidator):
     SAXON_BINDINGS: Final[list[str]] = ["xslt2", "xslt3", "xpath2", "xpath3"]
 
     # validator names
-    LXML_NAME: Final[str] = "XML Schematron Validator (lxml)"
-    SAXON_NAME: Final[str] = "XML Schematron Validator (saxon)"
+    LXML_VALIDATOR_NAME: Final[str] = "XML Schematron Validator (lxml)"
+    SAXON_VALIDATOR_NAME: Final[str] = "XML Schematron Validator (saxon)"
 
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
@@ -145,7 +145,7 @@ class SchematronValidator(SchemaValidator):
         """
         # This result is only used as self._creation_error if creation fails
         result = ValidationSubResult(
-            False, SchematronValidator.LXML_NAME, schema_uri=self.schema_uri
+            False, SchematronValidator.LXML_VALIDATOR_NAME, schema_uri=self.schema_uri
         )
         try:
             schema_tree = ET.parse(self.schema_uri)
@@ -167,7 +167,7 @@ class SchematronValidator(SchemaValidator):
         self.schema_validator is left to None.
         """
         result = ValidationSubResult(
-            False, SchematronValidator.SAXON_NAME, schema_uri=self.schema_uri
+            False, SchematronValidator.SAXON_VALIDATOR_NAME, schema_uri=self.schema_uri
         )
         try:
             from saxonche import PySaxonProcessor  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
@@ -195,7 +195,7 @@ class SchematronValidator(SchemaValidator):
             self._creation_error = result
 
     # TODO: does it make sense to have the tree here?
-    def validate(self, 
+    def validate(self,
                  tree: Optional[ET.ElementTree] = None, 
                  file_path: Optional[Path] = None) -> ValidationSubResult:
         """Validate an XML file against the Schematron schema.
@@ -210,21 +210,25 @@ class SchematronValidator(SchemaValidator):
         Returns:
             ValidationSubResult: A ValidationSubResult object
         """
+        # we need to make sure that only one of tree or file_path is given
         if tree is None and file_path is None:
             raise ValueError("Either a tree or a file_path must be given.")
         if tree is not None and file_path is not None:
             raise ValueError("Either a tree or a file_path must be given, but not both.")
-        
+        if tree is not None and file_path is not None:
+            raise ValueError("Either a tree or a file_path must be given, but not both.")
+
+        if self._creation_error is not None:
+            return self._creation_error
+         
         if file_path is not None:
             tree = ET.parse(file_path)
 
-        if tree is not None and file_path is not None:
-            raise ValueError("Either a tree or a file_path must be given, but not both.")
         # if the _creation_error is set something went wrong when creating the validator
-        if self._creation_error is not None:
-            result = ValidationResult(tree.docinfo.URL)
-            result.add_subresult(self._creation_error)
-            return result
+        #if self._creation_error is not None:
+            #result = ValidationResult(tree.docinfo.URL)
+            #result.add_subresult(self._creation_error)
+            #return result
         if self.binding in ["xslt2", "xslt3", "xpath2", "xpath3"]:
             file_path = Path(tree.docinfo.URL)
             return self._validate_with_saxon(file_path)
@@ -237,7 +241,7 @@ class SchematronValidator(SchemaValidator):
         for all schemas, but does not require saxon.
         """
         result = ValidationSubResult(
-            False, SchematronValidator.LXML_NAME, schema_uri=self.schema_uri
+            False, SchematronValidator.LXML_VALIDATOR_NAME, schema_uri=self.schema_uri
         )
 
         try:
@@ -267,7 +271,7 @@ class SchematronValidator(SchemaValidator):
         Use the Saxon validator, which supports xslt2/xslt3/xpath2/xpath3 and requires saxon.
         """
         result = ValidationSubResult(
-            False, SchematronValidator.SAXON_NAME, schema_uri=self.schema_uri
+            False, SchematronValidator.SAXON_VALIDATOR_NAME, schema_uri=self.schema_uri
         )
         xml_file = file_path.as_posix()
         svrl_report = self.schema_validator.transform_to_string(
@@ -318,7 +322,7 @@ class SchematronValidator(SchemaValidator):
             # If there is an error parsing the schema, we None
             self._creation_error = ValidationSubResult(
                 False,
-                SchematronValidator.LXML_NAME,
+                SchematronValidator.LXML_VALIDATOR_NAME,
                 schema_uri=self.schema_uri,
                 message=("Unable to create the Schematron validator instance for "
                         f"schema {self.schema_uri}"),
