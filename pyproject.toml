@@ -16,14 +16,15 @@ dependencies = [
     "tomlkit>=0.13.3",
     "rnc2rng>=2.7.0",
     "jsonschema>=4.25.1",
-    "magika>=1.0.1",
     "pygfried>=0.12.0",
     "pillow>=12.1.0",
     "pytest-datadir>=1.8.0",
+    "gams-xml-catalog",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
 keywords = ["GAMS"]
+
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -46,8 +47,19 @@ Changelog = "https://github.com/DHGraz/gamslib/blob/main/CHANGELOG.md"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# use install gamslib[saxon] to install saxon
+[project.optional-dependencies]
+saxon = [
+    "saxonche>=12.9.0",
+]
+magika = [
+    "magika>=1.0.1",
+]
+
 [dependency-groups]
 dev = [
+    # for testing we want the full install
+    "gamslib[saxon,magika]", 
     "pytest>=8.4.2",
     "pytest-datadir>=1.8.0",
     "pytest-cov>=7.0.0",
@@ -68,4 +80,7 @@ packages = ["src/gamslib"]
 
 [tool.ruff.lint]
 select = ["PL", "RUF", "SIM"]
+
+[tool.uv.sources]
+gams-xml-catalog = { path = "../gams-xml-catalog/dist/gams_xml_catalog-0.2.0-py3-none-any.whl" }
 

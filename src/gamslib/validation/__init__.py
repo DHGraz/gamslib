@@ -9,7 +9,8 @@ from gamslib.validation import xmlschemadetector
 from gamslib.validation.schemainfo import SchemaInfo
 from gamslib.validation.validator import ValidatorFactory
 
-
+# TODO: Check if including https://rda-fair4ml.github.io/FAIR4ML-schema/ makes sense
+#    and https://mlcommons.org/working-groups/data/croissant/
 def extract_referenced_schemas(
     file_path: Path,
     format_info: FormatInfo | None = None,

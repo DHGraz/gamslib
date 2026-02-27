@@ -4,5 +4,8 @@
     <rule context="products">
       <assert test="product!name = 'Phone'">Failed binding-specific test for xslt3.</assert>
     </rule>
+    <rule context="products/*">
+      <assert test="local-name() = 'product'">Only 'product' nodes are allowed inside of 'products'</assert>
+    </rule>
   </pattern>
 </schema>
