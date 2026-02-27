@@ -1,16 +1,25 @@
-"""Test the various schema validators defined in xmlvalidator.py."""
+"""Test the various schema validators defined in xmlvalidator.py.
 
-from pathlib import Path
+Each SchgemaValidator object provides a validate() method, which always returns a ValidationSubResult.
+"""
 
 import lxml.isoschematron
 import pytest
 import saxonche
 from lxml import etree as ET
 
-from gamslib.validation.xmlvalidator import SchematronValidator, XMLSchemaValidator
+from gamslib.validation.xmlvalidator import DTDValidator, SchematronValidator, XMLSchemaValidator
 
 # --- fixtures ---
 
+@pytest.fixture(name="dtd_validator")
+def create_dtd_validator(lazy_shared_datadir):
+    """Create a DTDValidator object."""
+    schema_path = lazy_shared_datadir / "schemas" / "simple.dtd"
+    assert schema_path.exists()
+    schema_uri = schema_path.resolve().as_uri()
+    validator = DTDValidator(schema_uri)
+    return validator
 
 @pytest.fixture(name="xmlschema_validator")
 def create_xmlschema_validator(lazy_shared_datadir):
@@ -37,10 +46,19 @@ def create_saxon_schematron_validator(lazy_shared_datadir):
     validator = SchematronValidator(schema_uri)
     return validator
 
+@pytest.fixture(name="invalid_dtd_uri")
+def create_invalid_dtd_uri(lazy_shared_datadir, tmp_path):
+    """Create a invalid DTD and return its location as URI."""
+    # Create an invalid DTD by taking a valid one and insert errors
+    valid_dtd_path = lazy_shared_datadir / "schemas" / "simple.dtd"
+    data = valid_dtd_path.read_text().replace("<!ELEMENT", "<<!ELEMENT")
+    invalid_dtd_path = tmp_path / "invalid.dtd"
+    invalid_dtd_path.write_text(data)
+    return invalid_dtd_path.resolve().as_uri()
 
 @pytest.fixture(name="invalid_schematron_uri")
 def create_invalid_schematron_uri(lazy_shared_datadir, tmp_path):
-    """Create a invalid schematron URI."""
+    """Create a invalid schematron file and return its location as URI."""
     # Create an invalid schema by taking a valid one and insert errors
     valid_schema_path = lazy_shared_datadir / "schemas" / "simple.sch"
     data = valid_schema_path.read_text().replace("<schema", "<<schema")
@@ -94,6 +112,54 @@ def test_xsd_validator_with_invalid_schema(lazy_shared_datadir, invalid_schematr
     result = broken_validator.validate(tree)
     assert not result.is_valid
     assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
+    assert len(result.errors) > 0
+    assert result.message.startswith("Unable to create the validator")
+
+
+# --- external DTD ---
+
+def test_dtd_validator_valid(dtd_validator, lazy_shared_datadir):
+    """Test the XSD validator."""
+    xml_path = lazy_shared_datadir / "simple.xml"
+    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
+    result = dtd_validator.validate(tree)
+    assert result.is_valid
+    assert (
+        result.message
+        == f"Document validates against DTD {dtd_validator.schema_uri}"
+    )
+    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert not result.has_warnings
+
+
+def test_dtd_validator_invalid_document(dtd_validator, lazy_shared_datadir):
+    """Test the XSD validator with an invalid document."""
+    xml_path = lazy_shared_datadir / "simple_invalid.xml"
+    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
+    result = dtd_validator.validate(tree)
+    assert not result.is_valid
+    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert result.message.startswith("Document does not validate against DTD")
+    assert not result.has_warnings
+    assert len(result.errors) == 2
+
+
+def test_dtd_validator_with_invalid_schema(lazy_shared_datadir, invalid_dtd_uri):
+    """Test the XSD validator with an invalid schema."""
+    # if creation of the validator fails, it should set the _creation_error
+    # attribute and not raise an exception
+    broken_validator = DTDValidator(invalid_dtd_uri)
+    assert (
+        broken_validator._creation_error is not None  ## pylint: disable=protected-access
+    )
+
+    # validating should always return the same error message, regardless of the input
+    # document, because the validator could not be created successfully.
+    xml_path = lazy_shared_datadir / "simple.xml"
+    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
+    result = broken_validator.validate(tree)
+    assert not result.is_valid
+    assert result.validator_name == DTDValidator.VALIDATOR_NAME
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 

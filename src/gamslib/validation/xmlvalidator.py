@@ -64,7 +64,7 @@ class XMLSchemaValidator(SchemaValidator):
         super().__init__(schema_uri)
         try:
             schema_tree = ET.parse(schema_uri)
-            self.schema = ET.XMLSchema(schema_tree)
+            self.schema_validator = ET.XMLSchema(schema_tree)
         except Exception as exp:  # pylint: disable=broad-exception-caught
             self._creation_error = ValidationSubResult(
                 False, XMLSchemaValidator.VALIDATOR_NAME,
@@ -92,14 +92,14 @@ class XMLSchemaValidator(SchemaValidator):
         )
 
         try:
-            if self.schema.validate(tree):
+            if self.schema_validator.validate(tree):
                 result.is_valid = True
                 result.message = f"Document validates against schema {self.schema_uri}"
             else:
                 result.message = (
                     f"Document does not validate against schema {self.schema_uri}"
                 )
-                result.errors = [str(err) for err in self.schema.error_log]
+                result.errors = [str(err) for err in self.schema_validator.error_log]
         except Exception as e:  # pylint: disable=broad-exception-caught
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
@@ -444,39 +444,74 @@ class RelaxNGCompactValidator(SchemaValidator):
 class DTDValidator(SchemaValidator):
     """A validator for DTD schemas using lxml."""
 
+    VALIDATOR_NAME = "XML DTD Validator (lxml)"
+
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
-        self.schema = SchemaProvider.get_dtd(schema_uri)
+        try:
+            self.schema_validator = ET.DTD(schema_uri)
+        except Exception as exp:  # pylint: disable=broad-exception-caught
+            self._creation_error = ValidationSubResult(
+                False, DTDValidator.VALIDATOR_NAME,
+                message=f"Unable to create the validator for '{schema_uri}'",
+                errors=[f"XMLSchemaParseError: {exp!s}"],
+        )    
 
-    def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
-        """Validate an XML file against the DTD schema.
+    def validate(self, tree: ET.ElementTree): 
+        if self._creation_error:
+            return self._creation_error
 
-        Args:
-            tree (ET.ElementTree): The xml tree to be validated.
-
-        Returns:
-            ValidationResult: A ValidationResult object
-        """
+        # A minimal common SubResult
         result = ValidationSubResult(
-            False, "XML DTD Validator (lxml)", schema_uri=self.schema_uri
+            False, DTDValidator.VALIDATOR_NAME, schema_uri=self.schema_uri
         )
 
+        # do a normal validation
         try:
-            # tree = ET.parse(file_path)
-            if self.schema.validate(tree):
+            if self.schema_validator.validate(tree):
                 result.is_valid = True
-                result.message = f"Document validates against schema {self.schema_uri}"
+                result.message = f"Document validates against DTD {self.schema_uri}"
             else:
                 result.message = (
-                    f"Document does not validate against schema {self.schema_uri}"
+                    f"Document does not validate against DTD {self.schema_uri}"
                 )
-                result.errors = [str(err) for err in self.schema.error_log]
+                result.errors = [str(err) for err in self.schema_validator.error_log]
         except Exception as e:  # pylint: disable=broad-exception-caught
             result.message = (
-                f"Document does not validate against schema {self.schema_uri}"
+                f"Document does not validate against DTD {self.schema_uri}"
             )
-            result.errors = [f"DTD Error: {e!s}"]
+            result.errors = [f"XSD Error: {e!s}"]
         return result
+
+    # def validate_old(self, tree: ET.ElementTree) -> ValidationSubResult:
+    #     """Validate an XML file against the DTD schema.
+
+    #     Args:
+    #         tree (ET.ElementTree): The xml tree to be validated.
+
+    #     Returns:
+    #         ValidationResult: A ValidationResult object
+    #     """
+    #     result = ValidationSubResult(
+    #         False, "XML DTD Validator (lxml)", schema_uri=self.schema_uri
+    #     )
+
+    #     try:
+    #         # tree = ET.parse(file_path)
+    #         if self.schema.validate(tree):
+    #             result.is_valid = True
+    #             result.message = f"Document validates against schema {self.schema_uri}"
+    #         else:
+    #             result.message = (
+    #                 f"Document does not validate against schema {self.schema_uri}"
+    #             )
+    #             result.errors = [str(err) for err in self.schema.error_log]
+    #     except Exception as e:  # pylint: disable=broad-exception-caught
+    #         result.message = (
+    #             f"Document does not validate against schema {self.schema_uri}"
+    #         )
+    #         result.errors = [f"DTD Error: {e!s}"]
+    #     return result
 
 
 # TODO: what about internal DTDs?
