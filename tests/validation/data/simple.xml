@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="schemas/simple.rnc" type="application/relax-ng-compact-syntax"?>
+
 <products>
     <product>
         <name>Phone</name>
