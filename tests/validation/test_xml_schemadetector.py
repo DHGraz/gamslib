@@ -192,7 +192,9 @@ def test_find_schemas_apply_default_schema(
     xml_file = lazy_shared_datadir / "simple.xml"
     format_info = Mock()
     format_info.subtype = subtype
+
     schemata = xmlschemadetector.detect_schemata(xml_file, format_info)
     assert len(schemata) == 1
+    
     assert schemata[0].schema_uri == expected_schema_uri
     assert schemata[0].schema_type == expected_schema_type

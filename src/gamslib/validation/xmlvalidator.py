@@ -102,7 +102,7 @@ class XMLSchemaValidator(SchemaValidator):
                     f"Document does not validate against schema {self.schema_uri}"
                 )
                 result.errors = [str(err) for err in self.schema_validator.error_log]
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover 
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
             )
@@ -183,7 +183,7 @@ class SchematronValidator(SchemaValidator):
                 schema_file = self.schema_uri 
                 validator_xslt_str = compiler_executable.transform_to_string(source_file=schema_file)
                 self.schema_validator = xslt_proc.compile_stylesheet(stylesheet_text=validator_xslt_str)
-        except ImportError:   # saxon not installed
+        except ImportError:   # saxon not installed # pragma: no cover 
             msg = f"Cannot validate because binding {self.binding} requires Saxon. Install saxonche to enable this validation."
             result.message = msg
             result.errors = [
@@ -217,14 +217,12 @@ class SchematronValidator(SchemaValidator):
             raise ValueError("Either a tree or a file_path must be given.")
         if tree is not None and file_path is not None:
             raise ValueError("Either a tree or a file_path must be given, but not both.")
-        if tree is not None and file_path is not None:
-            raise ValueError("Either a tree or a file_path must be given, but not both.")
 
         if self._creation_error is not None:
             return self._creation_error
          
         if file_path is not None:
-            tree = ET.parse(file_path)
+            tree = ET.parse(file_path)  # pragma: no cover
 
         # if the _creation_error is set something went wrong when creating the validator
         #if self._creation_error is not None:
@@ -259,7 +257,8 @@ class SchematronValidator(SchemaValidator):
                         self.schema_validator.validation_report
                     )
                 )
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        # last ressort
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover 
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
             )
@@ -343,14 +342,14 @@ class SchematronValidator(SchemaValidator):
         warnings = []
         ns = {"svrl": "http://purl.oclc.org/dsdl/svrl"}
         for failed_assert in report_root.findall("svrl:failed-assert", ns):
-            for txt in failed_assert.findall(".//svrl:text", ns):
+            for text_element in failed_assert.findall(".//svrl:text", ns):
                 errors.append(
-                    f"Error at {failed_assert.get('location', '')} ({failed_assert.get('test', '')}): {txt.text}"
+                    f"Error at {failed_assert.get('location', '')} ({failed_assert.get('test', '')}): {text_element.text}"
                 )
         for successful_report in report_root.findall("svrl:successful-report", ns):
-            for txt in successful_report.find(".//svrl:text", ns):
+            for text_element in successful_report.findall(".//svrl:text", ns):
                 warnings.append(
-                    f"Warning at {successful_report.get('location', '')} ({successful_report.get('test', '')}): {txt.text}"
+                    f"Warning at {successful_report.get('location', '')} ({successful_report.get('test', '')}): {text_element.text}"
                 )
         return errors, warnings
 
@@ -398,7 +397,7 @@ class RelaxNGValidator(SchemaValidator):
                     f"Document does not validate against schema {self.schema_uri}"
                 )
                 result.errors = [str(err) for err in self.schema_validator.error_log]
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
             )
@@ -450,7 +449,8 @@ class DTDValidator(SchemaValidator):
                     f"Document does not validate against DTD {self.schema_uri}"
                 )
                 result.errors = [str(err) for err in self.schema_validator.error_log]
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        # last ressort
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover
             result.message = (
                 f"Document does not validate against DTD {self.schema_uri}"
             )
@@ -614,21 +614,21 @@ class XMLValidator(Validator):
                 )
             )
         for schema_info in schemata:
-            #try:
-            validator = SchemaProvider.get_schemavalidator(
-                schema_info.schema_uri, schema_info.schema_type
-            )
-            result.add_subresult(validator.validate(doc, schema_info))
-            #except ValueError as exp:
-            #    result.add_subresult(
-            #        ValidationSubResult(
-            #            False,
-            #            "XML Schema Validator",
-            #            schema_uri=schema_info.schema_uri,
-            #            message=f"Could not create schema validator for schema '{schema_info.schema_uri}'",
-            #            errors=[f"ValueError: {exp!s}"],
-            #        )
-            #    )
+            try:
+                validator = SchemaProvider.get_schemavalidator(
+                    schema_info.schema_uri, schema_info.schema_type
+                )
+                result.add_subresult(validator.validate(doc))
+            except ValueError as exp:  # this happens if the schema type is unknown
+                result.add_subresult(
+                    ValidationSubResult(
+                        False,
+                        "XML Schema Validator",
+                        schema_uri=schema_info.schema_uri,
+                        message=f"Unknown schema format for schema '{schema_info.schema_uri}'",
+                        errors=[f"ValueError: {exp!s}"],
+                    )
+                )
         return result
 
     # def _validate_xsd(

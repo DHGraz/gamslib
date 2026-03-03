@@ -17,7 +17,7 @@ from gamslib.validation.xmlvalidator import (
     XMLSchemaValidator,
 )
 
-# --- fixtures ---
+# --- Fixtures ---
 
 
 @pytest.fixture(name="dtd_validator")
@@ -151,12 +151,15 @@ def test_xsd_validator_invalid_document(xmlschema_validator, lazy_shared_datadir
 
 def test_xsd_validator_with_invalid_schema(lazy_shared_datadir, invalid_schematron_uri):
     """Test the XSD validator with an invalid schema."""
+
+    # pylint: disable=protected-access
+
     # if creation of the validator fails, it should set the _creation_error
     # attribute and not raise an exception
     broken_validator = XMLSchemaValidator(invalid_schematron_uri)
     assert (
         broken_validator._creation_error
-        is not None  ## pylint: disable=protected-access
+        is not None  
     )
 
     # validating should always return the same error message, regardless of the input
@@ -197,9 +200,30 @@ def test_dtd_validator_invalid_document(dtd_validator, lazy_shared_datadir):
     assert not result.has_warnings
     assert len(result.errors) == 2
 
+def test_dtd_validator_with_invalid_schema(lazy_shared_datadir, invalid_dtd_uri):
+    """Test the DTD validator with an invalid schema."""
+
+    # pylint: disable=protected-access
+
+    # if creation of the validator fails, it should set the _creation_error
+    # attribute and not raise an exception
+    broken_validator = DTDValidator(invalid_dtd_uri)
+    assert (
+        broken_validator._creation_error
+        is not None  
+    )
+
+    # validating should always return the same error message, regardless of the input
+    # document, because the validator could not be created successfully.
+    xml_path = lazy_shared_datadir / "simple.xml"
+    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
+    result = broken_validator.validate(tree)
+    assert not result.is_valid
+    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert len(result.errors) > 0
+    assert result.message.startswith("Unable to create the validator")
 
 # --- RelaxNG Compact ----
-
 
 def test_rnc_validator_valid(rnc_validator, lazy_shared_datadir):
     """Test the RelaxNG validator against a valid document."""
@@ -433,3 +457,20 @@ def test_schematron_saxon_validator_invalid_document(
     assert not result.has_warnings
     assert len(result.errors) > 0
     assert "Only 'product' nodes are allowed" in result.errors[0]
+
+
+def test_schematron_validator_no_params_given(lxml_schematron_validator):
+    """The schematron validato allows to use a tree or a file as input. 
+    If no parameters are given, it should raise an error and not crash.
+    """
+    with pytest.raises(ValueError, match=r"Either a tree or a file_path must be given."):   
+        lxml_schematron_validator.validate()
+
+def test_schematron_validator_both_params_given(lxml_schematron_validator, lazy_shared_datadir):
+    """The schematron validato allows to use a tree or a file as input. 
+    If both parameters are given, it should raise an error and not crash.
+    """
+    xml_path = lazy_shared_datadir / "simple.xml"
+    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
+    with pytest.raises(ValueError, match=r"Either a tree or a file_path must be given, but not both."):   
+        lxml_schematron_validator.validate(tree=tree, file_path=xml_path)

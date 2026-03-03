@@ -57,6 +57,7 @@ def test_valid_validationresult(subresult):
     assert result.is_valid
     assert len(list(result.get_subresults())) == 2
     assert result.get_errors() == []
+    assert result.has_warnings
     assert result.get_warnings() == ["Warning 1", "Warning 2", "Warning 3"]
     assert result.get_messages() == ["msg1", "msg2"]
     assert list(result.get_subresults()) == [subresult, subresult2]

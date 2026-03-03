@@ -4,14 +4,14 @@ from gamslib.validation.xmlvalidator import SchemaProvider
 
 
 @pytest.mark.parametrize(
-    "uri, method_to_test",
+    "schema_uri, method_to_test",
     [
-        # xsd
+        # --- xsd ---
         ("simple.xsd", "get_xsd"),
         # relaxng
         ("simple.rng", "get_relaxng"),
-        ("simple.rnc", "get_relaxng"),
-        # dtd
+        ("simple.rnc", "get_relaxng_compact"),
+        # --- dtd ---
         ("simple.dtd", "get_dtd"),
         # schematron files with different query bindings
         ("simple_exslt.sch", "get_schematron"),
@@ -24,25 +24,25 @@ from gamslib.validation.xmlvalidator import SchemaProvider
         #("simple.xslt3.sch", "get_schematron"),
     ],
 )
-def test_get_simple_valid_schema(uri, method_to_test, lazy_shared_datadir):
+def test_get_simple_valid_schema(schema_uri, method_to_test, lazy_shared_datadir):
     """Test the passed function with a simple valid schema.
 
     Every schema is fetched twice to test the caching mechanism.
     """
     # if uri is a path to a file we convert it to a file URI
     # all filenames are relative to the schemas directory in the shared datadir
-    if not (uri.startswith("file:") or uri.startswith("http")):
-        uri = (lazy_shared_datadir / "schemas" / uri).resolve().as_uri()
-    get_schema = getattr(SchemaProvider, method_to_test)
+    if not (schema_uri.startswith("file:") or schema_uri.startswith("http")):
+        schema_uri = (lazy_shared_datadir / "schemas" / schema_uri).resolve().as_uri()
+    get_schema_method = getattr(SchemaProvider, method_to_test)
 
     # Clear cache to ensure the test is not affected by previous tests
-    get_schema.cache_clear()
+    get_schema_method.cache_clear()
 
-    schema = get_schema(uri)
+    schema = get_schema_method(schema_uri)
     assert schema is not None
 
     # Second call should return the cached schema (same object)
-    schema2 = get_schema(uri)
+    schema2 = get_schema_method(schema_uri)
     assert schema2 is schema
 
 
