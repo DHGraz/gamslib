@@ -59,7 +59,7 @@ magika = [
 [dependency-groups]
 dev = [
     # for testing we want the full install
-    "gamslib[saxon,magika]", 
+    "gamslib[saxon,magika]",
     "pytest>=8.4.2",
     "pytest-datadir>=1.8.0",
     "pytest-cov>=7.0.0",
@@ -70,6 +70,7 @@ dev = [
     "pdoc3>=0.11.6",
     "responses>=0.25.8",
     "pytest-mock>=3.15.1",
+    "gams-xml-catalog",
 ]
 
 [tool.hatch.metadata]
@@ -82,5 +83,5 @@ packages = ["src/gamslib"]
 select = ["PL", "RUF", "SIM"]
 
 [tool.uv.sources]
-gams-xml-catalog = { path = "../gams-xml-catalog/dist/gams_xml_catalog-0.2.0-py3-none-any.whl" }
+gams-xml-catalog = { path = "../gams-xml-catalog/dist/gams_xml_catalog-0.3.0-py3-none-any.whl" }
 

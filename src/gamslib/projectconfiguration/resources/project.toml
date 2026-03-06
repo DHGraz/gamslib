@@ -28,9 +28,21 @@ loglevel = "info"
 
 # A list of filenames/filename patterns, which should be ignored when creating datastreams.csv
 ds_ignore_files = ["*.log"]
-# siegfried, magika, base (pythons built in mimetypes) 
+
+# Set the format detector to be used. Leave this on the default detector unless for good reasons
+# Allowed values: siegfried, magika, base (pythons built in mimetypes) Default is siegfried 
 format_detector = ""
+
+# Using remote XML resources is unsave and thus intercepted, which should not be a problem,
+# because we provide a XML catalog with the most used schema files like TEI or LIDO.
+# If you want to use custom schemas, these must be locally acessible ('file:///') or on a safe_xml_host.
+# So add hosts, where your custom schemas are located to this list
+safe_xml_hosts = [
+    "gams.uni-graz.at"
+]
+
 # If you want to use a detector service like a FITS Server, set this to the URL
+# Currently not used
 format_detector_url = ""
 
 
