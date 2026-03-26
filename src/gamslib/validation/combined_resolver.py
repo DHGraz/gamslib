@@ -1,44 +1,66 @@
 """Custom resolver that combines XML CATALOG resolution with host filtering and local caching.
 
-This resolver extends the `lxml.etree.Resolver` class to provide custom resolution of 
-external XML entities using a local catalog. It intercepts requests for external 
-resources (such as DTDs or schemas) and attempts to resolve them to local files, 
+This resolver extends the `lxml.etree.Resolver` class to provide custom resolution of
+external XML entities using a local catalog. It intercepts requests for external
+resources (such as DTDs or schemas) and attempts to resolve them to local files,
 improving performance and reliability.
 
-The `CombinedCatalogResolver` class extends the `lxml.etree.Resolver` class and overrides 
+The `CombinedCatalogResolver` class extends the `lxml.etree.Resolver` class and overrides
 the `resolve` method to implement the custom resolution logic.
 
-The `resolve` method intercepts requests for external resources and attempts to resolve 
-them to local files. If a local file is found, it returns the local file path. If no 
-local file is found, the original request is made to the XML CATALOG and the result is 
+The `resolve` method intercepts requests for external resources and attempts to resolve
+them to local files. If a local file is found, it returns the local file path. If no
+local file is found, the original request is made to the XML CATALOG and the result is
 returned.
 
-The `get_cache_path` method generates a unique cache file path for the given URL. The cache 
-filename is derived from a hash of the URL to ensure uniqueness and avoid issues with special 
+The `get_cache_path` method generates a unique cache file path for the given URL. The cache
+filename is derived from a hash of the URL to ensure uniqueness and avoid issues with special
 characters.
 """
 
 import hashlib
+import logging
 import os
+from pathlib import Path
+import re
+from typing import Optional
+from urllib.parse import urlparse
+
+logger = logging.getLogger(__name__)
 
 from lxml import etree as ET
 import requests
 
 import gams_xml_catalog
 
+from gamslib.projectconfiguration import (
+    MissingConfigurationException,
+    get_configuration,
+)
+
 
 class CombinedCatalogResolver(ET.Resolver):
     """Custom resolver that combines XML CATALOG resolution with host filtering and local caching."""
 
-    def __init__(self, allowed_hosts: list[str], cache_dir: str = ".schema_cache"):
-        super().__init__()
-        gams_xml_catalog.activate_catalog()
-        self.allowed_hosts = allowed_hosts
-        self.cache_dir = cache_dir
-        if not os.path.exists(self.cache_dir):
-            os.makedirs(self.cache_dir)
+    def __init__(
+        self,
+        allowed_hosts: Optional[list[str]] = None,
+        cache_dir: str | None = ".schema_cache",
+    ):
+        """
+        Create a Resolver instance.
 
-    def get_cache_path(self, url):
+        Args:
+            allowed_hosts (Optional[list[str]], optional): _description_. Defaults to None.
+            cache_dir (str | None, optional): _description_. Defaults to ".schema_cache". Set to None to disable caching.
+        """
+        gams_xml_catalog.activate_catalog()
+        self._set_allowed_hosts(allowed_hosts)
+        self.cache_dir = cache_dir
+        if cache_dir is not None:
+            os.makedirs(self.cache_dir, exist_ok=True)
+
+    def get_cache_path(self, url: str) -> str | None:
         """Generate a unique cache file path for the given URL.
 
         The cache filename is derived from a hash of the URL to ensure uniqueness and avoid
@@ -49,13 +71,15 @@ class CombinedCatalogResolver(ET.Resolver):
             url (str): The URL of the file to be cached.
 
         Returns:
-            str: The path to the cache file.
+            str: The path to the cache file or None if caching is disabled.
         """
+        if self.cache_dir is None:
+            return None
         extension = os.path.splitext(url)[1]
         unique_id = hashlib.md5(url.encode("utf-8")).hexdigest()
         return os.path.join(self.cache_dir, f"cached{unique_id}{extension}")
 
-    def resolve(self, url: str, pubid: str | None, context) -> str | None:
+    def resolve(self, url: str, pubid: str | None, context):
         """Resolve a URL to an (XML) document.
 
         The resolution process follows these steps:
@@ -64,26 +88,61 @@ class CombinedCatalogResolver(ET.Resolver):
         3. Attempt to resolve from the local cache. If successful, return the cache result.
         4. Attempt to download the file and cache it. If successful, return the cache result.
         """
+
         # 1. try to load via XML CATALOG
         catalog_res = self.resolve_filename(url, context)
         if catalog_res is not None:
             return catalog_res
 
+        uri = urlparse(url)
+        host = (uri.hostname or "").lower()
+        is_allowed = host in {entry.lower() for entry in self.allowed_hosts}
+
         # 2. host filter
-        if not any(host in url for host in self.allowed_hosts):
+        if not is_allowed:
             return None
 
         # 3. local cache
         cache_path = self.get_cache_path(url)
-        if os.path.exists(cache_path):
+        if cache_path is not None and Path(cache_path).is_file():
             return self.resolve_filename(cache_path, context)
 
         # 4. download
         try:
-            response = requests.get(url, timeout=20)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()
-            with open(cache_path, "wb") as f:
-                f.write(response.content)
-            return self.resolve_filename(cache_path, context)
-        except Exception:
+            if cache_path is not None:
+                Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
+                Path(cache_path).write_bytes(response.content)
+                return self.resolve_filename(cache_path, context)
+            return self.resolve_string(response.content, context)
+
+        except Exception as exp:
+            logger.warning("Something unexpected happened while loading schema %s: %s", url, exp)
             return None
+
+    def _set_allowed_hosts(self, allowed_hosts: Optional[list[str]] = None) -> None:
+        """Set the list of allowed hosts from the project configuration or environment variable.
+
+        The method first attempts to read the allowed hosts from the project configuration. If the
+        configuration is not found, it falls back to reading from the environment variable
+        `GAMSLIB_SAFE_XML_HOSTS`, which should contain a comma-separated list of hosts.
+        If this environment variable is also not set, an empty list is returned, effectively
+        blocking all remote hosts.
+
+        Returns:
+            list[str]: A list of allowed hostnames.
+        """
+        if allowed_hosts is not None:
+            self.allowed_hosts = allowed_hosts
+        else:
+            try:
+                # normally, we should have a project configuration
+                config = get_configuration(os.environ.get("GAMSCFG_PROJECT_TOML"))
+                self.allowed_hosts = config.general.safe_xml_hosts
+            except MissingConfigurationException:
+                # if no cfg file: use env variable or empty list
+                allowed_hosts = re.split(
+                    r"\s*,\s*", os.environ.get("GAMSLIB_SAFE_XML_HOSTS", "")
+                )
+                self.allowed_hosts = [entry for entry in allowed_hosts if entry]
