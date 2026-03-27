@@ -3,13 +3,20 @@
 # pylint: disable=c-extension-no-member
 import abc
 from functools import lru_cache
+import io
+import os
 from pathlib import Path
+import re
+import tempfile
 from typing import Final, Optional
+from urllib.parse import urlparse
 
 import lxml.isoschematron
 from lxml import etree as ET
 
-import gams_xml_catalog # this is important as we need the catalog
+import requests  # this is important as we need the catalog
+
+from gamslib.projectconfiguration import MissingConfigurationException, get_configuration
 
 from gamslib.validation.validator import (
     Validator,
@@ -17,10 +24,10 @@ from gamslib.validation.validator import (
 )
 from gamslib.validation.schemainfo import SchemaInfo, SchemaType
 from gamslib.validation.validationresult import ValidationResult, ValidationSubResult
+from gamslib.validation.combined_resolver import CombinedCatalogResolver
 
 # Number of cached schemas per schema type
 MAX_CACHE_SIZE = 32
-
 
 class SchemaValidator(abc.ABC):
     """Abstract base class for schema-specific validators.
@@ -38,6 +45,7 @@ class SchemaValidator(abc.ABC):
 
     def __init__(self, schema_uri: str):
         self.schema_uri: str = schema_uri
+        self.scchema_validator = None
         # this is a special error message which is set if the creation of the validator fails.
         # this might happen if the schema file is not found, not well formed, or if there is an error in the schema itself.
         self._creation_error: Optional[ValidationSubResult] = None
@@ -57,19 +65,71 @@ class SchemaValidator(abc.ABC):
         """
         raise NotImplementedError
 
+    # # FIXME: I thinks this is no longer needed, as this is handled by the CombinedCatalogResolver
+    # # It is still part of som SchemaValidtors, which should be bfixed, too
+    # # @classmethod
+    # def _is_allowed_remote_schema_uri(cls, schema_uri: str) -> bool:
+    #     """Check if the schema_uri is located on a trusted host.
+
+    #     The list of trusted hosts is read from the configuration object.
+    #     If no configuration object is found (which might happen if validation is used outside
+    #     of a project context), we try to extract the configuration from the environment
+    #     (GAMSLIB_SAFE_XML_HOSTS). If this aloso fails, we assume that no hosts are trusted.
+
+    #     Only returns True, if schema_uri is located on a trusted host.
+    #     For all other URIs (including file:// URIs and local paths) is returns False. 
+    #     This makes sense, as these cases can be handled by standard loading.
+
+    #     """
+    #     try:
+    #         # normally, we should have a project configuration 
+    #         config = get_configuration(os.environ.get("GAMSCFG_PROJECT_TOML"))
+    #         safe_hosts = config.general.safe_xml_hosts
+    #     except  MissingConfigurationException:
+    #         # if no configuration file was found we try to extract hosts from the from the environment
+    #         safe_hosts = re.split(r'\s*,\s*',os.environ.get("GAMSLIB_SAFE_XML_HOSTS", ""))
+
+    #     uri = urlparse(schema_uri)
+    #     return (
+    #         uri.scheme in ("http", "https")
+    #         and uri.hostname in safe_hosts
+    #     )
+    def extract_lxml_errors_from_exception(self, exp: ET.LxmlError) -> list[str]:
+        """Expects a lxml parse exception all errors as list of strings.
+        """
+        errors = []
+        if isinstance(exp, ET.LxmlError) and exp.error_log is not None:
+            for error in exp.error_log:
+                errors.append(f"Line {error.line}, Column {error.column}: {error.message}")
+        return errors
 
 class XMLSchemaValidator(SchemaValidator):
     """A validator for XML Schema (XSD) schemas using lxml."""
 
-    VALIDATOR_NAME: Final[str] = "XML XSD Validator",
+    VALIDATOR_NAME: Final[str] = "XML XSD Validator"
+
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
+        resolver = CombinedCatalogResolver(cache_dir=None)
+        parser = ET.XMLParser()
+        parser.resolvers.add(resolver)
         try:
-            schema_tree = ET.parse(schema_uri)
-            self.schema_validator = ET.XMLSchema(schema_tree)
+            tree = ET.parse(schema_uri, parser=parser)
+            self.schema_validator = ET.XMLSchema(tree)
+        except ET.XMLSchemaParseError as e:
+            errors = self.extract_lxml_errors_from_exception(e)
+            self._creation_error = ValidationSubResult(
+                False,
+                schema_uri=schema_uri,
+                validator_name=XMLSchemaValidator.VALIDATOR_NAME,
+                message=f"Unable to create the validator for '{schema_uri}: {e}.'",
+                errors=errors,
+            )
         except Exception as exp:  # pylint: disable=broad-exception-caught
             self._creation_error = ValidationSubResult(
-                False, XMLSchemaValidator.VALIDATOR_NAME,
+                False,
+                schema_uri=schema_uri,
+                validator_name=XMLSchemaValidator.VALIDATOR_NAME,
                 message=f"Unable to create the validator for '{schema_uri}'",
                 errors=[f"XMLSchemaParseError: {exp!s}"],
             )
@@ -102,7 +162,7 @@ class XMLSchemaValidator(SchemaValidator):
                     f"Document does not validate against schema {self.schema_uri}"
                 )
                 result.errors = [str(err) for err in self.schema_validator.error_log]
-        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover 
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
             )
@@ -146,18 +206,38 @@ class SchematronValidator(SchemaValidator):
         self.schema_validator is left to None.
         """
         # This result is only used as self._creation_error if creation fails
+        # FIXME: this should not create a result, but directly set self._creation_error, as this is a bit confusing.
         result = ValidationSubResult(
             False, SchematronValidator.LXML_VALIDATOR_NAME, schema_uri=self.schema_uri
         )
         try:
-            schema_tree = ET.parse(self.schema_uri)
-            self.schema_validator = lxml.isoschematron.Schematron(
-                schema_tree, store_report=True
+            if self._is_allowed_remote_schema_uri(self.schema_uri):
+                response = requests.get(self.schema_uri, timeout=10)
+                response.raise_for_status()
+                schema_tree = ET.fromstring(response.content)
+                self.schema_validator = lxml.isoschematron.Schematron(
+                    schema_tree, store_report=True
+                )
+            else:  # load locally or via schematron catalog
+                schema_tree = ET.parse(self.schema_uri)
+                self.schema_validator = lxml.isoschematron.Schematron(
+                    schema_tree, store_report=True
+                )
+        except ET.LxmlError as e:
+            errors = self.extract_lxml_errors_from_exception(e)
+            self._creation_error = ValidationSubResult(
+                False,
+                schema_uri=self.schema_uri,
+                validator_name=self.VALIDATOR_NAME,
+                message=f"Unable to create the validator for '{self.schema_uri}': {e}.",
+                errors=errors,
             )
         except Exception as e:  # pylint: disable=broad-exception-caught
             # unable to create the schema object, e.g. schema is not well formed or not found
-            result.message = ("Unable to create the Schematron validator instance for  "
-                              f"schema {self.schema_uri}")
+            result.message = (
+                "Unable to create the Schematron validator instance for  "
+                f"schema {self.schema_uri}"
+            )
             result.errors = [f"Schema Error: {e!s}"]
             self._creation_error = result
 
@@ -173,21 +253,35 @@ class SchematronValidator(SchemaValidator):
         )
         try:
             from saxonche import PySaxonProcessor  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
+
             with PySaxonProcessor(license=False) as proc:
                 xslt_proc = proc.new_xslt30_processor()
                 compiler_file = (
                     Path(__file__).parent / "resources" / "schxslt2" / "transpile.xsl"
                 ).as_posix()
                 # convert Schematron (.sch) into a validating XSLT
-                compiler_executable = xslt_proc.compile_stylesheet(stylesheet_file=compiler_file)
-                schema_file = self.schema_uri 
-                validator_xslt_str = compiler_executable.transform_to_string(source_file=schema_file)
-                self.schema_validator = xslt_proc.compile_stylesheet(stylesheet_text=validator_xslt_str)
-        except ImportError:   # saxon not installed # pragma: no cover 
-            msg = f"Cannot validate because binding {self.binding} requires Saxon. Install saxonche to enable this validation."
+                compiler_executable = xslt_proc.compile_stylesheet(
+                    stylesheet_file=compiler_file
+                )
+                if self._is_allowed_remote_schema_uri(self.schema_uri):
+                    response = requests.get(self.schema_uri, timeout=10)
+                    response.raise_for_status()
+                    validator_xslt_str = response.text
+                else:
+                    #schema_file = self.schema_uri
+                    validator_xslt_str = compiler_executable.transform_to_string(
+                        source_file=self.schema_uri
+                        )
+                self.schema_validator = xslt_proc.compile_stylesheet(
+                    stylesheet_text=validator_xslt_str
+                )
+        except ImportError:  # saxon not installed # pragma: no cover
+            msg = (f"Cannot validate because binding {self.binding} requires Saxon. "
+                   "Install saxonche to enable this validation.")
             result.message = msg
             result.errors = [
-                "Saxon is not available, cannot validate schema, becauce the schema requires a queryBinding of {self.binding}"
+                (f"Cannot validate schema, becauce the schematron requires '{self.binding}' "
+                 "in its queryBinding. This only works if saxonche is installed.")
             ]
             self._creation_error = result
         except Exception as e:  # pylint: disable=broad-exception-caught
@@ -196,17 +290,16 @@ class SchematronValidator(SchemaValidator):
             result.errors = [f"Schema Error: {e!s}"]
             self._creation_error = result
 
-    # TODO: does it make sense to have the tree here?
-    def validate(self,
-                 tree: Optional[ET.ElementTree] = None, 
-                 file_path: Optional[Path] = None) -> ValidationSubResult:
+    def validate(
+        self, tree: Optional[ET.ElementTree] = None, file_path: Optional[Path] = None
+    ) -> ValidationSubResult:
         """Validate an XML file against the Schematron schema.
 
         Either a tree or a file_path must be given. Do not need both!
         Args:
-            tree (ET.ElementTree): The xml tree to be validated. 
+            tree (ET.ElementTree): The xml tree to be validated.
                 Should be None if a file_path is given.
-            file_path (Path): The path to the file to be validated. 
+            file_path (Path): The path to the file to be validated.
                 Should be None if a tree is given.
 
         Returns:
@@ -216,19 +309,16 @@ class SchematronValidator(SchemaValidator):
         if tree is None and file_path is None:
             raise ValueError("Either a tree or a file_path must be given.")
         if tree is not None and file_path is not None:
-            raise ValueError("Either a tree or a file_path must be given, but not both.")
+            raise ValueError(
+                "Either a tree or a file_path must be given, but not both."
+            )
 
         if self._creation_error is not None:
             return self._creation_error
-         
+
         if file_path is not None:
             tree = ET.parse(file_path)  # pragma: no cover
 
-        # if the _creation_error is set something went wrong when creating the validator
-        #if self._creation_error is not None:
-            #result = ValidationResult(tree.docinfo.URL)
-            #result.add_subresult(self._creation_error)
-            #return result
         if self.binding in ["xslt2", "xslt3", "xpath2", "xpath3"]:
             file_path = Path(tree.docinfo.URL)
             return self._validate_with_saxon(file_path)
@@ -258,13 +348,12 @@ class SchematronValidator(SchemaValidator):
                     )
                 )
         # last ressort
-        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover 
+        except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
             )
             result.errors = [f"Schematron Error: {e!s}"]
         return result
-
 
     def _validate_with_saxon(self, file_path: Path) -> ValidationSubResult:
         """Validate an XML file an return a ValidationSubResult.
@@ -278,10 +367,9 @@ class SchematronValidator(SchemaValidator):
         svrl_report = self.schema_validator.transform_to_string(
             source_file=str(xml_file)
         )
-        #print(svrl_report)
+        # print(svrl_report)
         svrl_report_root = ET.fromstring(svrl_report.encode("utf-8"))
-        errors, warnings = SchematronValidator.srvl_to_message_lists(svrl_report_root
-                                                                     )
+        errors, warnings = SchematronValidator.srvl_to_message_lists(svrl_report_root)
         if errors:
             result.message = (
                 f"Document does not validate against schema {self.schema_uri}"
@@ -298,7 +386,7 @@ class SchematronValidator(SchemaValidator):
 
         Use Path objects for local files, and strings for URIs.
 
-        Return a string like 'xslt2' or None, if detecting the binding fails. 
+        Return a string like 'xslt2' or None, if detecting the binding fails.
         """
         binding = "xslt"
         try:
@@ -325,8 +413,10 @@ class SchematronValidator(SchemaValidator):
                 False,
                 SchematronValidator.LXML_VALIDATOR_NAME,
                 schema_uri=self.schema_uri,
-                message=("Unable to create the Schematron validator instance for "
-                        f"schema {self.schema_uri}"),
+                message=(
+                    "Unable to create the Schematron validator instance for "
+                    f"schema {self.schema_uri}"
+                ),
                 errors=[f"Schema Error: {exp!s}"],
             )
             return None
@@ -361,15 +451,28 @@ class RelaxNGValidator(SchemaValidator):
 
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
+        resolver = CombinedCatalogResolver()
+        parser = ET.XMLParser()
+        parser.resolvers.add(resolver)
         try:
-            self.schema_validator = ET.RelaxNG(file=schema_uri)
+            tree = ET.parse(schema_uri, parser=parser)
+            self.schema_validator = ET.RelaxNG(tree)
+        except ET.LxmlError as e:
+            errors = self.extract_lxml_errors_from_exception(e)
+            self._creation_error = ValidationSubResult(
+                False,
+                schema_uri=schema_uri,
+                validator_name=self.VALIDATOR_NAME,
+                message=f"Unable to create the validator for '{schema_uri}: {e}.'",
+                errors=errors,
+            )
         except Exception as exp:  # pylint: disable=broad-exception-caught
             self._creation_error = ValidationSubResult(
-                False, self.VALIDATOR_NAME,
+                False,
+                self.VALIDATOR_NAME,
                 message=f"Unable to create the validator for '{schema_uri}'",
                 errors=[f"RelaxNGParseError: {exp!s}"],
             )
-
 
     def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
         """Validate an XML file against the RelaxNG schema.
@@ -421,16 +524,41 @@ class DTDValidator(SchemaValidator):
 
     def __init__(self, schema_uri: str):
         super().__init__(schema_uri)
+
+        resolver = CombinedCatalogResolver(cache_dir=None)
+        parser = ET.XMLParser(load_dtd=True)
+        parser.resolvers.add(resolver)
+
+        # A minimal XML, which only has a reference to the DTD. We need this to use the 
+        # resolver to load the DTD, because lxml does not provide a way to directly 
+        # load a DTD with a custom resolver.
+        dummy_xml = f'<!DOCTYPE root SYSTEM "{schema_uri}"><root/>'.encode('utf-8')
         try:
-            self.schema_validator = ET.DTD(schema_uri)
+            # we need the tree, so we have to put the string into an io.BytesIO object
+            tree = ET.parse(io.BytesIO(dummy_xml), parser=parser)
+            # the dtd should now be contained in the tree
+            if tree.docinfo.externalDTD is None:
+                raise ValueError(f"Unable to load DTD from {schema_uri}.")
+            self.schema_validator = tree.docinfo.externalDTD
+        except ET.LxmlError as e:
+            errors = self.extract_lxml_errors_from_exception(e)
+            self._creation_error = ValidationSubResult(
+                False,
+                schema_uri=schema_uri,
+                validator_name=DTDValidator.VALIDATOR_NAME,
+                message=f"Unable to create the validator for '{schema_uri}: {e}.'",
+                errors=errors,
+            )
         except Exception as exp:  # pylint: disable=broad-exception-caught
             self._creation_error = ValidationSubResult(
-                False, DTDValidator.VALIDATOR_NAME,
+                False,
+                schema_uri=schema_uri,
+                validator_name=DTDValidator.VALIDATOR_NAME,
                 message=f"Unable to create the validator for '{schema_uri}'",
-                errors=[f"XMLSchemaParseError: {exp!s}"],
-        )    
+                errors=[f"DTDParseError: {exp!s}"],
+            )
 
-    def validate(self, tree: ET.ElementTree): 
+    def validate(self, tree: ET.ElementTree):
         if self._creation_error:
             return self._creation_error
 
@@ -451,9 +579,7 @@ class DTDValidator(SchemaValidator):
                 result.errors = [str(err) for err in self.schema_validator.error_log]
         # last ressort
         except Exception as e:  # pylint: disable=broad-exception-caught # pragma: no cover
-            result.message = (
-                f"Document does not validate against DTD {self.schema_uri}"
-            )
+            result.message = f"Document does not validate against DTD {self.schema_uri}"
             result.errors = [f"XSD Error: {e!s}"]
         return result
 
@@ -544,7 +670,6 @@ class SchemaProvider:
         """
         return RelaxNGValidator(schema_uri)
 
-
     @staticmethod
     @lru_cache(maxsize=MAX_CACHE_SIZE)
     def get_relaxng_compact(schema_uri: str) -> RelaxNGCompactValidator:
@@ -562,7 +687,7 @@ class SchemaProvider:
             schema_path (str): Path to the schema file.
 
         Returns:
-            DTDValidator: An DTDValidator object. 
+            DTDValidator: An DTDValidator object.
         """
         return DTDValidator(schema_uri)
 
@@ -574,8 +699,8 @@ class SchemaProvider:
 class XMLValidator(Validator):
     """Validate an XML Document against a list of schemas."""
 
-#    def __init__(self):
-#        super().__init__()
+    #    def __init__(self):
+    #        super().__init__()
 
     def validate(
         self, file_path: Path, schemata: Optional[list[SchemaInfo]] = None

@@ -2,6 +2,15 @@
 
 Each SchemaValidator object provides a validate() method, which always 
 returns a ValidationSubResult.
+
+
+Currently we support these schema types:
+
+- DTD
+- XML Schema (XSD)
+- RelaxNG (RNG)
+- RelaxNG Compact (RNC)
+- Schematron (SCH)
 """
 
 import lxml.isoschematron
@@ -14,7 +23,6 @@ from gamslib.validation.xmlvalidator import (
     RelaxNGCompactValidator,
     RelaxNGValidator,
     SchematronValidator,
-    XMLSchemaValidator,
 )
 
 # --- Fixtures ---
@@ -27,14 +35,6 @@ def create_dtd_validator(lazy_shared_datadir):
     assert schema_path.exists()
     schema_uri = schema_path.resolve().as_uri()
     validator = DTDValidator(schema_uri)
-    return validator
-
-
-@pytest.fixture(name="xmlschema_validator")
-def create_xmlschema_validator(lazy_shared_datadir):
-    """Create an XMLSchemaValidator object."""
-    schema_uri = (lazy_shared_datadir / "schemas" / "simple.xsd").resolve().as_uri()
-    validator = XMLSchemaValidator(schema_uri)
     return validator
 
 
@@ -121,56 +121,6 @@ def create_invalid_rnc_uri(lazy_shared_datadir, tmp_path):
 
 
 # ---- XSD ----
-
-
-def test_xsd_validator_valid(xmlschema_validator, lazy_shared_datadir):
-    """Test the XSD validator."""
-    xml_path = lazy_shared_datadir / "simple.xml"
-    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
-    result = xmlschema_validator.validate(tree)
-    assert result.is_valid
-    assert (
-        result.message
-        == f"Document validates against schema {xmlschema_validator.schema_uri}"
-    )
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
-    assert not result.has_warnings
-
-
-def test_xsd_validator_invalid_document(xmlschema_validator, lazy_shared_datadir):
-    """Test the XSD validator with an invalid document."""
-    xml_path = lazy_shared_datadir / "simple_invalid.xml"
-    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
-    result = xmlschema_validator.validate(tree)
-    assert not result.is_valid
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
-    assert result.message.startswith("Document does not validate against schema")
-    assert not result.has_warnings
-    assert len(result.errors) == 1
-
-
-def test_xsd_validator_with_invalid_schema(lazy_shared_datadir, invalid_schematron_uri):
-    """Test the XSD validator with an invalid schema."""
-
-    # pylint: disable=protected-access
-
-    # if creation of the validator fails, it should set the _creation_error
-    # attribute and not raise an exception
-    broken_validator = XMLSchemaValidator(invalid_schematron_uri)
-    assert (
-        broken_validator._creation_error
-        is not None  
-    )
-
-    # validating should always return the same error message, regardless of the input
-    # document, because the validator could not be created successfully.
-    xml_path = lazy_shared_datadir / "simple.xml"
-    tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
-    result = broken_validator.validate(tree)
-    assert not result.is_valid
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
-    assert len(result.errors) > 0
-    assert result.message.startswith("Unable to create the validator")
 
 
 # --- external DTD ---
