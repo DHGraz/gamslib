@@ -4,9 +4,23 @@ import hashlib
 from pathlib import Path
 
 import pytest
+import requests
 
 import gamslib.validation.combined_resolver as combined_resolver_mod
 from gamslib.validation.combined_resolver import CombinedCatalogResolver
+
+
+class FakeResponse:
+    "Mock a requests.Response object for testing purposes."
+
+    def __init__(self, **kwargs):
+        self.content = kwargs.get("content", b"")
+        self.status_code = kwargs.get("status_code", 200)
+
+    def raise_for_status(self):
+        """Simulate the behavior of requests.Response.raise_for_status() by raising an exception for HTTP error status codes."""
+        if self.status_code >= 400:
+            raise requests.exceptions.RequestException(f"HTTP error {self.status_code}")
 
 
 def test_init_no_args():
@@ -157,8 +171,7 @@ def test_resolve_uses_cached_file_when_available(tmp_path, monkeypatch):
 def test_resolve_downloads_and_caches_when_not_in_catalog_or_cache(
     tmp_path, monkeypatch
 ):
-    """Resolve should download the missing schema, write it to the cache, and then resolve from the cached file.
-    """
+    """Resolve should download the missing schema, write it to the cache, and then resolve from the cached file."""
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(["example.org"], cache_dir=str(cache_dir))
     url = "https://example.org/schema/new-schema.xsd"
@@ -167,9 +180,9 @@ def test_resolve_downloads_and_caches_when_not_in_catalog_or_cache(
     cached_file = cache_dir / "cached_downloaded.xsd"
     monkeypatch.setattr(resolver, "get_cache_path", lambda _url: str(cached_file))
 
-    # The lxml resolver class, where CombinedCatalogResolver inherits from, will first call 
-    # resolve_filename to attempt to resolve the file  # with the original URL, and then 
-    # with the cached file path. We need to fake both calls to simulate the expected behavior. 
+    # The lxml resolver class, where CombinedCatalogResolver inherits from, will first call
+    # resolve_filename to attempt to resolve the file  # with the original URL, and then
+    # with the cached file path. We need to fake both calls to simulate the expected behavior.
     def fake_resolve_filename(filename, _context):
         if filename == url:
             return None
@@ -205,13 +218,6 @@ def test_resolve_returns_none_when_download_fails(tmp_path, monkeypatch):
 
     monkeypatch.setattr(resolver, "resolve_filename", lambda *_args, **_kwargs: None)
 
-    class FakeResponse:
-        content = b""
-
-        @staticmethod
-        def raise_for_status():
-            return None
-
     monkeypatch.setattr(
         combined_resolver_mod.requests, "get", lambda *_args, **_kwargs: FakeResponse()
     )
@@ -219,3 +225,67 @@ def test_resolve_returns_none_when_download_fails(tmp_path, monkeypatch):
     assert resolver.resolve(url, None, None) is None
 
 
+def test_get_content_from_file(tmp_path, lazy_shared_datadir):
+    "Test the get_content method with a local file path and URI."
+    cache_dir = tmp_path / "schema_cache"
+    resolver = CombinedCatalogResolver(cache_dir=str(cache_dir))
+    file = lazy_shared_datadir / "schemas" / "simple.xsd"
+
+    # a normal path
+    content = resolver.get_content(file.as_posix())
+    assert content == file.read_bytes()
+
+
+def test_get_content_from_allowed_uri(tmp_path, lazy_shared_datadir, monkeypatch):
+    "Test the get_content method with an allowed http URI."
+    cache_dir = tmp_path / "schema_cache"
+    resolver = CombinedCatalogResolver(["foo.com"], cache_dir=str(cache_dir))
+    # monkeypatch the requests.get method to return a fake response with the content of the test schema,
+    # since we cannot rely on external network access in tests
+    expected_content = (lazy_shared_datadir / "schemas" / "simple.xsd").read_bytes()
+    monkeypatch.setattr(
+        combined_resolver_mod.requests,
+        "get",
+        lambda *args, **kwargs: FakeResponse(content=expected_content),
+    )
+
+    content = resolver.get_content("http://foo.com/schema/simple.xsd")
+    assert content == expected_content
+
+    # the second call should use the cached file instead of making another HTTP request
+    # we only test if this succeeds
+    content = resolver.get_content("http://foo.com/schema/simple.xsd")
+    assert content == expected_content
+
+
+def test_get_content_from_allowed_uri_404(tmp_path, lazy_shared_datadir, monkeypatch):
+    "Test the get_content method with an allowed http URI which returns a 404 error."
+    cache_dir = tmp_path / "schema_cache"
+    resolver = CombinedCatalogResolver(["foo.com"], cache_dir=str(cache_dir))
+    # monkeypatch the requests.get method to return a fake response with the content of the test schema,
+    # since we cannot rely on external network access in tests
+    monkeypatch.setattr(
+        combined_resolver_mod.requests,
+        "get",
+        lambda *args, **kwargs: FakeResponse(status_code=404),
+    )
+    with pytest.raises(Exception):
+        resolver.get_content("http://foo.com/schema/simple.xsd")
+
+
+def test_get_content_from_catalog_uri(tmp_path, lazy_shared_datadir):
+    "Test the get_content method with a URI that can be resolved via the catalog."
+    cache_dir = tmp_path / "schema_cache"
+    resolver = CombinedCatalogResolver(cache_dir=str(cache_dir))
+    content = resolver.get_content(
+        "http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd"
+    )
+    assert content
+
+
+def test_get_content_from_disallowed_uri(tmp_path, lazy_shared_datadir):
+    "Test the get_content method with a URI that is not allowed and cannot be resolved via the catalog."
+    cache_dir = tmp_path / "schema_cache"
+    resolver = CombinedCatalogResolver(cache_dir=str(cache_dir))
+    with pytest.raises(Exception):
+        resolver.get_content("http://unallowed.example.org/schema.xsd")
