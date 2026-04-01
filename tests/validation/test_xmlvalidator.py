@@ -3,12 +3,21 @@
 import re
 from pathlib import Path
 import unittest
+from unittest.mock import MagicMock
 from lxml import etree as ET
 
 import pytest
 
 from gamslib.validation.schemainfo import SchemaInfo, SchemaType
-from gamslib.validation.xmlvalidator import DTDValidator, RelaxNGCompactValidator, RelaxNGValidator, SchematronValidator, XMLSchemaValidator, XMLValidator
+from gamslib.validation.xmlvalidator import (
+    DTDValidator,
+    RelaxNGCompactValidator,
+    RelaxNGValidator,
+    SchemaValidator,
+    SchematronValidator,
+    XMLSchemaValidator,
+    XMLValidator,
+)
 
 
 @pytest.fixture(name="make_schema_info")
@@ -26,11 +35,11 @@ def make_schema_info_fixture():
 @pytest.mark.parametrize(
     "schema_file, schema_type, validator_name",
     [
-        ("simple.xsd", SchemaType.XSD, XMLSchemaValidator.VALIDATOR_NAME),
-        ("simple.rng", SchemaType.RNG, RelaxNGValidator.VALIDATOR_NAME),
-        ("simple.rnc", SchemaType.RNC, RelaxNGCompactValidator.VALIDATOR_NAME),
-        ("simple.sch", SchemaType.SCH, SchematronValidator.LXML_VALIDATOR_NAME),
-        ("simple.dtd", SchemaType.DTD, DTDValidator.VALIDATOR_NAME),
+        ("simple.xsd", SchemaType.XSD, "XMLSchema Validator"),
+        ("simple.rng", SchemaType.RNG, "RelaxNG Validator"),
+        ("simple.rnc", SchemaType.RNC, "RelaxNGCompactValidator"),
+        ("simple.sch", SchemaType.SCH, "Schematron Validator (lxml)"),
+        ("simple.dtd", SchemaType.DTD, "DTD Validator"),
     ],
 )
 def test_validate_valid(
@@ -153,6 +162,7 @@ def test_validate_unsupported_schema_type(lazy_shared_datadir, make_schema_info)
     assert "Unknown schema format" in result.get_messages()[0]
     assert all("Unknown schema type" in err for err in errors)
 
+
 def test_srvl_to_message_lists_empty_report_returns_empty_lists():
     """srvl_to_message_lists should return empty lists if no assertions/reports exist."""
     report_root = ET.fromstring(
@@ -207,5 +217,26 @@ def test_srvl_to_message_lists_missing_attrs_use_empty_defaults():
     errors, warnings = SchematronValidator.srvl_to_message_lists(report_root)
 
     assert errors == ["Error at  (): Generic validation failure"]
-    assert warnings == []
+    assert not warnings
 
+
+@pytest.mark.parametrize(
+    "schema_uri,expected", [
+        ("file://path/to/schema.xsd", False),
+        ("http://example.com/schema.xsd", True),
+        ("https://gams.uni-graz.at/schema.xsd", True),
+        ("http://unallowed.example.org/schema.xsd", False)
+    ]
+)
+def test_is_safe_uri_validates_safe_host(schema_uri, expected, monkeypatch, lazy_shared_datadir):
+    """Before using the schema, we should check if the URI is safe to be loaded from the internet
+
+    Only hosts configured as as safe (safe_xml_hosts) should be allowed. 
+    All other URIs (including file:// URIs and local paths) should not be allowed.
+    """
+    # pylint: disable=protected-access
+
+    configfile = lazy_shared_datadir / "cfg" / "project.toml"
+    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(configfile))
+                        
+    assert SchemaValidator._is_allowed_remote_schema_uri(schema_uri) is expected

@@ -44,7 +44,6 @@ class SchemaValidator(abc.ABC):
     always returns a ValidationSubResult.
     """
 
-    VALIDATOR_NAME: Final[str] = "Abstract XML Schema Validator"
 
     def __init__(self, schema_uri: str):
         self.schema_uri: str = schema_uri
@@ -55,6 +54,7 @@ class SchemaValidator(abc.ABC):
         # this is a special error message which is set if the creation of the validator fails.
         # this might happen if the schema file is not found, not well formed, or if there is an error in the schema itself.
         self._creation_error: Union[ValidationSubResult, None] = None
+
         try:
             self.schema_validator = self._make_validator(schema_uri)
         except ET.LxmlError as exp: 
@@ -62,7 +62,7 @@ class SchemaValidator(abc.ABC):
             self._creation_error = ValidationSubResult(
                 False,
                 schema_uri=schema_uri,
-                validator_name=self.VALIDATOR_NAME,
+                validator_name=self.validator_name,
                 message=f"Unable to create the validator for '{schema_uri}: {exp}.'",
                 errors=errors,
             )
@@ -70,7 +70,7 @@ class SchemaValidator(abc.ABC):
             self._creation_error = ValidationSubResult(
                 False,
                 schema_uri=schema_uri,
-                validator_name=self.VALIDATOR_NAME,
+                validator_name=self.validator_name,
                 message=f"Unable to create the validator for '{schema_uri}'",
                 errors=[f"{exp!s}"],
             )
@@ -93,6 +93,13 @@ class SchemaValidator(abc.ABC):
             ValidatioSubnResult: A ValidationSubResult object
         """
         raise NotImplementedError
+    
+    @property
+    def validator_name(self) -> str:
+        """The name of the validator.
+        """
+        readable_name = self.__class__.__name__.replace("Validator", " Validator")
+        return readable_name
 
     # # FIXME: I thinks this is no longer needed, as this is handled by the CombinedCatalogResolver
     # # It is still part of som SchemaValidtors, which should be bfixed, too
@@ -140,7 +147,6 @@ class SchemaValidator(abc.ABC):
 class XMLSchemaValidator(SchemaValidator):
     """A validator for XML Schema (XSD) schemas using lxml."""
 
-    VALIDATOR_NAME: Final[str] = "XML XSD Validator"
 
     # def __init__(self, schema_uri: str):
     #     super().__init__(schema_uri)
@@ -189,7 +195,7 @@ class XMLSchemaValidator(SchemaValidator):
 
         # do a normal validation
         result = ValidationSubResult(
-            False, XMLSchemaValidator.VALIDATOR_NAME, schema_uri=self.schema_uri
+            False, self.validator_name, schema_uri=self.schema_uri
         )
 
         try:
@@ -208,6 +214,11 @@ class XMLSchemaValidator(SchemaValidator):
             result.errors = [f"XSD Error: {e!s}"]
         return result
 
+    # @property
+    # def validator_name(self) -> str:
+    #     """The name of the validator.
+    #     """
+    #     return "XML XSD Validator"
 
 class SchematronValidator(SchemaValidator):
     """A validator for Schematron schemas.
@@ -221,19 +232,20 @@ class SchematronValidator(SchemaValidator):
     """
 
     # use saxon for these bindings
-    SAXON_BINDINGS: Final[list[str]] = ["xslt2", "xslt3", "xpath2", "xpath3"]
-
-    # validator names
-    LXML_VALIDATOR_NAME: Final[str] = "XML Schematron Validator (lxml)"
-    SAXON_VALIDATOR_NAME: Final[str] = "XML Schematron Validator (saxon)"
-
-    VALIDATOR_NAME: str = LXML_VALIDATOR_NAME
-
+    _SAXON_BINDINGS: Final[list[str]] = ["xslt2", "xslt3", "xpath2", "xpath3"]
 
     def __init__(self, schema_uri: str):
         self.binding = None#self._get_schematron_binding(schema_uri)
         super().__init__(schema_uri)    
 
+    @property
+    def validator_name(self) -> str:
+        """The name of the validator.
+        """
+        if self.binding in SchematronValidator._SAXON_BINDINGS:
+            return "XML Schematron Validator (saxon)"   
+        return "XML Schematron Validator (lxml)"
+    
 #     def __init__(self, schema_uri: str):
 
 #         super().__init__(schema_uri)
@@ -260,7 +272,7 @@ class SchematronValidator(SchemaValidator):
         by the SchemaVallidator subclass.
         """
         self.binding = self._get_schematron_binding(schema_uri)
-        if self.binding in SchematronValidator.SAXON_BINDINGS:
+        if self.binding in SchematronValidator._SAXON_BINDINGS:
             validator = self._make_saxon_validator(schema_uri)
         else:
             validator = self._make_lxml_validator(schema_uri)
@@ -278,7 +290,7 @@ class SchematronValidator(SchemaValidator):
         #result = ValidationSubResult(
         #    False, SchematronValidator.LXML_VALIDATOR_NAME, schema_uri=self.schema_uri
         #)
-        self.VALIDATOR_NAME = SchematronValidator.LXML_VALIDATOR_NAME
+        #self.VALIDATOR_NAME = SchematronValidator.LXML_VALIDATOR_NAME
         schematron_document = ET.parse(schema_uri, parser=self.parser)
         return lxml.isoschematron.Schematron(schematron_document, store_report=True)
     
@@ -326,7 +338,7 @@ class SchematronValidator(SchemaValidator):
         try:
             from saxonche import PySaxonProcessor  # pylint: disable=import-outside-toplevel  # noqa: PLC0415
 
-            self.VALIDATOR_NAME = SchematronValidator.SAXON_VALIDATOR_NAME
+            #self.VALIDATOR_NAME = SchematronValidator.SAXON_VALIDATOR_NAME
             # Keep the processor on self so the compiled executable remains usable.
             #self._saxon_proc = PySaxonProcessor(license=False)
             saxon_proc = PySaxonProcessor(license=False)
@@ -371,12 +383,12 @@ class SchematronValidator(SchemaValidator):
             #     "in its queryBinding. This only works if saxonche is installed.")
             #]
             #self._creation_error = result
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        #except Exception as e:  # pylint: disable=broad-exception-caught
             # unable to create the schema object, e.g. because the schema is not well formed or not found.
         #    result.message = f"Unable to create the Schematron validator instance for  schema {self.schema_uri}"
         #    result.errors = [f"Schema Error: {e!s}"]
         #    self._creation_error = result
-            raise e
+        #    raise e
 
     def validate(
         self, tree: Optional[ET.ElementTree] = None, file_path: Optional[Path] = None
@@ -419,7 +431,7 @@ class SchematronValidator(SchemaValidator):
         for all schemas, but does not require saxon.
         """
         result = ValidationSubResult(
-            False, SchematronValidator.LXML_VALIDATOR_NAME, schema_uri=self.schema_uri
+            False, self.validator_name, schema_uri=self.schema_uri
         )
 
         try:
@@ -449,7 +461,7 @@ class SchematronValidator(SchemaValidator):
         Use the Saxon validator, which supports xslt2/xslt3/xpath2/xpath3 and requires saxon.
         """
         result = ValidationSubResult(
-            False, SchematronValidator.SAXON_VALIDATOR_NAME, schema_uri=self.schema_uri
+            False, self.validator_name, schema_uri=self.schema_uri
         )
         xml_file = file_path.as_posix()
         svrl_report = self.schema_validator.transform_to_string(
@@ -550,6 +562,7 @@ class RelaxNGValidator(SchemaValidator):
         rng_document = ET.parse(schema_uri, parser=self.parser)
         return ET.RelaxNG(rng_document)
     
+
     def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
         """Validate an XML file against the RelaxNG schema.
 
@@ -586,8 +599,6 @@ class RelaxNGValidator(SchemaValidator):
 class RelaxNGCompactValidator(RelaxNGValidator):
     """A validator for RelaxNG Compact schemas."""
 
-    VALIDATOR_NAME = "XML RelaxNG Compact Validator (lxml)"
-
     def _make_validator(self, schema_uri: str):
         """A factory method to create the appropriate schema_validator for this class.
         
@@ -604,7 +615,7 @@ class RelaxNGCompactValidator(RelaxNGValidator):
 class DTDValidator(SchemaValidator):
     """A validator for DTD schemas using lxml."""
 
-    VALIDATOR_NAME = "XML DTD Validator (lxml)"
+    #VALIDATOR_NAME = "XML DTD Validator (lxml)"
 
     # def __init__(self, schema_uri: str):
     #     super().__init__(schema_uri)
@@ -660,7 +671,7 @@ class DTDValidator(SchemaValidator):
 
         # A minimal common SubResult
         result = ValidationSubResult(
-            False, DTDValidator.VALIDATOR_NAME, schema_uri=self.schema_uri
+            False, self.validator_name, schema_uri=self.schema_uri
         )
 
         # do a normal validation

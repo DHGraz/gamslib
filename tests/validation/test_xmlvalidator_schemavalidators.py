@@ -138,7 +138,7 @@ def test_dtd_validator_valid(dtd_validator, lazy_shared_datadir):
     assert (
         result.message == f"Document validates against DTD {dtd_validator.schema_uri}"
     )
-    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert result.validator_name == "DTD Validator"
     assert not result.has_warnings
 
 
@@ -148,7 +148,7 @@ def test_dtd_validator_invalid_document(dtd_validator, lazy_shared_datadir):
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = dtd_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert result.validator_name == "DTD Validator"
     assert result.message.startswith("Document does not validate against DTD")
     assert not result.has_warnings
     assert len(result.errors) == 2
@@ -172,7 +172,7 @@ def test_dtd_validator_with_invalid_schema(lazy_shared_datadir, invalid_dtd_uri)
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == DTDValidator.VALIDATOR_NAME
+    assert result.validator_name == "DTD Validator"
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -223,7 +223,7 @@ def test_rnc_validator_with_invalid_schema(lazy_shared_datadir, invalid_rnc_uri)
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == RelaxNGCompactValidator.VALIDATOR_NAME
+    assert result.validator_name == "RelaxNGCompact Validator"
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -273,7 +273,7 @@ def test_rng_validator_with_invalid_schema(lazy_shared_datadir, invalid_rng_uri)
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == RelaxNGValidator.VALIDATOR_NAME
+    assert result.validator_name == "RelaxNG Validator"
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -347,7 +347,7 @@ def test_schematron_validator_with_invalid_schema(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == SchematronValidator.LXML_VALIDATOR_NAME
+    assert result.validator_name == "XML Schematron Validator (lxml)"
     assert len(result.errors) >= 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -388,7 +388,7 @@ def test_schematron_saxon_validator_valid_document(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = saxon_schematron_validator.validate(tree)
     assert result.is_valid
-    assert result.validator_name == SchematronValidator.SAXON_VALIDATOR_NAME
+    assert result.validator_name == "XML Schematron Validator (saxon)"
     assert (
         result.message
         == f"Document validates against schema {saxon_schematron_validator.schema_uri}"
@@ -405,7 +405,7 @@ def test_schematron_saxon_validator_invalid_document(
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = saxon_schematron_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == SchematronValidator.SAXON_VALIDATOR_NAME
+    assert result.validator_name == "XML Schematron Validator (saxon)"
 
     assert result.message.startswith("Document does not validate against schema")
     assert not result.has_warnings
