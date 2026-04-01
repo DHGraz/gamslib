@@ -94,10 +94,6 @@ class CombinedCatalogResolver(ET.Resolver):
         if catalog_res is not None:
             return catalog_res
 
-        #uri = urlparse(url)
-        #host = (uri.hostname or "").lower()
-        #is_allowed = host in {entry.lower() for entry in self.allowed_hosts}
-
         # 2. host filter
         if not self._is_allowed_host(url):
             return None
@@ -151,75 +147,6 @@ class CombinedCatalogResolver(ET.Resolver):
             content = path.read_bytes()
         return content
         
-        # # There seems to be no way to access the resolved content directly via lxml.   
-        # if self._is_allowed_host(schema_url):
-        #     cache_path = self.get_cache_path(schema_url)
-        #     if cache_path is not None and Path(cache_path).is_file():
-        #         return Path(cache_path).read_bytes()
-        #     try:
-        #         response = requests.get(schema_url, timeout=10)
-        #         response.raise_for_status()
-        #         if cache_path is not None:
-        #             Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
-        #             Path(cache_path).write_bytes(response.content)
-        #         return response.content
-        #     except Exception as exp:
-        #         logger.warning("Something unexpected happened while loading schema %s: %s", schema_url, exp)
-        #         raise exp from exp
-        # else:
-        #     raise ValueError(f"Host of URL '{schema_url}' is not in the allowed list.")
-
-
-
-          #  ---
-        # try:
-        #     # normally, we should have a project configuration 
-        #     config = get_configuration(os.environ.get("GAMSCFG_PROJECT_TOML"))
-        #     safe_hosts = config.general.safe_xml_hosts
-        # except  MissingConfigurationException:
-        #     # if no configuration file was found we try to extract hosts from the from the environment
-        #     safe_hosts = re.split(r'\s*,\s*',os.environ.get("GAMSLIB_SAFE_XML_HOSTS", ""))
-
-        # uri = urlparse(schema_uri)
-        # return (
-        #     uri.scheme in ("http", "https")
-        #     and uri.hostname in safe_hosts
-        # )
-
-
-        
-    # def get_content(self, schema_url: str) -> bytes:
-    #     """Return content of URL by using the resolver. 
-        
-    #     This works like resolve(), but returns the raw content instead of 
-    #     a file path or file-like object.
-    #     """
-    #     # We cannot relay on libxml2 here, because we need access to the resolved content directly
-    #     # So we have to do the catalog lookup by hand
-    #     catalog_path = gams_xml_catalog.get_catalog_path()
-    #     catalog = ET.XMLCatalog(catalog_path.as_posix())
-    #     actual_path = catalog.resolve(schema_url)
-    #     # is uri in catalog?
-    #     if actual_path is not None:
-    #         with open(actual_path, 'rb') as f:
-    #             return f.read()
-    #     # is host allowed?
-    #     if not self._is_allowed_host(schema_url):
-    #         raise ValueError(f"Host of URL '{schema_url}' is not in the allowed list.")
-    #     # is content in cache?
-    #     cache_path = self.get_cache_path(schema_url)
-    #     if cache_path is not None and Path(cache_path).is_file():
-    #         with open(cache_path, 'rb') as f:
-    #             return f.read()
-    #     # try to download content
-    #     try:
-    #         response = requests.get(schema_url, timeout=10)
-    #         response.raise_for_status()
-    #         return response.content
-    #     except Exception as exp:
-    #         logger.warning("Something unexpected happened while loading schema %s: %s", schema_url, exp)
-    #         raise exp from exp    
-
 
     def _is_allowed_host(self, url: str) -> bool:
         """Check if the host of the given URL is in the allowed list."""
