@@ -10,7 +10,8 @@ import re
 import tempfile
 from typing import Final, Optional
 from urllib.parse import urlparse
-
+import gams_xml_catalog
+import rnc2rng
 import lxml.isoschematron
 from lxml import etree as ET
 
@@ -67,7 +68,7 @@ class SchemaValidator(abc.ABC):
 
     # # FIXME: I thinks this is no longer needed, as this is handled by the CombinedCatalogResolver
     # # It is still part of som SchemaValidtors, which should be bfixed, too
-    # # @classmethod
+    # @classmethod
     # def _is_allowed_remote_schema_uri(cls, schema_uri: str) -> bool:
     #     """Check if the schema_uri is located on a trusted host.
 
@@ -189,8 +190,30 @@ class SchematronValidator(SchemaValidator):
     SAXON_VALIDATOR_NAME: Final[str] = "XML Schematron Validator (saxon)"
 
     def __init__(self, schema_uri: str):
+
         super().__init__(schema_uri)
+        resolver = CombinedCatalogResolver(cache_dir=None)
+        parser = ET.XMLParser()
+        parser.resolvers.add(resolver)
+
+        self.schema_validator = self._make_validator(schema_uri, parser, resolver)
+#            tree = self._load_document_with_resolver(schema_uri, parser, resolver)
+        
+        #super().__init__(schema_uri)
         self.schema_validator = None
+        self.binding = self._get_schematron_binding(schema_uri)
+        if self.binding is not None:
+            if self.binding in SchematronValidator.SAXON_BINDINGS:
+                self._make_saxon_validator()
+            else:
+                self._make_lxml_validator()
+
+    def _make_validator(self, schema_uri: str, parser: ET.XMLParser, resolver: CombinedCatalogResolver):
+        """A factory method to create the appropriate schema_validator for this class.
+        
+        Important: This does not create an instance of SchemaValidator, but a schema validator instance used internally
+        by the SchemaVallidator subclass.
+        """
         self.binding = self._get_schematron_binding(schema_uri)
         if self.binding is not None:
             if self.binding in SchematronValidator.SAXON_BINDINGS:
@@ -381,6 +404,7 @@ class SchematronValidator(SchemaValidator):
             result.message = f"Document validates against schema {self.schema_uri}"
         return result
 
+# TODO: umstellen auf resolver
     def _get_schematron_binding(self, schema_location: str | Path) -> str:
         """Get the query binding of a Schematron schema.
 
@@ -455,8 +479,10 @@ class RelaxNGValidator(SchemaValidator):
         parser = ET.XMLParser()
         parser.resolvers.add(resolver)
         try:
-            tree = ET.parse(schema_uri, parser=parser)
-            self.schema_validator = ET.RelaxNG(tree)
+            #rnc_schema = ET.parse(schema_uri, parser=parser)
+            #tree = ET.parse(schema_uri, parser=parser)
+            #tree = self._load_document_with_resolver(schema_uri, parser, resolver)
+            self.schema_validator = self._make_validator(schema_uri, parser, resolver)
         except ET.LxmlError as e:
             errors = self.extract_lxml_errors_from_exception(e)
             self._creation_error = ValidationSubResult(
@@ -474,6 +500,11 @@ class RelaxNGValidator(SchemaValidator):
                 errors=[f"RelaxNGParseError: {exp!s}"],
             )
 
+
+    def _make_validator(self, schema_uri: str, parser: ET.XMLParser, resolver: CombinedCatalogResolver):
+        rng_document = ET.parse(schema_uri, parser=parser)
+        return ET.RelaxNG(rng_document)
+    
     def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
         """Validate an XML file against the RelaxNG schema.
 
@@ -511,11 +542,75 @@ class RelaxNGValidator(SchemaValidator):
 class RelaxNGCompactValidator(RelaxNGValidator):
     """A validator for RelaxNG compact schemas."""
 
-    # currently we use the lxml RelaxNG validator for compact schemas as well,
-    # because lxml can handle both RNG and RNC.
-    # But want to keept rnc in its own class, to be more flexible in the future
-
     VALIDATOR_NAME = "XML RelaxNG Compact Validator (lxml)"
+    # def __init__(self, schema_uri: str):
+    #     """Create the Validator for RelaxNG Compact schema.
+        
+    #     This is a bit more complicated, because lxml does not support RNC directly, when using a catalog.
+    #     So we have to convert it to RNG first using the rnc2rng library.
+    #     """
+    #     # we cannot call the __init__ method of RelaxNGValidator, because this would fail when loading
+    #     # the schema from catalog via resolver.
+    #     super().__init__(schema_uri)
+    #     self._creation_error = None
+    #     resolver = CombinedCatalogResolver()
+    #     parser = ET.XMLParser()
+    #     parser.resolvers.add(resolver)
+    #     try:
+    #         # rnc expects a string, ET.parse bytes
+    #         rnc = resolver.get_content(schema_uri).decode("utf-8")
+    #         #if isinstance(rnc, bytes):
+    #         #    rnc = rnc.decode("utf-8")
+    #         ast = rnc2rng.loads(rnc)
+    #         rng_xml = rnc2rng.dumps(ast).encode("utf-8") 
+    #         #if isinstance(rng_xml, str):
+    #         #    rng_xml = rng_xml.encode("utf-8")
+    #         rng_doc = ET.parse(io.BytesIO(rng_xml), parser=parser)
+    #         self.schema_validator = ET.RelaxNG(rng_doc)
+    #     except ET.LxmlError as e:
+    #         errors = self.extract_lxml_errors_from_exception(e)
+    #         self._creation_error = ValidationSubResult(
+    #             False,
+    #             schema_uri=schema_uri,
+    #             validator_name=self.VALIDATOR_NAME,
+    #             message=f"Unable to create the validator for '{schema_uri}: {e}.'",
+    #             errors=errors,
+    #         )
+    #     except Exception as exp:  # pylint: disable=broad-exception-caught
+    #         self._creation_error = ValidationSubResult(
+    #             False,
+    #             self.VALIDATOR_NAME,
+    #             message=f"Unable to create the validator for '{schema_uri}'",
+    #             errors=[f"RelaxNGParseError: {exp!s}"],
+    #         )
+
+
+    def _make_validator(self, schema_uri: str, parser: ET.XMLParser, resolver: CombinedCatalogResolver):
+        """A factory method to create the appropriate schema_validator for this class.
+        
+        Important: This does not create an instance of SchemaValidator, but a schema validator instance used internally
+        by the SchemaVallidator subclass.
+        """
+        rnc = resolver.get_content(schema_uri).decode("utf-8")
+        if isinstance(rnc, bytes):
+            rnc = rnc.decode("utf-8")
+        ast = rnc2rng.loads(rnc)
+        rng_xml = rnc2rng.dumps(ast).encode("utf-8") 
+        if isinstance(rng_xml, str):
+            rng_xml = rng_xml.encode("utf-8")
+        rng_document = ET.parse(io.BytesIO(rng_xml), parser=parser)
+        return ET.RelaxNG(rng_document)
+    # def _load_document_with_resolver(self, schema_uri: str, parser: ET.XMLParser, resolver: CombinedCatalogResolver) -> ET.ElementTree:
+    #     """Convert the into an ElementTree."""
+    #     # rnc expects a string, ET.parse bytes
+    #     rnc = resolver.get_content(schema_uri).decode("utf-8")
+    #     if isinstance(rnc, bytes):
+    #         rnc = rnc.decode("utf-8")
+    #     ast = rnc2rng.loads(rnc)
+    #     rng_xml = rnc2rng.dumps(ast).encode("utf-8") 
+    #     if isinstance(rng_xml, str):
+    #         rng_xml = rng_xml.encode("utf-8")
+    #     return ET.parse(io.BytesIO(rng_xml), parser=parser)
 
 class DTDValidator(SchemaValidator):
     """A validator for DTD schemas using lxml."""
