@@ -90,9 +90,19 @@ class CombinedCatalogResolver(ET.Resolver):
         """
 
         # 1. try to load via XML CATALOG
-        catalog_res = self.resolve_filename(url, context)
-        if catalog_res is not None:
-            return catalog_res
+        # resolve_filename(url, ...) is not a reliable existence check and may return
+        # a resolver object even when URL is unresolved. Therefore we first ask the
+        # catalog explicitly for a mapped local path.
+        catalog_path = self._resolve_catalog_path(url)
+        if catalog_path is not None:
+            # Keep base_url=url so downstream relative imports remain URL-based
+            # and avoid duplicate imports caused by mixed URL/file identities.
+            return self.resolve_string(catalog_path.read_bytes(), context, base_url=url)
+
+        # Resolve local file paths/URIs directly.
+        local_path = re.sub(r"^file://", "", url)
+        if os.path.isfile(local_path):
+            return self.resolve_filename(local_path, context)
 
         # 2. host filter
         if not self._is_allowed_host(url):
@@ -101,7 +111,7 @@ class CombinedCatalogResolver(ET.Resolver):
         # 3. local cache
         cache_path = self.get_cache_path(url)
         if cache_path is not None and Path(cache_path).is_file():
-            return self.resolve_filename(cache_path, context)
+            return self.resolve_string(Path(cache_path).read_bytes(), context, base_url=url)
 
         # 4. download
         try:
@@ -110,8 +120,8 @@ class CombinedCatalogResolver(ET.Resolver):
             if cache_path is not None:
                 Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
                 Path(cache_path).write_bytes(response.content)
-                return self.resolve_filename(cache_path, context)
-            return self.resolve_string(response.content, context)
+                return self.resolve_string(response.content, context, base_url=url)
+            return self.resolve_string(response.content, context, base_url=url)
 
         except Exception as exp:
             logger.warning("Something unexpected happened while loading schema %s: %s", url, exp)
@@ -153,6 +163,23 @@ class CombinedCatalogResolver(ET.Resolver):
         uri = urlparse(url)
         host = (uri.hostname or "").lower()
         return host in {entry.lower() for entry in self.allowed_hosts}
+
+    def _resolve_catalog_path(self, url: str) -> Path | None:
+        """Resolve URL via gams_xml_catalog and return an existing local file path."""
+        path = gams_xml_catalog.resolve_uri_to_path(url)
+        if path is None:
+            return None
+
+        if path.is_file():
+            return path
+
+        # Some catalog entries point to .../3.x.y/<name>.xsd while files live in
+        # .../3.x.y/base/<name>.xsd. Try this fallback before giving up.
+        candidate = path.parent / "base" / path.name
+        if candidate.is_file():
+            return candidate
+
+        return None
 
     def _set_allowed_hosts(self, allowed_hosts: Optional[list[str]] = None) -> None:
         """Set the list of allowed hosts from the project configuration or environment variable.

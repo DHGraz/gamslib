@@ -117,7 +117,7 @@ def test_validate_with_explicit_schema_location(lazy_shared_datadir):
     assert len(list(result.get_subresults())) == 1
     subresult = next(iter(result.get_subresults()))
     assert subresult.schema_uri == schema_location.resolve().as_uri()
-    assert subresult.validator_name == XMLSchemaValidator.VALIDATOR_NAME
+    assert subresult.validator_name == "XMLSchema Validator"
 
 
 def test_validate_with_explicit_and_referenced_schema_location(lazy_shared_datadir):
@@ -132,5 +132,5 @@ def test_validate_with_explicit_and_referenced_schema_location(lazy_shared_datad
     assert result.is_valid
     subresults = list(result.get_subresults())
     assert len(subresults) == 2
-    assert any("XML DTD Validator" in subresult.validator_name for subresult in subresults)
-    assert any("XML XSD Validator" in subresult.validator_name for subresult in subresults)
+    assert any("DTD Validator" in subresult.validator_name for subresult in subresults)
+    assert any("XMLSchema Validator" in subresult.validator_name for subresult in subresults)

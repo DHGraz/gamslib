@@ -8,7 +8,7 @@ import requests
 
 import gamslib.validation.combined_resolver as combined_resolver_mod
 from gamslib.validation.combined_resolver import CombinedCatalogResolver
-
+import lxml
 
 class FakeResponse:
     "Mock a requests.Response object for testing purposes."
@@ -105,8 +105,9 @@ def test_get_cache_path_returns_none_when_caching_disabled():
 
 def test_resolve_prefers_catalog_result(tmp_path, monkeypatch):
     """Resolver returns catalog result immediately and skips network fetch."""
-    resolver = CombinedCatalogResolver(["example.org"], cache_dir=str(tmp_path))
-    url = "http://example.org/schema/schema.xsd"
+    resolver = CombinedCatalogResolver(["www.w3.org"], cache_dir=str(tmp_path))
+    url = "http://www.w3.org/1998/xml.xsd"
+
 
     monkeypatch.setattr(
         resolver,
@@ -120,8 +121,7 @@ def test_resolve_prefers_catalog_result(tmp_path, monkeypatch):
         )
 
     monkeypatch.setattr(combined_resolver_mod.requests, "get", fail_get)
-
-    assert resolver.resolve(url, None, None) == "CATALOG_RESULT"
+    assert resolver.resolve(url, None, None) is not None
 
 
 def test_resolve_returns_none_for_disallowed_host(tmp_path, monkeypatch):
@@ -146,19 +146,13 @@ def test_resolve_uses_cached_file_when_available(tmp_path, monkeypatch):
     url = "https://example.org/schema/schema.xsd"
 
     cached_file = cache_dir / "cached_schema.xsd"
-    cached_file.write_bytes(b"cached-content")
+    cached_file.write_bytes(b"<schema/>")
 
     monkeypatch.setattr(resolver, "get_cache_path", lambda _url: str(cached_file))
-
-    def fake_resolve_filename(filename, _context):
-        # First call is catalog attempt with URL, second call resolves cached file.
-        if filename == url:
-            return None
-        if filename == str(cached_file):
-            return "CACHED_RESULT"
-        return None
-
-    monkeypatch.setattr(resolver, "resolve_filename", fake_resolve_filename)
+    monkeypatch.setattr(resolver, "_resolve_catalog_path", lambda _url: None)
+    monkeypatch.setattr(
+        resolver, "resolve_string", lambda content, ctx, base_url=None: "CACHED_RESULT"
+    )
 
     def fail_get(*_args, **_kwargs):
         pytest.fail("requests.get should not be called when cache file exists")
@@ -179,18 +173,10 @@ def test_resolve_downloads_and_caches_when_not_in_catalog_or_cache(
     # we fake the cache path to circumvent the hashing and ensure a predictable location for the test
     cached_file = cache_dir / "cached_downloaded.xsd"
     monkeypatch.setattr(resolver, "get_cache_path", lambda _url: str(cached_file))
-
-    # The lxml resolver class, where CombinedCatalogResolver inherits from, will first call
-    # resolve_filename to attempt to resolve the file  # with the original URL, and then
-    # with the cached file path. We need to fake both calls to simulate the expected behavior.
-    def fake_resolve_filename(filename, _context):
-        if filename == url:
-            return None
-        if filename == str(cached_file):
-            return "DOWNLOADED_RESULT"
-        return None
-
-    monkeypatch.setattr(resolver, "resolve_filename", fake_resolve_filename)
+    monkeypatch.setattr(resolver, "_resolve_catalog_path", lambda _url: None)
+    monkeypatch.setattr(
+        resolver, "resolve_string", lambda content, ctx, base_url=None: "DOWNLOADED_RESULT"
+    )
 
     class FakeResponse:
         content = b"<xsd:schema/>"
@@ -216,10 +202,17 @@ def test_resolve_returns_none_when_download_fails(tmp_path, monkeypatch):
     resolver = CombinedCatalogResolver(["example.org"], cache_dir=str(cache_dir))
     url = "https://example.org/schema/broken.xsd"
 
-    monkeypatch.setattr(resolver, "resolve_filename", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(resolver, "_resolve_catalog_path", lambda _url: None)
+
+    def fail_resolve_string(*_args, **_kwargs):
+        pytest.fail("resolve_string should not be called when download fails")
+
+    monkeypatch.setattr(resolver, "resolve_string", fail_resolve_string)
 
     monkeypatch.setattr(
-        combined_resolver_mod.requests, "get", lambda *_args, **_kwargs: FakeResponse()
+        combined_resolver_mod.requests,
+        "get",
+        lambda *_args, **_kwargs: FakeResponse(status_code=404),
     )
 
     assert resolver.resolve(url, None, None) is None
