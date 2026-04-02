@@ -83,5 +83,5 @@ packages = ["src/gamslib"]
 select = ["PL", "RUF", "SIM"]
 
 [tool.uv.sources]
-gams-xml-catalog = { path = "../gams-xml-catalog/dist/gams_xml_catalog-0.3.0-py3-none-any.whl" }
+gams-xml-catalog = { path = "../gams-xml-catalog/dist/gams_xml_catalog-0.6.1-py3-none-any.whl" }
 

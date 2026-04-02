@@ -3,8 +3,8 @@
 The main function is detect_schemata, which tries to find all schema references in an XML file.
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 from lxml import etree as ET
 
@@ -12,7 +12,6 @@ from gamslib.formatdetect.formatinfo import FormatInfo, SubType
 
 # from gamslib.validation.xml.schemainfo import SchemaInfo#, XMLSchemaType
 from gamslib.validation.schemainfo import SchemaInfo, SchemaType  # , XMLSchemaType
-
 
 # pylint: disable=c-extension-no-member
 
@@ -143,19 +142,3 @@ def detect_schemata(
     ):
         schemata.append(SchemaInfo(DEFAULT_SCHEMAS_FOR_SUBTYPES[formatinfo.subtype]))
     return schemata
-    #     # if no schema was found in the tree, for some types we set a default schema
-    #     if formatinfo.subtype == SubType.TEIP4:
-    #         schemata.append(
-    #             SchemaInfo("http://tei-c.org/Vault/P4/xml/schema/dtd/tei2.dtd")
-    #         )
-    #     elif formatinfo.subtype == SubType.TEIP5:
-    #         schemata.append(
-    #             SchemaInfo(
-    #                 "http://www.tei-c.org/release/xml/tei/custom/schema/xsd/tei_all.xsd",
-    #             )
-    #         )
-    #     elif formatinfo.subtype == SubType.LIDO:
-    #         schemata.append(
-    #             SchemaInfo("http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd")
-    #         )
-    # return schemata

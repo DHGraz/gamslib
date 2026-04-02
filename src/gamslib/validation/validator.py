@@ -1,3 +1,22 @@
+"""
+Basic class for validators.
+
+Defines an abstract Validator class and a Validator Factory class.
+
+To register a new validator, create a subclass of Validator and decorate it
+with `@ValidatorFactory.register(mime_type)`, where `mime_type` is the MIME
+type that the validator should be associated with. For example:
+
+```python
+@ValidatorFactory.register("application/pdf")
+class PDFValidator(Validator):
+    def validate(self, 
+                 file_path: Path, 
+                 schemata: Optional[list[list[SchemaInfo]]] = None
+        ) -> ValidationResult:
+        # Implementation of PDF validation logic
+```
+"""
 
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -51,7 +70,7 @@ class ValidatorFactory:
             raise ValueError("FormatInfo must not be None.")
         validator_cls = cls._registry.get(format_info.mimetype.lower())
         if not validator_cls:
-            # Use the AlwaysValidValidator, as no specific validator is registered for this type. 
+            # Use the AlwaysValidValidator, as no specific validator is registered for this type.
             # This will return a valid result, but with a warning.
             validator_cls = cls._registry.get("*")
         return validator_cls()

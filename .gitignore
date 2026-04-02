@@ -20,3 +20,4 @@ uv.lock
 *.swp
 tmp/
 bar.py
+.schema_cache/

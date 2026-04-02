@@ -1,9 +1,16 @@
-    
-from dataclasses import dataclass, field
+"""Provides the SchemaInfo class.
+
+This class is a dataclass, which encapsulates information about a detected schema,
+including its URI, mimetype, schematypens, charset, and type. The class also includes
+methods for detecting the schema type based on the provided information.
+"""
+
 import enum
-from pathlib import Path
 import re
+from dataclasses import dataclass
+from pathlib import Path
 from typing import ClassVar
+
 
 # map extensions to schema types
 class SchemaType(enum.StrEnum):
@@ -19,13 +26,15 @@ class SchemaType(enum.StrEnum):
 
     UNKNOWN = "Unknown Schema Type"
 
+
 @dataclass
 class SchemaInfo:
     """Keeps data about a detected schema.
 
     The only required member is schema_uri
     """
-    schema_uri: str # uri
+
+    schema_uri: str  # uri
     mimetype: str = ""
     schematypens: str = ""
     charset: str = "utf-8"
@@ -36,7 +45,7 @@ class SchemaInfo:
         ".rng": SchemaType.RNG,
         ".rnc": SchemaType.RNC,
         ".sch": SchemaType.SCH,
-        ".dtd": SchemaType.DTD
+        ".dtd": SchemaType.DTD,
     }
 
     def __post_init__(self):
@@ -55,7 +64,7 @@ class SchemaInfo:
         detection_sequence = [
             self._detect_by_schematypens,
             self._detect_by_mimetype,
-            self._detect_by_extension
+            self._detect_by_extension,
         ]
         for method in detection_sequence:
             self.schema_type = method()
@@ -65,10 +74,10 @@ class SchemaInfo:
             raise ValueError(
                 f"Unknown schema type or schema type not supported: {self.schema_uri}"
             )
-    
+
     def _detect_by_schematypens(self) -> None:
         """Set self.schema_type based on the schematypens attribute."""
-        schematype=None
+        schematype = None
         if self.schematypens == "http://relaxng.org/ns/structure/1.0":
             schematype = SchemaType.RNG
         elif self.schematypens == "http://www.w3.org/2001/XMLSchema":
@@ -76,7 +85,7 @@ class SchemaInfo:
         elif self.schematypens == "http://purl.oclc.org/dsdl/schematron":
             schematype = SchemaType.SCH
         return schematype
-    
+
     def _detect_by_mimetype(self) -> bool:
         """Detect the schema type by the mimetype.
 
@@ -88,11 +97,10 @@ class SchemaInfo:
         elif self.mimetype == "application/relax-ng-compact-syntax":
             schema_type = SchemaType.RNC
         return schema_type
-    
 
     def _detect_by_extension(self) -> bool:
         """Detect the schema type by the file extension.
-        
+
         This is some sort of last ressortî
         """
         extension = "." + self.schema_uri.split(".")[-1]

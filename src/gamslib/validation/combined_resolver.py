@@ -21,26 +21,30 @@ characters.
 import hashlib
 import logging
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
 
-logger = logging.getLogger(__name__)
-
-from lxml import etree as ET
-import requests
-
 import gams_xml_catalog
+import requests
+from lxml import etree as ET
 
 from gamslib.projectconfiguration import (
     MissingConfigurationException,
     get_configuration,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class CombinedCatalogResolver(ET.Resolver):
-    """Custom resolver that combines XML CATALOG resolution with host filtering and local caching."""
+    """Custom XML resource resolver.
+     
+    This resolver extends the `lxml.etree.Resolver` class and provides custom resolution logic 
+    for external XML resources that combines XML CATALOG resolution with host filtering 
+    and local caching.
+    """
 
     def __init__(
         self,
@@ -52,7 +56,8 @@ class CombinedCatalogResolver(ET.Resolver):
 
         Args:
             allowed_hosts (Optional[list[str]], optional): _description_. Defaults to None.
-            cache_dir (str | None, optional): _description_. Defaults to ".schema_cache". Set to None to disable caching.
+            cache_dir (str | None, optional): _description_. 
+                    Defaults to ".schema_cache". Set to None to disable caching.
         """
         gams_xml_catalog.activate_catalog()
         self._set_allowed_hosts(allowed_hosts)
@@ -111,7 +116,9 @@ class CombinedCatalogResolver(ET.Resolver):
         # 3. local cache
         cache_path = self.get_cache_path(url)
         if cache_path is not None and Path(cache_path).is_file():
-            return self.resolve_string(Path(cache_path).read_bytes(), context, base_url=url)
+            return self.resolve_string(
+                Path(cache_path).read_bytes(), context, base_url=url
+            )
 
         # 4. download
         try:
@@ -124,17 +131,19 @@ class CombinedCatalogResolver(ET.Resolver):
             return self.resolve_string(response.content, context, base_url=url)
 
         except Exception as exp:
-            logger.warning("Something unexpected happened while loading schema %s: %s", url, exp)
+            logger.warning(
+                "Something unexpected happened while loading schema %s: %s", url, exp
+            )
             return None
 
     def get_content(self, schema_uri: str) -> bytes:
         """Return content of URL.
-        
-        Works like resolve(), but returns the raw content instead of 
+
+        Works like resolve(), but returns the raw content instead of
         a file path or file-like object.
 
-        This is a hack for non XML based schema formats (eg. RNC), where we cannot use the 
-        resolver.resolve mechanism directly, but still want to benefit from the catalog and caching. 
+        This is a hack for non XML based schema formats (eg. RNC), where we cannot use the
+        resolver.resolve mechanism directly, but still want to benefit from the catalog and caching.
         """
         cache_path = Path(self.get_cache_path(schema_uri))
         if cache_path is not None and cache_path.is_file():
@@ -143,20 +152,21 @@ class CombinedCatalogResolver(ET.Resolver):
         schema_uri = re.sub(r"^file://", "", schema_uri)
         if os.path.isfile(schema_uri):
             content = Path(schema_uri).read_bytes()
-        elif self._is_allowed_host(schema_uri): # or self._is_allowed_remote_schema_uri(schema_uri):
+        elif self._is_allowed_host(
+            schema_uri
+        ):  # or self._is_allowed_remote_schema_uri(schema_uri):
             resp = requests.get(schema_uri, timeout=10)
             resp.raise_for_status()
             content = resp.content
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             cache_path.write_bytes(content)
         else:
-            # use the custom CatalogResolver to get the content of the rnc schema 
+            # use the custom CatalogResolver to get the content of the rnc schema
             path = gams_xml_catalog.resolve_uri_to_path(schema_uri)
             if path is None:
                 raise FileNotFoundError(f"Cannot load schema '{schema_uri}'.")
             content = path.read_bytes()
         return content
-        
 
     def _is_allowed_host(self, url: str) -> bool:
         """Check if the host of the given URL is in the allowed list."""
