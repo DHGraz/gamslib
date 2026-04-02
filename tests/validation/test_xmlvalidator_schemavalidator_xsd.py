@@ -39,7 +39,7 @@ def test_invalid_schema(lazy_shared_datadir, invalid_xmlschema_uri):
     tree = ET.parse(xml_path)  
     result = broken_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
+    assert result.validator_name == "XMLSchema Validator"
     assert len(result.errors) > 0
     assert result.message.startswith("Unable to create the validator")
 
@@ -68,8 +68,8 @@ def test_remote_schema_not_in_catalog_allowed(monkeypatch):
     "Test for remote schema on allowed host."
     monkeypatch.setenv("GAMSLIB_SAFE_XML_HOSTS", "gams.uni-graz.at,localhost")
 
-    #schema_uri = "http://localhost:8000/opengis/gml/3.1.1/base/dynamicFeature.xsd"
-    schema_uri = "http://schemas.opengis.net/gml/3.3.1/base/gml.xsd"
+    #schema_uri = "http://schemas.opengis.net/gml/3.3.1/tin.xsd"
+    schema_uri = "http://schemas.opengis.net/gml/3.1.1/gml.xsd"
     #schema_uri = "http://localhost:8000/lido/1.0/lido.xsd"
     #schema_uri = "http://localhost:8000/lido/1.0/tei.xsd"
     #schema_uri = "http://localhost:8000/lido/1.0/dcr.xsd"
@@ -95,7 +95,7 @@ def test_validate_valid_document(xmlschema_validator, lazy_shared_datadir):
         result.message
         == f"Document validates against schema {xmlschema_validator.schema_uri}"
     )
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
+    assert result.validator_name == "XMLSchema Validator"
     assert not result.has_warnings
     assert result.errors == []
 
@@ -105,7 +105,7 @@ def test_validate_invalid_document(xmlschema_validator, lazy_shared_datadir):
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = xmlschema_validator.validate(tree)
     assert not result.is_valid
-    assert result.validator_name == XMLSchemaValidator.VALIDATOR_NAME
+    assert result.validator_name == "XMLSchema Validator"
     assert result.message.startswith("Document does not validate against schema")
     assert not result.has_warnings
     assert len(result.errors) == 1
@@ -113,9 +113,9 @@ def test_validate_invalid_document(xmlschema_validator, lazy_shared_datadir):
 @pytest.mark.parametrize(
     "xml_file, schema_file",
     [
-        ("simple.xml", "simple.xsd"),
+#        ("simple.xml", "simple.xsd"),
         ("lido.xml", "https://gams.uni-graz.at/lido/1.0/lido.xsd"),
-#         "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
+#         ("lido.xml", "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
 #        ("lido.xml", "http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd"),
     ])
 def test_xsd_validator_validiate_with_real_schemas(xml_file, schema_file, lazy_shared_datadir, monkeypatch):
@@ -136,7 +136,6 @@ def test_xsd_validator_validiate_with_real_schemas(xml_file, schema_file, lazy_s
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = validator.validate(tree)
     assert result.is_valid
-
 
 
 

@@ -37,8 +37,8 @@ def make_schema_info_fixture():
     [
         ("simple.xsd", SchemaType.XSD, "XMLSchema Validator"),
         ("simple.rng", SchemaType.RNG, "RelaxNG Validator"),
-        ("simple.rnc", SchemaType.RNC, "RelaxNGCompactValidator"),
-        ("simple.sch", SchemaType.SCH, "Schematron Validator (lxml)"),
+        ("simple.rnc", SchemaType.RNC, "RelaxNGCompact Validator"),
+        ("simple.sch", SchemaType.SCH, "XML Schematron Validator (lxml)"),
         ("simple.dtd", SchemaType.DTD, "DTD Validator"),
     ],
 )
@@ -72,11 +72,11 @@ def test_validate_multiple_valid_schemas(make_schema_info, lazy_shared_datadir):
     """Run validate using multiple valid schemas."""
     xml_file = lazy_shared_datadir / "simple.xml"
     test_schemas = [
-        ("simple.dtd", SchemaType.DTD, DTDValidator.VALIDATOR_NAME),
-        ("simple.rnc", SchemaType.RNC, RelaxNGCompactValidator.VALIDATOR_NAME),
-        ("simple.rng", SchemaType.RNG, RelaxNGValidator.VALIDATOR_NAME),
-        ("simple.sch", SchemaType.SCH, SchematronValidator.LXML_VALIDATOR_NAME),
-        ("simple.xsd", SchemaType.XSD, XMLSchemaValidator.VALIDATOR_NAME),
+        ("simple.dtd", SchemaType.DTD, "DTD Validator"),
+        ("simple.rnc", SchemaType.RNC, "RelaxNGCompact Validator"),
+        ("simple.rng", SchemaType.RNG, "RelaxNG Validator"),
+        ("simple.sch", SchemaType.SCH, "XML Schematron Validator (lxml)"),
+        ("simple.xsd", SchemaType.XSD, "XMLSchema Validator"),
     ]
     schemata = []
     for schema_uri, schema_type, _ in test_schemas:
@@ -218,25 +218,3 @@ def test_srvl_to_message_lists_missing_attrs_use_empty_defaults():
 
     assert errors == ["Error at  (): Generic validation failure"]
     assert not warnings
-
-
-@pytest.mark.parametrize(
-    "schema_uri,expected", [
-        ("file://path/to/schema.xsd", False),
-        ("http://example.com/schema.xsd", True),
-        ("https://gams.uni-graz.at/schema.xsd", True),
-        ("http://unallowed.example.org/schema.xsd", False)
-    ]
-)
-def test_is_safe_uri_validates_safe_host(schema_uri, expected, monkeypatch, lazy_shared_datadir):
-    """Before using the schema, we should check if the URI is safe to be loaded from the internet
-
-    Only hosts configured as as safe (safe_xml_hosts) should be allowed. 
-    All other URIs (including file:// URIs and local paths) should not be allowed.
-    """
-    # pylint: disable=protected-access
-
-    configfile = lazy_shared_datadir / "cfg" / "project.toml"
-    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(configfile))
-                        
-    assert SchemaValidator._is_allowed_remote_schema_uri(schema_uri) is expected

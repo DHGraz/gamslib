@@ -556,8 +556,6 @@ class SchematronValidator(SchemaValidator):
 class RelaxNGValidator(SchemaValidator):
     """A validator for RelaxNG schemas using lxml."""
 
-    VALIDATOR_NAME = "XML RelaxNG Validator (lxml)"
-
     def _make_validator(self, schema_uri: str):
         rng_document = ET.parse(schema_uri, parser=self.parser)
         return ET.RelaxNG(rng_document)
@@ -576,7 +574,7 @@ class RelaxNGValidator(SchemaValidator):
             return self._creation_error
 
         result = ValidationSubResult(
-            False, self.VALIDATOR_NAME, schema_uri=self.schema_uri
+            False, self.validator_name, schema_uri=self.schema_uri
         )
 
         try:
@@ -615,7 +613,6 @@ class RelaxNGCompactValidator(RelaxNGValidator):
 class DTDValidator(SchemaValidator):
     """A validator for DTD schemas using lxml."""
 
-    #VALIDATOR_NAME = "XML DTD Validator (lxml)"
 
     # def __init__(self, schema_uri: str):
     #     super().__init__(schema_uri)
