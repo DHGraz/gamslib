@@ -160,10 +160,7 @@ def is_bag(bag_path: Path) -> bool:
     It does not check the validity of the Bag, only if the structure indicates
     that it looks like a Bag.
 
-    To check the validity of the Bag, unpack it using the unpack function
-    and use the validate_object_dir function.
-
-    pag_path can be either a directory or a file (zip).
+    bag_path can be either a directory or a file (zip).
 
     Args:
         bag_path (Path): The path to the directory to check.
