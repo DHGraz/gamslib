@@ -29,7 +29,7 @@ from gamslib.projectconfiguration.configuration import Configuration
 @fixture(name="test_config")
 def config_fixture(datadir):
     "Return a conguration object."
-    return Configuration.from_toml(datadir / "project.toml")
+    return Configuration.from_toml(datadir / "gamsproject.toml")
 
 
 @fixture(name="test_dc")
