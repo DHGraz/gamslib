@@ -127,7 +127,7 @@ class Configuration(BaseModel):
         reason = reasons.get(error_type)
         if reason is None:
             return None
-        return f"Error in project TOML file '{cfgfile}'. {reason}: '{loc_str}'"
+        return f"Error in gamsproject TOML file '{cfgfile}'. {reason}: '{loc_str}'"
 
     @classmethod
     def from_toml(cls, toml_file: Path) -> "Configuration":
@@ -161,7 +161,7 @@ class Configuration(BaseModel):
             ) from exc
         except tomllib.TOMLDecodeError as exc:
             raise tomllib.TOMLDecodeError(
-                f"Error in project TOML file '{toml_file}': {exc}"
+                f"Error in gamsproject TOML file '{toml_file}': {exc}"
             ) from exc
         except ValidationError as exc:
             msg = cls._make_readable_message(
@@ -186,7 +186,7 @@ class Configuration(BaseModel):
         """Update the configuration object from environment variables."""
         for key, value in os.environ.items():
             if key.startswith("GAMSCFG_") and key != "GAMSCFG_PROJECT_TOML":
-                new_key = key[8:].lower()
+                new_key = key[len("GAMSCFG_"):].lower()
                 if "_" in new_key:
                     table, field = new_key.split("_", 1)
                     logger.debug(

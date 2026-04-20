@@ -45,16 +45,14 @@ Copyright &copy; 2026 The authors
 #   { "Markdown in 5min" = "markdown.md" },
 # ]
 
-#nav = [
+nav = [
 {"Home" = "index.md"},
-{
-  "Reference" = [
-        "reference/api/projectconfiguration/projectconfiguration.md",
-        "api/projectconfiguration/configuration.md",
-        "api/projectconfiguration/utils.md"
-      ]
-  }
-#]
+{"Reference" = [
+        "reference/index.md",
+        {"projectconfiguration" = "reference/projectconfiguration/index.md"},
+      ]}
+]
+
 
 
 # With the "extra_css" option you can add your own CSS styling to customize
