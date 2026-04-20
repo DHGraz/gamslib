@@ -2,15 +2,14 @@
 
 import copy
 import re
-
+import shutil
 
 import pygfried
 import pytest
+from conftest import get_testfiles
 
 from gamslib.formatdetect.formatinfo import SubType
 from gamslib.formatdetect.siegfrieddetector import SiegfriedDetector
-
-from conftest import get_testfiles
 
 
 @pytest.fixture(name="detector")
