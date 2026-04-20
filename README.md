@@ -41,6 +41,43 @@ The objectcsv package provides tools to handle this metadata.
     hassles of importing and exporting the csv files, which led to encoding
     problems in the past.
 
+### Migration notes (since 0.7.13)
+
+`DSData` now enforces required-field validation on every assignment.
+
+What changed:
+
+  * Setting invalid values for required fields (`dspath`, `dsid`, `mimetype`,
+    `rights`) raises `ValueError` immediately.
+  * Failed assignments are atomic: the previous value is kept unchanged.
+  * `dspath` safety checks are applied immediately (`..` traversal, absolute
+    paths, and `~`-prefixed paths are rejected).
+
+How to migrate existing code:
+
+  * Do not rely on temporary invalid intermediate states anymore.
+  * When updating multiple values, apply only values that are valid at each
+    step.
+  * If older code set invalid values first and called `validate()` later,
+    move that validation logic to the assignment point and handle `ValueError`
+    there.
+
+  Example:
+
+  ```python
+  # before (no longer valid): temporary invalid state
+  ds = DSData(dspath="TEI.xml", dsid="TEI.xml", mimetype="application/xml", rights="GPLv3")
+  ds.dsid = ""
+  ds.validate()  # used to fail later
+
+  # after: fail at assignment time
+  ds = DSData(dspath="TEI.xml", dsid="TEI.xml", mimetype="application/xml", rights="GPLv3")
+  try:
+    ds.dsid = ""
+  except ValueError:
+    pass  # ds.dsid is still "TEI.xml"
+  ```
+
 ## projectconfiguration
 
 This package contains a central class `Configuration` that represents the
@@ -62,7 +99,7 @@ function.
 ## Contributing
 
 The Github repository is ment to be a read only mirror of the work repository
-hosted on our institutional private Github server. You can use the bug tracker
+hosted on our institutional private GitLab server. You can use the bug tracker
 on Github, but everything else should happen in the Zimlab Github repo.
 
 

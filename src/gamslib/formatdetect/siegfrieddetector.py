@@ -116,7 +116,13 @@ class SiegfriedDetector(FormatDetector):
         if pronom_id in ("UNKNOWN", "x-fmt/111"):
             if "fmt/101" in pronom_warning:  # we have an xml file without doctype
                 mime_type, subtype = xmltypes.get_format_info(filepath, mime_type)
-                return mime_type, subtype, "fmt/101"
+                # if we detected a xml type, we should check, if the pronom_id can be fixed to a more specific one, based on the subtype
+                puid = "fmt/101"
+                if subtype is not None:
+                    detected_puid = xmltypes.subformats.get_puid_for_format_type(subtype)
+                    if detected_puid is not None:
+                        puid = detected_puid    
+                return mime_type, subtype, puid
             if "fmt/817" in pronom_warning:  # we have an unrecognized json file
                 mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
         return mime_type, subtype, pronom_id
@@ -171,9 +177,9 @@ class SiegfriedDetector(FormatDetector):
                 pronom_id = "fmt/101"
         if mime_type in {None, "", "application/undefined"}:
             mime_type = DEFAULT_TYPE
-            warnings.warn(
-                f"Could not determine mimetype for {filepath}. Using default type."
-            )
+            # warnings.warn(
+            #     f"Could not determine mimetype for {filepath}. Using default type."
+            # )
         elif xmltypes.is_xml_type(mime_type):
             mime_type, subtype = xmltypes.get_format_info(filepath, mime_type)
         elif jsontypes.is_json_type(mime_type):

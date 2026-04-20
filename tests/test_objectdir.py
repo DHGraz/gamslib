@@ -60,7 +60,7 @@ def create_test_object_dir(
         ds_dict = {}
         for field in gamslib.objectcsv.dsdata.DSData.fieldnames():
             if field == "dspath":
-                ds_dict[field] = f"{object_id}/{ds_file_name}"
+                ds_dict[field] = ds_file_name
             elif field == "dsid":
                 ds_dict[field] = ds_file_name
             elif field == "mimetype":

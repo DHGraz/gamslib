@@ -2,7 +2,7 @@
 
 import copy
 import re
-import shutil
+
 
 import pygfried
 import pytest
@@ -88,13 +88,7 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
     elif testfile.filepath.name == "xml_lido.xml":
         testfile.mimetype = "application/xml"
     shutil.copy(testfile.filepath, file_to_test)
-    if (
-        testfile.filepath.name == "text.txt"
-    ):  # this one (with wrong extension) is always detected wrong
-        with pytest.warns(UserWarning):
-            result = detector.guess_file_type(file_to_test)
-    else:
-        result = detector.guess_file_type(file_to_test)
+    result = detector.guess_file_type(file_to_test)
     assert result.subtype == testfile.subtype, (
         f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' "
         f"for file {testfile.filepath.name}"
@@ -162,8 +156,7 @@ def test_guess_file_type_no_mimetype(
         pygfried, "identify", lambda *args, **kwargs: no_mime_type_test_data
     )
     testfile = shared_datadir / "xml_tei_p4.xml"
-    with pytest.warns(UserWarning):
-        f_info = detector.guess_file_type(testfile)
+    f_info = detector.guess_file_type(testfile)
     assert f_info.mimetype == "application/octet-stream"
 
 
@@ -193,8 +186,7 @@ def test_guess_file_type_undefined_mimetype(
         pygfried, "identify", lambda *args, **kwargs: undefined_mime_types_test_data
     )
     testfile = shared_datadir / "xml_tei_p4.xml"
-    with pytest.warns(UserWarning):
-        f_info = detector.guess_file_type(testfile)
+    f_info = detector.guess_file_type(testfile)
     assert f_info.mimetype == "application/octet-stream"
 
 

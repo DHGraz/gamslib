@@ -1,13 +1,14 @@
-"""GAMS Project Configuration Management.
+"""A helper module for GAMS project configuration management.
 
 This module provides tools to locate, validate, and load project configuration files 
-for GAMS projects.
-Supported sources include `project.toml`, `.env`, and environment variables, with a 
-clear precedence order.
+for GAMS projects. The central function is `get_configuration()`, which retrieves the 
+current project configuration as a `Configuration` object. The configuration can be 
+sourced from multiple locations, with a clear precedence order to allow for flexible overrides.
 
-Main features:
 
-  - Automatic discovery of configuration files.
+What this function does:
+
+  # TODO: document how the config file is searched- It searches for the configuration files in the following locations: `project.toml`, `.env`, and environment variables. Automatic discovery of the configuration files
   - Validation of configuration structure and values.
   - Access to configuration data as Python objects.
   - Layered overrides: `.env` values override `project.toml`, environment variables override both.

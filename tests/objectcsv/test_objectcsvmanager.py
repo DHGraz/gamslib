@@ -1,3 +1,5 @@
+"Tests for the ObjectCSVManager class in objectcsvmanager.py."
+
 import copy
 import csv
 import dataclasses
@@ -12,10 +14,13 @@ from gamslib.objectcsv.objectcsvmanager import (
     OBJ_CSV_FILENAME,
     DATASTREAM_FILES_TO_IGNORE,
     ObjectCSVManager,
-    InvalidCSVFileError
+    InvalidCSVFileError,
 )
 from gamslib.objectcsv.objectdata import ObjectData
 from gamslib.projectconfiguration import MissingConfigurationException
+
+
+# pylint: disable=protected-access
 
 def test_init_empty_objdir(tmp_path):
     """Test initialization with an empty object directory."""
@@ -26,7 +31,7 @@ def test_init_empty_objdir(tmp_path):
     assert manager._object_data is None
     assert manager.get_object() is None
     assert manager._datastream_data == []
-    assert list(manager.get_datastreamdata()) == []
+    assert not list(manager.get_datastreamdata())
 
 
 def test_init_with_nonexistent_objdir(tmp_path):
@@ -82,7 +87,7 @@ def test_merge_object(tmp_path, objdata):
     assert manager.get_object() == new_obj_data
 
 
-def test_get_object(tmp_path, objdata):
+def test_get_object(tmp_path):
     """Test getting the object data."""
     manager = ObjectCSVManager(tmp_path)
     assert manager.get_object() is None
@@ -123,25 +128,26 @@ def test_datastream_csv_with_missing_column(tmp_path):
     # make dicts with all fields as keys and <fieldname>_value as values
     dsdata = {name: f"name: {name}_value" for name in DSData.fieldnames()}
     objdata = {name: f"name: {name}_value" for name in ObjectData.fieldnames()}
-    # remove one column from the dcsv file 
-    del dsdata['mimetype']
+    # remove one column from the dcsv file
+    del dsdata["mimetype"]
     obj_ds_file = tmp_path / "object.csv"
     ds_csv_files = tmp_path / "datastreams.csv"
     # write the invalid datastreams.csv file
     ds_csv_files_content = [
-        ",".join(DSData.fieldnames()),   
+        ",".join(DSData.fieldnames()),
         ",".join(dsdata.values()),
     ]
     ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
     # write the valid object.csv file
     obj_ds_file_content = [
-        ",".join(ObjectData.fieldnames()),   
+        ",".join(ObjectData.fieldnames()),
         ",".join(objdata.values()),
     ]
-    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")
 
     with pytest.raises(InvalidCSVFileError, match=r"Missing comma in line 2."):
         ObjectCSVManager(tmp_path)
+
 
 def test_datastream_csv_with_extra_column(tmp_path):
     """Creation of ObjectCSVManager should fail if in datastreams.csv has an extra column."""
@@ -154,19 +160,20 @@ def test_datastream_csv_with_extra_column(tmp_path):
     ds_csv_files = tmp_path / "datastreams.csv"
     # write the invalid datastreams.csv file
     ds_csv_files_content = [
-        ",".join(DSData.fieldnames()),   
+        ",".join(DSData.fieldnames()),
         ",".join(dsdata.values()),
     ]
     ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
     # write the valid object.csv file
     obj_ds_file_content = [
-        ",".join(ObjectData.fieldnames()),   
+        ",".join(ObjectData.fieldnames()),
         ",".join(objdata.values()),
     ]
-    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")
 
     with pytest.raises(InvalidCSVFileError, match=r"Extra comma in line 2."):
         ObjectCSVManager(tmp_path)
+
 
 def test_object_csv_with_missing_column(tmp_path):
     """Creation of ObjectCSVManager should fail if in object.csv a column is missing."""
@@ -179,19 +186,20 @@ def test_object_csv_with_missing_column(tmp_path):
     ds_csv_files = tmp_path / "datastreams.csv"
     # write the invalid csv files
     ds_csv_files_content = [
-        ",".join(DSData.fieldnames()),   
+        ",".join(DSData.fieldnames()),
         ",".join(dsdata.values()),
     ]
     ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
     # write the valid object.csv file
     obj_ds_file_content = [
-        ",".join(ObjectData.fieldnames()),   
+        ",".join(ObjectData.fieldnames()),
         ",".join(objdata.values()),
     ]
-    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")
 
     with pytest.raises(InvalidCSVFileError, match=r"Missing comma in line 2."):
         ObjectCSVManager(tmp_path)
+
 
 def test_object_csv_with_extra_column(tmp_path):
     """Creation of ObjectCSVManager should fail if in object.csv has an extra column."""
@@ -204,16 +212,16 @@ def test_object_csv_with_extra_column(tmp_path):
     ds_csv_files = tmp_path / "datastreams.csv"
     # write the invalid csv files
     ds_csv_files_content = [
-        ",".join(DSData.fieldnames()),   
+        ",".join(DSData.fieldnames()),
         ",".join(dsdata.values()),
     ]
     ds_csv_files.write_text("\n".join(ds_csv_files_content) + "\n")
     # write the valid object.csv file
     obj_ds_file_content = [
-        ",".join(ObjectData.fieldnames()),   
+        ",".join(ObjectData.fieldnames()),
         ",".join(objdata.values()),
     ]
-    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")   
+    obj_ds_file.write_text("\n".join(obj_ds_file_content) + "\n")
 
     with pytest.raises(InvalidCSVFileError, match=r"Extra comma in line 2."):
         ObjectCSVManager(tmp_path)
@@ -385,7 +393,8 @@ def test_validate_double_ds_id(tmp_path, objdata: ObjectData, dsdata: DSData):
     manager = ObjectCSVManager(tmp_path)
     manager.set_object(objdata)
     manager.add_datastream(dsdata)
-    # as this is already handled in add_datastream, we have to cirumvent the add_datastream validation
+    # as this is already handled in add_datastream, we have to cirumvent
+    # the add_datastream validation
     new_dsdata = copy.deepcopy(dsdata)
     new_dsdata.dsid = "TEI2.xml"
     manager.add_datastream(new_dsdata)
@@ -395,7 +404,8 @@ def test_validate_double_ds_id(tmp_path, objdata: ObjectData, dsdata: DSData):
     with pytest.raises(ValueError, match="must be unique"):
         manager.validate()
 
-def test_validate_invalid_object(tmp_path, objdata, dsdata):
+
+def test_validate_invalid_object(tmp_path, objdata):
     """Test validation of invalid object data."""
     objdata.recid = ""  # Invalid recid
 
@@ -405,16 +415,10 @@ def test_validate_invalid_object(tmp_path, objdata, dsdata):
         manager.validate()
 
 
-def test_validate_invalid_datastream(tmp_path, objdata, dsdata):
-    """Test validation of invalid datastream data."""
-    dsdata.dsid = ""  # Invalid dsid
-
-    manager = ObjectCSVManager(tmp_path)
-    manager.set_object(objdata)
-    manager.add_datastream(dsdata)
-
+def test_validate_invalid_datastream(dsdata):
+    """Invalid datastream values should fail immediately on assignment."""
     with pytest.raises(ValueError, match="must not be empty"):
-        manager.validate()
+        dsdata.dsid = ""  # Invalid dsid
 
 
 def test_fix_for_mainresource(tmp_path):
@@ -448,7 +452,7 @@ def test_fix_for_mainresource(tmp_path):
 
 
 def test_guess_mainresource_single_xml(
-    objcsvfile: Path, dscsvfile: Path, dsdata: DSData
+    objcsvfile: Path, dsdata: DSData
 ):
     """Test the guess_mainresource method with a single XML file."""
     # Create an ObjectCSV instance
@@ -459,14 +463,14 @@ def test_guess_mainresource_single_xml(
 
     # Add a DC.xml file which should be ignored
     dc_ds = copy.deepcopy(dsdata)
-    dc_ds.dspath = "obj1/DC.xml"
+    dc_ds.dspath = "DC.xml"
     dc_ds.dsid = "DC.xml"
     dc_ds.mimetype = "application/xml"
     oc.add_datastream(dc_ds)
 
     # Add a TEI XML file which should be detected as main resource
     tei_ds = copy.deepcopy(dsdata)
-    tei_ds.dspath = "obj1/TEI.xml"
+    tei_ds.dspath = "TEI.xml"
     tei_ds.dsid = "TEI.xml"
     tei_ds.mimetype = "application/tei+xml"
     oc.add_datastream(tei_ds)
@@ -483,7 +487,7 @@ def test_guess_mainresource_single_xml(
 
 
 def test_guess_mainresource_multiple_xml(
-    objcsvfile: Path, dscsvfile: Path, dsdata: DSData
+    objcsvfile: Path, dsdata: DSData
 ):
     """Test the guess_mainresource method with multiple XML files."""
     # Create an ObjectCSV instance
@@ -498,13 +502,13 @@ def test_guess_mainresource_multiple_xml(
 
     # Add several XML files
     xml_ds1 = copy.deepcopy(dsdata)
-    xml_ds1.dspath = "obj1/file1.xml"
+    xml_ds1.dspath = "file1.xml"
     xml_ds1.dsid = "FILE1"
     xml_ds1.mimetype = "application/xml"
     oc.add_datastream(xml_ds1)
 
     xml_ds2 = copy.deepcopy(dsdata)
-    xml_ds2.dspath = "obj1/file2.xml"
+    xml_ds2.dspath = "file2.xml"
     xml_ds2.dsid = "FILE2"
     xml_ds2.mimetype = "text/xml"
     oc.add_datastream(xml_ds2)
@@ -516,7 +520,7 @@ def test_guess_mainresource_multiple_xml(
     assert not oc.get_object().mainResource  # Should be empty
 
 
-def test_guess_mainresource_no_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DSData):
+def test_guess_mainresource_no_xml(objcsvfile: Path, dsdata: DSData):
     """Test the guess_mainresource method with no XML files."""
     # Create an ObjectCSV instance
     oc = ObjectCSVManager(objcsvfile.parent)
@@ -530,7 +534,7 @@ def test_guess_mainresource_no_xml(objcsvfile: Path, dscsvfile: Path, dsdata: DS
 
     # Add a non-XML file
     non_xml_ds = copy.deepcopy(dsdata)
-    non_xml_ds.dspath = "obj1/image.jpg"
+    non_xml_ds.dspath = "image.jpg"
     non_xml_ds.dsid = "IMG"
     non_xml_ds.mimetype = "image/jpeg"
     oc.add_datastream(non_xml_ds)
@@ -561,7 +565,7 @@ def test_count_datastreams_multiple(tmp_path, dsdata):
     ds1 = copy.deepcopy(dsdata)
     ds2 = copy.deepcopy(dsdata)
     ds2.dsid = "DS2"
-    ds2.dspath = "obj1/DS2.xml"
+    ds2.dspath = "DS2.xml"
     manager.add_datastream(ds1)
     manager.add_datastream(ds2)
     assert manager.count_datastreams() == 2
@@ -612,11 +616,11 @@ def test_get_languages_multiple_datastreams(tmp_path, dsdata, monkeypatch):
     ds1.lang = "deu"
     ds2 = copy.deepcopy(dsdata)
     ds2.dsid = "DS2"
-    ds2.dspath = "obj1/DS2.xml"
+    ds2.dspath = "DS2.xml"
     ds2.lang = "eng"
     ds3 = copy.deepcopy(dsdata)
     ds3.dsid = "DS3"
-    ds3.dspath = "obj1/DS3.xml"
+    ds3.dspath = "DS3.xml"
     ds3.lang = "deu"
     manager = ObjectCSVManager(tmp_path)
     manager.add_datastream(ds1)
@@ -633,7 +637,7 @@ def test_get_languages_ignores_empty_lang(tmp_path, dsdata, monkeypatch):
     ds1.lang = ""
     ds2 = copy.deepcopy(dsdata)
     ds2.dsid = "DS2"
-    ds2.dspath = "obj1/DS2.xml"
+    ds2.dspath = "DS2.xml"
     ds2.lang = "eng"
     manager = ObjectCSVManager(tmp_path)
     manager.add_datastream(ds1)
@@ -683,7 +687,7 @@ def test_write_object_csv_overwrites_if_ignore_flag(tmp_path, objdata):
 def test_get_mainresource(objcsvfile: Path, dscsvfile: Path):
     """Test the get_mainresource method."""
     # we need dscsvfile fixture because the datastream files must exist
-
+    assert dscsvfile.is_file()  # Ensure datastreams.csv exists
     obj_dir = objcsvfile.parent
 
     # Create an ObjectCSVManager instance
@@ -691,10 +695,10 @@ def test_get_mainresource(objcsvfile: Path, dscsvfile: Path):
 
     # Get the main resource
     main_resource = obj_mgr.get_mainresource()
-    assert main_resource.dspath == "obj1/TEI.xml"
+    assert main_resource.dspath == "TEI.xml"
 
 
-def test_get_mainresource_no_mainresource(objcsvfile: Path, dscsvfile: Path):
+def test_get_mainresource_no_mainresource(objcsvfile: Path):
     """Test the get_mainresource method if no mainresource is set."""
     # we need dscsvfile fixture because the datastream files must exist
 
@@ -709,29 +713,37 @@ def test_get_mainresource_no_mainresource(objcsvfile: Path, dscsvfile: Path):
     assert main_resource is None
 
 
-def test_get_ds_ignore_list_nothing_from_config(tmp_path, monkeypatch):
+def test_get_ds_ignore_list_nothing_from_config(tmp_path):
     """Test the get_ignore_list method with no values from configuration."""
     mgr = ObjectCSVManager(tmp_path)
-    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE #  pylint: disable=protected-access
+    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE  #  pylint: disable=protected-access
 
 
 def test_get_ds_ignore_list_from_config(tmp_path, monkeypatch):
     """Test the get_ignore_list method with values from configuration."""
+
     def get_configuration_mock_cfg():
         cfg_mock = MagicMock()
         cfg_mock.general.ds_ignore_files = ["foo.bar", "bar.foo"]
         return cfg_mock
 
     mgr = ObjectCSVManager(tmp_path)
-    monkeypatch.setattr("gamslib.objectcsv.objectcsvmanager.get_configuration", get_configuration_mock_cfg)
+    monkeypatch.setattr(
+        "gamslib.objectcsv.objectcsvmanager.get_configuration",
+        get_configuration_mock_cfg,
+    )
     ignorelist = mgr._get_ds_ignore_list()  # pylint: disable=protected-access
     assert ignorelist == DATASTREAM_FILES_TO_IGNORE.union({"foo.bar", "bar.foo"})
 
-def test_get_ds_ignore_list_with_missing_no_config_error(tmp_path, monkeypatch):    
+
+def test_get_ds_ignore_list_with_missing_no_config_error(tmp_path, monkeypatch):
     "Test if get_ignore_list raises MissingConfigurationException if no configuration is available."
+
     def get_configuration_raises():
         raise MissingConfigurationException()
 
     mgr = ObjectCSVManager(tmp_path)
-    monkeypatch.setattr("gamslib.objectcsv.objectcsvmanager.get_configuration", get_configuration_raises)
-    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE #  pylint: disable=protected-access
+    monkeypatch.setattr(
+        "gamslib.objectcsv.objectcsvmanager.get_configuration", get_configuration_raises
+    )
+    assert mgr._get_ds_ignore_list() == DATASTREAM_FILES_TO_IGNORE  #  pylint: disable=protected-access

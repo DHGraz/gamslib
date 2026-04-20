@@ -32,14 +32,14 @@ def populated_objcollection_fixture(objdata, dsdata):
     objdata2.recid = "obj2"
 
     dsdata.dsid = "DC.xml"
-    dsdata.dspath = "obj1/DC.xml"
+    dsdata.dspath = "DC.xml"
     dsdata2 = copy.deepcopy(dsdata)
     dsdata2.dsid = "TEI2.xml"
-    dsdata2.dspath = "obj1/TEI2.xml"
+    dsdata2.dspath = "TEI2.xml"
 
     dsdata3 = copy.deepcopy(dsdata)
     dsdata3.dsid = "TEI3.xml"
-    dsdata3.dspath = "obj2/TEI3.xml"
+    dsdata3.dspath = "TEI3.xml"
 
     objcollection = ObjectCollection()
     objcollection.objects["obj1"] = objdata
@@ -132,6 +132,35 @@ def test_collect_from_objects(objcollection, populated_objcollection, populated_
     assert objcollection.count_objects() == populated_objcollection.count_objects()
     assert "obj1" in objcollection.objects
     assert "obj2" in objcollection.objects
+
+
+def test_collect_from_objects_with_old_prefix_in_dspath(objcollection, populated_dir):
+    """Test that collect_from_objects correctly handles datastreams with old prefix in dspath.
+
+    The recid as prefix is no longer used in the datastreams.csv files, but there might 
+    still be old files around with the recid as prefix in the dspath. The 
+    collect_from_objects method should be able to handle this and remove the old prefix 
+    if it is present, so that the datastreams are correctly associated with their objects.
+    """
+    # Manually add the old prefix to the dspath in datastreams.csv for obj1
+    obj1_ds_csv = populated_dir / "obj1" / "datastreams.csv"
+    rows = []
+    with obj1_ds_csv.open("r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row["dspath"] = f"obj1/{row['dspath']}"  # Add old prefix back
+            rows.append(row)
+    with obj1_ds_csv.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+    # Collect objects, should handle the old prefix and remove it
+    objcollection.collect_from_objects(populated_dir)
+    assert "obj1" in objcollection.datastreams
+    for dsdata in objcollection.datastreams["obj1"]:
+        assert not dsdata.dspath.startswith("obj1/")  # Old prefix should be removed
 
 
 def test_save_to_csv(tmp_path, populated_objcollection):
@@ -236,7 +265,7 @@ def test_distribute_to_objects_updates_files(tmp_path, populated_objcollection):
         reader = csv.DictReader(f)
         rows = list(reader)
         dspaths = [row["dspath"] for row in rows]
-        assert set(dspaths) == set(["obj1/DC.xml", "obj1/TEI2.xml"])
+        assert set(dspaths) == set(["DC.xml", "TEI2.xml"])
 
     # Check object.csv for obj2
     with (obj2_dir / "object.csv").open("r", encoding="utf-8") as f:
@@ -250,7 +279,7 @@ def test_distribute_to_objects_updates_files(tmp_path, populated_objcollection):
         reader = csv.DictReader(f)
         rows = list(reader)
         dspaths = [row["dspath"] for row in rows]
-        assert dspaths == ["obj2/TEI3.xml"]
+        assert dspaths == ["TEI3.xml"]
 
 
 def test_distribute_to_objects_missing_directory(populated_objcollection, tmp_path):

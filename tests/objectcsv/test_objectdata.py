@@ -1,10 +1,8 @@
 "Tests for the ObjectData class."
 
 import copy
-import csv
 
 import pytest
-
 
 
 def test_objectdata_creation(objdata):
@@ -22,15 +20,11 @@ def test_objectdata_creation(objdata):
     assert objdata.tags == "tag1; tag2"
 
 
-
-
-
 @pytest.mark.parametrize(
     "fieldname, old_value, new_value, expected_value",
     [
         # changed recid should raise an exception
         ("recid", "obj2", "obj3", "ValueError"),
-
         # values that should be replaced
         ("title", "Old title", "New title", "New title"),
         ("title", "", "New title", "New title"),
@@ -61,11 +55,9 @@ def test_objectdata_creation(objdata):
         ("funder", "Old funder", "New funder", "New funder"),
         ("funder", "", "New funder", "New funder"),
         ("funder", "Old funder", "", "Old funder"),
-
         # description should not be touched if not empty
         ("description", "Old description", "New description", "Old description"),
         ("description", "", "New description", "New description"),
-
         # tags should only be updated if empty
         ("tags", "tag1; tag2", "tag3; tag4", "tag1; tag2"),
         ("tags", "", "tag3; tag4", "tag3; tag4"),

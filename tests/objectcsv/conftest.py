@@ -33,7 +33,7 @@ def objdata_fixture() -> ObjectData:
 def dsdata_fixture() -> DSData:
     "Return a DSData object."
     return DSData(
-        dspath="obj1/TEI.xml",
+        dspath="TEI.xml",
         dsid="TEI.xml",
         title="The TEI file with üßÄ",
         description="A TEI",
@@ -68,7 +68,7 @@ def dscsvfile_fixture(dsdata: DSData, tmp_path: Path) -> Path:
     """
     ds1 = asdict(dsdata)
     ds2 = copy.deepcopy(ds1)
-    ds2["dspath"] = "obj1/TEI2.xml"
+    ds2["dspath"] = "TEI2.xml"
     ds2["dsid"] = "TEI2.xml"
     ds2["lang"] = "nl; it"
     ds2["tags"] = ["tag 8", "tag 9"]

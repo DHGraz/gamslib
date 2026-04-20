@@ -67,7 +67,7 @@ def test_encoding_roundtrip(datadir, tmp_path):
 
     with new_object_csv.open("r", encoding="utf-8", newline="") as f:
         text = f.read()
-        assert "الوصف" in text  
+        assert "الوصف" in text
     with ds_csv.open("r", encoding="utf-8", newline="") as f:
         text = f.read()
         assert "الوصف" in text
@@ -86,6 +86,4 @@ def test_encoding_in_xslx(datadir):
     # now read the xlsx file and check if special characters are present
     with zipfile.ZipFile(xlsx_file, "r") as zip_:
         xml = zip_.read("xl/sharedStrings.xml").decode("utf-8")
-    assert 'الوصف' in xml
-
-
+    assert "الوصف" in xml

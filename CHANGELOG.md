@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.13] - 2026-04-13
+
+### Changed
+
+  - Breaking change: DSData now validates on every field assignment, not only on explicit validate() calls.
+  - DSData assignments are now atomic: invalid updates raise ValueError and keep the previous value unchanged.
+  - dspath security checks (relative path only, no traversal, no home shortcut) now also run immediately on assignment.
+
 ## [0.7.12]
 
 # Changed

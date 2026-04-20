@@ -57,6 +57,12 @@ class ObjectCollection:
             for dsdata in object_meta.get_datastreamdata():
                 if obj_dir.name not in self.datastreams:
                     self.datastreams[obj_dir.name] = []
+                # There might still be old datastreams around, which had the recid
+                # as prefix in the dspath as this is no longer needed/allowed, we
+                # check if the dspath already has the recid as prefix
+                # and remove it if necessary
+                if dsdata.dspath.startswith(f"{obj_dir.name}/"):
+                    dsdata.dspath = dsdata.dspath[len(f"{obj_dir.name}/") :]
                 self.datastreams[obj_dir.name].append(dsdata)
 
     def distribute_to_objects(self, root_dir: Path) -> tuple[int, int]:
@@ -116,9 +122,23 @@ class ObjectCollection:
         """
         Save object and datastream metadata to two CSV files.
 
+        There is on relevant difference: The collected datastreams have a different
+        dspath than the datastreams in the individual object directories. The dspath
+        in the collection has the recid as prefix, while the dspath
+        in the individual object directories is relative to the object directory.
+
+        We need this to keep track of which datastream belongs to which object in the collection,
+        but we want to avoid an additional column for the object id in the datastreams CSV, because:
+
+          - the format of the csv should not be different
+          - an extra column would be more tempting to be accidentally modified, which would
+            break the connection between datastreams and objects
+          - we can easily reconstruct the object id from the dspath by splitting it at the
+            first slash
+
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
-            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to
             'all_datastreams.csv'.
         """
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
@@ -131,9 +151,11 @@ class ObjectCollection:
         with ds_file.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=DSData.fieldnames())
             writer.writeheader()
-            for datastreams in self.datastreams.values():
-                for dsdata in datastreams:
-                    writer.writerow(asdict(dsdata))
+            for obj_id, obj_datastreams in self.datastreams.items():
+                for dsdata in obj_datastreams:
+                    row = asdict(dsdata)
+                    row["dspath"] = f"{obj_id}/{dsdata.dspath}"
+                    writer.writerow(row)
 
     def save_to_xlsx(self, xlsx_file: Path | None = None) -> None:
         """
@@ -155,9 +177,11 @@ class ObjectCollection:
         """
         Load object and datastream metadata from two CSV files.
 
+
+
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
-            ds_file (Path | None): Path for datastream metadata CSV. Defaults to 
+            ds_file (Path | None): Path for datastream metadata CSV. Defaults to
             'all_datastreams.csv'.
 
         Raises:
@@ -181,8 +205,10 @@ class ObjectCollection:
         with ds_file.open("r", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                full_dspath = row["dspath"]
+                obj_id = full_dspath.split("/")[0]  # Extract object id from dspath
+                row["dspath"] = "/".join(full_dspath.split("/")[1:])
                 ds_data = DSData(**row)
-                obj_id = ds_data.dspath.split("/")[0]  # Extract object id from dspath
                 if obj_id not in self.datastreams:
                     self.datastreams[obj_id] = []
                 self.datastreams[obj_id].append(ds_data)
