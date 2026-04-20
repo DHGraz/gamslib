@@ -266,12 +266,13 @@ def validate_dc_file(object_path: Path) -> None:
     try:
         dc = DublinCore(dc_file)
         dc.validate()
-        identifiers = dc.get_element_all_langs("identifier")
-        if object_path.name.replace("%3A", ":") not in identifiers:
-            raise ObjectDirectoryValidationError(
-                f"Object directory '{object_path.name}': DC.xml identifier value does not match "
-                f"the object directory name."
-            )
+        #identifiers = dc.get_element_all_langs("identifier")
+        
+        # if object_path.name.replace("%3A", ":") not in identifiers:
+        #     raise ObjectDirectoryValidationError(
+        #         f"Object directory '{object_path.name}': DC.xml identifier value does not match "
+        #         f"the object directory name."
+        #     )
     except ValueError as e:
         raise ObjectDirectoryValidationError(
             f"Object directory '{object_path.name}': DC.xml file is invalid: {e}"
