@@ -100,7 +100,7 @@ def count_files(root_dir: Path) -> int:
     return total_files
 
 
-def read_sip_schema_from_package():
+def read_sip_schema_from_package() -> dict:
     """
     Read the SIP JSON schema from the package data.
 
