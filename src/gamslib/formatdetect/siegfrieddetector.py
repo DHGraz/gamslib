@@ -127,7 +127,7 @@ class SiegfriedDetector(FormatDetector):
                 mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
         return mime_type, subtype, pronom_id
 
-    def run_pronom(self, filepath) -> tuple[str, SubType, str, str]:
+    def _run_pronom(self, filepath) -> tuple[str, SubType, str, str]:
         """Run pronom on the file and return the mimetype, subtype, pronom id and pronom warning.
 
         If something goes wrong
@@ -165,7 +165,7 @@ class SiegfriedDetector(FormatDetector):
         # pygfried always returns a dict; only indicates missing file in 'errors'
         if not filepath.is_file():
             raise FileNotFoundError(f"File {filepath} does not exist.")
-        mime_type, subtype, pronom_id, pronom_warning = self.run_pronom(filepath)
+        mime_type, subtype, pronom_id, pronom_warning = self._run_pronom(filepath)
         # siegfried sometime is more accurate if an xml declaration is inserted
         if pronom_id in ("UNKNOWN", "fmt/101") and self.looks_like_xml(filepath):
             if not self.has_xml_declaration(filepath):
@@ -211,7 +211,7 @@ class SiegfriedDetector(FormatDetector):
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + filepath.read_text()
         with tempfile.NamedTemporaryFile("w", delete=False, delete_on_close=True) as f:
             f.write(xml)
-            mime_type, subtype, pronom_id, pronom_warning = self.run_pronom(
+            mime_type, subtype, pronom_id, pronom_warning = self._run_pronom(
                 Path(f.name)
             )
         return mime_type, subtype, pronom_id, pronom_warning
