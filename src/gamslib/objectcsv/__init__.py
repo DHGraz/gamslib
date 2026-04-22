@@ -11,8 +11,7 @@ Main components:
   - ObjectCollection: Aggregates metadata from multiple objects into a single CSV file and 
     distributes updates back to individual object directories. Useful for batch editing and 
     synchronization.
-  - dublincore: Functions for accessing and processing Dublin Core metadata from 'DC.xml' files,
-    including language preference utilities.
+  - DublinCore: A class which represents Dublin Core metadata (from the DC.xml file). 
   - create_csv: Initializes CSV files for all objects in a project.
   - manage_csv: Collects metadata from all objects into a single CSV for efficient editing, 
     and updates individual object directories from the aggregated data.

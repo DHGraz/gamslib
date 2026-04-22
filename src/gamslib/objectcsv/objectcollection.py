@@ -139,7 +139,7 @@ class ObjectCollection:
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
             ds_file (Path | None): Path for datastream metadata CSV. Defaults to
-            'all_datastreams.csv'.
+                all_datastreams.csv'.
         """
         obj_file = obj_file or Path(ALL_OBJECTS_CSV)
         ds_file = ds_file or Path(ALL_DATASTREAMS_CSV)
@@ -163,6 +163,8 @@ class ObjectCollection:
 
         Args:
             xlsx_file (Path | None): Path for XLSX file. Defaults to 'all_objects.xlsx'.
+        Returns:
+            None
         """
         xlsx_file = xlsx_file or Path(ALL_OBJECTS_XLSX)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -182,7 +184,7 @@ class ObjectCollection:
         Args:
             obj_file (Path | None): Path for object metadata CSV. Defaults to 'all_objects.csv'.
             ds_file (Path | None): Path for datastream metadata CSV. Defaults to
-            'all_datastreams.csv'.
+                all_datastreams.csv'.
 
         Raises:
             FileNotFoundError: If either CSV file does not exist.

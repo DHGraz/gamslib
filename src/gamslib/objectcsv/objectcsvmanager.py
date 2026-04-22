@@ -157,7 +157,7 @@ class ObjectCSVManager:
         """
         return len(self._datastream_data)
 
-    def get_languages(self):
+    def get_languages(self) -> list[str]:
         """
         Return the languages of the datastreams ordered by frequency.
 
