@@ -108,7 +108,7 @@ def _validate_type_prefix(type_prefix: str) -> None:
         )
 
 
-def validate_project_name(value: str) -> None:
+def _validate_project_name(value: str) -> None:
     """
     Validate the project name. Can also be used to validate the project prefix of a PID.
 
@@ -203,7 +203,7 @@ def validate_pid(pid: str) -> None:
         raise ValueError(f"ID must not be longer than {max_id_length} characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
-    validate_project_name(project_prefix)
+    _validate_project_name(project_prefix)
     _validate_object_id(object_id)
     if type_prefix:
         warnings.warn(

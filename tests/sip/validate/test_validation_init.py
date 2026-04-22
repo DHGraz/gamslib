@@ -7,7 +7,7 @@ import pytest
 from gamslib.sip import BagValidationError
 from gamslib.sip.validation import (
     _validate_object_id,
-    validate_project_name,
+    _validate_project_name,
     _validate_type_prefix,
     validate_bag,
     validate_datastream_id,
@@ -346,7 +346,7 @@ def test_validate_datastream_id_invalid(datastream_id, reason):
 def test_validate_project_name_valid(project_name):
     "Test valid project prefixes"
     # Should not raise for valid lowercase prefixes
-    validate_project_name(project_name)
+    _validate_project_name(project_name)
 
 
 @pytest.mark.parametrize(
@@ -374,7 +374,7 @@ def test_validate_project_name_valid(project_name):
 def test_validate_project_name_invalid(project_prefix):
     "Test invalid project prefixes"
     with pytest.raises(ValueError):
-        validate_project_name(project_prefix)
+        _validate_project_name(project_prefix)
 
 
 @pytest.mark.parametrize(

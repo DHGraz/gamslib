@@ -32,6 +32,15 @@ import requests
 from . import BagValidationError
 # from .validation import validate_pid
 
+__all__ = [
+    "count_bytes",
+    "count_files",
+    "fetch_json_schema",
+    "is_bag",
+    "md5hash",
+    "sha512hash",
+    ]
+
 logger = logging.getLogger(__name__)
 
 GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json"
