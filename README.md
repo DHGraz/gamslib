@@ -95,6 +95,11 @@ are currently:
 A basic configuration file can be generated via the `create_condiguration()`
 function.
 
+## Documentation 
+
+The documentation can be found under docs. A rendered HTML version can be found under
+
+https://github.com/DHGraz/gamslib/
 
 ## Contributing
 
