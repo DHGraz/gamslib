@@ -49,7 +49,38 @@ nav = [
 {"Home" = "index.md"},
 {"Reference" = [
         "reference/index.md",
-        {"projectconfiguration" = "reference/projectconfiguration/index.md"},
+        {"formatdetect" = [
+          "reference/formatdetect/index.md",
+          {"SiegfriedDetector" = "reference/formatdetect/siegfrieddetector.md"},
+          {"FormatInfo" = "reference/formatdetect/formatinfo.md"},
+          {"SubType" = "reference/formatdetect/subtype.md"},
+          {"MagikaDetector" = "reference/formatdetect/magikadetector.md"},
+          {"MinimalDetector" = "reference/formatdetect/minimaldetector.md"}
+        ]},
+        {"objectcsv" = [
+          "reference/objectcsv/index.md",
+          {"create_csv" = "reference/objectcsv/create_csv.md"},
+          {"manage_csv" = "reference/objectcsv/manage_csv.md"},
+          {"xlsx" = "reference/objectcsv/xlsx.md"},
+          {"utils" = "reference/objectcsv/utils.md"},
+          {"DSData" = "reference/objectcsv/dsdata.md"},
+          {"DublinCore" = "reference/objectcsv/dublincore.md"},
+          {"ObjectCollection" = "reference/objectcsv/objectcollection.md"},
+          {"ObjectCSVManager" = "reference/objectcsv/objectcsvmanager.md"},
+          {"ObjectData" = "reference/objectcsv/objectdata.md"},
+          
+        ]},
+        {"objectdir" = "reference/objectdir/index.md"},
+        {"projectconfiguration" = [
+          "reference/projectconfiguration/index.md",
+          {"Configuration" = "reference/projectconfiguration/configuration.md"}
+        ]},
+        {"sip" = [
+          "reference/sip/index.md",
+          {"utils" = "reference/sip/utils.md"},
+          {"validaton" = "reference/sip/validation.md"}
+          ]},
+        {"validation" = "reference/validation/index.md"}
       ]}
 ]
 
