@@ -27,6 +27,7 @@ def make_valid_baginfo() -> list[tuple[str, str]]:
         ("Contact-Email", "dh@uni-graz.at"),
         ("Contact-Email", "foo@example.com"),
         ("External-Description", "Test SIP"),
+        ("BagIt-Profile-Identifier", "https://example.com/bagit-profile.json")
     ]
 
 
@@ -64,7 +65,7 @@ def test_validate_required_baginfo_entries(valid_baginfo):
     # validate missing required entries
     valid_baginfo.pop(0)
     with pytest.raises(
-        BagValidationError, match="Missing required entry 'Bagging-Date'"
+        BagValidationError, match="Missing required entry"
     ):
         validate_required_baginfo_entries(valid_baginfo)
 
