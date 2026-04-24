@@ -14,7 +14,14 @@
       "title": "DC.xml",
       "description": "ds description",
       "creator": "creator 1",
-      "rights": "https://creativecommons.org/licenses/by-nc/4.0"
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+      "lang": ["en"],
+      "tags": ["tag1", "tag2"],
+      "puid": "fmt/111",
+      "checksum": [
+          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+      ]
     },
     {
       "size": 76255,
@@ -24,7 +31,14 @@
       "title": "img1.jpeg",
       "description": "img description",
       "creator": "creator 1",
-      "rights": "https://creativecommons.org/licenses/by-nc/4.0"
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+      "lang": ["en"],
+      "tags": ["tag1", "tag2"],
+      "puid": "fmt/111",
+      "checksum": [
+          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+      ]
     }
   ],
   "$schema": "https://gitlab.cern.ch/digitalmemory/sip-spec/-/raw/master/sip-schema-d1.json",
