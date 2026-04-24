@@ -20,6 +20,9 @@ rights = "Creative Commons Attribution-NonCommercial 4.0 (http://creativecommons
 
 
 [general]
+# This address will be added to each SIP package
+contact_email = ""
+
 # Normally dsid is the full filename (with extension). Set to false to strip extension for dsid.
 dsid_keep_extension = true
 

@@ -3,9 +3,7 @@
 # pylint: disable=protected-access
 
 import copy
-import os
 import re
-import shutil
 import tomllib
 from pathlib import Path
 
@@ -57,6 +55,7 @@ def test_general_class():
     assert general.format_detector_url == ""
     assert general.ds_ignore_files == []
     assert general.safe_xml_hosts == []
+    assert general.contact_email == ""
 
 
 def test_configuration_class_creation(configobj, datadir):
@@ -124,6 +123,7 @@ def test_configuration_from_toml(datadir):
     assert cfg.general.format_detector_url == ""
     assert cfg.general.ds_ignore_files == []
     assert cfg.general.safe_xml_hosts == ['gams.uni-graz.at']
+    assert cfg.general.contact_email == "foo@example.com"
 
 
 def test_configuration_from_toml_cfg_file_not_found(tmp_path):

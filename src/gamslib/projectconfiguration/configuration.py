@@ -58,6 +58,7 @@ class General(BaseModel, validate_assignment=True):
     format_detector_url: str = ""
     ds_ignore_files: list[str] = []
     safe_xml_hosts: list[str] = []
+    contact_email: str = ""
 
     @field_validator("format_detector", mode="before")
     @classmethod
