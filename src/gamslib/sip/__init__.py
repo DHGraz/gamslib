@@ -13,3 +13,6 @@ of Bagit directories, including checks for required files, manifests, and SIP JS
 
 class BagValidationError(Exception):
     """Exception raised when a bag is invalid."""
+
+
+GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json"

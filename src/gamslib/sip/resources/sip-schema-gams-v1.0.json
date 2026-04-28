@@ -1,16 +1,23 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://gams.uni-graz.at/OAIS/sip-schema-d1.json",
+    "$id": "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json",
     "title": "SIP metadata for GAMS",
     "description": "JSON Schema for GAMS SIPs.",
     "type": "object",
     "properties": {
+        "recid": {
+            "type": "string",
+            "minLength": 4,
+            "description": "The record ID of the object. This is typically the identifier of the object in the source repository."
+        },
         "title": {
             "type": "string",
+            "minLength": 5,
             "description": "The title of the object."
         },
         "project": {
             "type": "string",
+            "minLength": 2,
             "description": "The name of the project."
         },
         "description": {
@@ -19,26 +26,27 @@
         },
         "creator": {
             "type": "string",
+            "minLength": 4,
             "description": "The creator of the object."
         },
         "rights": {
             "type": "string",
+            "minLength": 3,
             "description": "Rights and licensing information."
         },
         "publisher": {
             "type": "string",
+            "minLength": 3,
             "description": "The publisher of the object."
         },
         "source": {
             "type": "string",
+            "minLength": 3,
             "description": "A unique string identifying the upstream source digital repository (producer). `local` means the package was created from a local file system."
-        },
-        "recid": {
-            "type": "string",
-            "description": "The record ID of the object. This is typically the identifier of the object in the source repository."
         },
         "objectType": {
             "type": "string",
+            "minLength": 3,
             "description": "The type of the object, e.g. 'text' or 'image'."
         },
         "created_by": {
@@ -51,70 +59,51 @@
         },
         "sip_creation_timestamp": {
             "description": "Date time timestamp of SIP creation",
-            "type": "integer"
+            "type": "number"
         },
-        "contenFiles": {
+        "contentFiles": {
             "type": "array",
+            "minItems": 1,
+            "description": "An arry of content files",
             "items": {
-                "$ref": "#/$defs/contenFile"
+                "$ref": "#/$defs/contentFile"
             }
         },
-        "audit": {
-            "type": "array",
-            "items": {
-                "$ref": "#/$defs/step"
-            }
+        "funder": {
+            "type": "string",
+            "description": "The funder for the creation of the digital object."
         },
-        "usr-meta": {
-            "$ref": "#/$defs/usr-meta"
+        "lang": {
+            "type": "array",
+            "description": "A list of languag code associated with the object. Preferred format is either BCP 47 or ISO 639-3."
         }
     },
+    
+    "required": [
+            "recid",
+            "title",
+            "project",
+            "creator",
+            "rights",
+            "contentFiles",
+            "publisher",
+            "source",
+            "objectType",            
+            "sip_creation_timestamp"
+        ],
     "$defs": {
-        "usr-meta": {
-            "type": "object",
-            "description": "This field can be used by the user to provide additional information about the SIP or the payload: an embargo timestamp, a comment and a free text describing the collection of the harvested record",
-            "properties": {
-                "collection": {
-                    "type": "string"
-                },
-                "embargo_timestamp": {
-                    "type": "integer"
-                },
-                "comment": {
-                    "type": "string"
-                }
-            }
-        },
-        "step": {
-            "type": "object",
-            "description": "A step in the SIP lifetime",
-            "properties": {
-                "tool": {
-                    "type": "object",
-                    "description": "Details on the tool responsible for this action"
-                },
-                "action": {
-                    "description": "Descriptive name for the action",
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "contentFile": {
             "description": "Object describing a single File with informations from its origin, checksums and bag location",
             "type": "object",
             "properties": {
                 "dsid": {
                     "type": "string",
+                    "minLength": 3,
                     "description": "The datastream ID of the file."
                 },
                 "mimetype": {
                     "type": "string",
+                    "minLength": 6,
                     "description": "The MIME type of the file."
                 },
                 "title": {
@@ -127,6 +116,7 @@
                 },
                 "creator": {
                     "type": "string",
+                    "minLength": 3,
                     "description": "The creator of the file."
                 },
                 "rights": {
@@ -139,7 +129,8 @@
                 },
                 "bagpath": {
                     "description": "Path where the file can be found inside the SIP",
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 3
                 },
                 "lang": {
                     "type": "array",
@@ -149,59 +140,45 @@
                     "type": "array",
                     "description": "A list of tags associated with the file."
                 },
-                "origin": {
-                    "type": "object",
-                    "properties": {
-                        "url": {
-                            "oneOf": [
-                                {
-                                    "type": "array"
-                                },
-                                {
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "filename": {
-                            "type": "string"
-                        },
-                        "path": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "url",
-                        "filename",
-                        "path"
-                    ]
-                },
-                "metadata": {
-                    "description": "Describes if the file is to be considered metadata",
-                    "type": "boolean"
-                },
-                "downloaded": {
-                    "description": "Describes if the file is included in the bag or not",
-                    "type": "boolean"
+                "puid": {
+                    "type": "string",
+                    "description": "The pronom PUID of the file."
                 },
                 "checksum": {
                     "description": "Available checksums for the file. Formatted as '<algorithm> <checksum>', e.g. 'md5 d41d8cd98f00b204e9800998ecf8427e'",
-                    "oneOf": [
-                        {
-                            "type": "array"
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
+                    "type": "array",
+                    "minLength": 1,
+                    "items": {
+                        "$ref": "#/$defs/checksum"
+                    }
                 }
             },
             "required": [
+                "bagpath",
                 "dsid",
                 "mimetype",
-                "title",
+                "creator",
                 "size",
-                "bagpath"
-            ]
+                "checksum"
+            ],
+            "additionalProperties": false
+        },
+        "checksum": {
+            "description": "Available checksums for the file.",
+            "type": "object",
+            "properties": {
+                "prefix": {
+                    "type": "string",
+                    "minLength": 3,
+                    "enum": ["md5", "sha512", "sha256"]
+                },
+                "checksum": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]+$",
+                    "minLength": 32
+                }
+            }
+            
         }
     }
 }

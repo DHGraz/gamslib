@@ -14,6 +14,10 @@ def make_contentfile_for_sip_json(file_path:Path):
     
     Return a dict describing a content file as expected by sip.json.
     """
+    puid_map = {
+        'DC.xml': 'fmt/111',
+        'IMG.jpeg': 'fmt/43',
+    }
     return {
         "size": file_path.stat().st_size,
         "bagpath": "data/content/" + file_path.name,
@@ -24,7 +28,8 @@ def make_contentfile_for_sip_json(file_path:Path):
         "creator": f"Creator of {file_path.name}",
         "rights": "https://creativecommons.org/licenses/by-nc/4.0",
         "lang": ["en"],
-        "tags": ["tag1", "tag2"]
+        "tags": ["tag1", "tag2"],
+        "puid": puid_map[file_path.name] 
     }
 
 

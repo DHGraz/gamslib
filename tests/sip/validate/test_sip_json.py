@@ -8,8 +8,8 @@ import pytest
 import referencing
 import requests
 
-from gamslib.sip import BagValidationError
-from gamslib.sip.utils import fetch_json_schema, GAMS_SIP_SCHEMA_URL
+from gamslib.sip import GAMS_SIP_SCHEMA_URL, BagValidationError
+from gamslib.sip.utils import fetch_json_schema
 from gamslib.sip.validation.sip_json import validate_sip_json
 
 

@@ -28,6 +28,8 @@ import zipfile
 
 import requests
 
+from gamslib.sip import GAMS_SIP_SCHEMA_URL
+
 
 from . import BagValidationError
 # from .validation import validate_pid
@@ -43,10 +45,8 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
-GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-d1.json"
-
 # This is the path were the schema is stored in the package
-SCHEMA_PATH = Path(__file__).parent / "resources" / "sip-schema-d1.json"
+RESOURCE_PATH = Path(__file__).parent / "resources"
 
 
 def md5hash(file: Path) -> str:
@@ -118,7 +118,12 @@ def read_sip_schema_from_package() -> dict:
     Returns:
         dict: Parsed JSON schema.
     """
-    with SCHEMA_PATH.open() as f:
+    local_schema_path = RESOURCE_PATH / GAMS_SIP_SCHEMA_URL.rsplit("/")[-1]
+    if not local_schema_path.is_file():
+        raise FileNotFoundError(
+            f"Embedded GAMS SIP schema not found at expected location: {local_schema_path}"
+        )
+    with local_schema_path.open() as f:
         return json.load(f)
 
 
