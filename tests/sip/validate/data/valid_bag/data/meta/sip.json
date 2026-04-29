@@ -19,14 +19,20 @@
       "tags": ["tag1", "tag2"],
       "puid": "fmt/111",
       "checksum": [
-          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
-          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
-      ]
+        {
+          "hashtype": "md5",
+          "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        {
+          "hashtype": "sha512",
+          "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+        }
+     ]
     },
     {
       "size": 76255,
       "bagpath": "data/content/IMG.jpeg",
-      "dsid": "dc",
+      "dsid": "IMG.jpeg",
       "mimetype": "text/xml",
       "title": "img1.jpeg",
       "description": "img description",
@@ -36,13 +42,14 @@
       "tags": ["tag1", "tag2"],
       "puid": "fmt/111",
       "checksum": [
-          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
-          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+        {"hashtype": "md5", "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"},
+        {"hashtype": "sha512", "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"}
       ]
     }
   ],
-  "$schema": "https://gitlab.cern.ch/digitalmemory/sip-spec/-/raw/master/sip-schema-d1.json",
+  "$schema":  "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json",
   "created_by": "CSV to SIP JSON converter",
+  "sip_creation_timestamp": 1777282176.7894132,
   "source": "local",
   "recid": "hsa.letter.1",
   "objectType": "text",

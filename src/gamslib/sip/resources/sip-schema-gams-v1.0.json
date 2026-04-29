@@ -167,7 +167,7 @@
             "description": "Available checksums for the file.",
             "type": "object",
             "properties": {
-                "prefix": {
+                "hashtype": {
                     "type": "string",
                     "minLength": 3,
                     "enum": ["md5", "sha512", "sha256"]

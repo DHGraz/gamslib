@@ -19,7 +19,7 @@ from pathlib import Path
 import jsonschema
 import referencing
 
-from .. import BagValidationError, utils
+from .. import BagValidationError, utils, GAMS_SIP_SCHEMA_URL
 
 
 def validate_main_resource(data: dict) -> None:
@@ -66,6 +66,10 @@ def validate_sip_json(bag_dir: Path) -> None:
 
     if "$schema" not in data:
         raise BagValidationError(f"{bag_dir}: Missing '$schema' in sip.json")
+    if data["$schema"] != GAMS_SIP_SCHEMA_URL:
+        raise BagValidationError(
+            f"{bag_dir}: Unsupported JSON schema in sip.json: {data['$schema']}"
+        )
 
     schema = utils.fetch_json_schema(data["$schema"])
 

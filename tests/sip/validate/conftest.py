@@ -29,7 +29,15 @@ def make_contentfile_for_sip_json(file_path:Path):
         "rights": "https://creativecommons.org/licenses/by-nc/4.0",
         "lang": ["en"],
         "tags": ["tag1", "tag2"],
-        "puid": puid_map[file_path.name] 
+        "puid": puid_map[file_path.name],
+        "checksum": [
+            {"algorithm": "md5",
+             "value": hashlib.md5(file_path.read_bytes()).hexdigest()},
+            {"algorithm": "sha256",
+             "value": hashlib.sha256(file_path.read_bytes()).hexdigest()},
+            {"algorithm": "sha512",
+             "value": hashlib.sha512(file_path.read_bytes()).hexdigest()},  
+        ] 
     }
 
 
@@ -73,9 +81,12 @@ def update_sip_json(sipjson_path:Path, *content_paths:Path):
     # read sip.json
     with sipjson_path.open('r', encoding="utf-8", newline="") as sipjson_file:
             sipjson = json.load(sipjson_file)
+    existing_content_files = [content_file["dsid"] for content_file in sipjson.get("contentFiles", [])]
 
+    # add new content files
     for content_file in content_paths:
-        sipjson["contentFiles"].append(make_contentfile_for_sip_json(content_file))
+        if content_file.name not in existing_content_files:
+            sipjson["contentFiles"].append(make_contentfile_for_sip_json(content_file))
     
     # write sip.json back to file
     with open(sipjson_path, 'w', encoding="utf-8", newline="") as sipjson_file:

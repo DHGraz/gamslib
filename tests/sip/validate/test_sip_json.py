@@ -9,8 +9,10 @@ import referencing
 import requests
 
 from gamslib.sip import GAMS_SIP_SCHEMA_URL, BagValidationError
-from gamslib.sip.utils import fetch_json_schema
+from gamslib.sip.utils import fetch_json_schema, GAMS_SIP_SCHEMA_URL
 from gamslib.sip.validation.sip_json import validate_sip_json
+
+
 
 
 @pytest.fixture(name="tmp_bag_dir")
@@ -70,16 +72,16 @@ def test_validate_schema_no_sip(valid_bag_dir):
     "Test if validator detects missing sip.json file."
     sip = valid_bag_dir / "data" / "meta" / "sip.json"
     sip.unlink()
-    with pytest.raises(BagValidationError, match="sip.json file does not exist"):
+    with pytest.raises(BagValidationError, match=r"sip.json file does not exist"):
         validate_sip_json(valid_bag_dir)
 
 
 def test_validate_schema_no_schema(valid_bag_dir):
     "Test if validator detects sip.json file misses the $schema entry."
-    sip = valid_bag_dir / "data" / "meta" / "sip.json"
-    data = json.load(sip.open())
+    sip_json_file = valid_bag_dir / "data" / "meta" / "sip.json"
+    data = json.load(sip_json_file.open())
     data.pop("$schema")
-    sip.write_text(json.dumps(data))
+    sip_json_file.write_text(json.dumps(data))
     with pytest.raises(
         BagValidationError, match=re.escape("Missing '$schema' in sip.json")
     ):
@@ -88,11 +90,11 @@ def test_validate_schema_no_schema(valid_bag_dir):
 
 def test_validate_schema_no_schema_value(valid_bag_dir):
     "Test if validator detects sip.json file misses the $schema entry."
-    sip = valid_bag_dir / "data" / "meta" / "sip.json"
-    data = json.load(sip.open())
+    sip_json_file = valid_bag_dir / "data" / "meta" / "sip.json"
+    data = json.load(sip_json_file.open())
     data["$schema"] = ""
-    sip.write_text(json.dumps(data))
-    with pytest.raises(BagValidationError, match="No scheme supplied"):
+    sip_json_file.write_text(json.dumps(data))
+    with pytest.raises(BagValidationError, match=r"Unsupported JSON schema in sip.json"):
         validate_sip_json(valid_bag_dir)
 
 
@@ -102,7 +104,6 @@ def test_validate_schema_invalid_json(valid_bag_dir):
     sip.write_text("foo")
     with pytest.raises(BagValidationError, match="Invalid JSON in sip.json"):
         validate_sip_json(valid_bag_dir)
-    # assert "Invalid JSON in sip.json" in str(excinfo.value)
 
 
 def test_validate_mainresource(valid_bag_dir):
@@ -110,7 +111,7 @@ def test_validate_mainresource(valid_bag_dir):
     sip = valid_bag_dir / "data" / "meta" / "sip.json"
     data = json.load(sip.open())
 
-    # if mainResource is set corectly, the should pass
+    # if mainResource is set corectly, the test should pass
     assert validate_sip_json(valid_bag_dir) is None, (
         "Should not raise an exception for valid sip.json"
     )
@@ -143,12 +144,13 @@ def write_sip_json(bag_dir, data):
     return sip_json_file
 
 
-def test_missing_sip_json(tmp_bag_dir):
+#def test_missing_sip_json(tmp_bag_dir):
+def test_missing_sip_json(shared_datadir):
     """Test error when sip.json file does not exist."""
-    sip_json_file = tmp_bag_dir / "data" / "meta" / "sip.json"
+    sip_json_file = shared_datadir / "valid_bag" / "data" / "meta" / "sip.json" 
     sip_json_file.unlink()
-    with pytest.raises(BagValidationError, match="sip.json file does not exist"):
-        validate_sip_json(tmp_bag_dir)
+    with pytest.raises(BagValidationError, match=r"sip.json file does not exist"):
+        validate_sip_json(shared_datadir / "valid_bag")
 
 
 def test_invalid_json_in_sip_json(tmp_bag_dir):
@@ -190,7 +192,7 @@ def test_main_resource_not_in_content_files(tmp_bag_dir, monkeypatch):
 def test_validate_sip_json_valid(monkeypatch, tmp_bag_dir):
     """Test successful validation of a correct sip.json."""
     data = {
-        "$schema": "http://example.com/schema.json",
+        "$schema": GAMS_SIP_SCHEMA_URL,
         "mainResource": "res1",
         "contentFiles": [{"dsid": "res1"}],
     }
@@ -214,10 +216,23 @@ def test_validate_sip_json_valid(monkeypatch, tmp_bag_dir):
     assert validate_sip_json(tmp_bag_dir) is None
 
 
+def test_validate_sip_json_invalid_schema(tmp_bag_dir):
+    """The schema referenced in sip.json must be the GAMS schema."""
+    data = {
+        "$schema": "http://example.com/unsupported-schema.json",
+        "mainResource": "res1",
+        "contentFiles": [{"dsid": "res1"}],
+        "extra": "not allowed",
+    }
+    write_sip_json(tmp_bag_dir, data)
+    with pytest.raises(BagValidationError, match="Unsupported JSON schema"):
+        validate_sip_json(tmp_bag_dir)
+
+
 def test_validate_sip_json_schema_validation_error(monkeypatch, tmp_bag_dir):
     """Test error when JSON schema validation fails (extra property not allowed)."""
     data = {
-        "$schema": "http://example.com/schema.json",
+        "$schema": GAMS_SIP_SCHEMA_URL,
         "mainResource": "res1",
         "contentFiles": [{"dsid": "res1"}],
         "extra": "not allowed",
