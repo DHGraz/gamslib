@@ -55,6 +55,7 @@ def test_read_baginfo_txt(valid_bag_dir):
     assert data[2] == ("Contact-Email", "dh@uni-graz.at")
     assert data[3] == ("Contact-Email", "foo@example.com")
     assert data[4] == ("External-Description", "Test SIP")
+    assert data[5] == ("BagIt-Profile-Identifier", "https://example.com/bagit-profile.json")
 
 
 def test_validate_required_baginfo_entries(valid_baginfo):

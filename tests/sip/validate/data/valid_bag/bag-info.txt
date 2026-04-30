@@ -3,4 +3,4 @@ Payload-Oxum: 78221.3
 Contact-Email: dh@uni-graz.at
 Contact-Email: foo@example.com
 External-Description: Test SIP
-BagIt-Profile-Identifier: https://example.com/foo.json
+BagIt-Profile-Identifier: https://example.com/bagit-profile.json
