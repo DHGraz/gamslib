@@ -19,7 +19,10 @@ from pathlib import Path
 import jsonschema
 import referencing
 
-from .. import BagValidationError, utils, GAMS_SIP_SCHEMA_URL
+from gamslib.sip import SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
+from gamslib.sip.utils import fetch_json_schema
+
+from .. import BagValidationError
 
 
 def validate_main_resource(data: dict) -> None:
@@ -71,7 +74,8 @@ def validate_sip_json(bag_dir: Path) -> None:
             f"{bag_dir}: Unsupported JSON schema in sip.json: {data['$schema']}"
         )
 
-    schema = utils.fetch_json_schema(data["$schema"])
+    #schema = utils.fetch_json_schema(data["$schema"])
+    schema = fetch_json_schema(data["$schema"])
 
     # do the real validation
     try:

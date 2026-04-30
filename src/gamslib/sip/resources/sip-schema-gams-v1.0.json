@@ -76,6 +76,10 @@
         "lang": {
             "type": "array",
             "description": "A list of languag code associated with the object. Preferred format is either BCP 47 or ISO 639-3."
+        },
+        "$schema": {
+            "type": "string",
+            "description": "The schema version of the SIP."
         }
     },
     
@@ -89,8 +93,10 @@
             "publisher",
             "source",
             "objectType",            
-            "sip_creation_timestamp"
+            "sip_creation_timestamp",
+            "$schema"
         ],
+        "additionalProperties": false,
     "$defs": {
         "contentFile": {
             "description": "Object describing a single File with informations from its origin, checksums and bag location",

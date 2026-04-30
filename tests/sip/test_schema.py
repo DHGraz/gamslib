@@ -91,6 +91,19 @@ def  test_validate_min_ds_field_sizes(field, min_size, sip_json):
         jsonschema.validate(instance=sip_json, schema=gams_schema)
 
 
+def test_validate_extra_field(sip_json):
+    """Test: Extra fields not defined in the schema should raise ValidationError."""
+    sip_json["extraField"] = "not allowed"
+    with pytest.raises(jsonschema.ValidationError, match="extraField") as exp:
+        jsonschema.validate(instance=sip_json, schema=gams_schema)
+
+
+def test_validate_extra_field_in_content_file(sip_json):
+    """Test: Extra fields in contentFiles should raise ValidationError."""
+    sip_json["contentFiles"][0]["extraField"] = "not allowed"
+    with pytest.raises(jsonschema.ValidationError, match="extraField") as exp:
+        jsonschema.validate(instance=sip_json, schema=gams_schema)
+
 def test_invalid_checkum_prefix(sip_json):
     """Test: Only a few prefix values are allowed."""
     sip_json["contentFiles"][0]["checksum"] = "invalidchecksum"

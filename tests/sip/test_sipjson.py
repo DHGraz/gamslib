@@ -1,19 +1,24 @@
 """Test for the sipjson module."""
 
+import json
 import shutil
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from freezegun import freeze_time
+import requests
 
 from gamslib.objectcsv.create_csv import DSData, ObjectCSVManager, ObjectData
-from gamslib.sip import sipjson
+from gamslib.sip import BagValidationError, sipjson
+import gamslib.sip
 from gamslib.sip.sipjson import ContentFile, SipJson
 
+from gamslib.sip.utils import fetch_json_schema
+from gamslib.sip.utils import read_sip_schema_from_package
 
-# FIXME: I guess copying to tmpdir is not really necessary
 @pytest.fixture(name="dummyobjectcsv")
 def get_dummyobjectcsv(tmpdir, datadir):
     "Return a dummy Metadata object."
@@ -315,7 +320,7 @@ def test_get_json(sipjson_obj):
     assert jsondata["contentFiles"][0]["bagpath"] == "data/content/bagpath1"
     assert jsondata["contentFiles"][1]["bagpath"] == "data/content/bagpath2"
     assert jsondata["created_by"] == "Test Creator"
-    assert jsondata["$schema"] == sipjson.SCHEMA
+    assert jsondata["$schema"] == gamslib.sip.SIP_JSON_SCHEMA_URL
     assert jsondata["lang"] == ["fr", "de"] 
     assert jsondata["contentFiles"][1]["lang"] == ["de"]
     assert jsondata["contentFiles"][0]["tags"] == ["footag", "bartag"]
@@ -336,3 +341,4 @@ def test_validate_recids_duplicate(dummyobjectcsv):
     sip.contentFiles[1].dsid = sip.contentFiles[0].dsid
     with pytest.raises(ValueError, match="Non-unique dsid:"):
         sip.validate_datastreams()
+

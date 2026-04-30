@@ -8,31 +8,27 @@ Features:
     - Extracts and validates object and datastream IDs.
     - Calculates MD5, SHA512 hashes for files.
     - Counts files and bytes in a directory tree.
-    - Fetches and parses JSON schemas from URLs, with error handling.
 
 Usage:
     Use `validate_object_dir(object_path)` to check an object directory.
     Use `extract_id(path)` to extract and validate an object or datastream ID.
     Use `md5hash(file)`, `sha512hash(file)`, or `sha256hash(file)` for file checksums.
     Use `count_bytes(root_dir)` or `count_files(root_dir)` for directory statistics.
-    Use `fetch_json_schema(url)` to retrieve a JSON schema from a remote URL.
 """
 
+from functools import lru_cache
 import hashlib
+
 import json
 import logging
-from functools import lru_cache
+
 from pathlib import Path
 import warnings
 import zipfile
 
 import requests
 
-from gamslib.sip import GAMS_SIP_SCHEMA_URL
-
-
-from . import BagValidationError
-# from .validation import validate_pid
+from gamslib.sip import RESOURCE_PATH, SIP_JSON_SCHEMA_URL, BagValidationError
 
 __all__ = [
     "count_bytes",
@@ -41,12 +37,9 @@ __all__ = [
     "is_bag",
     "md5hash",
     "sha512hash",
-    ]
+]
 
 logger = logging.getLogger(__name__)
-
-# This is the path were the schema is stored in the package
-RESOURCE_PATH = Path(__file__).parent / "resources"
 
 
 def md5hash(file: Path) -> str:
@@ -109,65 +102,6 @@ def count_files(root_dir: Path) -> int:
     return total_files
 
 
-def read_sip_schema_from_package() -> dict:
-    """
-    Read the SIP JSON schema from the package data.
-
-    The schema file is located in the sip subpackage under the resources directory.
-
-    Returns:
-        dict: Parsed JSON schema.
-    """
-    local_schema_path = RESOURCE_PATH / GAMS_SIP_SCHEMA_URL.rsplit("/")[-1]
-    if not local_schema_path.is_file():
-        raise FileNotFoundError(
-            f"Embedded GAMS SIP schema not found at expected location: {local_schema_path}"
-        )
-    with local_schema_path.open() as f:
-        return json.load(f)
-
-
-@lru_cache()
-def fetch_json_schema(url: str) -> dict:
-    """
-    Fetch a JSON schema from a URL.
-
-    Args:
-        url (str): URL to fetch the JSON schema from.
-
-    Returns:
-        dict: Parsed JSON schema.
-
-    Raises:
-        BagValidationError: If the schema cannot be fetched or is not valid JSON.
-    """
-    if url == GAMS_SIP_SCHEMA_URL:
-        logger.debug("Using embedded GAMS SIP schema")
-        return read_sip_schema_from_package()
-    try:
-        logger.debug("Fetching JSON schema from %s", url)
-        response = requests.get(url, timeout=20)
-        if not response.ok:
-            raise BagValidationError(
-                f"Failed to fetch JSON schema from '{url}': HTTP status code {response.status_code}"
-            )
-    except requests.RequestException as e:
-        raise BagValidationError(
-            f"Failed to fetch JSON schema from '{url}': {e}"
-        ) from e
-
-    try:
-        return response.json()
-    except (
-        requests.JSONDecodeError,
-        requests.exceptions.InvalidJSONError,
-        TypeError,
-    ) as e:
-        raise BagValidationError(
-            f"Schema referenced in 'sip.json' is not valid JSON: {e}"
-        ) from e
-
-
 def is_bag(bag_path: Path) -> bool:
     """Check if the given path points to a Bag.
 
@@ -208,3 +142,62 @@ def is_bag(bag_path: Path) -> bool:
         )
         looks_like_a_bag = False
     return looks_like_a_bag
+
+
+def read_sip_schema_from_package() -> dict:
+    """
+    Read the SIP JSON schema from the package data.
+
+    The schema file is located in the sip subpackage under the resources directory.
+
+    Returns:
+        dict: Parsed JSON schema.
+    """
+    local_schema_path = RESOURCE_PATH / SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
+    if not local_schema_path.is_file():
+        raise FileNotFoundError(
+            f"Embedded GAMS SIP schema not found at expected location: {local_schema_path}"
+        )
+    with local_schema_path.open() as f:
+        return json.load(f)
+
+
+@lru_cache()
+def fetch_json_schema(url: str) -> dict:
+    """
+    Fetch a JSON schema from a URL.
+
+    Args:
+        url (str): URL to fetch the JSON schema from.
+
+    Returns:
+        dict: Parsed JSON schema.
+
+    Raises:
+        BagValidationError: If the schema cannot be fetched or is not valid JSON.
+    """
+    if url == SIP_JSON_SCHEMA_URL:
+        logger.debug("Using embedded GAMS SIP schema")
+        return read_sip_schema_from_package()
+    try:
+        logger.debug("Fetching JSON schema from %s", url)
+        response = requests.get(url, timeout=20)
+        if not response.ok:
+            raise BagValidationError(
+                f"Failed to fetch JSON schema from '{url}': HTTP status code {response.status_code}"
+            )
+    except requests.RequestException as e:
+        raise BagValidationError(
+            f"Failed to fetch JSON schema from '{url}': {e}"
+        ) from e
+
+    try:
+        return response.json()
+    except (
+        requests.JSONDecodeError,
+        requests.exceptions.InvalidJSONError,
+        TypeError,
+    ) as e:
+        raise BagValidationError(
+            f"Schema referenced in 'sip.json' is not valid JSON: {e}"
+        ) from e

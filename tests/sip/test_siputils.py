@@ -8,7 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from gamslib.sip import GAMS_SIP_SCHEMA_URL, BagValidationError, utils
+from gamslib.sip import BagValidationError, utils
+from gamslib.sip import SIP_JSON_SCHEMA_URL
 
 from gamslib.sip.utils import (
     count_bytes,
@@ -132,6 +133,67 @@ def test_count_files(datadir):
     assert count_files(datadir / "folder3") == len(["DC.xml", "foo.txt", "folder_a"])
 
 
+def test_is_bag_with_valid_directory(bag_dir):
+    """Test that is_bag returns True for a directory with bagit.txt."""
+    assert is_bag(bag_dir)
+
+
+def test_is_bag_with_incomplete_directory(bag_dir: Path):
+    """Test that is_bag returns False for a directory without bagit.txt."""
+    (bag_dir / "bagit.txt").unlink()
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(bag_dir) is False
+
+
+def test_is_bag_with_valid_zip(zipped_bag: Path):
+    """Test that is_bag returns True for a zip file containing bagit.txt."""
+    # Create a temporary directory with bagit.txt
+    assert is_bag(zipped_bag)
+
+
+@pytest.mark.parametrize(
+    "incomplete_zipped_bag", ["bagit.txt", "manifest-md5.txt"], indirect=True
+)
+def test_is_bag_with_incomplete_zip(incomplete_zipped_bag):
+    """Test that is_bag returns False if one of the required files is missing."""
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(incomplete_zipped_bag) is False
+
+
+def test_is_bag_with_non_zip_file(tmp_path):
+    """Test that is_bag returns False for a non-zip file."""
+    txt_file = tmp_path / "file.txt"
+    txt_file.touch()
+
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(txt_file) is False
+
+
+def test_is_bag_with_nonexistent_path(tmp_path):
+    """Test that is_bag returns False for a nonexistent path."""
+    nonexistent = tmp_path / "does_not_exist"
+
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(nonexistent) is False
+
+
+def test_is_bag_with_empty_directory(tmp_path):
+    """Test that is_bag returns False for an empty directory."""
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(empty_dir) is False
+
+
+def test_is_bag_with_bagit_as_directory(tmp_path):
+    """Test that is_bag returns False when bagit.txt is a directory, not a file."""
+    bag_dir = tmp_path / "test_bag.zip"
+    bag_dir.mkdir()
+
+    with pytest.warns(UserWarning, match="missing"):
+        assert is_bag(bag_dir) is False
+
 def test_read_sip_schema_from_package_reads_json():
     "Test reading the embedded JSON schema from the package."
     schema_dict = read_sip_schema_from_package()
@@ -148,7 +210,7 @@ def test_read_sip_schema_from_package_reads_json():
 def test_read_sip_schema_from_package_raises_if_missing(monkeypatch, tmp_path):
     "Test if validator detects missing sip.json file."
     missing_schema_file = (tmp_path / "missing_sip.json").as_posix()
-    monkeypatch.setattr("gamslib.sip.utils.GAMS_SIP_SCHEMA_URL", missing_schema_file)
+    monkeypatch.setattr("gamslib.sip.utils.SIP_JSON_SCHEMA_URL", missing_schema_file)
 
     # Act & Assert
     with pytest.raises(FileNotFoundError):
@@ -160,8 +222,10 @@ def test_read_sip_schema_from_package_raises_on_invalid_json(monkeypatch, tmp_pa
     # Arrange: create invalid JSON in sip.json
     resources_dir = tmp_path / "resources"
     resources_dir.mkdir()
-    schema_path = resources_dir / GAMS_SIP_SCHEMA_URL.rsplit("/")[-1] 
+    schema_name = SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
+    schema_path = resources_dir / schema_name
     schema_path.write_text("{invalid json}")
+
     monkeypatch.setattr(
         "gamslib.sip.utils.RESOURCE_PATH", schema_path.parent
     )
@@ -177,7 +241,7 @@ def test_fetch_json_schema_embedded(monkeypatch):
     monkeypatch.setattr(
         "gamslib.sip.utils.read_sip_schema_from_package", lambda: expected_schema
     )
-    result = fetch_json_schema(GAMS_SIP_SCHEMA_URL)
+    result = fetch_json_schema(SIP_JSON_SCHEMA_URL)
     assert result == expected_schema
 
 
@@ -257,64 +321,3 @@ def test_fetch_json_schema_json_type_error(mock_get):
         fetch_json_schema(url)
     assert "not valid JSON" in str(excinfo.value)
 
-
-def test_is_bag_with_valid_directory(bag_dir):
-    """Test that is_bag returns True for a directory with bagit.txt."""
-    assert is_bag(bag_dir)
-
-
-def test_is_bag_with_incomplete_directory(bag_dir: Path):
-    """Test that is_bag returns False for a directory without bagit.txt."""
-    (bag_dir / "bagit.txt").unlink()
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(bag_dir) is False
-
-
-def test_is_bag_with_valid_zip(zipped_bag: Path):
-    """Test that is_bag returns True for a zip file containing bagit.txt."""
-    # Create a temporary directory with bagit.txt
-    assert is_bag(zipped_bag)
-
-
-@pytest.mark.parametrize(
-    "incomplete_zipped_bag", ["bagit.txt", "manifest-md5.txt"], indirect=True
-)
-def test_is_bag_with_incomplete_zip(incomplete_zipped_bag):
-    """Test that is_bag returns False if one of the required files is missing."""
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(incomplete_zipped_bag) is False
-
-
-def test_is_bag_with_non_zip_file(tmp_path):
-    """Test that is_bag returns False for a non-zip file."""
-    txt_file = tmp_path / "file.txt"
-    txt_file.touch()
-
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(txt_file) is False
-
-
-def test_is_bag_with_nonexistent_path(tmp_path):
-    """Test that is_bag returns False for a nonexistent path."""
-    nonexistent = tmp_path / "does_not_exist"
-
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(nonexistent) is False
-
-
-def test_is_bag_with_empty_directory(tmp_path):
-    """Test that is_bag returns False for an empty directory."""
-    empty_dir = tmp_path / "empty"
-    empty_dir.mkdir()
-
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(empty_dir) is False
-
-
-def test_is_bag_with_bagit_as_directory(tmp_path):
-    """Test that is_bag returns False when bagit.txt is a directory, not a file."""
-    bag_dir = tmp_path / "test_bag.zip"
-    bag_dir.mkdir()
-
-    with pytest.warns(UserWarning, match="missing"):
-        assert is_bag(bag_dir) is False

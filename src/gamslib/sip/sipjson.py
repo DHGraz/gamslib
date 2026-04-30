@@ -1,22 +1,19 @@
 """Manage data for genertating SIP JSON files."""
 
 # pylint: disable=too-many-instance-attributes
+import logging
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Final
+
 
 from gamslib.formatdetect import detect_format
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 from gamslib.objectcsv.utils import split_entry
+from gamslib.sip import SIP_JSON_SCHEMA_URL
 from gamslib.sip.validation import validate_datastream_id
 from gamslib.sip.utils import md5hash, sha512hash
 
-#from . import NAME, VERSION
-
-SCHEMA: Final = "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json"
-
-#PACKAGER: Final = f"{NAME} {VERSION}"
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ContentFile:
@@ -130,7 +127,7 @@ class SipJson:
     def get_json(self) -> dict:
         """Return the SIP JSON as a dictionary."""
         data = dict(asdict(self).items())
-        data["$schema"] = SCHEMA
+        data["$schema"] = SIP_JSON_SCHEMA_URL
         for content_file in data["contentFiles"]:
             # dspath is a Path, which is not serializable to json
             content_file["bagpath"] = str(content_file["bagpath"])

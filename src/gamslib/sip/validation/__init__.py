@@ -21,7 +21,7 @@ aspects of the bag or the metadata:
 """
 
 import re
-import urllib
+#import urllib
 from pathlib import Path
 import warnings
 
