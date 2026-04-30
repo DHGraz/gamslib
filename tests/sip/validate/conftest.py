@@ -30,14 +30,11 @@ def make_contentfile_for_sip_json(file_path:Path):
         "lang": ["en"],
         "tags": ["tag1", "tag2"],
         "puid": puid_map[file_path.name],
-        "checksum": [
-            {"algorithm": "md5",
-             "value": hashlib.md5(file_path.read_bytes()).hexdigest()},
-            {"algorithm": "sha256",
-             "value": hashlib.sha256(file_path.read_bytes()).hexdigest()},
-            {"algorithm": "sha512",
-             "value": hashlib.sha512(file_path.read_bytes()).hexdigest()},  
-        ] 
+        "checksums": [
+            f"md5 {hashlib.md5(file_path.read_bytes()).hexdigest()}",
+            f"sha256 {hashlib.sha256(file_path.read_bytes()).hexdigest()}",
+            f"sha512 {hashlib.sha512(file_path.read_bytes()).hexdigest()}"
+        ]
     }
 
 
@@ -122,6 +119,6 @@ def valid_bag_dir(shared_datadir):
     update_sip_json(sipjson_path, *content_files)    
     fix_payload_oxums(bag_dir)
     create_manifests(bag_dir, sipjson_path,  *content_files)
-    return bag_dir
+    yield bag_dir
     
 

@@ -18,15 +18,9 @@
       "lang": ["en"],
       "tags": ["tag1", "tag2"],
       "puid": "fmt/111",
-      "checksum": [
-          {
-            "prefix": "md5", 
-            "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
-          },
-          {
-            "prefix": "sha512",
-            "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
-          }
+      "checksums": [
+            "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+            "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
       ]
     },
     {
@@ -41,15 +35,9 @@
       "lang": ["en"],
       "tags": ["tag1", "tag2"],
       "puid": "fmt/111",
-      "checksum": [
-        {
-          "prefix": "md5",
-          "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
-        },
-        {
-          "prefix": "sha512",
-          "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
-        }
+      "checksums": [
+          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
       ]
     }
   ],

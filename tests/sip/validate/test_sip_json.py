@@ -162,12 +162,14 @@ def test_invalid_json_in_sip_json(tmp_bag_dir):
         validate_sip_json(tmp_bag_dir)
 
 
-def test_missing_schema_key(tmp_bag_dir):
+def test_missing_schema_key(valid_bag_dir):
     """Test error when $schema key is missing in sip.json."""
-    data = {"mainResource": "res1", "contentFiles": [{"dsid": "res1"}]}
-    write_sip_json(tmp_bag_dir, data)
-    with pytest.raises(BagValidationError, match=r"Missing '\\$schema' in sip.json"):
-        validate_sip_json(tmp_bag_dir)
+    sip_json_file = valid_bag_dir / "data" / "meta" / "sip.json"
+    data = json.load(sip_json_file.open())
+    data.pop("$schema")
+    sip_json_file.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(BagValidationError, match=r"Missing '\$schema' in sip.json"):
+        validate_sip_json(valid_bag_dir)
 
 
 # we skip this because it's really slow (waiting for timeout)
@@ -210,7 +212,6 @@ def test_validate_sip_json_schema_validation_error(valid_bag_dir):
     data = json.load(sip_json_file.open())
     data["extra"] = "not allowed"
     sip_json_file.write_text(json.dumps(data), encoding="utf-8")
-
 
     with pytest.raises(BagValidationError, match=r"Invalid JSON in sip.json"):
         validate_sip_json(valid_bag_dir)

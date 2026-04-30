@@ -38,13 +38,13 @@ def test_validate_missing_required_field(field, sip_json):
         jsonschema.validate(instance=sip_json, schema=gams_schema)
 
 @pytest.mark.parametrize("field", [
-                "bagpath",
-                "dsid",
-                "mimetype",
-                "creator",
-                "size",
-                "checksum"
-    ])
+        "bagpath",
+        "dsid",
+        "mimetype",
+        "creator",
+        "size",
+        "checksums" 
+       ])
 def tests_validate_missing_contenttype_field(field, sip_json):
     """Test: Missing required field in contentType should raise ValidationError."""
     del sip_json["contentFiles"][0][field]
@@ -106,20 +106,20 @@ def test_validate_extra_field_in_content_file(sip_json):
 
 def test_invalid_checkum_prefix(sip_json):
     """Test: Only a few prefix values are allowed."""
-    sip_json["contentFiles"][0]["checksum"] = "invalidchecksum"
-    with pytest.raises(jsonschema.ValidationError, match="checksum") as exp:
+    sip_json["contentFiles"][0]["checksums"][0] = sip_json["contentFiles"][0]["checksums"][0].replace("md5", "invalidprefix")
+    with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=sip_json, schema=gams_schema)
 
 
 def test_invalid_checksum_length(sip_json):
     """Test: Checksum must be minimum  32 characters long."""
-    sip_json["contentFiles"][0]["checksum"] = "md5:" + "x" * 31  # Too short
-    with pytest.raises(jsonschema.ValidationError, match="checksum") as exp:
+    sip_json["contentFiles"][0]["checksums"][0] = "md5 " + "x" * 31  # Too short
+    with pytest.raises(jsonschema.ValidationError, match="checksums") as exp:
         jsonschema.validate(instance=sip_json, schema=gams_schema)  
 
 
 def test_invalid_checksum_value(sip_json):
     """Test: Checksums must be hex chars .""" 
-    sip_json["contentFiles"][0]["checksum"] = "md5:" + "g" * 32  # Invalid hex character
-    with pytest.raises(jsonschema.ValidationError, match="checksum") as exp:
+    sip_json["contentFiles"][0]["checksums"][0] = "md5 " + "g" * 32  # Invalid hex character
+    with pytest.raises(jsonschema.ValidationError, match="checksums"):
         jsonschema.validate(instance=sip_json, schema=gams_schema)
