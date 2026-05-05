@@ -36,7 +36,6 @@ def validate_required_baginfo_entries(entries: list[tuple[str, str]]) -> None:
         "Payload-Oxum",
         "Contact-Email",
         "External-Description",
-        "BagIt-Profile-Identifier"
     ]
 
     existing_keys = [key for key, _ in entries]
