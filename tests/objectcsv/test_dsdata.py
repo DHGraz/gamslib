@@ -24,7 +24,7 @@ def test_dsdata_creation(dsdata):
     assert dsdata.creator == "Foo Bar"
     assert dsdata.rights == "GPLv3"
     assert dsdata.lang == "en; de"
-    assert dsdata.tags == "tag 1, tag 2, tag 3"
+    assert dsdata.tags == "tag1; tag_2; tag-3"
 
 
 
@@ -141,9 +141,9 @@ def test_ds_data_guess_missing_values(detector, shared_datadir, monkeypatch):
         ("lang", "", "en de", ""),
         ("lang", "en de", "de en", "en de"),
         # tags should not be touched
-        ("tags", "tag1 tag2", "", "tag1 tag2"),
-        ("tags", "", "tag1 tag2", ""),
-        ("tags", "tag1 tag2", "tag3 tag4", "tag1 tag2"),
+        ("tags", "tag1; tag2", "", "tag1; tag2"),
+        ("tags", "", "tag1; tag2", ""),
+        ("tags", "tag1; tag2", "tag3; tag4", "tag1; tag2"),
         # dspath and dsid must not change
         ("dspath", "TEI.xml", "TEI2.xml", "ValueError"),
         ("dsid", "TEI.xml", "TEI2.xml", "ValueError"),
@@ -194,4 +194,26 @@ def test_dsdata_validate_invalid_dspath(dsdata):
     with pytest.raises(ValueError):
         dsdata.dspath = "~/file.txt"
     assert dsdata.dspath == "TEI.xml"
+
+
+
+def test_dsdata_validate_valid_tags(dsdata):
+    "Test tagswith valid tag values"
+    dsdata.tags = "tag1; tag_2; tag-3; tag~3; tag.4"
+    assert dsdata.validate() is None
+
+@pytest.mark.parametrize("value, msg", [ 
+    ("a", "short"),
+    ("a"*51, "exceeds maximum length"),
+    ("foo bar", "invalid character"),
+    ("foo:bar", "invalid character"),
+    ("foo#bar", "invalid character"),
+    ("foo/bar", "invalid character"),
+    ("foo\\bar", "invalid character"),
+])
+def test_dsdata_validate_invalid_tag(value, msg, dsdata):
+    "Should raise if tag is invalid."
+    with pytest.raises(ValueError, match=msg):
+        dsdata.tags = value
+        dsdata.validate() 
 

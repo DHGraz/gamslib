@@ -30,7 +30,7 @@ class ContentFile:
     puid: str = ""
     lang: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
-    checksum: list[dict[str, str]] = field(default_factory=list)
+    checksums: list[dict[str, str]] = field(default_factory=list)
 
 
 @dataclass
@@ -101,7 +101,7 @@ class SipJson:
             ds_format = detect_format(ds_path)
             if ds_format:
                 contentfile.puid = ds_format.pronom_id
-            contentfile.checksum = [
+            contentfile.checksums = [
                 f"md5 {md5hash(ds_path)}",
                 f"sha512 {sha512hash(ds_path)}"
             ]

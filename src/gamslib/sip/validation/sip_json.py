@@ -15,6 +15,7 @@ Usage:
 
 import json
 from pathlib import Path
+import re
 
 import jsonschema
 import referencing
@@ -24,6 +25,8 @@ from gamslib.sip.utils import fetch_json_schema
 
 from .. import BagValidationError
 
+MAX_TAG_LENGTH = 50
+MIN_TAG_LENGTH = 3
 
 def validate_main_resource(data: dict) -> None:
     """
@@ -42,6 +45,23 @@ def validate_main_resource(data: dict) -> None:
             f"mainResource '{data['mainResource']}' is not listed in contentFiles"
         )
 
+
+def validate_tag(tag: str) -> None:
+    """Validate a single tag value.
+
+    Raises Value error for invalid tag.
+    """
+    stripped_tag = tag.strip()
+    if not stripped_tag:
+        raise ValueError(f"Tag '{tag}'must not be empty")
+    m = re.match(r"^[a-zA-Z0-9\-._~]+$", stripped_tag)
+    if not m:
+        raise ValueError(f"Tag '{stripped_tag}' contains invalid characters: "
+                         "only letters, digits, and - . _ ~ are allowed")
+    if len(stripped_tag) > MAX_TAG_LENGTH:
+        raise ValueError(f"Tag '{tag}' exceeds maximum length of {MAX_TAG_LENGTH} characters")
+    if len(stripped_tag) < MIN_TAG_LENGTH:
+        raise ValueError(f"Tag '{tag}' is too short, minimum length is {MIN_TAG_LENGTH} characters")
 
 def validate_sip_json(bag_dir: Path) -> None:
     """

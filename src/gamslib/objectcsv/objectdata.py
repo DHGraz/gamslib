@@ -6,6 +6,8 @@ Provides methods for merging, validating, and listing field names.
 
 from dataclasses import dataclass
 import dataclasses
+from gamslib.objectcsv import utils
+from gamslib.sip.validation.sip_json import validate_tag
 
 # pylint: disable=too-many-instance-attributes,invalid-name
 
@@ -43,6 +45,15 @@ class ObjectData:
     mainResource: str = ""  # main datastream
     funder: str = ""
     tags: str = ""
+
+
+    def __post_init__(self):
+        """
+        Post-initialization processing for ObjectData.
+
+        Make values for tags distinct
+        """
+        self.tags = utils.distinctify(self.tags)
 
     @classmethod
     def fieldnames(cls) -> list[str]:
@@ -118,3 +129,9 @@ class ObjectData:
             raise ValueError(f"{self.recid}: source must not be empty")
         if not self.objectType:
             raise ValueError(f"{self.recid}: objectType must not be empty")
+        
+        for tag in utils.split_entry(self.tags):
+            try:
+                validate_tag(tag)
+            except ValueError as e:
+                raise ValueError(f"Problem: 'tags' entry in 'datastreams.csv' for '{self.recid}': {e}") from e            

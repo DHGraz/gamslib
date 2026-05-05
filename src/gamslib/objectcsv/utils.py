@@ -89,3 +89,15 @@ def find_object_root(start_path: Path) -> Path:
                 f"No DC.XML file found in {start_path} or any parent directory."
             )
         current_path = current_path.parent
+
+
+def distinctify(values: str) -> str:
+    """Remove duplicate values from a semicolon-separated string."""
+    # we want to keep the order, so no set
+    clean_values = []
+    for val in split_entry(values):
+        if val not in clean_values:
+            clean_values.append(val)
+    return "; ".join(clean_values)
+
+

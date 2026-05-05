@@ -509,7 +509,7 @@ def test_collect_object_data_basic(test_config, test_dc):
     assert obj_data.objectType == defaultvalues.DEFAULT_OBJECT_TYPE
     assert obj_data.publisher == "GAMS"
     assert obj_data.funder == "The funder"
-    assert obj_data.tags == "Subject1;Subject2"
+    assert obj_data.tags == "Subject1; Subject2"
 
     obj_data = collect_object_data("obj1", test_config, test_dc)
     assert obj_data.tags == ""
@@ -565,7 +565,7 @@ def test_collect_object_data_with_subject_tags(test_config, test_dc):
     obj_data = collect_object_data(
         "obj1", test_config, test_dc, use_subjects_as_tags=True
     )
-    assert obj_data.tags == "Subject1;Subject2"
+    assert obj_data.tags == "Subject1; Subject2"
 
 
 def test_collect_object_data_empty_subject(test_config, test_dc):

@@ -105,12 +105,9 @@ def get_sipjson_obj():
             tags=["footag", "bartag"],
             puid="fmt/11",
             size=123,
-            checksum=[
-                {"prefix": "md5", "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b"},
-                {
-                    "prefix": "sha512",
-                    "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
-                },
+            checksums=[
+                "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b",
+                "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
             ],
         )
     )
@@ -127,12 +124,9 @@ def get_sipjson_obj():
             tags=["tagfoo"],
             puid="fmt/22",
             size=456,
-            checksum=[
-                {"prefix": "md5", "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b"},
-                {
-                    "prefix": "sha512",
-                    "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
-                },            
+            checksums=[
+                "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b",
+                "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
             ],
         )
     )                   
@@ -152,12 +146,9 @@ def test_contentfile():
         lang=["en", "fr"],
         tags=["tag1", "tag2"],
         puid="fmt/123",
-        checksum=[
-            {"prefix": "md5", "checksum": "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"},
-            {
-                "prefix": "sha512",
-                "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
-            },
+        checksums=[
+            "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+            "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
         ],
     )
     assert cf.dsid == "dsid"
@@ -171,10 +162,8 @@ def test_contentfile():
     assert cf.puid == "fmt/123"
     assert cf.size == 123
     assert cf.bagpath == "data/content/dsid"
-    assert cf.checksum[0]["prefix"] == "md5"
-    assert cf.checksum[0]["checksum"] == "8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
-    assert cf.checksum[1]["prefix"] == "sha512"
-    assert cf.checksum[1]["checksum"] == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+    assert cf.checksums[0] == "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+    assert cf.checksums[1] == "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
 
 
 def test_sipjson_init_explicit_values():
@@ -269,8 +258,8 @@ def test_from_metadata(dummyobjectcsv):
     assert sip.contentFiles[0].lang == ["en", "fr"]
     assert sip.contentFiles[0].tags == ["footag", "bartag"]
     assert sip.contentFiles[0].puid == "fmt/11"
-    assert "md5" in sip.contentFiles[0].checksum[0]
-    assert "sha512" in sip.contentFiles[0].checksum[1]
+    assert "md5" in sip.contentFiles[0].checksums[0]
+    assert "sha512" in sip.contentFiles[0].checksums[1]
 
 
     assert sip.contentFiles[1].dsid == "img2.jpg"
@@ -284,8 +273,8 @@ def test_from_metadata(dummyobjectcsv):
     assert sip.contentFiles[1].lang == ["de"]
     assert sip.contentFiles[1].tags == ["tagfoo"]
     assert sip.contentFiles[1].puid == "fmt/43"
-    assert "md5" in sip.contentFiles[0].checksum[0]
-    assert "sha512" in sip.contentFiles[0].checksum[1]
+    assert "md5" in sip.contentFiles[0].checksums[0]
+    assert "sha512" in sip.contentFiles[0].checksums[1]
 
 
 def test_get_json(sipjson_obj):

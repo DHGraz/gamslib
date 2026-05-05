@@ -101,3 +101,23 @@ def test_objectdata_validate(objdata):
     objdata.objectType = ""
     with pytest.raises(ValueError):
         objdata.validate()
+
+def test_objectdata_validate_valid_tags(objdata):
+    "Test tagswith valid tag values"
+    objdata.tags = "tag1; tag_2; tag-3; tag~3; tag.4"
+    assert objdata.validate() is None
+
+@pytest.mark.parametrize("value, msg", [ 
+    ("a", "short"),
+    ("a"*51, "exceeds maximum length"),
+    ("foo bar", "invalid character"),
+    ("foo:bar", "invalid character"),
+    ("foo#bar", "invalid character"),
+    ("foo/bar", "invalid character"),
+    ("foo\\bar", "invalid character"),
+])
+def test_objectdata_validate_invalid_tag(value, msg, objdata):
+    "Should raise if tag is invalid."
+    with pytest.raises(ValueError, match=msg):
+        objdata.tags = value
+        objdata.validate() 

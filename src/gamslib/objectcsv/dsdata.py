@@ -10,7 +10,8 @@ from typing import ClassVar
 from pathlib import Path, PurePath
 
 from gamslib import formatdetect
-from gamslib.objectcsv import defaultvalues
+from gamslib.objectcsv import defaultvalues, utils
+from gamslib.sip.validation.sip_json import validate_tag
 
 
 # pylint: disable=too-many-instance-attributes
@@ -50,6 +51,8 @@ class DSData:
 
         Validates the datastream path and ID, and ensures that required fields are not empty.
         """
+        self.tags = utils.distinctify(self.tags)
+        self.lang = utils.distinctify(self.lang)
         if not self._DATA_FIELD_NAMES:
             type(self)._DATA_FIELD_NAMES = {
                 field.name for field in dataclasses.fields(type(self))
@@ -134,6 +137,12 @@ class DSData:
             raise ValueError(f"{self.dspath}: mimetype must not be empty")
         if not isinstance(self.rights, str) or not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
+        
+        for tag in utils.split_entry(self.tags):
+            try:
+                validate_tag(tag)
+            except ValueError as e:
+                raise ValueError(f"Problem: 'tags' entry in 'datastreams.csv' for '{self.dspath}': {e}") from e
 
     def guess_missing_values(self, object_path: Path):
         """
