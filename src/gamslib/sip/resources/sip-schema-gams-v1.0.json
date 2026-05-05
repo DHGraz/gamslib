@@ -77,18 +77,14 @@
             "type": "array",
             "description": "A list of languag code associated with the object. Preferred format is either BCP 47 or ISO 639-3.",
             "items": {
-                "type": "string",
-                "minLength": 2,
-                "maxLength": 24
+                "$ref": "#/$defs/lang"
             }
         },
         "tags": {
             "type": "array",
             "description": "A list of tags associated with the object.",
             "items": {
-                "type": "string",
-                "minLength": 3,
-                "maxLength": 50
+                "$ref": "#/$defs/tag"
             }
         },
         "$schema": {
@@ -112,6 +108,17 @@
         ],
         "additionalProperties": false,
     "$defs": {
+        "tag": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9._~-]+$"
+        },
+        "lang": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 24
+        },
         "contentFile": {
             "description": "Object describing a single File with informations from its origin, checksums and bag location",
             "type": "object",
@@ -156,18 +163,14 @@
                     "type": "array",
                     "description": "The language(s) of the file.",
                     "items": {
-                        "type": "string",
-                        "minLength": 2,
-                        "maxLength": 24
+                        "$ref": "#/$defs/lang"
                     }
                 },
                 "tags": {
                     "type": "array",
                     "description": "A list of tags associated with the file.",
                     "items": {
-                        "type": "string",
-                        "minLength": 3,
-                        "maxLength": 50
+                        "$ref": "#/$defs/tag"
                     }
                 },
                 "puid": {
