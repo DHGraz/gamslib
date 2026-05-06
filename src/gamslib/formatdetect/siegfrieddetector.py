@@ -7,6 +7,7 @@ It includes logic to  to integrate with GAMSlib's
 format detection infrastructure.
 """
 
+import os
 import tempfile
 import warnings
 from pathlib import Path
@@ -209,9 +210,16 @@ class SiegfriedDetector(FormatDetector):
         """Create a temporary copy of the file and insert the xml declaration."""
 
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + filepath.read_text()
-        with tempfile.NamedTemporaryFile("w", delete=False, delete_on_close=True) as f:
+        f = tempfile.NamedTemporaryFile("w", delete=False)
+        try:
             f.write(xml)
+            f.close()  # Datei schließen, damit andere Prozesse darauf zugreifen können
             mime_type, subtype, pronom_id, pronom_warning = self._run_pronom(
                 Path(f.name)
             )
-        return mime_type, subtype, pronom_id, pronom_warning
+            return mime_type, subtype, pronom_id, pronom_warning
+        finally:
+            # Manuelles Aufräumen
+            if os.path.exists(f.name):
+                os.remove(f.name)
+
