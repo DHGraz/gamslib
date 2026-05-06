@@ -107,7 +107,7 @@ def test_find_object_root_finds_parent_with_dc_xml(tmp_path: Path):
     object_root = tmp_path / "obj1"
     nested_dir = object_root / "content" / "images"
     nested_dir.mkdir(parents=True)
-    (object_root / "DC.XML").write_text("<dc/>", encoding="utf-8")
+    (object_root / "DC.xml").write_text("<dc/>", encoding="utf-8")
 
     assert find_object_root(nested_dir) == object_root
 
