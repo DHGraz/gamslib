@@ -35,6 +35,8 @@ from gamslib.projectconfiguration import (
     get_configuration,
 )
 
+# ruff: noqa: PLR0911
+
 logger = logging.getLogger(__name__)
 
 
@@ -84,6 +86,7 @@ class CombinedCatalogResolver(ET.Resolver):
         unique_id = hashlib.md5(url.encode("utf-8")).hexdigest()
         return os.path.join(self.cache_dir, f"cached{unique_id}{extension}")
 
+    
     def resolve(self, url: str, pubid: str | None, context):
         """Resolve a URL to an (XML) document.
 

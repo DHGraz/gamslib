@@ -210,8 +210,10 @@ class SiegfriedDetector(FormatDetector):
         """Create a temporary copy of the file and insert the xml declaration."""
 
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + filepath.read_text()
-        f = tempfile.NamedTemporaryFile("w", delete=False)
+        # Not using a context manager here, because we need the file to persist after closing it, so that pygfried can read it. 
+        # We will delete it manually after we are done.
         try:
+            f = tempfile.NamedTemporaryFile("w", delete=False)  # noqa: SIM115
             f.write(xml)
             f.close()  # Datei schließen, damit andere Prozesse darauf zugreifen können
             mime_type, subtype, pronom_id, pronom_warning = self._run_pronom(
