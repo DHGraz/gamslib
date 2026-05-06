@@ -1,0 +1,56 @@
+{
+  "$schema": "https://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json",
+  "title": "Charles Baissac an Hugo Schuchardt (15-00432)",
+  "project": "hsa",
+  "description": "digital object description",
+  "creator": "Gams HSA Project",
+  "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+  "publisher": "Institut für Sprachwissenschaft, Karl-Franzens-Universität Graz",
+  "contentFiles": [
+    {
+      "size": 849,
+      "bagpath": "data/content/DC.xml",
+      "dsid": "dc.xml",
+      "mimetype": "text/xml",
+      "title": "DC.xml",
+      "description": "ds description",
+      "creator": "creator 1",
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+      "lang": ["en"],
+      "tags": ["tag1", "tag2"],
+      "puid": "fmt/111",
+      "checksums": [
+            "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+            "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+      ]
+    },
+    {
+      "size": 76255,
+      "bagpath": "data/content/IMG.jpeg",
+      "dsid": "p1.dc.xml",
+      "mimetype": "text/xml",
+      "title": "img1.jpeg",
+      "description": "img description",
+      "creator": "creator 1",
+      "rights": "https://creativecommons.org/licenses/by-nc/4.0",
+      "lang": ["en"],
+      "tags": ["tag1", "tag2"],
+      "puid": "fmt/111",
+      "checksums": [
+          "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
+          "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+      ]
+    }
+  ],
+
+  "created_by": "CSV to SIP JSON converter",
+  "source": "local",
+  "recid": "hsa.letter.1",
+  "objectType": "text",
+  "mainResource": "IMG.jpeg",
+  "lang": ["fr", "de"],
+  "funder": "The project funder",
+  "sip_creation_timestamp": 1777282176.7894132
+}
+
+

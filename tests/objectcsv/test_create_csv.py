@@ -29,7 +29,7 @@ from gamslib.projectconfiguration.configuration import Configuration
 @fixture(name="test_config")
 def config_fixture(datadir):
     "Return a conguration object."
-    return Configuration.from_toml(datadir / "project.toml")
+    return Configuration.from_toml(datadir / "gamsproject.toml")
 
 
 @fixture(name="test_dc")
@@ -136,8 +136,34 @@ def test_create_csv(datadir, test_config):
         data = list(reader)
         assert len(data) == len(["DC.xml", "SOURCE.xml"])
         assert data[0]["dsid"] == "DC.xml"
+        assert data[0]["dspath"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
+        assert data[1]["dspath"] == "SOURCE.xml"
         assert data[0]["mimetype"] == "application/xml"
+
+
+def test_create_csv_with_subdirectories(datadir, test_config):
+    """Test the create_csv function on an object directory with subdirectories."""
+    # we move the test jpeg into a image folder befor calling create_csv
+    object_dir = datadir / "objects" / "obj1"
+    xml_dir = object_dir / "xml"
+    xml_dir.mkdir()
+    xml_file = object_dir / "SOURCE.xml"
+    xml_file.rename(xml_dir / "SOURCE.xml")  # move the file to the object directory
+    assert (xml_dir / "SOURCE.xml").exists()
+
+    create_csv(object_dir, test_config)
+
+    # check contents of the newly created datastreams.csv file
+    ds_csv = object_dir / "datastreams.csv"
+    with open(ds_csv, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        data = list(reader)
+        assert len(data) == len(["DC.xml", "xml/SOURCE.xml"])
+        assert data[0]["dsid"] == "DC.xml"
+        assert data[0]["dspath"] == "DC.xml"
+        assert data[1]["dsid"] == "SOURCE.xml"
+        assert data[1]["dspath"] == "xml/SOURCE.xml"
 
 
 def test_create_csv_force_overwrite(datadir, test_config):
@@ -483,7 +509,7 @@ def test_collect_object_data_basic(test_config, test_dc):
     assert obj_data.objectType == defaultvalues.DEFAULT_OBJECT_TYPE
     assert obj_data.publisher == "GAMS"
     assert obj_data.funder == "The funder"
-    assert obj_data.tags == "Subject1;Subject2"
+    assert obj_data.tags == "Subject1; Subject2"
 
     obj_data = collect_object_data("obj1", test_config, test_dc)
     assert obj_data.tags == ""
@@ -539,7 +565,7 @@ def test_collect_object_data_with_subject_tags(test_config, test_dc):
     obj_data = collect_object_data(
         "obj1", test_config, test_dc, use_subjects_as_tags=True
     )
-    assert obj_data.tags == "Subject1;Subject2"
+    assert obj_data.tags == "Subject1; Subject2"
 
 
 def test_collect_object_data_empty_subject(test_config, test_dc):

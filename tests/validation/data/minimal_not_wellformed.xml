@@ -1,0 +1,5 @@
+<!-- an xml file without schema-->
+<foo>
+    <bar>bar</xxxx>
+    <foobar>foobar<grr>
+</foo>

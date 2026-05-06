@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE products SYSTEM "schemas/simple.dtd">
+<products>
+    <product>
+        <name>Phone</name>
+        <price>500</price>
+    </product>
+    <product>
+        <name>Laptop</name>
+        <price>1000</price>
+        <foo>bar</foo>
+    </product>
+</products>

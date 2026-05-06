@@ -7,7 +7,7 @@ import pytest
 from gamslib.sip import BagValidationError
 from gamslib.sip.validation import (
     _validate_object_id,
-    validate_project_name,
+    _validate_project_name,
     _validate_type_prefix,
     validate_bag,
     validate_datastream_id,
@@ -25,12 +25,12 @@ def bag_dir_fixture(tmp_path):
 def test_validate_bag_success(bag_dir):
     "Patch all validation functions to succeed"
     with (
-        patch("gamslib.sip.validation.validate_structure") as mock_structure,
-        patch("gamslib.sip.validation.validate_bagit_txt") as mock_bagit_txt,
-        patch("gamslib.sip.validation.validate_manifest_md5") as mock_md5,
-        patch("gamslib.sip.validation.validate_manifest_sha512") as mock_sha512,
-        patch("gamslib.sip.validation.validate_sip_json") as mock_sip_json,
-        patch("gamslib.sip.validation.validate_baginfo_text") as mock_baginfo,
+        patch("gamslib.sip.validation.bagit.validate_structure") as mock_structure,
+        patch("gamslib.sip.validation.bagit.validate_bagit_txt") as mock_bagit_txt,
+        patch("gamslib.sip.validation.manifests.validate_manifest_md5") as mock_md5,
+        patch("gamslib.sip.validation.manifests.validate_manifest_sha512") as mock_sha512,
+        patch("gamslib.sip.validation.sip_json.validate_sip_json") as mock_sip_json,
+        patch("gamslib.sip.validation.baginfo.validate_baginfo_text") as mock_baginfo,
     ):
         # All mocks do nothing (success)
         validate_bag(bag_dir)
@@ -54,27 +54,27 @@ def test_validate_bag_dir_not_exists(tmp_path):
     "fail_func,fail_exception",
     [
         (
-            "gamslib.sip.validation.validate_structure",
+            "gamslib.sip.validation.bagit.validate_structure",
             BagValidationError("structure failed"),
         ),
         (
-            "gamslib.sip.validation.validate_bagit_txt",
+            "gamslib.sip.validation.bagit.validate_bagit_txt",
             BagValidationError("bagit.txt failed"),
         ),
         (
-            "gamslib.sip.validation.validate_manifest_md5",
+            "gamslib.sip.validation.manifests.validate_manifest_md5",
             BagValidationError("md5 failed"),
         ),
         (
-            "gamslib.sip.validation.validate_manifest_sha512",
+            "gamslib.sip.validation.manifests.validate_manifest_sha512",
             BagValidationError("sha512 failed"),
         ),
         (
-            "gamslib.sip.validation.validate_sip_json",
+            "gamslib.sip.validation.sip_json.validate_sip_json",
             BagValidationError("sip json failed"),
         ),
         (
-            "gamslib.sip.validation.validate_baginfo_text",
+            "gamslib.sip.validation.baginfo.validate_baginfo_text",
             BagValidationError("baginfo failed"),
         ),
     ],
@@ -82,32 +82,32 @@ def test_validate_bag_dir_not_exists(tmp_path):
 def test_validate_bag_raises_on_validation_failure(bag_dir, fail_func, fail_exception):
     "Patch all validation functions to succeed except one, which raises"
     patches = {
-        "gamslib.sip.validation.validate_structure": patch(
-            "gamslib.sip.validation.validate_structure"
+        "gamslib.sip.validation.bagit.validate_structure": patch(
+            "gamslib.sip.validation.bagit.validate_structure"
         ),
-        "gamslib.sip.validation.validate_bagit_txt": patch(
-            "gamslib.sip.validation.validate_bagit_txt"
+        "gamslib.sip.validation.bagit.validate_bagit_txt": patch(
+            "gamslib.sip.validation.bagit.validate_bagit_txt"
         ),
-        "gamslib.sip.validation.validate_manifest_md5": patch(
-            "gamslib.sip.validation.validate_manifest_md5"
+        "gamslib.sip.validation.manifests.validate_manifest_md5": patch(
+            "gamslib.sip.validation.manifests.validate_manifest_md5"
         ),
-        "gamslib.sip.validation.validate_manifest_sha512": patch(
-            "gamslib.sip.validation.validate_manifest_sha512"
+        "gamslib.sip.validation.manifests.validate_manifest_sha512": patch(
+            "gamslib.sip.validation.manifests.validate_manifest_sha512"
         ),
-        "gamslib.sip.validation.validate_sip_json": patch(
-            "gamslib.sip.validation.validate_sip_json"
+        "gamslib.sip.validation.sip_json.validate_sip_json": patch(
+            "gamslib.sip.validation.sip_json.validate_sip_json"
         ),
-        "gamslib.sip.validation.validate_baginfo_text": patch(
-            "gamslib.sip.validation.validate_baginfo_text"
+        "gamslib.sip.validation.baginfo.validate_baginfo_text": patch(
+            "gamslib.sip.validation.baginfo.validate_baginfo_text"
         ),
     }
     with (
-        patches["gamslib.sip.validation.validate_structure"] as mock_structure,
-        patches["gamslib.sip.validation.validate_bagit_txt"] as mock_bagit_txt,
-        patches["gamslib.sip.validation.validate_manifest_md5"] as mock_md5,
-        patches["gamslib.sip.validation.validate_manifest_sha512"] as mock_sha512,
-        patches["gamslib.sip.validation.validate_sip_json"] as mock_sip_json,
-        patches["gamslib.sip.validation.validate_baginfo_text"] as mock_baginfo,
+        patches["gamslib.sip.validation.bagit.validate_structure"] as mock_structure,
+        patches["gamslib.sip.validation.bagit.validate_bagit_txt"] as mock_bagit_txt,
+        patches["gamslib.sip.validation.manifests.validate_manifest_md5"] as mock_md5,
+        patches["gamslib.sip.validation.manifests.validate_manifest_sha512"] as mock_sha512,
+        patches["gamslib.sip.validation.sip_json.validate_sip_json"] as mock_sip_json,
+        patches["gamslib.sip.validation.baginfo.validate_baginfo_text"] as mock_baginfo,
     ):
         # Set all to succeed
         for m in [
@@ -121,12 +121,12 @@ def test_validate_bag_raises_on_validation_failure(bag_dir, fail_func, fail_exce
             m.side_effect = None
         # Set the one to fail
         failing_mock = {
-            "gamslib.sip.validation.validate_structure": mock_structure,
-            "gamslib.sip.validation.validate_bagit_txt": mock_bagit_txt,
-            "gamslib.sip.validation.validate_manifest_md5": mock_md5,
-            "gamslib.sip.validation.validate_manifest_sha512": mock_sha512,
-            "gamslib.sip.validation.validate_sip_json": mock_sip_json,
-            "gamslib.sip.validation.validate_baginfo_text": mock_baginfo,
+            "gamslib.sip.validation.bagit.validate_structure": mock_structure,
+            "gamslib.sip.validation.bagit.validate_bagit_txt": mock_bagit_txt,
+            "gamslib.sip.validation.manifests.validate_manifest_md5": mock_md5,
+            "gamslib.sip.validation.manifests.validate_manifest_sha512": mock_sha512,
+            "gamslib.sip.validation.sip_json.validate_sip_json": mock_sip_json,
+            "gamslib.sip.validation.baginfo.validate_baginfo_text": mock_baginfo,
         }[fail_func]
         failing_mock.side_effect = fail_exception
         with pytest.raises(BagValidationError) as excinfo:
@@ -346,7 +346,7 @@ def test_validate_datastream_id_invalid(datastream_id, reason):
 def test_validate_project_name_valid(project_name):
     "Test valid project prefixes"
     # Should not raise for valid lowercase prefixes
-    validate_project_name(project_name)
+    _validate_project_name(project_name)
 
 
 @pytest.mark.parametrize(
@@ -374,7 +374,7 @@ def test_validate_project_name_valid(project_name):
 def test_validate_project_name_invalid(project_prefix):
     "Test invalid project prefixes"
     with pytest.raises(ValueError):
-        validate_project_name(project_prefix)
+        _validate_project_name(project_prefix)
 
 
 @pytest.mark.parametrize(

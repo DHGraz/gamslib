@@ -4,32 +4,31 @@ import csv
 
 import pytest
 
-import gamslib
 from gamslib.objectcsv.objectcollection import ObjectCollection
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager    
 from gamslib.objectcsv.manage_csv import (
     collect_csv_data,
     split_from_csv,
-    split_from_xlsx
+    split_from_xlsx,
 )
 
 
-@pytest.fixture
-def collector(datadir):
+@pytest.fixture(name="collector")
+def collector_fixture(datadir):
     """Fixture to collect data from all csv files in all object folders.
     Provides a collector object with updated object and datastream data.
     This is used to test the split_from_xxx functions.
     """
-    collector = ObjectCollection()
-    collector.collect_from_objects(datadir / "objects")
+    collector_ = ObjectCollection()
+    collector_.collect_from_objects(datadir / "objects")
 
     # replace all titles with the suffix " new"
-    for obj_id, obj_data in collector.objects.items():
+    for obj_id, obj_data in collector_.objects.items():
         # update the object data to have some new values
         obj_data.title = f"{obj_data.title} new"
-        for dsdata in collector.datastreams.get(obj_id, []):
-            dsdata.title = f"{dsdata.title} new"    
-    return collector
+        for dsdata in collector_.datastreams.get(obj_id, []):
+            dsdata.title = f"{dsdata.title} new"
+    return collector_
+
 
 def test_collect_csv_data(datadir, tmp_path):
     "Collect data from all csv files in all object folders."
@@ -40,7 +39,6 @@ def test_collect_csv_data(datadir, tmp_path):
 
     # this is the root dictory of all object directorie
     root_dir = datadir / "objects"
-
 
     collector = collect_csv_data(root_dir, obj_file, ds_file)
 
@@ -62,14 +60,16 @@ def test_collect_csv_data(datadir, tmp_path):
     with open(ds_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         data = list(reader)
-    assert len(data) == len([
-        "obj1/foo.xml",
-        "obj1/foo.jpg",
-        "obj1/DC.xml",
-        "obj2/bar.xml",
-        "obj2/bar.jpg",
-        "obj2/DC.xml",
-    ])
+    assert len(data) == len(
+        [
+            "obj1/foo.xml",
+            "obj1/foo.jpg",
+            "obj1/DC.xml",
+            "obj2/bar.xml",
+            "obj2/bar.jpg",
+            "obj2/DC.xml",
+        ]
+    )
     dspaths = [row["dspath"] for row in data]
     assert "obj1/foo.xml" in dspaths
     assert "obj1/foo.jpg" in dspaths
@@ -97,20 +97,25 @@ def test_split_from_csv(datadir, tmp_path, collector):
     assert num_ds == 6  # noqa: PLR2004
 
     # check if the object.csv files have been updated
-    for dir in ["obj1", "obj2"]:
-        obj_csv = root_dir / dir / "object.csv"
+    for directory in ["obj1", "obj2"]:
+        obj_csv = root_dir / directory / "object.csv"
         with open(obj_csv, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             obj_data = list(reader)
-        assert obj_data[0]["title"].endswith(" new"), f"{obj_data[0]}.title does not end with ' new'" 
+        assert obj_data[0]["title"].endswith(" new"), (
+            f"{obj_data[0]}.title does not end with ' new'"
+        )
 
-        ds_csv = root_dir / dir / "datastreams.csv"
+        ds_csv = root_dir / directory / "datastreams.csv"
         with open(ds_csv, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             ds_data = list(reader)
-        assert ds_data[0]["title"].endswith(" new"), f"{ds_data[0]}.title does not end with ' new'"
+        assert ds_data[0]["title"].endswith(" new"), (
+            f"{ds_data[0]}.title does not end with ' new'"
+        )
 
-def test_split_from_xlsx(datadir, tmp_path, collector):    
+
+def test_split_from_xlsx(datadir, tmp_path, collector):
     "Update object folder csv metadata from the combined xlsx data."
 
     # this is where we put the collected data
@@ -131,19 +136,22 @@ def test_split_from_xlsx(datadir, tmp_path, collector):
     assert num_ds == 6  # noqa: PLR2004
 
     # check if the object.csv files have been updated
-    for dir in ["obj1", "obj2"]:
-        obj_csv = root_dir / dir / "object.csv"
+    for directory in ["obj1", "obj2"]:
+        obj_csv = root_dir / directory / "object.csv"
         with open(obj_csv, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             obj_data = list(reader)
-        assert obj_data[0]["title"].endswith(" new"), f"{obj_data[0]}.title does not end with ' new'" 
+        assert obj_data[0]["title"].endswith(" new"), (
+            f"{obj_data[0]}.title does not end with ' new'"
+        )
 
-        ds_csv = root_dir / dir / "datastreams.csv"
+        ds_csv = root_dir / directory / "datastreams.csv"
         with open(ds_csv, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             ds_data = list(reader)
-        assert ds_data[0]["title"].endswith(" new"), f"{ds_data[0]}.title does not end with ' new'"
-
+        assert ds_data[0]["title"].endswith(" new"), (
+            f"{ds_data[0]}.title does not end with ' new'"
+        )
 
 
 # def test_update_csv_files_no_collect_dir(datadir, monkeypatch):

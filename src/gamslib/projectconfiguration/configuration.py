@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from dotenv import dotenv_values
-from pydantic import BaseModel, StringConstraints, ValidationError
+from pydantic import BaseModel, StringConstraints, ValidationError, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -54,9 +54,17 @@ class General(BaseModel, validate_assignment=True):
 
     dsid_keep_extension: bool = True
     loglevel: Literal["debug", "info", "warning", "error", "critical"] = "info"
-    format_detector: Literal["siegfried", "magika", "base", ""] = "siegfried"
+    format_detector: Literal["siegfried", "magika", "base"] = "siegfried"
     format_detector_url: str = ""
     ds_ignore_files: list[str] = []
+    safe_xml_hosts: list[str] = []
+    contact_email: str = ""
+
+    @field_validator("format_detector", mode="before")
+    @classmethod
+    def _empty_format_detector_to_default(cls, value: str) -> str:
+        "Convert empty string to default value 'siegfried' for format_detector field."
+        return "siegfried" if value == "" or value is None else value
 
 
 class Configuration(BaseModel):
@@ -120,7 +128,7 @@ class Configuration(BaseModel):
         reason = reasons.get(error_type)
         if reason is None:
             return None
-        return f"Error in project TOML file '{cfgfile}'. {reason}: '{loc_str}'"
+        return f"Error in gamsproject TOML file '{cfgfile}'. {reason}: '{loc_str}'"
 
     @classmethod
     def from_toml(cls, toml_file: Path) -> "Configuration":
@@ -154,7 +162,7 @@ class Configuration(BaseModel):
             ) from exc
         except tomllib.TOMLDecodeError as exc:
             raise tomllib.TOMLDecodeError(
-                f"Error in project TOML file '{toml_file}': {exc}"
+                f"Error in gamsproject TOML file '{toml_file}': {exc}"
             ) from exc
         except ValidationError as exc:
             msg = cls._make_readable_message(
@@ -179,7 +187,7 @@ class Configuration(BaseModel):
         """Update the configuration object from environment variables."""
         for key, value in os.environ.items():
             if key.startswith("GAMSCFG_") and key != "GAMSCFG_PROJECT_TOML":
-                new_key = key[8:].lower()
+                new_key = key[len("GAMSCFG_"):].lower()
                 if "_" in new_key:
                     table, field = new_key.split("_", 1)
                     logger.debug(

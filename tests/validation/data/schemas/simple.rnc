@@ -1,0 +1,9 @@
+default namespace = ""
+
+start =
+  element products {
+    element product {
+      element name { text },
+      element price { text }
+    }+
+  }

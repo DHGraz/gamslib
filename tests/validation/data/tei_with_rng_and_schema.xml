@@ -1,0 +1,820 @@
+<?xml-model href="schemas/eabgb.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="schemas/eabgb_odd.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader xml:lang="de">
+    <fileDesc>
+      <titleStmt>
+        <title>ABGB: §§ 1-14</title>
+        <author ana="marcrelator:aut">
+          <persName xml:id="pb">
+            <forename>Peter</forename>
+            <surname>Bydlinski, Univ.-Prof. Dr.</surname>
+            <email>peter.bydlinski@uni-graz.at</email>
+          </persName>
+        </author>
+        <principal>
+          <persName xml:id="es">
+            <forename>Elisabeth</forename>
+            <surname>Staudegger</surname>, <roleName>Univ.-Prof. Mag. Dr.</roleName>
+            <email>elisabeth.staudegger@uni-graz.at</email>
+          </persName>
+        </principal>
+        <principal>
+          <persName xml:id="gv">
+            <forename>Georg</forename>
+            <surname>Vogeler</surname>, <roleName>Univ.-Prof. Dr. M.A.</roleName>
+            <email>georg.vogeler@uni-graz.at</email>
+          </persName>
+        </principal>
+        <respStmt ana="marcrelator:edt">
+          <resp>Vertiefte Recherche, Formatierung der Tabellen, Unterstützung bei der Erstellung der
+            Ausgangsdokumente</resp>
+          <persName>
+            <forename>Elisabeth</forename>
+            <surname>Kaban</surname>, <roleName>Mag.</roleName>
+            <email>elisabeth.kaban@uni-graz.at</email>
+          </persName>
+        </respStmt>
+        <respStmt ana="marcrelator:mrk">
+          <resp>Transformation der Tabellen in enriched TEI, Webdevelopment</resp>
+          <persName xml:id="sk">
+            <forename>Sina</forename>
+            <surname>Krottmaier</surname>, <roleName>BA BA</roleName>
+            <email>sina.krottmaier@uni-graz.at</email>
+          </persName>
+        </respStmt>
+        <funder ana="marcrelator:fnd">
+          <orgName ref="https://digital-transformation.uni-graz.at/de/">Netzwerk - Human Factor in
+            Digital Transformation</orgName>
+        </funder>
+      </titleStmt>
+      <editionStmt>
+        <p>Erstellung des Worddokumentes: <date>24.09.2015</date>
+        </p>
+        <p>Letzte Überarbeitung des Worddokumentes: <date>28.02.2022</date>
+        </p>
+        <p>Konversion zu TEI: <date>02.08.2022</date>
+        </p>
+        <p>Anreicherung des TEI: <date>16.08.2022</date>
+        </p>
+        <p>Behandelte Paragraphen: <seg>§§ 1-14 ABGB</seg>
+        </p>
+      </editionStmt>
+      <publicationStmt>
+        <publisher>
+          <orgName corresp="https://zivilrecht.uni-graz.at/de/">Institut für Zivilrecht,
+            Ausländisches und Internationales Privatrecht</orgName>
+        </publisher>
+        <authority ana="marcrelator:his">
+          <orgName corresp="https://informationsmodellierung.uni-graz.at"
+            ref="http://d-nb.info/gnd/1137284463">Zentrum für Informationsmodellierung - Austrian
+            Centre for Digital Humanities, Karl-Franzens-Universität Graz</orgName>
+        </authority>
+        <distributor ana="marcrelator:rps">
+          <orgName ref="https://gams.uni-graz.at">GAMS - Geisteswissenschaftliches Asset Management
+            System</orgName>
+        </distributor>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-nc/4.0">Creative Commons BY-NC
+            4.0</licence>
+        </availability>
+        <date ana="dcterms:issued" when="2022">2022</date>
+        <pubPlace ana="marcrelator:pup">Graz</pubPlace>
+        <idno type="PID">o:eabgb.1-14</idno>
+      </publicationStmt>
+      <seriesStmt>
+        <title ref="https://gams.uni-graz.at/eabgb">Digitale Edition des ABGB / eABGB</title>
+        <respStmt ana="marcrelator:pdr">
+          <resp>Projektleitung - ZIM</resp>
+          <persName>
+            <forename>Georg</forename>
+            <surname>Vogeler</surname>
+          </persName>
+        </respStmt>
+        <respStmt ana="marcrelator:pdr">
+          <resp>Projektleitung - Institut für Zivilrecht, Ausländisches und Internationales
+            Privatrecht</resp>
+          <persName>
+            <forename>Peter</forename>
+            <surname>Bydlinski</surname>
+          </persName>
+        </respStmt>
+        <respStmt ana="marcrelator:res">
+          <resp>Mitarbeiter - Institut für Zivilrecht, Ausländisches und Internationales
+            Privatrecht</resp>
+          <persName>
+            <forename>Elisabeth</forename>
+            <surname>Kaban</surname>
+          </persName>
+        </respStmt>
+        <respStmt ana="marcrelator:res">
+          <resp>ZIM Mitarbeiter</resp>
+          <persName>
+            <forename>Sina</forename>
+            <surname>Krottmaier</surname>
+          </persName>
+        </respStmt>
+      </seriesStmt>
+      <sourceDesc>
+        <bibl>
+          <date ana="dcterms:created">24.9.2015</date>
+          <placeName ana="marcrelator:prp" ref="https://zivilrecht.uni-graz.at/de/">Institut für
+            Zivilrecht, Ausländisches und Internationales Privatrecht</placeName>
+        </bibl>
+      </sourceDesc>
+    </fileDesc>
+    <encodingDesc>
+      <projectDesc>
+        <p>Das ABGB stammt aus dem Jahre 1811 und ist somit schon über 200 Jahre alt. Aus heutiger
+          Sicht weist es eine Mehrzahl von Mängeln auf: Viele Paragraphen sind unverändert seit 1811
+          in Geltung und daher häufig sprachlich nicht zugänglich. Andere, neu hinzugekommene
+          Paragraphen sind textlich schwerfällig und haben das Gesetz überdies sehr inhomogen
+          gemacht. Hinzu kommen eine altertümliche äußere Systematik (Institutionen- statt
+          Pandektensystem) sowie ein zum Teil veraltetes inneres System.</p>
+      </projectDesc>
+      <listPrefixDef>
+        <!-- Personen -->
+        <prefixDef ident="marcrelator" matchPattern="([a-z]+)"
+          replacementPattern="http://id.loc.gov/vocabulary/relators/$1">
+          <p>Taxonomie Rollen MARC</p>
+        </prefixDef>
+        <!-- datum dcterms -->
+        <prefixDef ident="dcterms" matchPattern="([a-z]+)"
+          replacementPattern="http://purl.org/dc/terms/$1">
+          <p>DCterms</p>
+        </prefixDef>
+        <!-- akoma Ntoso -->
+        <prefixDef ident="akn" matchPattern="([a-z])+)"
+          replacementPattern="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/$1">
+          <p>Akoma Ntoso</p>
+        </prefixDef>
+        <!--Erweiterung, um die eabgb Ontologie, sobald diese vervollständigt ist -->
+      </listPrefixDef>
+    </encodingDesc>
+    <profileDesc>
+      <langUsage>
+        <language ident="de">Deutsch</language>
+      </langUsage>
+    </profileDesc>
+  </teiHeader>
+  <text xml:lang="de">
+    <body ana="akn:body">
+      <div>
+        <div>
+          <head>§§ 1-14 ABGB Stand 24.9.2015 </head>
+        </div>
+        <milestone subtype="introduction" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:introduction">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Einleitung Von den bürgerlichen Gesetzen
+                überhaupt </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Einleitung <note ana="akn:authorialNote"
+                  n="1" type="eabgb:footnote">
+                  <seg rend="underline" type="eabgb:termproblem">Abstimmungsbedarf: "<seg
+                      type="eabgb:term">Einleitung</seg>"!</seg>
+                  <hi rend="underline"> In einer späten Phase Überschriftenkonzept überlegen und
+                    ergänzen.</hi>
+                </note>
+              </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e70">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Begriff des bürgerlichen Rechtes </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Begriff des bürgerlichen Rechts </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§1." xml:id="p1">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Definition des bürgerlichen Rechts </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 1.</idno> Der Inbegriff der Gesetze, wodurch die
+                  Privat-Rechte und Pflichten der Einwohner des Staates unter sich bestimmt werden,
+                  macht das bürgerliche Recht in demselben aus. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 1.</idno> Zum bürgerlichen Recht gehören alle
+                  Gesetze, die die privaten Rechte und Pflichten der Einwohner <note
+                    ana="akn:authorialNote" n="2" type="eabgb:footnote">
+                    <hi rend="underline">Schon im Zuge der Gesetzgebung wurde die (zu) enge
+                      Formulierung erkannt und für ein weites Verständnis plädiert (siehe nur </hi>
+                    <bibl>
+                      <hi rend="italic">Ofner</hi>, Ur-Entwurf I 15</bibl>). Schon <bibl>
+                      <hi rend="italic">Zeiller</hi> (Commentar I 32 f)</bibl>
+                    <hi rend="underline"> zählt dazu nicht nur die einzelnen Staatsbürger, sondern
+                      auch juristische Personen und Personen, die sich vorübergehend im Staatsgebiet
+                      aufhalten; ferner sogar jene Fremden, die Rechtsgeschäfte abschließen, auf die
+                      innerstaatliches Recht anzuwenden ist, womit sogar schon das IPR angesprochen
+                      wird. Das alles wird in der Alternative deutlich berücksichtigt.</hi>
+                  </note> der Republik Österreich untereinander regeln. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 1.</idno>
+                  <seg ana="akn:subparagraph" n="(1)" type="eabgb:passage">
+                    <idno type="eabgb:passagenum">(1)</idno> Zum bürgerlichen Recht gehören alle
+                    Gesetze, die die privaten Rechte und Pflichten von Menschen und von juristischen
+                    Personen (§ 26) untereinander regeln. </seg>
+                  <seg ana="akn:subparagraph" n="(2)" type="eabgb:passage">
+                    <idno type="eabgb:passagenum">(2)</idno> Diese Gesetze sind auch auf
+                    Sachverhalte mit Auslandsbezug so weit anwendbar, wie sie das selbst vorsehen
+                    oder Vorschriften des internationalen Privatrechts auf sie verweisen. </seg>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e133">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original"/>
+              <seg ana="akn:p" type="eabgb:suggestion">Geltungsbeginn der Gesetze </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§2." xml:id="p2">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Geltungsvoraussetzung einer Rechtsnorm </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 2.</idno> Sobald ein Gesetz gehörig kund gemacht
+                  worden ist, kann sich niemand damit entschuldigen, daß ihm dasselbe nicht bekannt
+                  geworden sei. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 2.</idno> Nach Veröffentlichung (Kundmachung)
+                  eines Gesetzes kann sich niemand mit dessen Unkenntnis entschuldigen. <note
+                    ana="akn:authorialNote" n="3" type="eabgb:footnote">
+                    <hi rend="underline">Problem: Nach ganz hA wird § 2 nur iS allgemeinen
+                      Gültigwerdens verstanden, während im Bereich der subjektiven Vorwerfbarkeit
+                      (Verschulden an der Unkenntnis) in engen Grenzen Entlastungen akzeptiert
+                      werden.</hi>
+                  </note>
+                </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 2.</idno> Veröffentlichte Gesetze gelten für
+                  jedermann ohne Rücksicht auf seine Kenntnis. </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e164">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Anfang und Wirksamkeit der Gesetze </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">-- </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§3." xml:id="p3">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Kundmachung und ihre Folgen </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 3.</idno> Die Wirksamkeit eines Gesetzes und die
+                  daraus entspringenden rechtlichen Folgen nehmen gleich nach der Kundmachung ihren
+                  Anfang; es wäre denn, daß in dem kund gemachten Gesetze selbst der Zeitpunkt
+                  seiner Wirksamkeit weiter hinaus bestimmt würde. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 3.</idno> Gesetze werden mit ihrer
+                  Veröffentlichung wirksam, sofern nicht das Gesetz selbst einen späteren
+                  Wirksamkeitsbeginn vorsieht. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <note type="eabgb:inlinecommentary"> 1. § 3 vor § 2 stellen oder 2. § 3 streichen,
+                    da Regelung nunmehr in § 11 BGBlG, bzw an dessen Wortlaut angleichen. <note
+                      ana="akn:authorialNote" n="4" type="eabgb:footnote">
+                      <hi rend="underline">ZB: „Gesetze werden im Bundesgesetzblatt kundgemacht. Sie
+                        treten, soweit darin oder gesetzlich nicht ausdrücklich anderes bestimmt
+                        ist, mit Ablauf des Tages der Freigabe zur Abfrage im elektronischen
+                        Rechtsinformationssystem des Bundes (RIS; www.ris.bka.gv.at) in Kraft.“</hi>
+                    </note>
+                  </note>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e198">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Umfang des Gesetzes </seg>
+              <seg ana="akn:p" type="eabgb:suggestion"/>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§4." xml:id="p4">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary"/>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks"/>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <note type="eabgb:inlinecommentary">
+                    <idno ana="akn:num" rend="bold">§ 4.</idno> aufgehoben (BGBl 1978/304) </note>
+                </seg>
+                <seg ana="akn:p" type="eabgb:suggestion"/>
+                <seg ana="akn:p" type="eabgb:alternative"/>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e217">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original"/>
+              <seg ana="akn:p" type="eabgb:suggestion">Zeitliche Geltung </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§5." xml:id="p5">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Zeitliche Geltung von Gesetzen </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 5.</idno> Gesetze wirken nicht zurück; sie haben
+                  daher auf vorhergegangene Handlungen und auf vorher erworbene Rechte keinen
+                  Einfluß. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 5.</idno> Gesetze wirken nicht zurück; sie haben
+                  daher auf vor ihrer Veröffentlichung vorgenommene Handlungen und auf davor
+                  erworbene Rechte keinen Einfluss. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 5.</idno> Gesetze wirken mangels gegenteiliger
+                  Anordnung <note ana="akn:authorialNote" n="5" type="eabgb:footnote">
+                    <hi rend="underline">Grund: Entsprechende Ausnahmen werden anerkannt.</hi>
+                  </note> nicht zurück; sie haben dann auf vor ihrer Veröffentlichung vorgenommene
+                  Handlungen und auf davor erworbene Rechte keinen Einfluss. </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e250">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Auslegung </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Gesetzesauslegung </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§6." xml:id="p6">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Auslegung von Gesetzen </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 6.</idno> Einem Gesetze darf in der Anwendung
+                  kein anderer Verstand beigelegt werden, als welcher aus der eigentümlichen
+                  Bedeutung der Worte in ihrem Zusammenhange und aus der klaren Absicht des
+                  Gesetzgebers hervorleuchtet. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 6.</idno> Eine Gesetzesregel ist so zu
+                  verstehen, wie es aus ihrer Wortbedeutung im jeweiligen Zusammenhang und der
+                  klaren Absicht des Gesetzgebers hervorgeht. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 6.</idno> Eine Gesetzesregel ist so zu
+                  verstehen, wie es ihrer Wortbedeutung im jeweiligen Zusammenhang und der Absicht
+                  des Gesetzgebers entspricht. </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <div ana="akn:paragraph" n="§7." xml:id="p7">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">„Rechtsfortbildung“ (Analogie usw) </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 7.</idno> Läßt sich ein Rechtsfall weder aus den
+                  Worten, noch aus dem natürlichen Sinne eines Gesetzes entscheiden, so muß auf
+                  ähnliche, in den Gesetzen bestimmt entschiedene Fälle, und auf die Gründe anderer
+                  damit verwandten Gesetze Rücksicht genommen werden. Bleibt der Rechtsfall noch
+                  zweifelhaft; so muß solcher mit Hinsicht auf die sorgfältig gesammelten und
+                  reiflich erwogenen Umstände nach den natürlichen Rechtsgrundsätzen entschieden
+                  werden. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 7.</idno>
+                  <s n="1" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">1</idno>Lässt sich ein Rechtsfall weder mithilfe
+                    der Worte noch mithilfe des natürlichen <note ana="akn:authorialNote" n="6"
+                      type="eabgb:footnote">
+                      <hi rend="underline"> „Natürlich“ meint ev die teleologische Auslegung,
+                        während in § 6 wohl nur die historische angesprochen ist. Allerdings scheint </hi>
+                      <bibl>
+                        <hi rend="italic">Zeiller</hi> (Commentar I 54)</bibl>
+                      <hi rend="underline"> nicht allzu scharf zu trennen, wenn er sagt: „Die
+                        entfernte und letzte Absicht des Civil-Gesetzgebers ist die Realisierung des
+                        obersten allgemeinen Rechtsgesetzes, welches die Freyheit eines jeden
+                        Einzelnen darauf beschränkt, daß auch alle Uebrigen in Gemeinschaft mit ihm
+                        freythätig oder sicher seyn können.“ Der Begriff „natürlich“ (in Verbindung
+                        mit „Sinn“) könnte heute durchaus zu Missverständnissen führen (Naturrecht –
+                        das ist aber erst mit den „natürlichen Rechtsgrundsätzen“ am Ende von § 7
+                        gemeint); daher ist in der Alternative seine Streichung vorgesehen.</hi>
+                    </note> Sinns eines Gesetzes entscheiden, so müssen ähnliche gesetzlich klar
+                    geregelte Fälle und die Gründe verwandter Gesetze beachtet werden. </s>
+                  <s n="2" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">2</idno>Bleibt der Rechtsfall immer noch
+                    zweifelhaft, so muss er unter Beachtung der sorgfältig gesammelten und reiflich
+                    erwogenen Umstände nach den natürlichen Rechtsgrundsätzen entschieden werden.
+                  </s>
+                </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 7.</idno>
+                  <s n="1" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">1</idno>Kann ein Rechtsfall weder aufgrund der
+                    Wortbedeutung noch aufgrund des Sinns eines Gesetzes entschieden werden, müssen
+                    ähnliche Fälle und die Gründe verwandter Gesetze herangezogen werden. </s>
+                  <s n="2" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">2</idno>Bleibt der Rechtsfall dann immer noch
+                    zweifelhaft, ist er nach den natürlichen Rechtsgrundsätzen zu entscheiden. </s>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <div ana="akn:paragraph" n="§8." xml:id="p8">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Verbindliche Auslegung durch den Gesetzgeber
+              </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 8.</idno> Nur dem Gesetzgeber steht die Macht
+                  zu, ein Gesetz auf eine allgemein verbindliche Art zu erklären. Eine solche
+                  Erklärung muß auf alle noch zu entscheidende Rechtsfälle angewendet werden, dafern
+                  der Gesetzgeber nicht hinzufügt, daß seine Erklärung bei Entscheidung solcher
+                  Rechtsfälle, welche die vor der Erklärung unternommenen Handlungen und
+                  angesprochenen Rechte zum Gegenstande haben, nicht bezogen werden solle. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 8.</idno>
+                  <s n="1" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">1</idno>Nur der Gesetzgeber kann ein Gesetz mit
+                    allgemein verbindlicher Wirkung auslegen. </s>
+                  <s n="2" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">2</idno>Eine solche Auslegung ist für alle noch
+                    zu entscheidenden Rechtsfälle bindend, außer der Gesetzgeber hat ausgesprochen,
+                    dass sie nicht für Fälle gilt, die die vor dieser Festlegung unternommenen
+                    Handlungen und angesprochenen Rechte zum Gegenstand haben. </s>
+                </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 8.</idno>
+                  <s n="1" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">1</idno>Die allgemein verbindliche Auslegung
+                    eines Gesetzes steht allein dem Gesetzgeber zu. </s>
+                  <s n="2" type="eabgb:sentence">
+                    <idno type="eabgb:sentencenum">2</idno>Eine solche durch ein Gesetz erfolgte
+                    Auslegung ist für alle noch zu entscheidenden Rechtsfälle bindend, sofern nicht
+                    der Gesetzgeber eine Rückwirkung ausgeschlossen hat. </s>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e426">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Dauer des Gesetzes </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Außerkrafttreten von Gesetzen </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§9." xml:id="p9">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Geltungsdauer </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 9.</idno> Gesetze behalten so lange ihre Kraft,
+                  bis sie von dem Gesetzgeber abgeändert oder ausdrücklich aufgehoben werden. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 9.</idno> Gesetze bleiben so lange gültig <note
+                    ana="akn:authorialNote" n="7" type="eabgb:footnote">
+                    <hi rend="underline">Alternative: in Kraft.</hi>
+                  </note>, bis sie vom Gesetzgeber abgeändert oder aufgehoben <note
+                    ana="akn:authorialNote" n="8" type="eabgb:footnote">
+                    <hi rend="underline">„Ausdrücklich“ gestrichen, da auch eine bloß materielle
+                      Derogation denkbar ist.</hi>
+                  </note> werden. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 9.</idno> Sofern Gesetze nicht von vornherein
+                  befristet erlassen wurden <note ana="akn:authorialNote" n="9"
+                    type="eabgb:footnote">
+                    <hi rend="underline">Dieser Aspekt fehlt bisher im Text.</hi>
+                  </note>, bleiben sie so lange gültig, bis sie vom Gesetzgeber abgeändert oder
+                  aufgehoben werden. </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e476">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Andere Arten der Vorschriften, als: </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Bedeutung von Gewohnheiten und
+                Gerichtsentscheidungen </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e492">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">a) Gewohnheiten </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Gewohnheiten </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§10." xml:id="p10">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Bedeutung von Gewohnheiten (nicht
+                Gewohnheitsrecht!) </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 10.</idno> Auf Gewohnheiten kann nur in den
+                  Fällen, in welchen sich ein Gesetz darauf beruft, Rücksicht genommen werden. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 10.</idno> Gewohnheiten sind nur in jenen Fällen
+                  zu berücksichtigen, in denen sich ein Gesetz darauf beruft. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <idno ana="akn:num" rend="bold">§ 10.</idno> Faktische <note
+                    ana="akn:authorialNote" n="10" type="eabgb:footnote">
+                    <hi rend="underline">„Faktisch“ würde verdeutlichen, dass es nicht um das
+                      Gewohnheitsrecht geht (vgl</hi>
+                    <bibl>
+                      <hi rend="italic">Zeiller</hi>, Commentar I 78 f</bibl>
+                    <hi rend="underline">); ebenso die Ergänzung „Usancen“.</hi>
+                  </note> Gewohnheiten (Usancen) dürfen nur dann berücksichtigt werden, wenn sich
+                  ein Gesetz auf sie beruft. </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e536">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">[b) Provinzialstatuten] </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">-- </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§11." xml:id="p11">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Kompetenzregelung (veraltet; Vorschriften
+                nunmehr in den §§ 10 ff B-VG) </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 11.</idno> [Nur jene Statuten einzelner
+                  Provinzen und Landesbezirke haben Gesetzeskraft, welche nach der Kundmachung
+                  dieses Gesetzbuches von dem Landesfürsten ausdrücklich bestätigt werden.] <note
+                    type="eabgb:inlinecommentary">[Gegenstandslos] </note>
+                </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <note type="eabgb:inlinecommentary">[Gegenstandslos] </note>
+                </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <note type="eabgb:inlinecommentary">Auch formell aufheben. </note>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e561">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">c) Richterliche Aussprüche </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Gerichtsentscheidungen </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§12." xml:id="p12">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Bedeutung von Einzelentscheidungen </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 12.</idno> Die in einzelnen Fällen ergangenen
+                  Verfügungen und die von Richterstühlen in besonderen Rechtsstreitigkeiten
+                  gefällten Urteile haben nie die Kraft eines Gesetzes, sie können auf andere Fälle
+                  oder auf andere Personen nicht ausgedehnt werden. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 12.</idno> Einzelne Entscheidungen haben nie die
+                  Kraft eines Gesetzes; sie sind daher für andere Fälle und für andere Personen
+                  nicht verbindlich <note ana="akn:authorialNote" n="11" type="eabgb:footnote">
+                    <hi rend="underline">Oder „bindend“.</hi>
+                  </note>. </seg>
+                <seg ana="akn:p" type="eabgb:alternative"/>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e591">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">d) Privilegien </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Privilegien </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§13." xml:id="p13">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Bedeutung von Privilegien </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 <note
+                  type="eabgb:inlinecommentary">heutzutage wohl bedeutungslos </note>
+              </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 13.</idno> Die einzelnen Personen oder auch
+                  ganzen Körpern verliehenen Privilegien und Befreiungen sind, insofern hierüber die
+                  politischen Verordnungen keine besondere Bestimmung enthalten, gleich den übrigen
+                  Rechten zu beurteilen. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 13.</idno> Verliehene Privilegien und
+                  Befreiungen sind mangels gegenteiliger Anordnung wie sonstige Rechte zu
+                  beurteilen. </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <note type="eabgb:inlinecommentary">Streichung wäre empfehlenswert (schon weil
+                    Privatrecht nicht betroffen <note ana="akn:authorialNote" n="12"
+                      type="eabgb:footnote">
+                      <hi rend="underline">Vgl</hi>
+                      <bibl>
+                        <hi rend="italic">Ofner</hi>, Ur-Entwurf I 49</bibl>
+                      <hi rend="underline">.</hi>
+                    </note> und heutzutage bedeutungslos <note ana="akn:authorialNote" n="13"
+                      type="eabgb:footnote">
+                      <hi rend="underline">Statt vieler </hi>
+                      <bibl>
+                        <hi rend="italic">Kodek</hi> in <hi rend="italic">Rummel/Lukas</hi>
+                        <hi rend="superscript">4</hi> § 13 Rz 1 (Stand 1.7.2015, rdb.at).</bibl>
+                    </note>). </note>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+        <milestone subtype="paragraphheading" type="start" unit="t:div"/>
+        <div ana="akn:heading" type="eabgb:paragraphheading" xml:id="heading-d1e666">
+          <p>
+            <choice>
+              <seg ana="akn:p" type="eabgb:original">Haupteinteilung des bürgerlichen Rechtes </seg>
+              <seg ana="akn:p" type="eabgb:suggestion">Teile des bürgerlichen Rechts </seg>
+              <seg ana="akn:p" type="eabgb:alternative"/>
+            </choice>
+          </p>
+        </div>
+        <div ana="akn:paragraph" n="§14." xml:id="p14">
+          <div ana="akn:intro" type="eabgb:shortinformation">
+            <p>
+              <seg ana="akn:p" type="eabgb:summary">Grobgliederung des ABGB </seg>
+            </p>
+            <p>
+              <seg ana="akn:p" type="eabgb:remarks">idF JGS Nr. 946/1811 </seg>
+            </p>
+          </div>
+          <div ana="akn:content">
+            <p>
+              <choice>
+                <seg ana="akn:p" type="eabgb:original">
+                  <idno ana="akn:num" rend="bold">§ 14.</idno> Die in dem bürgerlichen Gesetzbuche
+                  enthaltenen Vorschriften haben das Personenrecht, das Sachenrecht und die
+                  denselben gemeinschaftlich zukommenden Bestimmungen zum Gegenstande. </seg>
+                <seg ana="akn:p" type="eabgb:suggestion">
+                  <idno ana="akn:num" rend="bold">§ 14.</idno> Dieses Gesetzbuch enthält
+                  Vorschriften über das Personenrecht (§§ 15–284h), über das Sachenrecht <note
+                    ana="akn:authorialNote" n="14" type="eabgb:footnote">
+                    <hi rend="underline">Ev ergänzen: „einschließlich Erbrecht und persönlichem
+                      Sachenrecht“. (Oder doch Begriff “Schuldrecht“ einführen?)</hi>
+                  </note> (§§ 285–1341) und gemeinschaftliche Bestimmungen für beide Rechtsbereiche
+                  (§§ 1342–1503). </seg>
+                <seg ana="akn:p" type="eabgb:alternative">
+                  <note type="eabgb:inlinecommentary">Streichung wäre empfehlenswert; allenfalls
+                    Vorziehen zu § 1. </note>
+                </seg>
+              </choice>
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  </text>
+</TEI>
+<?xml-model href="../out/eabgb_odd2.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>

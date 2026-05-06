@@ -16,8 +16,10 @@ from gamslib import formatdetect
 from gamslib.formatdetect.formatinfo import FormatInfo
 
 # from .utils import find_object_folders
+from gamslib.objectcsv.utils import find_object_root
 from gamslib.objectdir import find_object_folders
 from gamslib.projectconfiguration import Configuration
+from gamslib.sip.validation import validate_datastream_id
 
 from . import defaultvalues
 from .dsdata import DSData
@@ -31,7 +33,6 @@ logger = logging.getLogger()
 NAMESPACES = {
     "dc": "http://purl.org/dc/elements/1.1/",
 }
-
 
 
 def is_datastream_file(ds_file: Path, configuration: Configuration) -> bool:
@@ -130,8 +131,7 @@ def extract_dsid(datastream: Path | str, keep_extension=True) -> str:
                     UserWarning,
                 )
 
-    if re.match(r"^[a-zA-Z0-9]+[-.%_a-zA-Z0-9]+[a-zA-Z0-9]+$", pid) is None:
-        raise ValueError(f"Invalid PID: '{pid}'")
+    validate_datastream_id(pid)
 
     logger.debug(
         "Extracted PID: %s from %s (keep_extension=%s)", pid, datastream, keep_extension
@@ -251,11 +251,12 @@ def collect_datastream_data(
     # I think it's not possible to derive a ds title or description from the DC file
     # title = "; ".join(dc.get_element("title", default=dsid)) # ??
     # description = "; ".join(dc.get_element("description", default="")) #??
+    object_dir = find_object_root(ds_file)
 
     format_info: FormatInfo = formatdetect.detect_format(ds_file)
 
     return DSData(
-        dspath=str(ds_file.relative_to(ds_file.parents[1])),  # objectsdir
+        dspath=str(ds_file.relative_to(object_dir)),  # objectsdir
         dsid=dsid,
         title=make_ds_title(dsid, format_info),
         description=make_ds_description(dsid, format_info),
@@ -311,7 +312,7 @@ def create_csv(
         use_subjects_as_tags=use_subjects_as_tags,
     )
     objectcsv.set_object(obj)
-    for ds_file in object_directory.glob("*"):
+    for ds_file in object_directory.rglob("*"):
         if is_datastream_file(ds_file, configuration):
             objectcsv.add_datastream(
                 collect_datastream_data(ds_file, configuration, dc)
@@ -361,7 +362,7 @@ def update_csv(
             use_subjects_as_tags=use_subjects_as_tags,
         )
     )
-    for ds_file in object_directory.glob("*"):
+    for ds_file in object_directory.rglob("*"):
         if is_datastream_file(ds_file, configuration):
             # dsdata = collect_datastream_data(ds_file, configuration, dc)
             objectcsv.merge_datastream(

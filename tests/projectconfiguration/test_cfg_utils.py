@@ -18,8 +18,8 @@ from gamslib.projectconfiguration.utils import (
 
 def test_create_configuraton_skeleton(tmp_path):
     create_project_toml(tmp_path)
-    assert (tmp_path / "project.toml").exists()
-    assert "publisher" in (tmp_path / "project.toml").read_text(encoding="utf-8")
+    assert (tmp_path / "gamsproject.toml").exists()
+    assert "publisher" in (tmp_path / "gamsproject.toml").read_text(encoding="utf-8")
 
     # A we have created the toml file before, we should get None
     with pytest.warns(UserWarning):
@@ -31,7 +31,7 @@ def test_find_project_toml(datadir):
     "Test finding the project.toml file."
 
     # toml is in datadir
-    project_toml = datadir / "project.toml"
+    project_toml = datadir / "gamsproject.toml"
     assert find_project_toml(project_toml.parent) == project_toml
 
     # toml is in a child folder
@@ -46,12 +46,12 @@ def test_find_project_toml_current_folder(datadir, tmp_path, monkeypatch):
 
     # we switch to datadir, where a project.toml file is located
     monkeypatch.chdir(datadir)
-    # there in no project.toml in tmp_path, so the funtion should return the project.toml in datadir
-    assert find_project_toml(tmp_path) == datadir / "project.toml"
+    # there in no gamsproject.toml in tmp_path, so the funtion should return the gamsproject.toml in datadir
+    assert find_project_toml(tmp_path) == datadir / "gamsproject.toml"
 
 
 def test_find_project_toml_not_found(tmp_path):
-    "Test finding the project.toml file when it is not found."
+    "Test finding the gamsproject.toml file when it is not found."
 
     # toml is not in the parent folder
     with pytest.raises(FileNotFoundError):
@@ -96,15 +96,15 @@ def test_read_path_from_dotenv_returns_none_if_file_not_exists(tmp_path):
 def test_initialize_project_dir(tmp_path):
     "Test the initialize_project_dir function."
     initialize_project_dir(tmp_path)
-    assert (tmp_path / "project.toml").exists()
+    assert (tmp_path / "gamsproject.toml").exists()
     assert (tmp_path / ".gitignore").exists()
     assert (tmp_path / "objects").exists() and (tmp_path / "objects").is_dir()
 
 
 def test_initialize_project_dir_existing_toml_file(tmp_path):
-    "If the project.toml file exists, a warning should be raised."
-    (tmp_path / "project.toml").touch()
-    with pytest.warns(UserWarning, match="project.toml"):
+    "If the gamsproject.toml file exists, a warning should be raised."
+    (tmp_path / "gamsproject.toml").touch()
+    with pytest.warns(UserWarning, match="gamsproject.toml"):
         initialize_project_dir(tmp_path)
 
 
@@ -131,7 +131,7 @@ def test_get_config_file_from_env_environ(monkeypatch, tmp_path):
 
 def test_get_config_file_from_env_dotenv(monkeypatch, tmp_path):
     "Test the get_config_file_from_env function with path specified in .env."
-    project_path = tmp_path / "project.toml"
+    project_path = tmp_path / "gamsproject.toml"
     (tmp_path / ".env").write_text(f'project_toml = "{project_path!s}"')
     monkeypatch.chdir(tmp_path)
     assert get_config_file_from_env() == project_path
@@ -145,9 +145,9 @@ def test_config_needs_update_no_update_needed(tmp_path):
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
-    config_path = tmp_path / "project.toml"
+    config_path = tmp_path / "gamsproject.toml"
     shutil.copy(template_path, config_path)
     assert not configuration_needs_update(config_path)
 
@@ -178,7 +178,7 @@ def test_config_needs_update_update_needed(tmp_path):
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
 
     # remove the "publisher" key from the template data and store as project.toml
@@ -200,7 +200,7 @@ def test_config_needs_update_no_cfg_file(tmp_path):
 
     This means that config_needs_update should False.
     """
-    non_existting_cfg = tmp_path / "project.toml"
+    non_existting_cfg = tmp_path / "gamsproject.toml"
     assert not configuration_needs_update(non_existting_cfg)
 
 def test_update_configuration_no_changes(tmp_path):
@@ -211,9 +211,9 @@ def test_update_configuration_no_changes(tmp_path):
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
-    config_path = tmp_path / "project.toml"
+    config_path = tmp_path / "gamsproject.toml"
     shutil.copy(template_path, config_path)
     update_configuration(config_path)
 
@@ -234,9 +234,9 @@ def test_update_configuration_with_changes(tmp_path):
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
-    config_path = tmp_path / "project.toml"
+    config_path = tmp_path / "gamsproject.toml"
     template_doc = toml_file.TOMLFile(template_path).read()
 
     # remove some fields and a table from the template

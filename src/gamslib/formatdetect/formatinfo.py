@@ -85,27 +85,22 @@ class FormatInfo:
     subtype: SubType | None = None  # only for xml and json types
     pronom_id: str | None = None  # PRONOM identifier, if available
 
-    def is_xml_type(self) -> bool:  # type: ignore
-        """
-        Check if the subtype is an XML type.
-
-        Returns:
-            bool: True if the subtype's maintype is 'xml', False otherwise.
-        """
+    def is_xml_type(self) -> bool:
+        "Return True if the Format is XML (or a subtype of XML)."
+        # As mimetype is set by user, it might be wrong.
         subtype_info = self._get_subtype_info()
         if subtype_info is not None:
             return (
                 subtype_info["subformat"] == self.subtype.name
                 and subtype_info["maintype"] == "xml"
             )
-        return False
+        # Use mimetype as fallback
+        return 'xml' in self.mimetype
+
 
     def is_json_type(self) -> bool:  # type: ignore
         """
-        Check if the subtype is a JSON type.
-
-        Returns:
-            bool: True if the subtype's maintype is 'json', False otherwise.
+        Return True if the subtype is a JSON type or a subtype of JSON.
         """
         subtype_info = self._get_subtype_info()
         if subtype_info is not None:
@@ -113,7 +108,7 @@ class FormatInfo:
                 subtype_info["subformat"] == self.subtype.name
                 and subtype_info["maintype"] == "json"
             )
-        return False
+        return 'json' in self.mimetype
 
     @property
     def description(self) -> str:

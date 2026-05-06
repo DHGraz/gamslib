@@ -6,10 +6,12 @@ Provides methods for merging, validating, and inferring missing metadata values.
 """
 
 import dataclasses
-from pathlib import Path
+from typing import ClassVar
+from pathlib import Path, PurePath
 
 from gamslib import formatdetect
-from gamslib.objectcsv import defaultvalues
+from gamslib.objectcsv import defaultvalues, utils
+from gamslib.sip.validation.sip_json import validate_tag
 
 
 # pylint: disable=too-many-instance-attributes
@@ -41,14 +43,47 @@ class DSData:
     lang: str = ""
     tags: str = ""
 
-    @property
-    def object_id(self):
-        """
-        Return the object ID for the datastream.
+    _DATA_FIELD_NAMES: ClassVar[set[str]] = set()
 
-        The object ID is inferred from the first part of the datastream path.
+    def __post_init__(self):
         """
-        return Path(self.dspath).parts[0]
+        Post-initialization processing for DSData.
+
+        Validates the datastream path and ID, and ensures that required fields are not empty.
+        """
+        self.tags = utils.distinctify(self.tags)
+        self.lang = utils.distinctify(self.lang)
+        if not self._DATA_FIELD_NAMES:
+            type(self)._DATA_FIELD_NAMES = {
+                field.name for field in dataclasses.fields(type(self))
+            }
+        object.__setattr__(self, "_is_initialized", True)
+        self.validate()
+
+    def __setattr__(self, name, value):
+        """Set dataclass fields atomically and validate the full object immediately."""
+        # Internal attributes and early initialization should not trigger validation.
+        if name not in self._DATA_FIELD_NAMES or not getattr(
+            self, "_is_initialized", False
+        ):
+            object.__setattr__(self, name, value)
+            return
+
+        # During validation/rollback we bypass recursive checks.
+        if getattr(self, "_is_validating", False):
+            object.__setattr__(self, name, value)
+            return
+
+        old_value = getattr(self, name)
+        object.__setattr__(self, name, value)
+        object.__setattr__(self, "_is_validating", True)
+        try:
+            self.validate()
+        except Exception:
+            object.__setattr__(self, name, old_value)
+            raise
+        finally:
+            object.__setattr__(self, "_is_validating", False)
 
     @classmethod
     def fieldnames(cls) -> list[str]:
@@ -90,14 +125,24 @@ class DSData:
         Raises:
             ValueError: If any required field (dspath, dsid, mimetype, rights) is empty.
         """
-        if not self.dspath.strip():
+        if not isinstance(self.dspath, str) or not self.dspath.strip():
             raise ValueError(f"{self.dsid}: dspath must not be empty")
-        if not self.dsid.strip():
+        if not self._is_in_objectdir(self.dspath):
+            raise ValueError(
+                f"{self.dspath}: dspath must be in or below object directory"
+            )
+        if not isinstance(self.dsid, str) or not self.dsid.strip():
             raise ValueError(f"{self.dspath}: dsid must not be empty")
-        if not self.mimetype.strip():
+        if not isinstance(self.mimetype, str) or not self.mimetype.strip():
             raise ValueError(f"{self.dspath}: mimetype must not be empty")
-        if not self.rights.strip():
+        if not isinstance(self.rights, str) or not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
+        
+        for tag in utils.split_entry(self.tags):
+            try:
+                validate_tag(tag)
+            except ValueError as e:
+                raise ValueError(f"Problem: 'tags' entry in 'datastreams.csv' for '{self.dspath}': {e}") from e
 
     def guess_missing_values(self, object_path: Path):
         """
@@ -112,6 +157,33 @@ class DSData:
         format_info = formatdetect.detect_format(ds_file)
         self._guess_mimetype(format_info)
         self._guess_missing_values(ds_file, format_info)
+
+    def _is_in_objectdir(self, filepath: str) -> bool:
+        """
+        Check if the given filepath is within the object directory.
+
+        Use this to make shure, that filepath is not outside of the object directory.
+
+        Args:
+            filepath (str): The filepath to check.
+
+        Returns:
+            bool: True if the filepath is within the object directory, False otherwise.
+        """
+        # '~' ist not expanded by PurePath, so we can check for it directly to block home
+        # directory access
+        if filepath.startswith("~"):
+            return False
+
+        p = PurePath(filepath)
+
+        # block absolute paths to prevent access to any location outside the object
+        # directory
+        if p.is_absolute():
+            return False
+
+        # block path traversal to prevent access to parent directories
+        return ".." not in p.parts
 
     def _guess_mimetype(self, format_info=None):
         """

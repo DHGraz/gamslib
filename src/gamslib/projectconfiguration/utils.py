@@ -13,33 +13,34 @@ from tomlkit import toml_file
 
 def find_project_toml(start_dir: Path) -> Path:
     """
-    Search for a 'project.toml' file starting from the given directory and moving upwards.
+    Search for a 'gamsproject.toml' file starting from the given directory and moving upwards.
 
     Args:
         start_dir (Path): The directory to begin the search.
 
     Returns:
-        Path: The path to the first 'project.toml' file found.
+        Path: The path to the first 'gamsproject.toml' file found.
 
     Raises:
-        FileNotFoundError: If no 'project.toml' file is found in the start_dir, its
+        FileNotFoundError: If no 'gamsproject.toml' file is found in the start_dir, its
         parents, or the current working directory.
 
-    The function checks each parent directory of start_dir for a 'project.toml' file.
+    The function checks each parent directory of start_dir for a 'gamsproject.toml' file.
     If none is found, it checks the current working directory as a fallback.
     """
+    # we add a non existing folder to the start_dir to make sure that we also check the start_dir itself for a gamsproject.toml
     for folder in (start_dir / "a_non_existing_folder_to_include_start_dir").parents:
-        project_toml = folder / "project.toml"
+        project_toml = folder / "gamsproject.toml"
         if project_toml.exists():
             return project_toml
 
-    # if we read this point, no project.toml has been found in object_root or above
-    # So we check if there's a project.toml in the current working directory
-    project_toml = Path.cwd() / "project.toml"
+    # if we read this point, no gamsproject.toml has been found in object_root or above
+    # So we check if there's a gamsproject.toml in the current working directory
+    project_toml = Path.cwd() / "gamsproject.toml"
 
     if project_toml.exists():
         return project_toml
-    raise FileNotFoundError("No project.toml file found in or above the start_dir.")
+    raise FileNotFoundError("No gamsproject.toml file found in or above the start_dir.")
 
 
 def create_gitignore(project_dir: Path) -> None:
@@ -89,7 +90,7 @@ def create_project_toml(project_dir: Path) -> None:
     Raises:
         UserWarning: If the 'project.toml' file already exists and will not be recreated.
     """
-    toml_file_ = project_dir / "project.toml"
+    toml_file_ = project_dir / "gamsproject.toml"
     if toml_file_.exists():
         warnings.warn(
             f"'{toml_file_}' already exists. Will not be re-created.", UserWarning
@@ -99,7 +100,7 @@ def create_project_toml(project_dir: Path) -> None:
             impresources.files("gamslib")
             / "projectconfiguration"
             / "resources"
-            / "project.toml"
+            / "gamsproject.toml"
         )
         shutil.copy(toml_template_file, toml_file_)
 
@@ -107,7 +108,7 @@ def create_project_toml(project_dir: Path) -> None:
 def initialize_project_dir(project_dir: Path) -> None:
     """Initialize a GAMS project directory.
 
-    Create a skeleton project.toml file and a .gitignore file in the project_dir directory.
+    Create a skeleton gamsproject.toml file and a .gitignore file in the project_dir directory.
     Also creates a directory 'objects' in the project_dir directory.
     """
     create_project_toml(project_dir)
@@ -222,7 +223,7 @@ def configuration_needs_update(config_file: Path) -> bool:
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
 
     config_toml_file = toml_file.TOMLFile(config_file)
@@ -266,7 +267,7 @@ def update_configuration(config_file: Path):
         impresources.files("gamslib")
         / "projectconfiguration"
         / "resources"
-        / "project.toml"
+        / "gamsproject.toml"
     )
 
     # make a backup of the current config file

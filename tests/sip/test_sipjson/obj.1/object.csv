@@ -1,0 +1,2 @@
+recid,title,project,description,creator,rights,publisher,source,objectType,mainResource,funder,tags
+obj.1,obj.1,Test,,Creator,Public Domain (http://creativecommons.org/publicdomain/mark/1.0/),GAMS,local,text,TEI_SOURCE.xml,Funder,tag1;tag2

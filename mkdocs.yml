@@ -1,0 +1,15 @@
+site_name: "gamslib API"
+theme:
+  name: material  
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - sys.path.append(".")
+          options:
+            show_source: true         # Show source link
+            show_root_heading: true   # Show module name as header
+            show_category_heading: true

@@ -74,8 +74,15 @@ def test_extract_subtype_info_from_csv():
 def test_is_xml_type():
     """Test that is_xml_type returns True for known XML types."""
 
+    # Test with an XML type which has a subtype
     formatinfo = FormatInfo(
         detector="test_detector", mimetype="application/xml", subtype=SubType.TEIP5
+    )
+    assert formatinfo.is_xml_type()
+
+    # test with an xml type which has no subtype
+    formatinfo = FormatInfo(
+        detector="test_detector", mimetype="application/xml", subtype=None
     )
     assert formatinfo.is_xml_type()
 
@@ -168,22 +175,22 @@ def test_is_xml_type_false_wrong_subformat(monkeypatch):
     )
     assert fi.is_xml_type() is False
 
+@pytest.mark.parametrize("mimetype, expected", [
+    ("application/xml", True),
+    ("application/foo", False),
+    ])
+def test_is_xml_type_no_subtype(mimetype, expected, monkeypatch):
+    """Test is_xml_type() when subtype is None.
 
-def test_is_xml_type_false_no_subtype_info(monkeypatch):
-    """Test is_xml_type returns False when _get_subtype_info returns None."""
-
+    This should return True if xml in mimetype, False otherwise
+    """
     class DummySubType:
+        "Only used in constructor. Value does not matter."
         name = "TEIP5"
 
-    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
+    fi = FormatInfo(detector="det", mimetype=mimetype, subtype=DummySubType())
     monkeypatch.setattr(fi, "_get_subtype_info", lambda: None)
-    assert fi.is_xml_type() is False
-
-
-def test_is_xml_type_false_no_subtype():
-    """Test is_xml_type returns False when subtype is None."""
-    fi = FormatInfo(detector="det", mimetype="application/xml", subtype=None)
-    assert fi.is_xml_type() is False
+    assert fi.is_xml_type() is expected
 
 
 def test_is_json_type_true(monkeypatch):
@@ -224,19 +231,17 @@ def test_is_json_type_false_wrong_subformat(monkeypatch):
     )
     assert fi.is_json_type() is False
 
-
-def test_is_json_type_false_no_subtype_info(monkeypatch):
+@pytest.mark.parametrize("mimetype, expected", [
+    ("application/json", True),
+    ("application/foo", False),
+])
+def test_is_json_type_false_no_subtype_info(mimetype, expected, monkeypatch):
     """Test is_json_type returns False when _get_subtype_info returns None."""
-
     class DummySubType:
         name = "JSON"
 
-    fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
+    fi = FormatInfo(detector="det", mimetype=mimetype, subtype=DummySubType())
     monkeypatch.setattr(fi, "_get_subtype_info", lambda: None)
-    assert fi.is_json_type() is False
+    assert fi.is_json_type() is expected
 
 
-def test_is_json_type_false_no_subtype():
-    """Test is_json_type returns False when subtype is None."""
-    fi = FormatInfo(detector="det", mimetype="application/json", subtype=None)
-    assert fi.is_json_type() is False

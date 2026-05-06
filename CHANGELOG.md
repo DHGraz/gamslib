@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-05-06
+
+## Changed
+
+  - Add the validation sub package (currently only supports XML)
+  - Used the new gams-xml-catalog to load XML resources (schemas)
+  - formatdetect now provide PRONOM IDs
+  - Rename project.toml to gamsproject.toml
+  - Reorganize documentation
+    - HTML-documentation no longer is part of the repo, but is created a Github Pages
+    - Switched to zensical as documentation generator
+  - Extend sip.json
+    - Add puid (PRONOM ID) for each contentFile
+    - Add checksums Array for each contentFile
+    - Switch from CERN json-schema to a custom gams json schema with more strict 
+      validation rules  
+
+## [0.7.13] - 2026-04-13
+
+### Changed
+
+  - Breaking change: DSData now validates on every field assignment, not only on explicit validate() calls.
+  - DSData assignments are now atomic: invalid updates raise ValueError and keep the previous value unchanged.
+  - dspath security checks (relative path only, no traversal, no home shortcut) now also run immediately on assignment.
+
 ## [0.7.12]
 
 # Changed

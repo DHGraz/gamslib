@@ -14,10 +14,13 @@ requirements-dev.lock
 requirements.lock
 .vscode/settings.json
 
-
-
+.DS_Store
 foo.py
 uv.lock
+*.swp
+tmp/
+bar.py
+.schema_cache/
 src/gamslib/validate/xml/X_dtdvalidator.py
 src/gamslib/validate/xml/X_genericxmlvalidator.py
 src/gamslib/validate/xml/X_lidovalidator.py
@@ -25,4 +28,9 @@ src/gamslib/validate/xml/X_teivalidator.py
 tests/validate/xml/X_test_dtdvalidator.py
 tests/validate/xml/data/Xminimal_non_existing_schema_reference.xml
 .DS_Store
+.schema_cache
 coverage
+Xvalidate/
+tmp
+bar.py
+foo.py

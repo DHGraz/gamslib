@@ -1,32 +1,33 @@
 """Validation utilities for Bagit and object directories in GAMS projects.
 
-This subpackage provides functions to validate the structure and metadata of Bagit directories,
-including checks for required files, manifests, and SIP JSON metadata.
+This subpackage provides functions to validate the structure and metadata of 
+Bagit directories, including checks for required files, manifests, and SIP 
+JSON metadata.
 
-Features:
-    - Validates Bagit directory structure and required files.
-    - Checks bagit.txt, bag-info.txt, and manifest files (MD5, SHA512).
-    - Validates SIP JSON metadata for completeness and correctness.
-    - Raises BagValidationError for any validation failures.
+All public functions are made available in the top-level 
+`gamslib.sip.validation` namespace for easy access.
 
-Usage:
-    Call `validate_bag(bag_dir)` to perform all standard validations on a Bagit directory.
-    Individual validation functions are also available for more granular checks.
+The most important function is `validate_bag`, which performs a comprehensive 
+validation of a Bagit directory, including structure, required files, 
+manifests, and SIP JSON metadata. It raises a `BagValidationError` if any
+validation check fails.
+
+There are two more functions which might be useful for validating specific 
+aspects of the bag or the metadata:
+
+- `validate_pid(pid)`: Validates a given PID (Project Identifier) according 
+  to specific rules.
+- `validate_datastream_id(datastream_id)`: Validates a given datastream ID
 """
 
 import re
-import urllib
+#import urllib
 from pathlib import Path
 import warnings
 
 from .. import BagValidationError
-from .baginfo import validate_baginfo_text
-from .bagit import validate_bagit_txt, validate_structure
-from .manifests import (
-    validate_manifest_md5,
-    validate_manifest_sha512,
-)
-from .sip_json import validate_sip_json
+
+from . import baginfo, bagit, manifests, sip_json
 
 
 def _split_id(pid: str) -> tuple[str, str, str]:
@@ -107,7 +108,7 @@ def _validate_type_prefix(type_prefix: str) -> None:
         )
 
 
-def validate_project_name(value: str) -> None:
+def _validate_project_name(value: str) -> None:
     """
     Validate the project name. Can also be used to validate the project prefix of a PID.
 
@@ -141,7 +142,7 @@ def _validate_object_id(object_id: str) -> None:
 
     Args:
         object_id (str): The object identifier to validate.
-        allow_uppercase (bool, optional): If True, allow uppercase letters in object 
+        allow_uppercase (bool, optional): If True, allow uppercase letters in object
         identifier. Defaults to False.
         Object identifiers should normally be lowercase only.
 
@@ -178,7 +179,7 @@ def validate_pid(pid: str) -> None:
      - The part after the dot must start with a letter or a number, followed by any
        number of ASCII letters, numbers, dots, and dashes.
      - For legacy reasons, the project prefix can be proceeded by a type prefix like 'o:'
-       but we discourage the use of this prefix for new objects. Only lowercase letters 
+       but we discourage the use of this prefix for new objects. Only lowercase letters
        and numbers are allowed as type prefix.
 
     Invalid ids are for example:
@@ -202,7 +203,7 @@ def validate_pid(pid: str) -> None:
         raise ValueError(f"ID must not be longer than {max_id_length} characters")
     type_prefix, project_prefix, object_id = _split_id(pid)
     _validate_type_prefix(type_prefix)
-    validate_project_name(project_prefix)
+    _validate_project_name(project_prefix)
     _validate_object_id(object_id)
     if type_prefix:
         warnings.warn(
@@ -249,15 +250,15 @@ def validate_bag(bag_dir: Path) -> None:
         BagValidationError: If the bag directory does not exist or any validation check fails.
 
     Notes:
-        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON, 
+        - Runs all standard validation checks: structure, bagit.txt, manifests, SIP JSON,
           and bag-info.txt.
         - Raises an error immediately if any check fails.
     """
     if not bag_dir.is_dir():
         raise BagValidationError(f"Bag directory {bag_dir} does not exist")
-    validate_structure(bag_dir)
-    validate_bagit_txt(bag_dir)
-    validate_manifest_md5(bag_dir)
-    validate_manifest_sha512(bag_dir)
-    validate_sip_json(bag_dir)
-    validate_baginfo_text(bag_dir)
+    bagit.validate_structure(bag_dir)
+    bagit.validate_bagit_txt(bag_dir)
+    manifests.validate_manifest_md5(bag_dir)
+    manifests.validate_manifest_sha512(bag_dir)
+    sip_json.validate_sip_json(bag_dir)
+    baginfo.validate_baginfo_text(bag_dir)

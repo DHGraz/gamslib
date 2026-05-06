@@ -53,3 +53,11 @@ def test_split_entry():
     assert utils.split_entry("foo,bar") == ["foo,bar"]
     assert utils.split_entry("foo , bar") == ["foo , bar"]
     assert utils.split_entry("foo:foo, bar-bar;") == ["foo:foo, bar-bar"]
+
+
+def test_distinctify():
+    "Test the distinctify method."
+    assert utils.distinctify("foo;bar;foo") == "foo; bar"
+    assert utils.distinctify("foo;bar;foo;bar") == "foo; bar"
+    assert utils.distinctify("foo") == "foo"
+    assert utils.distinctify("") == ""

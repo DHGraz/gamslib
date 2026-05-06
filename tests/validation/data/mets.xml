@@ -1,0 +1,93 @@
+<mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/mets/mets.xsd">
+  <mets:dmdSec ID="DMD.1">
+    <mets:mdWrap MDTYPE="MODS" MIMETYPE="text/xml">
+      <mets:xmlData>
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3" version="3.5" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods.xsd">
+          <mods:identifier type="urn">o:hsa.letter.1</mods:identifier>
+          <mods:titleInfo>
+            <mods:title>Charles Baissac an Hugo Schuchardt (15-00432)</mods:title>
+          </mods:titleInfo>
+          <mods:name authorityURI="https://viaf.org/" type="personal" valueURI="https://viaf.org/viaf/228232402">
+            <mods:namePart type="family">Baissac</mods:namePart>
+            <mods:namePart type="given">Charles</mods:namePart>
+            <mods:displayForm>Charles Baissac</mods:displayForm>
+            <mods:role>
+              <mods:roleTerm authority="marcrelator" type="code">aut</mods:roleTerm>
+              <mods:roleTerm>Autor</mods:roleTerm>
+            </mods:role>
+          </mods:name>
+          <mods:language>
+            <mods:languageTerm authority="rfc5646" type="code">fr</mods:languageTerm>
+          </mods:language>
+          <mods:originInfo>
+            <mods:place>
+              <mods:placeTerm authorityURI="http://sws.geonames.org/" valueURI="http://sws.geonames.org/934154">Port Louis</mods:placeTerm>
+            </mods:place>
+            <mods:dateCreated>1885-01-20</mods:dateCreated>
+          </mods:originInfo>
+          <mods:physicalDescription>
+            <mods:digitalOrigin>reformatted digital</mods:digitalOrigin>
+            <mods:extent>1 Seite</mods:extent>
+            <mods:internetMediaType>image/jpeg</mods:internetMediaType>
+            <mods:internetMediaType>text/xml</mods:internetMediaType>
+          </mods:physicalDescription>
+          <mods:typeOfResource>text</mods:typeOfResource>
+          <mods:genre authority="dct">text</mods:genre>
+          <mods:accessCondition>Creative Commons BY-NC 4.0</mods:accessCondition>
+        </mods:mods>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+  <mets:amdSec ID="AMD.1">
+    <mets:rightsMD ID="RMD.1">
+      <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml" OTHERMDTYPE="DVRIGHTS">
+        <mets:xmlData>
+          <dv:rights xmlns:dv="http://dfg-viewer.de/">
+            <dv:owner>Karl-Franzens-Universität Graz</dv:owner>
+            <dv:license>Creative Commons BY-NC 4.0</dv:license>
+            <dv:ownerSiteURL>http://www.uni-graz.at</dv:ownerSiteURL>
+          </dv:rights>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:digiprovMD ID="PMD.1">
+      <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml" OTHERMDTYPE="DVLINKS">
+        <mets:xmlData>
+          <dv:links xmlns:dv="http://dfg-viewer.de/">
+            <dv:reference></dv:reference>
+            <dv:presentation></dv:presentation>
+          </dv:links>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+  <mets:fileSec>
+    <mets:fileGrp USE="DEFAULT">
+      <mets:file ID="IMG.1" MIMETYPE="image/jpeg">
+        <mets:FLocat LOCTYPE="URL" xlink:href="https://gams.uni-graz.at/o:hsa.letter.1/IMG.1"></mets:FLocat>
+        <mets:FContent>
+          <mets:xmlData>
+            <x:xmpmeta xmlns:x="adobe:ns:meta/">
+              <exif:PixelXDimension xmlns:exif="http://ns.adobe.com/exif/1.0/">809</exif:PixelXDimension>
+              <exif:PixelYDimension xmlns:exif="http://ns.adobe.com/exif/1.0/">1269</exif:PixelYDimension>
+            </x:xmpmeta>
+          </mets:xmlData>
+        </mets:FContent>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap TYPE="PHYSICAL">
+    <mets:div ID="PHYS.1" TYPE="physSequence">
+      <mets:div ID="P.1" LABEL="1" ORDER="1" TYPE="page">
+        <mets:fptr FILEID="IMG.1"></mets:fptr>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+  <mets:structMap TYPE="LOGICAL">
+    <mets:div ADMID="AMD.1" DMDID="DMD.1" ID="LOG.1" TYPE="letter"></mets:div>
+  </mets:structMap>
+  <mets:structLink>
+    <mets:smLink xlink:from="LOG.1" xlink:to="PHYS.1"></mets:smLink>
+  </mets:structLink>
+</mets:mets>

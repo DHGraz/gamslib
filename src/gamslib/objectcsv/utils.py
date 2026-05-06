@@ -66,3 +66,39 @@ def extract_title_from_lido(lido_file: Path | str) -> str:
         namespaces=NAMESPACES,
     )
     return title_node.text if title_node is not None else ""
+
+
+def find_object_root(start_path: Path) -> Path:
+    """
+    Find the root folder of an object by looking a DC.XML file in the current and parent directories.
+
+    Args:
+        start_path (Path): The path to start searching from.
+
+    Returns:
+        Path: The root folder of the object.
+    Raises:
+        FileNotFoundError: If no DC.XML file is found in the current or parent directories
+    """
+    # this behaves different on different platforms, so we need to be defensive
+    current_path = start_path.parent if start_path.is_file() else start_path
+    while True:
+        if (current_path / "DC.xml").is_file():
+            return current_path
+        if current_path.parent == current_path:
+            raise FileNotFoundError(
+                f"No DC.xml file found in {start_path} or any parent directory."
+            )
+        current_path = current_path.parent
+
+
+def distinctify(values: str) -> str:
+    """Remove duplicate values from a semicolon-separated string."""
+    # we want to keep the order, so no set
+    clean_values = []
+    for val in split_entry(values):
+        if val not in clean_values:
+            clean_values.append(val)
+    return "; ".join(clean_values)
+
+

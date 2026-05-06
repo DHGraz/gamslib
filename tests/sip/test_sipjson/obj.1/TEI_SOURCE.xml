@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader xml:lang="de">
+        <fileDesc>
+            <titleStmt>
+                <title>Object 1</title>
+                <author>
+                    <persName>Creator One</persName>
+                </author>
+            </titleStmt>
+            <publicationStmt>
+                <ab>foo</ab>
+            </publicationStmt>
+            <sourceDesc>
+                <ab>foo</ab>
+            </sourceDesc>
+        </fileDesc>
+    </teiHeader>
+    <facsimile>
+        <surface start="#img.1">
+            <graphic mimeType="image/png" url="file://img.1.png" xml:id="IMG.1"> </graphic>
+        </surface>
+        <surface start="#IMG.2">
+            <graphic mimeType="image/jpeg" url="file://img.2.jpg" xml:id="IMG.2"> </graphic>
+        </surface>
+    </facsimile>
+    <text>
+        <body>
+            <div xml:lang="de">
+                <p><pb n="1" facs="#IMG.1" break="yes"/> foo bar foobar</p>
+            </div>
+            <div xml:lang="de">
+                <p> barfoo bar foo</p>
+            </div>
+        </body>
+    </text>
+</TEI>

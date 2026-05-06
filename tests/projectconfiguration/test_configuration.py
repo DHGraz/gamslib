@@ -3,9 +3,7 @@
 # pylint: disable=protected-access
 
 import copy
-import os
 import re
-import shutil
 import tomllib
 from pathlib import Path
 
@@ -56,6 +54,8 @@ def test_general_class():
     assert general.format_detector == "siegfried"
     assert general.format_detector_url == ""
     assert general.ds_ignore_files == []
+    assert general.safe_xml_hosts == []
+    assert general.contact_email == ""
 
 
 def test_configuration_class_creation(configobj, datadir):
@@ -68,7 +68,7 @@ def test_configclass_update_from_dotenv(datadir, tmp_path, monkeypatch):
     dotenv_file = tmp_path / ".env"
     dotenv_file.write_text("general.loglevel = 'debug'\nmetadata.project_id = 'foo'\n")
     monkeypatch.chdir(tmp_path)
-    configobj = Configuration.from_toml(datadir / "project.toml")
+    configobj = Configuration.from_toml(datadir / "gamsproject.toml")
 
     assert configobj.general.loglevel == "debug"
     assert configobj.metadata.project_id == "foo"
@@ -86,7 +86,7 @@ def test_configclass_update_from_env(datadir, tmp_path, monkeypatch):
     dotenv_file.write_text("general.loglevel = 'debug'\nmetadata.project_id = 'foo'\n")
     monkeypatch.chdir(tmp_path)
 
-    configobj = Configuration.from_toml(datadir / "project.toml")
+    configobj = Configuration.from_toml(datadir / "gamsproject.toml")
 
     assert configobj.general.loglevel == "info"
     assert configobj.metadata.project_id == "bar"
@@ -98,7 +98,7 @@ def test_configobject_update_value(datadir, tmp_path, monkeypatch):
     dotenv_file.write_text("general.loglevel = 'foo'\nmetadata.project_id = ''\n")
     monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError):
-        configobj = Configuration.from_toml(datadir / "project.toml")
+        configobj = Configuration.from_toml(datadir / "gamsproject.toml")
 
 
 def test_configuration_from_toml(datadir):
@@ -106,7 +106,7 @@ def test_configuration_from_toml(datadir):
 
     Here the configuration is loaded from a valid TOML file.
     """
-    toml_file = datadir / "project.toml"
+    toml_file = datadir / "gamsproject.toml"
     cfg = Configuration.from_toml(toml_file)
 
     assert cfg.toml_file == toml_file
@@ -119,24 +119,29 @@ def test_configuration_from_toml(datadir):
 
     assert cfg.general.loglevel == "info"
     assert cfg.general.dsid_keep_extension
+    assert cfg.general.format_detector == "siegfried"
+    assert cfg.general.format_detector_url == ""
+    assert cfg.general.ds_ignore_files == []
+    assert cfg.general.safe_xml_hosts == ['gams.uni-graz.at']
+    assert cfg.general.contact_email == "foo@example.com"
 
 
 def test_configuration_from_toml_cfg_file_not_found(tmp_path):
     "Customized FileNotFoundError is raised if TOML file does not exist."
-    toml_file = tmp_path / "project.toml"
+    toml_file = tmp_path / "gamsproject.toml"
     with pytest.raises(FileNotFoundError, match=r"Configuration file .* not found"):
         Configuration.from_toml(toml_file)
 
 
 def test_configuration_from_toml_invalid_toml_value(datadir):
     "An invalid TOML file value should raise an ValueError."
-    with pytest.raises(ValueError, match=r"Error in project TOML file .*"):
+    with pytest.raises(ValueError, match=r"Error in gamsproject TOML file .*"):
         Configuration.from_toml(datadir / "invalid_value.toml")
 
 
 def test_configuration_from_toml_invalid_toml(datadir):
     "An invalid TOML file should raise an error."
-    with pytest.raises(tomllib.TOMLDecodeError, match=r"Error in project TOML file .*"):
+    with pytest.raises(tomllib.TOMLDecodeError, match=r"Error in gamsproject TOML file .*"):
         Configuration.from_toml(datadir / "invalid.toml")
 
 def test_configuration_missing_required_keys(datadir):
@@ -156,7 +161,7 @@ def test_configuration_missing_required_keys(datadir):
         with toml_file.open("w", encoding="utf-8", newline="") as f:
             f.writelines(new_lines)
 
-    toml_file = datadir / "project.toml"
+    toml_file = datadir / "gamsproject.toml"
 
     comment_key(toml_file, "project_id")
     with pytest.raises(
@@ -181,7 +186,7 @@ def test_configuration_invalid_values(datadir):
     def set_value(table: str, field: str, value: str):
         "Replace a value in a TOML file."
 
-        with (datadir / "project.toml").open("rb") as f:
+        with (datadir / "gamsproject.toml").open("rb") as f:
             orig_data = tomllib.load(f)
             test_data = copy.deepcopy(orig_data)
             test_data[table][field] = value
@@ -225,33 +230,33 @@ def test_configuration_make_readable_message():
     assert Configuration._make_readable_message(
         cfgfile, "missing", ("metadata", "project_id")
     ) == (
-        "Error in project TOML file 'test.toml'. missing required field: 'metadata.project_id'"
+        "Error in gamsproject TOML file 'test.toml'. missing required field: 'metadata.project_id'"
     )
 
     assert Configuration._make_readable_message(
         cfgfile, "string_too_short", ("metadata", "creator")
     ) == (
-        "Error in project TOML file 'test.toml'. value is too short: 'metadata.creator'"
+        "Error in gamsproject TOML file 'test.toml'. value is too short: 'metadata.creator'"
     )
 
     assert Configuration._make_readable_message(
         cfgfile, "bool_type", ("general", "dsid_keep_extension")
     ) == (
-        "Error in project TOML file 'test.toml'. value is "
+        "Error in gamsproject TOML file 'test.toml'. value is "
         "not a boolean: 'general.dsid_keep_extension'"
     )
 
     assert Configuration._make_readable_message(
         cfgfile, "bool_parsing", ("general", "dsid_keep_extension")
     ) == (
-        "Error in project TOML file 'test.toml'. value is "
+        "Error in gamsproject TOML file 'test.toml'. value is "
         "not a boolean: 'general.dsid_keep_extension'"
     )
 
     assert Configuration._make_readable_message(
         cfgfile, "literal_error", ("general", "loglevel")
     ) == (
-        "Error in project TOML file 'test.toml'. value is "
+        "Error in gamsproject TOML file 'test.toml'. value is "
         "not allowed here: 'general.loglevel'"
     )
 
@@ -266,7 +271,7 @@ def test_changing_values(datadir):
 
     Does validation work for those values?
     """
-    cfg = Configuration.from_toml(datadir / "project.toml")
+    cfg = Configuration.from_toml(datadir / "gamsproject.toml")
     cfg.general.loglevel = "error"
     assert cfg.general.loglevel == "error"
 

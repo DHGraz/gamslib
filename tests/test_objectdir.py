@@ -11,7 +11,7 @@ from lxml import etree as ET
 
 import gamslib
 from gamslib.objectcsv import defaultvalues
-from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
+from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager, InvalidCSVFileError
 from gamslib.objectdir import (
     ObjectDirectoryValidationError,
     find_object_folders,
@@ -45,7 +45,7 @@ def create_test_object_dir(
         The path to the created object directory
     """
     object_path: Path = tmp_path / object_id.replace(":", "%3A")
-    object_path.mkdir(parents=True, exist_ok=True)  
+    object_path.mkdir(parents=True, exist_ok=True)
     mgr = ObjectCSVManager(object_path)
     obj_dict = {}
     for field in gamslib.objectcsv.objectdata.ObjectData.fieldnames():
@@ -60,7 +60,7 @@ def create_test_object_dir(
         ds_dict = {}
         for field in gamslib.objectcsv.dsdata.DSData.fieldnames():
             if field == "dspath":
-                ds_dict[field] = f"{object_id}/{ds_file_name}"
+                ds_dict[field] = ds_file_name
             elif field == "dsid":
                 ds_dict[field] = ds_file_name
             elif field == "mimetype":
@@ -138,7 +138,7 @@ def valid_object_dir_fixture(
     tmp_path: Path, pdf_content, png_content, dc_content
 ) -> Generator[Path, None, None]:
     """Create a valid object directory for testing."""
-    dir_name = "o%3Atest.object.001"  
+    dir_name = "o%3Atest.object.001"
     datastreams = [
         ("foo.pdf", "application/pdf", pdf_content),
         ("DC.xml", "application/xml", dc_content),
@@ -410,23 +410,16 @@ def test_validate_csv_files_unexpected_field_in_datastreams_csv(object_dir: Path
     lines = ds_csv_path.read_text().splitlines()
     new_lines = [f"{line},unexpected" for line in lines]
     # Add an unexpected field to the header
-    #lines[0] += ",unexpected_field"
-    #for i, line in enumerate(lines[1:]):
+    # lines[0] += ",unexpected_field"
+    # for i, line in enumerate(lines[1:]):
     #    lines[i] = line + ",unexpected_value"
     ds_csv_path.write_text("\n".join(new_lines))
-    content = ds_csv_path.read_text()
+    ds_csv_path.read_text()
     with pytest.raises(
         ObjectDirectoryValidationError,
         match=r"datastreams.csv contains an unexpected field",
     ):
         validate_csv_files(object_dir)
-
-# o%3Atest.object.001/DC.xml,DC.xml,title_2,description_2,application/xml,creator_2,rights_2,lang_2,tags_2,unexpected_value
-# o%3Atest.object.001/baz.png,baz.png,title_3,description_3,image/png,creator_3,rights_3,lang_3,tags_3,unexpected_value
-# o%3Atest.object.001/foo.pdf,foo.pdf,title_1,description_1,application/pdf,creator_1,rights_1,lang_1,tags_1,unexpected_value
-# o%3Atest.object.001/foo.pdf,foo.pdf,title_1,description_1,application/pdf,creator_1,rights_1,lang_1,tags_1
-
-
 
 
 def test_validate_csv_files_type_error_fallback(
@@ -551,14 +544,14 @@ def test_validate_main_resource_id_tei_file_raises(tei_object_dir):
         gamslib.objectdir.validate_main_resource_id(tei_object_dir)
 
 
-@pytest.mark.filterwarnings("ignore::UserWarning")  
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_validate_main_resource_id_lido_file_no_raises(lido_object_dir):
     """Test LIDO file with matching object ID does not raise."""
     # if ids match should not raise
     gamslib.objectdir.validate_main_resource_id(lido_object_dir)
 
 
-@pytest.mark.filterwarnings("ignore::UserWarning")  
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_validate_main_resource_id_lidofile_raises(lido_object_dir):
     """Asure LIDO file with non matching object ID raises."""
     main_resource = lido_object_dir / "lido.xml"
@@ -569,7 +562,8 @@ def test_validate_main_resource_id_lidofile_raises(lido_object_dir):
     with pytest.raises(ValueError, match="does not match"):
         gamslib.objectdir.validate_main_resource_id(lido_object_dir)
 
-@pytest.mark.filterwarnings("ignore::UserWarning")  
+
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_validate_main_resource_id_non_tei_non_lido_file_does_not_check(object_dir):
     """Make sure that non-TEI/LIDO files are not checked."""
 
@@ -622,18 +616,12 @@ def test_validate_dc_file_identifier_with_colon(tmp_path: Path, dc_content: byte
     validate_dc_file(obj_dir)
 
 
-def test_validate_dc_file_identifier_mismatch(object_dir: Path):
-    """Test validate_dc_file raises if DC.xml identifier does not match directory name."""
-    dc_file = object_dir / "DC.xml"
-    # Change identifier in DC.xml to something else
-    xml = dc_file.read_text(encoding="utf-8")
-    xml = xml.replace(
-        "<dc:identifier>o:test.object.001</dc:identifier>",
-        "<dc:identifier>some.other.id</dc:identifier>",
+def test_create_csvmgr_with_error_handling(mocker):
+    """Test that create_csvmgr handles InvalidCSVFileError correctly."""
+    mocker.patch(
+        "gamslib.objectdir.ObjectCSVManager",
+        side_effect=InvalidCSVFileError("invalid csv file"),
     )
-    dc_file.write_text(xml, encoding="utf-8")
 
-    with pytest.raises(
-        ObjectDirectoryValidationError, match=r"DC.xml identifier value does not match"
-    ):
-        validate_dc_file(object_dir)
+    with pytest.raises(ObjectDirectoryValidationError, match=r"invalid csv file"):
+        gamslib.objectdir._create_csvmgr_with_error_handling(Path("invalid csv file"))  # pylint: disable=protected-access

@@ -1,0 +1,5 @@
+dspath,dsid,title,description,mimetype,creator,rights,lang,tags
+DC.xml,DC.xml,XML Dublin Core metadata: DC.xml,DCMI,application/xml,Creator,Public Domain (http://creativecommons.org/publicdomain/mark/1.0/),,
+TEI_SOURCE.xml,TEI_SOURCE.xml,XML TEI document: TEI_SOURCE.xml,TEI,application/xml,Creator,Public Domain (http://creativecommons.org/publicdomain/mark/1.0/),,
+img.1.png,img.1.png,Image document: img.1.png,,image/png,Creator,Public Domain (http://creativecommons.org/publicdomain/mark/1.0/),,
+img.2.jpg,img.2.jpg,Image document: img.2.jpg,,image/jpeg,Creator,Public Domain (http://creativecommons.org/publicdomain/mark/1.0/),,

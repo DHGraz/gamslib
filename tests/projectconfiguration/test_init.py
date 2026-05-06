@@ -12,14 +12,14 @@ def test_get_configuration_no_toml():
 
 def test_get_configuration(datadir):
     "Now we set the toml file via parameter."
-    config = get_configuration(datadir / "project.toml")
+    config = get_configuration(datadir / "gamsproject.toml")
     assert config.metadata.project_id == "Test Project"
     assert config.general.dsid_keep_extension
 
 
 def test_get_configuration_env(datadir, monkeypatch):
     "Now we set the toml file via environment variable."
-    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(datadir / "project.toml"))
+    monkeypatch.setenv("GAMSCFG_PROJECT_TOML", str(datadir / "gamsproject.toml"))
     get_configuration.cache_clear()  # otherwise w might have side effects from other tests
     config = get_configuration()
     assert config.metadata.project_id == "Test Project"
@@ -27,9 +27,9 @@ def test_get_configuration_env(datadir, monkeypatch):
 
 
 def test_get_configuration_dotenv(datadir, tmp_path, monkeypatch):
-    "Now we set the path to project.toml file via .env value."
+    "Now we set the path to gamsproject.toml file via .env value."
     dotenv_file = tmp_path / ".env"
-    toml_file = (datadir / "project.toml")
+    toml_file = (datadir / "gamsproject.toml")
     dotenv_file.write_text(f'project_toml = "{toml_file}"\n')
     monkeypatch.chdir(tmp_path)
     get_configuration.cache_clear()  # otherwise we might have side effects from other tests
@@ -40,7 +40,7 @@ def test_get_configuration_dotenv(datadir, tmp_path, monkeypatch):
 
 def test_get_configuration_is_cached(datadir):
     "Check if multiple calls to get_configuration return the same object."
-    config1 = get_configuration(datadir / "project.toml")
-    config2 = get_configuration(datadir / "project.toml")
+    config1 = get_configuration(datadir / "gamsproject.toml")
+    config2 = get_configuration(datadir / "gamsproject.toml")
     assert config1 is config2
 

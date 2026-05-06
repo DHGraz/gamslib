@@ -15,12 +15,19 @@ Usage:
 
 import json
 from pathlib import Path
+import re
+import warnings
 
 import jsonschema
 import referencing
 
-from .. import BagValidationError, utils
+from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
+from gamslib.sip.utils import fetch_json_schema
 
+from .. import CURRENT_SIP_JSON_SCHEMA_URL, DEPRECATED_SIP_JSON_SCHEMA_URLS, BagValidationError
+
+MAX_TAG_LENGTH = 50
+MIN_TAG_LENGTH = 3
 
 def validate_main_resource(data: dict) -> None:
     """
@@ -39,6 +46,34 @@ def validate_main_resource(data: dict) -> None:
             f"mainResource '{data['mainResource']}' is not listed in contentFiles"
         )
 
+
+def validate_tag(tag: str) -> None:
+    """Validate a single tag value.
+
+    Raises Value error for invalid tag.
+    """
+    stripped_tag = tag.strip()
+    if not stripped_tag:
+        raise ValueError(f"Tag '{tag}'must not be empty")
+    m = re.match(r"^[a-zA-Z0-9\-._~]+$", stripped_tag)
+    if not m:
+        raise ValueError(f"Tag '{stripped_tag}' contains invalid characters: "
+                         "only letters, digits, and - . _ ~ are allowed")
+    if len(stripped_tag) > MAX_TAG_LENGTH:
+        raise ValueError(f"Tag '{tag}' exceeds maximum length of {MAX_TAG_LENGTH} characters")
+    if len(stripped_tag) < MIN_TAG_LENGTH:
+        raise ValueError(f"Tag '{tag}' is too short, minimum length is {MIN_TAG_LENGTH} characters")
+
+def is_allowed_schema_url(url: str) -> bool:
+    """Check if the given URL is an allowed SIP JSON schema URL."""
+    if url == GAMS_SIP_SCHEMA_URL:
+        return True
+    if url in DEPRECATED_SIP_JSON_SCHEMA_URLS:
+        warnings.warn(
+            f"Schema URL {url} is deprecated and should not be used for new SIPs"
+        )
+        return True
+    return False
 
 def validate_sip_json(bag_dir: Path) -> None:
     """
@@ -66,8 +101,13 @@ def validate_sip_json(bag_dir: Path) -> None:
 
     if "$schema" not in data:
         raise BagValidationError(f"{bag_dir}: Missing '$schema' in sip.json")
+    if not is_allowed_schema_url(data["$schema"]):
+        raise BagValidationError(
+            f"{bag_dir}: Unsupported JSON schema in sip.json: {data['$schema']}"
+        )
 
-    schema = utils.fetch_json_schema(data["$schema"])
+    #schema = utils.fetch_json_schema(data["$schema"])
+    schema = fetch_json_schema(data["$schema"])
 
     # do the real validation
     try:

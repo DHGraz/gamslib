@@ -10,4 +10,6 @@ dsid_keep_extension = true
 loglevel = "info"
 format_detector = ""
 format_detector_url = ""
+safe_xml_hosts = ["gams.uni-graz.at"]
+contact_email = "foo@example.com"
 

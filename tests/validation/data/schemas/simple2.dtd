@@ -1,0 +1,4 @@
+<!ELEMENT products (product+)>
+<!ELEMENT product (name, price)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT price (#PCDATA)>

@@ -14,6 +14,10 @@ def make_contentfile_for_sip_json(file_path:Path):
     
     Return a dict describing a content file as expected by sip.json.
     """
+    puid_map = {
+        'DC.xml': 'fmt/111',
+        'IMG.jpeg': 'fmt/43',
+    }
     return {
         "size": file_path.stat().st_size,
         "bagpath": "data/content/" + file_path.name,
@@ -24,7 +28,13 @@ def make_contentfile_for_sip_json(file_path:Path):
         "creator": f"Creator of {file_path.name}",
         "rights": "https://creativecommons.org/licenses/by-nc/4.0",
         "lang": ["en"],
-        "tags": ["tag1", "tag2"]
+        "tags": ["tag1", "tag2"],
+        "puid": puid_map[file_path.name],
+        "checksums": [
+            f"md5 {hashlib.md5(file_path.read_bytes()).hexdigest()}",
+            f"sha256 {hashlib.sha256(file_path.read_bytes()).hexdigest()}",
+            f"sha512 {hashlib.sha512(file_path.read_bytes()).hexdigest()}"
+        ]
     }
 
 
@@ -68,9 +78,12 @@ def update_sip_json(sipjson_path:Path, *content_paths:Path):
     # read sip.json
     with sipjson_path.open('r', encoding="utf-8", newline="") as sipjson_file:
             sipjson = json.load(sipjson_file)
+    existing_content_files = [content_file["dsid"] for content_file in sipjson.get("contentFiles", [])]
 
+    # add new content files
     for content_file in content_paths:
-        sipjson["contentFiles"].append(make_contentfile_for_sip_json(content_file))
+        if content_file.name not in existing_content_files:
+            sipjson["contentFiles"].append(make_contentfile_for_sip_json(content_file))
     
     # write sip.json back to file
     with open(sipjson_path, 'w', encoding="utf-8", newline="") as sipjson_file:
@@ -106,6 +119,6 @@ def valid_bag_dir(shared_datadir):
     update_sip_json(sipjson_path, *content_files)    
     fix_payload_oxums(bag_dir)
     create_manifests(bag_dir, sipjson_path,  *content_files)
-    return bag_dir
+    yield bag_dir
     
 

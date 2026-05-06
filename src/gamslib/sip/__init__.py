@@ -11,5 +11,20 @@ of Bagit directories, including checks for required files, manifests, and SIP JS
 """
 
 
+from pathlib import Path
+from typing import Final
+
+
 class BagValidationError(Exception):
     """Exception raised when a bag is invalid."""
+
+# this is the current (latest) version of the SIP JSON schema
+CURRENT_SIP_JSON_SCHEMA_URL: Final = "https://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json"
+
+# These deprected versions of the GAMS SIP JSON schema are still supported for validation, 
+# but should not be used for new SIPs. 
+DEPRECATED_SIP_JSON_SCHEMA_URLS: Final = []
+
+RESOURCE_PATH = Path(__file__).parent / "resources"
+
+
