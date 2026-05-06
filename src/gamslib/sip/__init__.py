@@ -19,11 +19,5 @@ class BagValidationError(Exception):
     """Exception raised when a bag is invalid."""
 
 
-SIP_JSON_SCHEMA_URL: Final = "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json"
-# This is the path were the schema is stored in the package
+SIP_JSON_SCHEMA_URL: Final = "http://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json"
 RESOURCE_PATH = Path(__file__).parent / "resources"
-
-
-# TODO: Remove this after all tests pass again
-# It was moved to .sipjson.SCHEMA
-#GAMS_SIP_SCHEMA_URL = "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json"

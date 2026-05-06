@@ -1,5 +1,5 @@
 {
-  "$schema": "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json",
+  "$schema": "https://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json",
   "title": "Charles Baissac an Hugo Schuchardt (15-00432)",
   "project": "hsa",
   "description": "digital object description",

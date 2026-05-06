@@ -41,7 +41,7 @@
       ]
     }
   ],
-  "$schema":  "https://gams.uni-graz.at/OAIS/sip-schema-gams-v1.0.json",
+  "$schema":  "https://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json",
   "created_by": "CSV to SIP JSON converter",
   "sip_creation_timestamp": 1777282176.7894132,
   "source": "local",
