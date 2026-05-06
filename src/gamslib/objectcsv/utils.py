@@ -80,7 +80,8 @@ def find_object_root(start_path: Path) -> Path:
     Raises:
         FileNotFoundError: If no DC.XML file is found in the current or parent directories
     """
-    current_path = start_path
+    # this behaves different on different platforms, so we need to be defensive
+    current_path = start_path.parent if start_path.is_file() else start_path
     while True:
         if (current_path / "DC.XML").is_file():
             return current_path
