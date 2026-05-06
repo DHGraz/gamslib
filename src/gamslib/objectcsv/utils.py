@@ -83,11 +83,11 @@ def find_object_root(start_path: Path) -> Path:
     # this behaves different on different platforms, so we need to be defensive
     current_path = start_path.parent if start_path.is_file() else start_path
     while True:
-        if (current_path / "DC.XML").is_file():
+        if (current_path / "DC.xml").is_file():
             return current_path
         if current_path.parent == current_path:
             raise FileNotFoundError(
-                f"No DC.XML file found in {start_path} or any parent directory."
+                f"No DC.xml file found in {start_path} or any parent directory."
             )
         current_path = current_path.parent
 
