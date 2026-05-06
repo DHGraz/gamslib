@@ -73,6 +73,7 @@ dev = [
     "zensical>=0.0.33",
     "mkdocstrings-python>=2.0.3",
     "freezegun>=1.5.5",
+    "mkdocstrings>=1.0.4",
 ]
 
 [tool.hatch.metadata]
