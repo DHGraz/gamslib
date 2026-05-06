@@ -28,7 +28,7 @@ import zipfile
 
 import requests
 
-from gamslib.sip import RESOURCE_PATH, SIP_JSON_SCHEMA_URL, BagValidationError
+from gamslib.sip import RESOURCE_PATH, CURRENT_SIP_JSON_SCHEMA_URL, BagValidationError
 
 __all__ = [
     "count_bytes",
@@ -144,7 +144,7 @@ def is_bag(bag_path: Path) -> bool:
     return looks_like_a_bag
 
 
-def read_sip_schema_from_package() -> dict:
+def read_sip_schema_from_package(schema_uri: str) -> dict | None:
     """
     Read the SIP JSON schema from the package data.
 
@@ -153,13 +153,13 @@ def read_sip_schema_from_package() -> dict:
     Returns:
         dict: Parsed JSON schema.
     """
-    local_schema_path = RESOURCE_PATH / SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
-    if not local_schema_path.is_file():
-        raise FileNotFoundError(
-            f"Embedded GAMS SIP schema not found at expected location: {local_schema_path}"
-        )
-    with local_schema_path.open() as f:
-        return json.load(f)
+    data = None
+    schema_filename = schema_uri.rsplit("/", maxsplit=1)[-1]
+    local_schema_path = RESOURCE_PATH / schema_filename
+    if local_schema_path.is_file():
+        with local_schema_path.open() as f:
+            data = json.load(f)
+    return data
 
 
 @lru_cache()
@@ -176,9 +176,11 @@ def fetch_json_schema(url: str) -> dict:
     Raises:
         BagValidationError: If the schema cannot be fetched or is not valid JSON.
     """
-    if url == SIP_JSON_SCHEMA_URL:
-        logger.debug("Using embedded GAMS SIP schema")
-        return read_sip_schema_from_package()
+    # Try to load the schema from the package
+    json_schema = read_sip_schema_from_package(url)
+    if json_schema is not None:
+        return json_schema
+    # if package is not in the package, try to fetch it from the URL
     try:
         logger.debug("Fetching JSON schema from %s", url)
         response = requests.get(url, timeout=20)
@@ -199,5 +201,5 @@ def fetch_json_schema(url: str) -> dict:
         TypeError,
     ) as e:
         raise BagValidationError(
-            f"Schema referenced in 'sip.json' is not valid JSON: {e}"
+            f"Schema referenced in 'sip.json' is not a valid JSON document: {e}"
         ) from e

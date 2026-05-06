@@ -9,7 +9,7 @@ import pytest
 import requests
 
 from gamslib.sip import BagValidationError, utils
-from gamslib.sip import SIP_JSON_SCHEMA_URL
+from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL
 
 from gamslib.sip.utils import (
     count_bytes,
@@ -196,10 +196,10 @@ def test_is_bag_with_bagit_as_directory(tmp_path):
 
 def test_read_sip_schema_from_package_reads_json():
     "Test reading the embedded JSON schema from the package."
-    schema_dict = read_sip_schema_from_package()
+    schema_dict = read_sip_schema_from_package(CURRENT_SIP_JSON_SCHEMA_URL)
     # and now read it directly from the file to compare
     local_schema_path = (
-        Path(utils.__file__).parent / "resources" / "sip-schema-gams-v1.0.json"
+        Path(utils.__file__).parent / "resources" / CURRENT_SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
     )
     schema_file = local_schema_path
     schema_content = json.loads(schema_file.read_text(encoding="utf-8"))
@@ -207,14 +207,14 @@ def test_read_sip_schema_from_package_reads_json():
     assert schema_dict == schema_content
 
 
-def test_read_sip_schema_from_package_raises_if_missing(monkeypatch, tmp_path):
+def test_read_sip_schema_from_package_returns_none_if_not_found(monkeypatch, tmp_path):
     "Test if validator detects missing sip.json file."
-    missing_schema_file = (tmp_path / "missing_sip.json").as_posix()
-    monkeypatch.setattr("gamslib.sip.utils.SIP_JSON_SCHEMA_URL", missing_schema_file)
-
-    # Act & Assert
-    with pytest.raises(FileNotFoundError):
-        read_sip_schema_from_package()
+    #missing_schema_file = (tmp_path / "missing_sip.json").as_posix()
+    #monkeypatch.setattr("gamslib.sip.utils.CURRENT_SIP_JSON_SCHEMA_URL", missing_schema_file)
+#
+#    with pytest.raises(FileNotFoundError):
+#        read_sip_schema_from_package(CURRENT_SIP_JSON_SCHEMA_URL)
+    assert read_sip_schema_from_package("http://example.com/nonexistent.json") is None
 
 
 def test_read_sip_schema_from_package_raises_on_invalid_json(monkeypatch, tmp_path):
@@ -222,7 +222,7 @@ def test_read_sip_schema_from_package_raises_on_invalid_json(monkeypatch, tmp_pa
     # Arrange: create invalid JSON in sip.json
     resources_dir = tmp_path / "resources"
     resources_dir.mkdir()
-    schema_name = SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
+    schema_name = CURRENT_SIP_JSON_SCHEMA_URL.rsplit("/", maxsplit=1)[-1]
     schema_path = resources_dir / schema_name
     schema_path.write_text("{invalid json}")
 
@@ -231,7 +231,7 @@ def test_read_sip_schema_from_package_raises_on_invalid_json(monkeypatch, tmp_pa
     )
 
     with pytest.raises(json.JSONDecodeError):
-        read_sip_schema_from_package()
+        read_sip_schema_from_package(CURRENT_SIP_JSON_SCHEMA_URL)
 
 
 def test_fetch_json_schema_embedded(monkeypatch):
@@ -239,9 +239,9 @@ def test_fetch_json_schema_embedded(monkeypatch):
     # Patch read_sip_schema_from_package to return a known dict
     expected_schema = {"type": "object"}
     monkeypatch.setattr(
-        "gamslib.sip.utils.read_sip_schema_from_package", lambda: expected_schema
+        "gamslib.sip.utils.read_sip_schema_from_package", lambda x: expected_schema
     )
-    result = fetch_json_schema(SIP_JSON_SCHEMA_URL)
+    result = fetch_json_schema(CURRENT_SIP_JSON_SCHEMA_URL)
     assert result == expected_schema
 
 
@@ -293,7 +293,7 @@ def test_fetch_json_schema_invalid_json(mock_get):
     url = "http://example.com/invalid.json"
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema(url)
-    assert "not valid JSON" in str(excinfo.value)
+    assert "not a valid JSON document" in str(excinfo.value)
 
 
 @patch("gamslib.sip.utils.requests.get")
@@ -306,7 +306,7 @@ def test_fetch_json_schema_json_decode_error(mock_get):
     url = "http://example.com/invalid.json"
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema(url)
-    assert "not valid JSON" in str(excinfo.value)
+    assert "not a valid JSON document" in str(excinfo.value)
 
 
 @patch("gamslib.sip.utils.requests.get")
@@ -319,5 +319,5 @@ def test_fetch_json_schema_json_type_error(mock_get):
     url = "http://example.com/invalid.json"
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema(url)
-    assert "not valid JSON" in str(excinfo.value)
+    assert "not a valid JSON document" in str(excinfo.value)
 

@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 from gamslib.formatdetect import detect_format
 from gamslib.objectcsv.objectcsvmanager import ObjectCSVManager
 from gamslib.objectcsv.utils import split_entry
-from gamslib.sip import SIP_JSON_SCHEMA_URL
+from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL
 from gamslib.sip.validation import validate_datastream_id
 from gamslib.sip.utils import md5hash, sha512hash
 
@@ -127,7 +127,7 @@ class SipJson:
     def get_json(self) -> dict:
         """Return the SIP JSON as a dictionary."""
         data = dict(asdict(self).items())
-        data["$schema"] = SIP_JSON_SCHEMA_URL
+        data["$schema"] = CURRENT_SIP_JSON_SCHEMA_URL
         for content_file in data["contentFiles"]:
             # dspath is a Path, which is not serializable to json
             content_file["bagpath"] = str(content_file["bagpath"])

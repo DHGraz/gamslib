@@ -9,7 +9,7 @@ import referencing
 import requests
 
 from gamslib.sip import BagValidationError
-from gamslib.sip import SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
+from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
 from gamslib.sip.utils import fetch_json_schema
 from gamslib.sip.validation.sip_json import validate_sip_json
 
@@ -59,7 +59,7 @@ def test_fetch_schema_invalid_json(monkeypatch):
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema("http://example.com")
     monkeypatch.undo()
-    assert "Schema referenced in 'sip.json' is not valid JSON" in str(excinfo.value)
+    assert "Schema referenced in 'sip.json' is not a valid JSON document" in str(excinfo.value)
 
 
 def test_validate_schema(valid_bag_dir):

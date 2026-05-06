@@ -4,9 +4,10 @@ import json
 import pytest
 import jsonschema
 
+from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL
 from gamslib.sip.utils import read_sip_schema_from_package
 
-gams_schema = read_sip_schema_from_package()
+gams_schema = read_sip_schema_from_package(CURRENT_SIP_JSON_SCHEMA_URL)
 
 @pytest.fixture(name="sip_json")
 def get_valid_sip_json(datadir) -> dict:

@@ -309,7 +309,7 @@ def test_get_json(sipjson_obj):
     assert jsondata["contentFiles"][0]["bagpath"] == "data/content/bagpath1"
     assert jsondata["contentFiles"][1]["bagpath"] == "data/content/bagpath2"
     assert jsondata["created_by"] == "Test Creator"
-    assert jsondata["$schema"] == gamslib.sip.SIP_JSON_SCHEMA_URL
+    assert jsondata["$schema"] == gamslib.sip.CURRENT_SIP_JSON_SCHEMA_URL
     assert jsondata["lang"] == ["fr", "de"] 
     assert jsondata["contentFiles"][1]["lang"] == ["de"]
     assert jsondata["contentFiles"][0]["tags"] == ["footag", "bartag"]
