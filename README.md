@@ -97,9 +97,9 @@ function.
 
 ## Documentation 
 
-The documentation can be found under docs. A rendered HTML version can be found under
+The documentation can be found under docs. A rendered HTML version is available here:
+https://dhgraz.github.io/gamslib/
 
-https://github.com/DHGraz/gamslib/
 
 ## Contributing
 
