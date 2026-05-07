@@ -64,6 +64,8 @@ class MinimalDetector(FormatDetector):
             mime_type = "application/x-xz"
         elif str(file_to_validate).endswith('.tar.lzma'):
             mime_type = "application/x-tar"
+        elif mime_type == "application/x-zip-compressed":  # Microsoft Windows often returns this for .zip files
+            mime_type = "application/zip"
         return mime_type
 
 
