@@ -109,7 +109,8 @@ class CombinedCatalogResolver(ET.Resolver):
             return self.resolve_string(catalog_path.read_bytes(), context, base_url=url)
 
         # Resolve local file paths/URIs directly.
-        local_path = re.sub(r"^file://", "", url)
+        parsed = urlparse(url)
+        local_path = url2pathname(parsed.path) if parsed.scheme == "file" else url
         if os.path.isfile(local_path):
             return self.resolve_filename(local_path, context)
 
@@ -156,9 +157,15 @@ class CombinedCatalogResolver(ET.Resolver):
         parsed = urlparse(schema_uri)
         if parsed.scheme == "file":
             schema_uri = url2pathname(parsed.path)
+
         if os.path.isfile(schema_uri):
-            content = Path(schema_uri).read_bytes()
-        elif self._is_allowed_host(
+            return Path(schema_uri).read_bytes()
+
+        catalog_path = self._resolve_catalog_path(schema_uri)
+        if catalog_path is not None:
+            return catalog_path.read_bytes()
+
+        if self._is_allowed_host(
             schema_uri
         ):  # or self._is_allowed_remote_schema_uri(schema_uri):
             resp = requests.get(schema_uri, timeout=10)
@@ -166,13 +173,9 @@ class CombinedCatalogResolver(ET.Resolver):
             content = resp.content
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             cache_path.write_bytes(content)
-        else:
-            # use the custom CatalogResolver to get the content of the rnc schema
-            path = gams_xml_catalog.resolve_uri_to_path(schema_uri)
-            if path is None:
-                raise FileNotFoundError(f"Cannot load schema '{schema_uri}'.")
-            content = path.read_bytes()
-        return content
+            return content
+
+        raise FileNotFoundError(f"Cannot load schema '{schema_uri}'.")
 
     def _is_allowed_host(self, url: str) -> bool:
         """Check if the host of the given URL is in the allowed list."""

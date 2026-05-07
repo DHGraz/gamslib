@@ -115,12 +115,22 @@ class SchemaValidator(abc.ABC):
             errors.append(f"Line {error.line}, Column {error.column}: {error.message}")
         return errors
 
+    def _load_xml_schema_document(self, schema_uri: str) -> ET.ElementTree:
+        """Load an XML schema document through the custom resolver."""
+        schema_bytes = self.resolver.get_content(schema_uri)
+        root = ET.fromstring(
+            schema_bytes,
+            parser=self.parser,
+            base_url=schema_uri,
+        )
+        return ET.ElementTree(root)
+
 
 class XMLSchemaValidator(SchemaValidator):
     """A validator for XML Schema (XSD) schemas using lxml."""
 
     def _make_validator(self, schema_uri: str) -> ET.XMLSchema:
-        tree = ET.parse(schema_uri, parser=self.parser)
+        tree = self._load_xml_schema_document(schema_uri)
         return ET.XMLSchema(tree)
 
     def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
@@ -204,7 +214,7 @@ class SchematronValidator(SchemaValidator):
         self._creation_error is set to a ValidationSubResult with the error message and
         self.schema_validator is left to None.
         """
-        schematron_document = ET.parse(schema_uri, parser=self.parser)
+        schematron_document = self._load_xml_schema_document(schema_uri)
         return lxml.isoschematron.Schematron(schematron_document, store_report=True)
 
     def _make_saxon_validator(self, schema_uri: str):
@@ -384,7 +394,7 @@ class RelaxNGValidator(SchemaValidator):
     """A validator for RelaxNG schemas using lxml."""
 
     def _make_validator(self, schema_uri: str):
-        rng_document = ET.parse(schema_uri, parser=self.parser)
+        rng_document = self._load_xml_schema_document(schema_uri)
         return ET.RelaxNG(rng_document)
 
     def validate(self, tree: ET.ElementTree) -> ValidationSubResult:
