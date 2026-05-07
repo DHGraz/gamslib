@@ -7,7 +7,7 @@ Provides methods for merging, validating, and inferring missing metadata values.
 
 import dataclasses
 from typing import ClassVar
-from pathlib import Path, PurePath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from gamslib import formatdetect
 from gamslib.objectcsv import defaultvalues, utils
@@ -175,15 +175,18 @@ class DSData:
         if filepath.startswith("~"):
             return False
 
-        p = PurePath(filepath)
-
-        # block absolute paths to prevent access to any location outside the object
-        # directory
-        if p.is_absolute():
+        # block absolute paths — check both POSIX (/foo) and Windows (C:\foo) styles,
+        # plus bare UNC/rooted Windows paths (\foo) which PureWindowsPath does not
+        # consider absolute (no drive letter) but are still outside the object dir.
+        if (
+            PurePosixPath(filepath).is_absolute()
+            or PureWindowsPath(filepath).is_absolute()
+            or filepath.startswith("\\")
+        ):
             return False
 
         # block path traversal to prevent access to parent directories
-        return ".." not in p.parts
+        return ".." not in PurePosixPath(filepath).parts
 
     def _guess_mimetype(self, format_info=None):
         """

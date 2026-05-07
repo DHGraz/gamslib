@@ -34,3 +34,4 @@ Xvalidate/
 tmp
 bar.py
 foo.py
+.vscode/launch.json

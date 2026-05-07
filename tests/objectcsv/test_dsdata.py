@@ -192,6 +192,14 @@ def test_dsdata_validate_invalid_dspath(dsdata):
     assert dsdata.dspath == "TEI.xml"
 
     with pytest.raises(ValueError):
+        dsdata.dspath = "C:\\absolute\\windows\\path.txt"
+    assert dsdata.dspath == "TEI.xml"
+
+    with pytest.raises(ValueError):
+        dsdata.dspath = "\\absolute\\windows\\path.txt"
+    assert dsdata.dspath == "TEI.xml"
+
+    with pytest.raises(ValueError):
         dsdata.dspath = "~/file.txt"
     assert dsdata.dspath == "TEI.xml"
 

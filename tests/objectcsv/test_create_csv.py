@@ -3,6 +3,7 @@
 # pylint: disable=W0212 # access to ._data
 import csv
 from dataclasses import fields
+import os
 from pathlib import Path
 import shutil
 
@@ -163,7 +164,7 @@ def test_create_csv_with_subdirectories(datadir, test_config):
         assert data[0]["dsid"] == "DC.xml"
         assert data[0]["dspath"] == "DC.xml"
         assert data[1]["dsid"] == "SOURCE.xml"
-        assert data[1]["dspath"] == "xml/SOURCE.xml"
+        assert data[1]["dspath"] == os.path.join("xml", "SOURCE.xml")
 
 
 def test_create_csv_force_overwrite(datadir, test_config):
