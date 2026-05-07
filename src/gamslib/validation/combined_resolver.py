@@ -25,6 +25,7 @@ import re
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import gams_xml_catalog
 import requests
@@ -152,7 +153,9 @@ class CombinedCatalogResolver(ET.Resolver):
         if cache_path is not None and cache_path.is_file():
             return cache_path.read_bytes()
 
-        schema_uri = re.sub(r"^file://", "", schema_uri)
+        parsed = urlparse(schema_uri)
+        if parsed.scheme == "file":
+            schema_uri = url2pathname(parsed.path)
         if os.path.isfile(schema_uri):
             content = Path(schema_uri).read_bytes()
         elif self._is_allowed_host(

@@ -93,7 +93,7 @@ def test_get_cache_path(url, tmp_path, monkeypatch):
     expected_extension = Path(url).suffix
     expected_filename = f"cached{expected_hash}{expected_extension}"
     expected_path = (tmp_path / expected_filename).as_posix()
-    assert cache_file == expected_path
+    assert Path(cache_file) == Path(expected_path)
 
 
 def test_get_cache_path_returns_none_when_caching_disabled():
