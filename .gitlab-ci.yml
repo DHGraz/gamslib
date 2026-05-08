@@ -5,7 +5,7 @@ stages:
   - publish
 
 default:
-  image: ghcr.io/astral-sh/uv:latest-python3.12-debian-slim
+  image: ghcr.io/astral-sh/uv:debian-slim
 
 # A hidden job template that can be used by different Python versions
 .test-template:
