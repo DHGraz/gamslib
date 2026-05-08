@@ -11,7 +11,7 @@ import requests
 from gamslib.sip import BagValidationError
 from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
 from gamslib.sip.utils import fetch_json_schema
-from gamslib.sip.validation.sip_json import validate_sip_json
+from gamslib.sip.validation.sip_json import validate_sip_json, validate_tag
 
 
 @pytest.fixture(name="tmp_bag_dir")
@@ -246,3 +246,45 @@ def test_validate_sip_json_unresolvable_schema(monkeypatch, tmp_bag_dir):
         BagValidationError, match=r"Failed to resolve a reference in the JSON Schema"
     ):
         validate_sip_json(tmp_bag_dir)
+
+
+@pytest.mark.parametrize(
+    "tag",
+    [
+        "abc",
+        "tag-01",
+        "tag._~withchars",
+        "  spaced_tag  ",
+        "A" * 50,
+    ],
+)
+def test_validate_tag_valid_values(tag):
+    """validate_tag accepts allowed characters and valid lengths."""
+    assert validate_tag(tag) is None
+
+
+@pytest.mark.parametrize("tag", ["", "   "])
+def test_validate_tag_rejects_empty_or_whitespace(tag):
+    """Empty values after stripping are invalid."""
+    with pytest.raises(ValueError, match=r"must not be empty"):
+        validate_tag(tag)
+
+
+@pytest.mark.parametrize("tag", ["ab", "  a "])
+def test_validate_tag_rejects_too_short_values(tag):
+    """Tags shorter than the configured minimum length are invalid."""
+    with pytest.raises(ValueError, match=r"minimum length"):
+        validate_tag(tag)
+
+
+def test_validate_tag_rejects_too_long_values():
+    """Tags longer than the configured maximum length are invalid."""
+    with pytest.raises(ValueError, match=r"exceeds maximum length"):
+        validate_tag("a" * 51)
+
+
+@pytest.mark.parametrize("tag", ["bad tag", "bad/tag", "bad+tag", "täg"])
+def test_validate_tag_rejects_invalid_characters(tag):
+    """Only letters, digits, and - . _ ~ are allowed."""
+    with pytest.raises(ValueError, match=r"contains invalid characters"):
+        validate_tag(tag)
