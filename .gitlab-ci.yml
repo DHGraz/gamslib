@@ -38,6 +38,42 @@ test-py_3.13:
   variables:
     PYTHON_VERSION: "3.13"    
 
+# Nightly jobs: force fresh environments and dependency upgrades
+.nightly-test-template:
+  extends: .test-template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
+  script:
+    - echo "uv environment version"
+    - uv --version
+    - echo "Pinning ${PYTHON_VERSION}"
+    - uv python pin ${PYTHON_VERSION}
+    - echo "Forcing fresh install and upgraded dependencies"
+    - rm -rf .venv
+    - uv cache clean
+    - uv sync --upgrade
+    - echo "Using python version:"
+    - python --version
+    - echo "Running tests with uv"
+    - uv run pytest tests
+
+nightly-test-py_3.11:
+  extends: .nightly-test-template
+  variables:
+    PYTHON_VERSION: "3.11"
+
+nightly-test-py_3.12:
+  extends: .nightly-test-template
+  variables:
+    PYTHON_VERSION: "3.12"
+
+nightly-test-py_3.13:
+  extends: .nightly-test-template
+  variables:
+    PYTHON_VERSION: "3.13"
+
 
 lint:
   stage: lint
