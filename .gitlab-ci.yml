@@ -1,12 +1,11 @@
 variables:
-  UV_VERSION: 0.11.10
+  UV_VERSION: latest
   PYTHON_BASE_VERSION: 3.12
   BASE_LAYER: bookworm-slim
 
 stages:
   - test
   - lint
-
 
 # A hidden job template that can be used by different Python versions
 .test-template:

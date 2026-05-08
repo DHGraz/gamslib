@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://gams.uni-graz.at/pub/SIP/sip-schema-gams-v1.0.json",
+    "$id": "https://gams.uni-graz.at/pub/gams/static/schemas/sip-schema-gams-v1.0.json",
     "title": "SIP metadata for GAMS",
     "description": "JSON Schema for GAMS SIPs.",
     "type": "object",
