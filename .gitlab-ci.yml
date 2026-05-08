@@ -6,6 +6,8 @@ variables:
 stages:
   - test
   - lint
+  - tag
+  - publish
 
 # A hidden job template that can be used by different Python versions
 .test-template:
@@ -89,3 +91,42 @@ lint:
 .rules:
   - if: $CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "develop"
     when: always
+
+# Reads the version from pyproject.toml and creates a git tag if it does not
+# already exist. Runs only on pushes to main (not on scheduled pipelines).
+auto-tag:
+  stage: tag
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+    - when: never
+  script:
+    - VERSION=$(python -c "import tomllib; data=tomllib.load(open('pyproject.toml','rb')); print(data['project']['version'])")
+    - TAG="v${VERSION}"
+    - echo "Detected version ${TAG}"
+    - |
+      if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q "${TAG}"; then
+        echo "Tag ${TAG} already exists, nothing to do"
+      else
+        echo "Creating tag ${TAG}"
+        git config user.email "ci@gitlab"
+        git config user.name "GitLab CI"
+        git tag "${TAG}"
+        git push "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "${TAG}"
+      fi
+
+# Builds the package and publishes it to PyPI whenever a vX.Y.Z tag is pushed.
+# Requires a PYPI_TOKEN CI/CD variable set in the project's GitLab settings.
+publish-to-pypi:
+  stage: publish
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
+      when: always
+    - when: never
+  script:
+    - echo "Building package"
+    - uv build
+    - echo "Publishing version ${CI_COMMIT_TAG} to PyPI"
+    - uv publish --token "${PYPI_TOKEN}"
