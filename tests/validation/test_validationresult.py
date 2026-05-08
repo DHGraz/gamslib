@@ -1,4 +1,5 @@
-"""Tests for the ValidationResult and ValidationSubResult classes from the validationresult module."""
+"""Tests for the ValidationResult and ValidationSubResult classes."""
+
 import copy
 import pytest
 
@@ -12,15 +13,16 @@ def make_subresult():
         True, "TestValidator", "file:///foo/bar", "msg1", [], ["Warning 1", "Warning 2"]
     )
 
+
 def test_validationresult_str(monkeypatch):
     "Test the __str__ method of a ValidationResult object."
     result = ValidationResult("foo/bar.xml")
     assert str(result) == "ValidationResult for file 'foo/bar.xml': valid."
 
     # is_valid is a property, so we need to monkeypatch it to test the invalid case
-    monkeypatch.setattr(type(result), "is_valid", 
-                        property(lambda self: False))
+    monkeypatch.setattr(type(result), "is_valid", property(lambda self: False))
     assert str(result) == "ValidationResult for file 'foo/bar.xml': invalid."
+
 
 def test_validationsubresult(subresult):
     "Test creation of a ValidationSubResult object."
@@ -37,7 +39,7 @@ def test_empty_validationresult():
     result = ValidationResult("foo/bar.xml")
     assert result.is_valid  # TODO: is this correct if not a single subresult was added?
     assert result.file_path == "foo/bar.xml"
-    assert not list(result.get_subresults()) # no subresults
+    assert not list(result.get_subresults())  # no subresults
     assert result.get_errors() == []
     assert result.get_warnings() == []
 

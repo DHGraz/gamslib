@@ -119,11 +119,11 @@ class XMLSubFormats:
     def get_puid_for_format_type(self, format_type) -> str:
         """Return the pronom PUID for the given format type.
 
-        If the format type is not found, return "fmt/101" (generic xml). 
+        If the format type is not found, return "fmt/101" (generic xml).
         """
         for format_ in self.formats:
             if format_.subtype == format_type:
-                return format_.puid 
+                return format_.puid
         return "fmt/101"
 
 

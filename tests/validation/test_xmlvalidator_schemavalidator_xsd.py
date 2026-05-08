@@ -1,13 +1,13 @@
 """Tests for the XMLSchemaValidator class in xmlvalidator.py."""
+
 import pytest
+from lxml import etree as ET
 
 from gamslib.validation.xmlvalidator import XMLSchemaValidator
 
-
-from lxml import etree as ET
-
 # pylint: disable=protected-access
 # pylint: disable=c-extension-no-member
+
 
 @pytest.fixture(name="xmlschema_validator")
 def create_xmlschema_validator(lazy_shared_datadir):
@@ -15,6 +15,7 @@ def create_xmlschema_validator(lazy_shared_datadir):
     schema_uri = (lazy_shared_datadir / "schemas" / "simple.xsd").resolve().as_uri()
     validator = XMLSchemaValidator(schema_uri)
     return validator
+
 
 @pytest.fixture(name="invalid_xmlschema_uri")
 def create_invalid_xmlschema_uri(lazy_shared_datadir, tmp_path):
@@ -26,6 +27,7 @@ def create_invalid_xmlschema_uri(lazy_shared_datadir, tmp_path):
     invalid_schema_path.write_text(data)
     return invalid_schema_path.resolve().as_uri()
 
+
 def test_invalid_schema(lazy_shared_datadir, invalid_xmlschema_uri):
     """Test the XSD validator with an invalid schema."""
     # if creation of the validator fails, it should set the _creation_error
@@ -36,7 +38,7 @@ def test_invalid_schema(lazy_shared_datadir, invalid_xmlschema_uri):
     # validating should always return the same error message, regardless of the input
     # document, because creation of the validator failed.
     xml_path = lazy_shared_datadir / "simple.xml"
-    tree = ET.parse(xml_path)  
+    tree = ET.parse(xml_path)
     result = broken_validator.validate(tree)
     assert not result.is_valid
     assert result.validator_name == "XMLSchema Validator"
@@ -45,17 +47,16 @@ def test_invalid_schema(lazy_shared_datadir, invalid_xmlschema_uri):
 
 
 def test_remote_schema_via_catalog():
-    """Create a validator with a schema URI that is only resolvable via the catalog.
-    """
+    """Create a validator with a schema URI that is only resolvable via the catalog."""
     schema_uri = "http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd"
     validator = XMLSchemaValidator(schema_uri)
     assert validator.schema_uri == schema_uri
     assert validator._creation_error is None
     assert validator.schema_validator is not None
 
-def test_remote_schema_not_in_catalog_not_allowed(monkeypatch):
-    """Test a remote schema not in catalog and not in allowed.
-    """
+
+def test_remote_schema_not_in_catalog_not_allowed():
+    """Test a remote schema not in catalog and not in allowed."""
     schema_uri = "http://gams.uni-graz.at/lido/1.1/lido.xsd"
 
     # Not in catalog, not in safe hosts should fail
@@ -68,11 +69,11 @@ def test_remote_schema_not_in_catalog_allowed(monkeypatch):
     "Test for remote schema on allowed host."
     monkeypatch.setenv("GAMSLIB_SAFE_XML_HOSTS", "gams.uni-graz.at,localhost")
 
-    #schema_uri = "http://schemas.opengis.net/gml/3.3.1/tin.xsd"
+    # schema_uri = "http://schemas.opengis.net/gml/3.3.1/tin.xsd"
     schema_uri = "http://schemas.opengis.net/gml/3.1.1/gml.xsd"
-    #schema_uri = "http://localhost:8000/lido/1.0/lido.xsd"
-    #schema_uri = "http://localhost:8000/lido/1.0/tei.xsd"
-    #schema_uri = "http://localhost:8000/lido/1.0/dcr.xsd"
+    # schema_uri = "http://localhost:8000/lido/1.0/lido.xsd"
+    # schema_uri = "http://localhost:8000/lido/1.0/tei.xsd"
+    # schema_uri = "http://localhost:8000/lido/1.0/dcr.xsd"
     # parser = ET.XMLParser(no_network=False)
     # try:
     #     tree = ET.parse(file=schema_uri, parser=parser)  # pylint: disable=c-extension-no-member
@@ -99,6 +100,7 @@ def test_validate_valid_document(xmlschema_validator, lazy_shared_datadir):
     assert not result.has_warnings
     assert result.errors == []
 
+
 def test_validate_invalid_document(xmlschema_validator, lazy_shared_datadir):
     """Test the XSD validator with an invalid document."""
     xml_path = lazy_shared_datadir / "simple_invalid.xml"
@@ -110,15 +112,19 @@ def test_validate_invalid_document(xmlschema_validator, lazy_shared_datadir):
     assert not result.has_warnings
     assert len(result.errors) == 1
 
+
 @pytest.mark.parametrize(
     "xml_file, schema_file",
     [
-#        ("simple.xml", "simple.xsd"),
+        #        ("simple.xml", "simple.xsd"),
         ("lido.xml", "https://gams.uni-graz.at/lido/1.0/lido.xsd"),
-#         ("lido.xml", "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
-#        ("lido.xml", "http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd"),
-    ])
-def test_xsd_validator_validiate_with_real_schemas(xml_file, schema_file, lazy_shared_datadir, monkeypatch):
+        #         ("lido.xml", "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
+        #        ("lido.xml", "http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd"),
+    ],
+)
+def test_xsd_validator_validiate_with_real_schemas(
+    xml_file, schema_file, lazy_shared_datadir, monkeypatch
+):
     """Test the XSD validator with real schemas and documents.
 
     We need this, as we've noticed problems with some schema files.
@@ -136,10 +142,3 @@ def test_xsd_validator_validiate_with_real_schemas(xml_file, schema_file, lazy_s
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = validator.validate(tree)
     assert result.is_valid
-
-
-
-
-
-
-

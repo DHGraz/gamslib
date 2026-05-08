@@ -27,7 +27,6 @@ def test_dsdata_creation(dsdata):
     assert dsdata.tags == "tag1; tag_2; tag-3"
 
 
-
 @pytest.mark.parametrize("detector", [MinimalDetector(), MagikaDetector()])
 def test_ds_data_guess_missing_values(detector, shared_datadir, monkeypatch):
     "Optional missing values should be added automatically."
@@ -181,6 +180,7 @@ def test_dsdata_validate(dsdata):
         dsdata.rights = ""
     assert dsdata.rights == "GPLv3"
 
+
 def test_dsdata_validate_invalid_dspath(dsdata):
     "Should raise immediately if dspath is invalid."
     with pytest.raises(ValueError):
@@ -204,24 +204,26 @@ def test_dsdata_validate_invalid_dspath(dsdata):
     assert dsdata.dspath == "TEI.xml"
 
 
-
 def test_dsdata_validate_valid_tags(dsdata):
     "Test tagswith valid tag values"
     dsdata.tags = "tag1; tag_2; tag-3; tag~3; tag.4"
     assert dsdata.validate() is None
 
-@pytest.mark.parametrize("value, msg", [ 
-    ("a", "short"),
-    ("a"*51, "exceeds maximum length"),
-    ("foo bar", "invalid character"),
-    ("foo:bar", "invalid character"),
-    ("foo#bar", "invalid character"),
-    ("foo/bar", "invalid character"),
-    ("foo\\bar", "invalid character"),
-])
+
+@pytest.mark.parametrize(
+    "value, msg",
+    [
+        ("a", "short"),
+        ("a" * 51, "exceeds maximum length"),
+        ("foo bar", "invalid character"),
+        ("foo:bar", "invalid character"),
+        ("foo#bar", "invalid character"),
+        ("foo/bar", "invalid character"),
+        ("foo\\bar", "invalid character"),
+    ],
+)
 def test_dsdata_validate_invalid_tag(value, msg, dsdata):
     "Should raise if tag is invalid."
     with pytest.raises(ValueError, match=msg):
         dsdata.tags = value
-        dsdata.validate() 
-
+        dsdata.validate()

@@ -28,7 +28,9 @@ def test_validate_bag_success(bag_dir):
         patch("gamslib.sip.validation.bagit.validate_structure") as mock_structure,
         patch("gamslib.sip.validation.bagit.validate_bagit_txt") as mock_bagit_txt,
         patch("gamslib.sip.validation.manifests.validate_manifest_md5") as mock_md5,
-        patch("gamslib.sip.validation.manifests.validate_manifest_sha512") as mock_sha512,
+        patch(
+            "gamslib.sip.validation.manifests.validate_manifest_sha512"
+        ) as mock_sha512,
         patch("gamslib.sip.validation.sip_json.validate_sip_json") as mock_sip_json,
         patch("gamslib.sip.validation.baginfo.validate_baginfo_text") as mock_baginfo,
     ):
@@ -105,7 +107,9 @@ def test_validate_bag_raises_on_validation_failure(bag_dir, fail_func, fail_exce
         patches["gamslib.sip.validation.bagit.validate_structure"] as mock_structure,
         patches["gamslib.sip.validation.bagit.validate_bagit_txt"] as mock_bagit_txt,
         patches["gamslib.sip.validation.manifests.validate_manifest_md5"] as mock_md5,
-        patches["gamslib.sip.validation.manifests.validate_manifest_sha512"] as mock_sha512,
+        patches[
+            "gamslib.sip.validation.manifests.validate_manifest_sha512"
+        ] as mock_sha512,
         patches["gamslib.sip.validation.sip_json.validate_sip_json"] as mock_sip_json,
         patches["gamslib.sip.validation.baginfo.validate_baginfo_text"] as mock_baginfo,
     ):
@@ -231,12 +235,14 @@ def test_validate_pid_valid(pid):
     else:
         validate_pid(pid)
 
+
 def testvalidate_object_id_fails():
     "Test that _validate_object_id raises ValueError"
     with pytest.raises(ValueError):
         _validate_object_id("")
     with pytest.raises(ValueError):
         _validate_object_id("foo--bar")
+
 
 @pytest.mark.parametrize(
     "pid,reason",
@@ -248,11 +254,11 @@ def testvalidate_object_id_fails():
         (
             "abc/def",
             "must contain a dot",
-        ),  # contains invalid character #("abc@def",  "contain only"),  # contains invalid character
+        ),  # contains invalid character
         (
             "abc@def",
             "must contain a dot",
-        ),  # contains invalid character #("abc@def",  "contain only"),  # contains invalid character
+        ),  # contains invalid character
         ("abcdef", "must contain a dot"),  # no dot
         ("abc..def", "must start with a letter"),
         ("abc.-def", "must start with a letter"),  # dot followed by dash

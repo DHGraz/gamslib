@@ -1,5 +1,5 @@
-"""Test the validate_bagit_txt function of validate.py.
-"""
+"""Test the validate_bagit_txt function of validate.py."""
+
 import pytest
 
 from gamslib.sip.validation.bagit import validate_bagit_txt
@@ -9,16 +9,15 @@ from gamslib.sip import BagValidationError
 def test_validate_bagit_txt_missing(valid_bag_dir):
     """A missing bagit.txt file should raise an exception."""
     (valid_bag_dir / "bagit.txt").unlink()
-    with pytest.raises(BagValidationError, match="'bagit.txt' file does not exist"):
+    with pytest.raises(BagValidationError, match=r"'bagit.txt' file does not exist"):
         validate_bagit_txt(valid_bag_dir)
 
 
 def test_validate_empty_bagit_txt(valid_bag_dir):
     "Ab empty bagit.txt file should raise an exception."
     (valid_bag_dir / "bagit.txt").write_text("")
-    with pytest.raises(BagValidationError, match="bagit.txt is incomplete") as excinfo:
+    with pytest.raises(BagValidationError, match=r"bagit.txt is incomplete"):
         validate_bagit_txt(valid_bag_dir)
-    # assert "Invalid number of lines in bagit.txt" in str(excinfo.value)
 
 
 def test_validate_bagit_txt_invalid_line(valid_bag_dir):
@@ -49,7 +48,9 @@ def test_validate_bagit_txt_ignore_empty_lines(valid_bag_dir):
     bagit_file.write_text(
         "\nBagIt-Version: 1.0\n\nTag-File-Character-Encoding: UTF-8\n\n\n"
     )
-    assert validate_bagit_txt(valid_bag_dir) is None, "Should not raise an exception for empty lines"
+    assert validate_bagit_txt(valid_bag_dir) is None, (
+        "Should not raise an exception for empty lines"
+    )
 
 
 def test_validate_bagit_txt_wrong_version(valid_bag_dir):

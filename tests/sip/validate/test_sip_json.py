@@ -14,8 +14,6 @@ from gamslib.sip.utils import fetch_json_schema
 from gamslib.sip.validation.sip_json import validate_sip_json
 
 
-
-
 @pytest.fixture(name="tmp_bag_dir")
 def tmp_bag_dir_fixture(tmp_path):
     """Create a temporary bag directory structure with sip.json."""
@@ -59,7 +57,9 @@ def test_fetch_schema_invalid_json(monkeypatch):
     with pytest.raises(BagValidationError) as excinfo:
         fetch_json_schema("http://example.com")
     monkeypatch.undo()
-    assert "Schema referenced in 'sip.json' is not a valid JSON document" in str(excinfo.value)
+    assert "Schema referenced in 'sip.json' is not a valid JSON document" in str(
+        excinfo.value
+    )
 
 
 def test_validate_schema(valid_bag_dir):
@@ -95,7 +95,9 @@ def test_validate_schema_no_schema_value(valid_bag_dir):
     data = json.load(sip_json_file.open())
     data["$schema"] = ""
     sip_json_file.write_text(json.dumps(data))
-    with pytest.raises(BagValidationError, match=r"Unsupported JSON schema in sip.json"):
+    with pytest.raises(
+        BagValidationError, match=r"Unsupported JSON schema in sip.json"
+    ):
         validate_sip_json(valid_bag_dir)
 
 
@@ -145,10 +147,10 @@ def write_sip_json(bag_dir, data):
     return sip_json_file
 
 
-#def test_missing_sip_json(tmp_bag_dir):
+# def test_missing_sip_json(tmp_bag_dir):
 def test_missing_sip_json(shared_datadir):
     """Test error when sip.json file does not exist."""
-    sip_json_file = shared_datadir / "valid_bag" / "data" / "meta" / "sip.json" 
+    sip_json_file = shared_datadir / "valid_bag" / "data" / "meta" / "sip.json"
     sip_json_file.unlink()
     with pytest.raises(BagValidationError, match=r"sip.json file does not exist"):
         validate_sip_json(shared_datadir / "valid_bag")
@@ -173,7 +175,7 @@ def test_missing_schema_key(valid_bag_dir):
 
 
 # we skip this because it's really slow (waiting for timeout)
-#@pytest.mark.skip
+# @pytest.mark.skip
 def test_main_resource_not_in_content_files(valid_bag_dir):
     """Test error when mainResource is not listed in contentFiles."""
     sip_json_file = valid_bag_dir / "data" / "meta" / "sip.json"
@@ -205,7 +207,7 @@ def test_validate_sip_json_invalid_schema(tmp_bag_dir):
         validate_sip_json(tmp_bag_dir)
 
 
-#def test_validate_sip_json_schema_validation_error(monkeypatch, tmp_bag_dir):
+# def test_validate_sip_json_schema_validation_error(monkeypatch, tmp_bag_dir):
 def test_validate_sip_json_schema_validation_error(valid_bag_dir):
     """Test error when JSON schema validation fails (extra property not allowed)."""
     sip_json_file = valid_bag_dir / "data" / "meta" / "sip.json"

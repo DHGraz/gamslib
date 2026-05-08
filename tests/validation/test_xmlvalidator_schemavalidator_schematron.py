@@ -1,11 +1,13 @@
-"""Tests for the xmlvalidator.SchematronValidator.
-"""
-import pytest
+"""Tests for the xmlvalidator.SchematronValidator."""
+
 import lxml.isoschematron
-from lxml import etree as ET
+import pytest
 import saxonche  # pylint: disable=import-error
+from lxml import etree as ET
 
 from gamslib.validation.xmlvalidator import SchematronValidator
+
+# pylint: disable=c-extension-no-member
 
 @pytest.fixture(name="lxml_schematron_validator")
 def create_lxml_schematron_validator(lazy_shared_datadir):
@@ -24,6 +26,7 @@ def create_saxon_schematron_validator(lazy_shared_datadir):
     validator = SchematronValidator(schema_uri)
     return validator
 
+
 @pytest.fixture(name="invalid_schematron_uri")
 def create_invalid_schematron_uri(lazy_shared_datadir, tmp_path):
     """Create a invalid schematron file and return its location as URI."""
@@ -33,7 +36,6 @@ def create_invalid_schematron_uri(lazy_shared_datadir, tmp_path):
     invalid_schema_path = tmp_path / "invalid.sch"
     invalid_schema_path.write_text(data)
     return invalid_schema_path.resolve().as_uri()
-
 
 
 def test_schematron_validator_init_lxml(lxml_schematron_validator):
@@ -91,10 +93,7 @@ def test_schematron_validator_with_invalid_schema(
     # if creation of the validator fails, it should set the _creation_error
     # attribute and not raise an exception
     broken_validator = SchematronValidator(invalid_schematron_uri)
-    assert (
-        broken_validator._creation_error
-        is not None  
-    )
+    assert broken_validator._creation_error is not None
 
     # validating should return the SubResult set when object initialiation failed
     # (and not try to validate the document)
@@ -156,7 +155,6 @@ def test_schematron_saxon_validator_invalid_document(
 ):
     """Test the Schematron validator with an invalid document."""
     xml_path = lazy_shared_datadir / "simple_invalid.xml"
-    x = saxon_schematron_validator.schema_uri
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
     result = saxon_schematron_validator.validate(tree)
     assert not result.is_valid
@@ -169,17 +167,24 @@ def test_schematron_saxon_validator_invalid_document(
 
 
 def test_schematron_validator_no_params_given(lxml_schematron_validator):
-    """The schematron validato allows to use a tree or a file as input. 
+    """The schematron validato allows to use a tree or a file as input.
     If no parameters are given, it should raise an error and not crash.
     """
-    with pytest.raises(ValueError, match=r"Either a tree or a file_path must be given."):   
+    with pytest.raises(
+        ValueError, match=r"Either a tree or a file_path must be given."
+    ):
         lxml_schematron_validator.validate()
 
-def test_schematron_validator_both_params_given(lxml_schematron_validator, lazy_shared_datadir):
-    """The schematron validato allows to use a tree or a file as input. 
+
+def test_schematron_validator_both_params_given(
+    lxml_schematron_validator, lazy_shared_datadir
+):
+    """The schematron validato allows to use a tree or a file as input.
     If both parameters are given, it should raise an error and not crash.
     """
     xml_path = lazy_shared_datadir / "simple.xml"
     tree = ET.parse(xml_path)  # pylint: disable=c-extension-no-member
-    with pytest.raises(ValueError, match=r"Either a tree or a file_path must be given, but not both."):   
+    with pytest.raises(
+        ValueError, match=r"Either a tree or a file_path must be given, but not both."
+    ):
         lxml_schematron_validator.validate(tree=tree, file_path=xml_path)

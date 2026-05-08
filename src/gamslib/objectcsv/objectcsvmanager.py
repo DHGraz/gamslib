@@ -218,7 +218,6 @@ class ObjectCSVManager:
         if ds_csv_file.is_file():
             ds_csv_file.unlink()
 
-
     def _find_datastream_doublettes(self) -> list[str]:
         """
         Find duplicate datastream IDs.
@@ -229,7 +228,7 @@ class ObjectCSVManager:
         dsid_counts = Counter(dsdata.dsid for dsdata in self._datastream_data)
         doublettes = [dsid for dsid, count in dsid_counts.items() if count > 1]
         return doublettes
-    
+
     def validate(self) -> None:
         """
         Validate the object metadata and datastreams.
@@ -246,7 +245,8 @@ class ObjectCSVManager:
         doublettes = self._find_datastream_doublettes()
         if doublettes:
             raise ValueError(
-                f"Duplicate datastream IDs found: {', '.join(doublettes)}. Datastream IDs must be unique."
+                f"Duplicate datastream IDs found: {', '.join(doublettes)}. "
+                "Datastream IDs must be unique."
             )
         # Validate each datastream
         for dsdata in self._datastream_data:
@@ -306,7 +306,6 @@ class ObjectCSVManager:
                 if "mainresource" in row:
                     row["mainResource"] = row.pop("mainresource")
                 return ObjectData(**row)
-
 
     def _write_object_csv(self):
         """

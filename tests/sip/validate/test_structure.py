@@ -86,8 +86,8 @@ def test_validate_structure_missing_sip_json(valid_bag_dir):
     "Check if missing sip.json is detected."
     (valid_bag_dir / "data" / "meta" / "sip.json").unlink()
     with pytest.raises(
-        BagValidationError, match="Bag file 'data/meta/sip.json' does not exist"
-    ) as excinfo:
+        BagValidationError, match=r"Bag file 'data/meta/sip.json' does not exist"
+    ):
         validate_structure(valid_bag_dir)
 
 
@@ -96,5 +96,5 @@ def test_validate_structure_missing_dc_xml(valid_bag_dir):
     (valid_bag_dir / "data" / "content" / "DC.xml").unlink()
     with pytest.raises(
         BagValidationError, match="Bag file 'data/content/DC.xml' does not exist"
-    ) as excinfo:
+    ):
         validate_structure(valid_bag_dir)

@@ -5,7 +5,7 @@ from lxml import etree as ET
 
 from gamslib.validation.xmlvalidator import DTDValidator
 
-
+# pylint: disable=c-extension-no-member
 @pytest.fixture(name="dtd_validator")
 def create_dtd_validator(lazy_shared_datadir):
     """Create a DTDValidator object."""

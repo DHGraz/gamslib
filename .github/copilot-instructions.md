@@ -36,4 +36,3 @@
 - Keep changes domain-local (e.g., `objectcsv` change + matching `tests/objectcsv/*`).
 - Prefer extending existing dataclasses/models and validators over introducing parallel abstractions.
 - Add/update tests next to the affected module and use existing fixture style before adding new fixture systems.
-- Do not change generated docs in `reference/` unless explicitly asked or running `make docs` as part of the task.

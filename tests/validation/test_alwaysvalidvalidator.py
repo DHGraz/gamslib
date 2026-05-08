@@ -1,5 +1,5 @@
-"""Tests for the alwaysvalidvalidator module.
-"""
+"""Tests for the alwaysvalidvalidator module."""
+
 from pathlib import Path
 
 import pytest
@@ -8,7 +8,7 @@ from gamslib.validation.alwaysvalidvalidator import AlwaysValidValidator
 
 def test_alwaysvalidvalidator():
     "Test the AlwaysValidValidator class."
-    assert isinstance(AlwaysValidValidator(), AlwaysValidValidator) 
+    assert isinstance(AlwaysValidValidator(), AlwaysValidValidator)
 
 
 def test_validate():
@@ -22,6 +22,7 @@ def test_validate():
     assert result.get_errors() == []
     assert result.get_warnings()[0] == "This file type has no validator registered."
     assert "Did not validate file" in result.get_messages()[0]
+
 
 def test_add_subresult():
     "Test that the add_subresult method of the AlwaysValidValidator raises a NotImplementedError."

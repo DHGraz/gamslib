@@ -13,7 +13,7 @@ from tomlkit import toml_file
 
 def find_project_toml(start_dir: Path) -> Path:
     """
-    Search for a 'gamsproject.toml' file starting from the given directory and moving upwards.
+    Search for a 'gamsproject.toml' in current and parent directories.
 
     Args:
         start_dir (Path): The directory to begin the search.
@@ -28,7 +28,8 @@ def find_project_toml(start_dir: Path) -> Path:
     The function checks each parent directory of start_dir for a 'gamsproject.toml' file.
     If none is found, it checks the current working directory as a fallback.
     """
-    # we add a non existing folder to the start_dir to make sure that we also check the start_dir itself for a gamsproject.toml
+    # we add a non existing folder to the start_dir to make sure that we also check the
+    # start_dir itself for a gamsproject.toml
     for folder in (start_dir / "a_non_existing_folder_to_include_start_dir").parents:
         project_toml = folder / "gamsproject.toml"
         if project_toml.exists():
@@ -238,7 +239,7 @@ def update_configuration(config_file: Path):
     Update the configuration file by adding missing entries from the template.
 
     Compares the provided config file to the template 'project.toml' included with the package.
-    Any keys present in the template but missing from the config file are added, preserving 
+    Any keys present in the template but missing from the config file are added, preserving
     existing values and comments.
     The function does not remove or modify existing entries—only additions are handled.
 

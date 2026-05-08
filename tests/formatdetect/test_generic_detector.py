@@ -7,12 +7,13 @@ I added this to facilitate identifying problems with validation files.
 """
 
 import pytest
-from conftest import get_testfiles_from_validation
 
-from gamslib.formatdetect import detect_format, FormatDetector
+from gamslib.formatdetect import FormatDetector, detect_format
 from gamslib.formatdetect.magikadetector import MagikaDetector
 from gamslib.formatdetect.minimaldetector import MinimalDetector
 from gamslib.formatdetect.siegfrieddetector import SiegfriedDetector
+
+from conftest import get_testfiles_from_validation
 
 @pytest.mark.parametrize("detector", [
     SiegfriedDetector(),

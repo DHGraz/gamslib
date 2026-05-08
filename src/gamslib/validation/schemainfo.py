@@ -22,7 +22,7 @@ class SchemaType(enum.StrEnum):
     SCH = "Schematron"
     DTD = "Document Type Definition"
 
-    # TODO: add a type for each supported schem type (json etc.)
+    # TODO: add a type for each supported schema type (json etc.)
 
     UNKNOWN = "Unknown Schema Type"
 

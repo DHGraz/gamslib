@@ -24,7 +24,7 @@ import referencing
 from gamslib.sip import CURRENT_SIP_JSON_SCHEMA_URL as GAMS_SIP_SCHEMA_URL
 from gamslib.sip.utils import fetch_json_schema
 
-from .. import CURRENT_SIP_JSON_SCHEMA_URL, DEPRECATED_SIP_JSON_SCHEMA_URLS, BagValidationError
+from .. import DEPRECATED_SIP_JSON_SCHEMA_URLS, BagValidationError
 
 MAX_TAG_LENGTH = 50
 MIN_TAG_LENGTH = 3

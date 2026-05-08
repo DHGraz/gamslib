@@ -2,24 +2,17 @@
 
 import re
 from pathlib import Path
-import unittest
-from unittest.mock import MagicMock
-from lxml import etree as ET
 
 import pytest
+from lxml import etree as ET
 
 from gamslib.validation.schemainfo import SchemaInfo, SchemaType
 from gamslib.validation.xmlvalidator import (
-    DTDValidator,
-    RelaxNGCompactValidator,
-    RelaxNGValidator,
-    SchemaValidator,
     SchematronValidator,
-    XMLSchemaValidator,
     XMLValidator,
 )
 
-
+# pylint: disable=c-extension-no-member
 @pytest.fixture(name="make_schema_info")
 def make_schema_info_fixture():
     "Provide a factory function for creating SchemaInfo objects."
@@ -143,7 +136,10 @@ def test_parse_error_returns_syntax_error(lazy_shared_datadir, make_schema_info)
 
 
 def test_validate_no_schema(lazy_shared_datadir):
-    """Test XMLValidator.validate() If no schema is given(nor explicitely nore referenced in the XML)."""
+    """Test XMLValidator.validate().
+    
+    If no schema is given(nor explicitely nore referenced in the XML).
+    """
     xml_file = lazy_shared_datadir / "minimal_wellformed.xml"
     result = XMLValidator().validate(xml_file, [])
     assert result.is_valid
@@ -173,12 +169,15 @@ def test_srvl_to_message_lists_empty_report_returns_empty_lists():
 
     errors, warnings = SchematronValidator.srvl_to_message_lists(report_root)
 
-    assert errors == []
-    assert warnings == []
+    assert not errors
+    assert not warnings
 
 
 def test_srvl_to_message_lists_extracts_errors_and_warnings():
-    """srvl_to_message_lists should extract both failed-assert errors and successful-report warnings."""
+    """srvl_to_message_lists should extract both:
+    
+    failed-assert errors and successful-report warnings.
+    """
     report_root = ET.fromstring(
         """
         <svrl:schematron-output xmlns:svrl="http://purl.oclc.org/dsdl/svrl">
@@ -203,7 +202,8 @@ def test_srvl_to_message_lists_extracts_errors_and_warnings():
 
 
 def test_srvl_to_message_lists_missing_attrs_use_empty_defaults():
-    """srvl_to_message_lists should fall back to empty strings for missing location/test attributes."""
+    """srvl_to_message_lists should fall back to empty strings 
+    for missing location/test attributes."""
     report_root = ET.fromstring(
         """
         <svrl:schematron-output xmlns:svrl="http://purl.oclc.org/dsdl/svrl">

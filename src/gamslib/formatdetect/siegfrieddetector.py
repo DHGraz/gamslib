@@ -117,12 +117,15 @@ class SiegfriedDetector(FormatDetector):
         if pronom_id in ("UNKNOWN", "x-fmt/111"):
             if "fmt/101" in pronom_warning:  # we have an xml file without doctype
                 mime_type, subtype = xmltypes.get_format_info(filepath, mime_type)
-                # if we detected a xml type, we should check, if the pronom_id can be fixed to a more specific one, based on the subtype
+                # if we detected a xml type, we should check, if the pronom_id can
+                # be fixed to a more specific one, based on the subtype
                 puid = "fmt/101"
                 if subtype is not None:
-                    detected_puid = xmltypes.subformats.get_puid_for_format_type(subtype)
+                    detected_puid = xmltypes.subformats.get_puid_for_format_type(
+                        subtype
+                    )
                     if detected_puid is not None:
-                        puid = detected_puid    
+                        puid = detected_puid
                 return mime_type, subtype, puid
             if "fmt/817" in pronom_warning:  # we have an unrecognized json file
                 mime_type, subtype = jsontypes.get_format_info(filepath, mime_type)
@@ -210,10 +213,11 @@ class SiegfriedDetector(FormatDetector):
         """Create a temporary copy of the file and insert the xml declaration."""
 
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + filepath.read_text()
-        # Not using a context manager here, because we need the file to persist after closing it, so that pygfried can read it. 
+        # Not using a context manager here, because we need the file to persist
+        # after closing it, so that pygfried can read it.
         # We will delete it manually after we are done.
         try:
-            f = tempfile.NamedTemporaryFile("w", delete=False)  # noqa: SIM115
+            f = tempfile.NamedTemporaryFile("w", delete=False)  # noqa: SIM115 # pylint: disable=consider-using-with
             f.write(xml)
             f.close()  # Datei schließen, damit andere Prozesse darauf zugreifen können
             mime_type, subtype, pronom_id, pronom_warning = self._run_pronom(
@@ -224,4 +228,3 @@ class SiegfriedDetector(FormatDetector):
             # Manuelles Aufräumen
             if os.path.exists(f.name):
                 os.remove(f.name)
-

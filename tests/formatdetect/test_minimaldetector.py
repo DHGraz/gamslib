@@ -1,11 +1,13 @@
 """Tests for the minimal detector."""
+
 import shutil
+
 import pytest
-from conftest import get_testfiles
 
 from gamslib.formatdetect.formatdetector import DEFAULT_TYPE
 from gamslib.formatdetect.minimaldetector import MinimalDetector
 
+from conftest import get_testfiles
 
 @pytest.fixture(name="detector")
 def get_detector():
@@ -22,14 +24,15 @@ def test_get_file_type(detector, testfile):
     """Test that the detector can guess the file type of a file."""
     result = detector.guess_file_type(testfile.filepath)
     assert result.mimetype == testfile.mimetype, (
-        f"{detector}: Expected '{testfile.mimetype}', got '{result.mimetype}' for file {testfile.filepath.name}"
+        f"{detector}: Expected '{testfile.mimetype}', got "
+        f"'{result.mimetype}' for file {testfile.filepath.name}"
     )
     assert result.subtype == testfile.subtype, (
-        f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' for file {testfile.filepath.name}"
+        f"{detector}: Expected '{testfile.subtype}', got "
+        f"'{result.subtype}' for file {testfile.filepath.name}"
     )
 
 
-# @pytest.mark.xfail(reason="Detecting files without extension is not supported by the mimetypes module.")
 @pytest.mark.parametrize("testfile", files_to_try, ids=param_ids)
 def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
     """Test that the detector can guess the file type of a file with now extension.
@@ -40,7 +43,8 @@ def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
     with pytest.warns(UserWarning):
         result = detector.guess_file_type(tmp_path / "foo")
         assert result.mimetype == DEFAULT_TYPE, (
-            f"{detector}: Expected '{DEFAULT_TYPE}', got '{result.mimetype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{DEFAULT_TYPE}', got "
+            f"'{result.mimetype}' for file {testfile.filepath.name}"
         )
         assert result.subtype is None, (
             f"{detector}: Expected '"
@@ -61,13 +65,14 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
     # We have some known issues with the mimetype detector v 0.5
     if testfile.filepath.name == "image.jp2":
         pytest.skip("jp2 is not detected by magika")
-    elif testfile.filepath.name == 'iiif_manifest.json':
+    elif testfile.filepath.name == "iiif_manifest.json":
         pytest.skip("jsonld with wrong extension is detected by magika as javascript")
     else:
         shutil.copy(testfile.filepath, file_to_test)
         result = detector.guess_file_type(file_to_test)
         assert result.mimetype == expected_wrong_type, (
-            f"{detector}: Expected '{DEFAULT_TYPE}', got '{result.mimetype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{expected_wrong_type}', got "
+            f"'{result.mimetype}' for file {testfile.filepath.name}"
         )
         assert result.subtype is None, (
             f"{detector}: Expected '"

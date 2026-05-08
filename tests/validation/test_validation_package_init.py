@@ -12,7 +12,6 @@ from gamslib.validation import (
 )
 from gamslib.validation.alwaysvalidvalidator import AlwaysValidValidator
 from gamslib.validation.validator import ValidatorFactory
-from gamslib.validation.xmlvalidator import XMLSchemaValidator
 
 
 @pytest.mark.parametrize(

@@ -8,7 +8,9 @@ import requests
 
 import gamslib.validation.combined_resolver as combined_resolver_mod
 from gamslib.validation.combined_resolver import CombinedCatalogResolver
-import lxml
+
+
+# pylint: disable=too-few-public-methods
 
 class FakeResponse:
     "Mock a requests.Response object for testing purposes."
@@ -18,7 +20,7 @@ class FakeResponse:
         self.status_code = kwargs.get("status_code", 200)
 
     def raise_for_status(self):
-        """Simulate the behavior of requests.Response.raise_for_status() by raising an exception for HTTP error status codes."""
+        "Mock requests.Response.raise_for_status()."
         if self.status_code >= 400:
             raise requests.exceptions.RequestException(f"HTTP error {self.status_code}")
 
@@ -52,7 +54,9 @@ def test_init_with_allowed_hosts_from_config(monkeypatch):
     """Check if the allowed hosts are properly initialized from the configuration"""
 
     class DummyConfig:
+        "A dummy configuration class to mock the get_configuration method"
         class General:
+            "A dummy configuration class to mock the get_configuration method"
             safe_xml_hosts = ["config.example", "foo.uni-graz.at"]
 
         general = General()
@@ -83,7 +87,7 @@ def test_init_with_allowed_hosts_from_env(monkeypatch):
         "https://example.org/schema.sch",
     ],
 )
-def test_get_cache_path(url, tmp_path, monkeypatch):
+def test_get_cache_path(url, tmp_path):
     """get_cache_path should return a path based on the URL hash and extension."""
     resolver = CombinedCatalogResolver(cache_dir=str(tmp_path))
     cache_file = resolver.get_cache_path(
@@ -107,7 +111,6 @@ def test_resolve_prefers_catalog_result(tmp_path, monkeypatch):
     """Resolver returns catalog result immediately and skips network fetch."""
     resolver = CombinedCatalogResolver(["www.w3.org"], cache_dir=str(tmp_path))
     url = "http://www.w3.org/1998/xml.xsd"
-
 
     monkeypatch.setattr(
         resolver,
@@ -165,28 +168,37 @@ def test_resolve_uses_cached_file_when_available(tmp_path, monkeypatch):
 def test_resolve_downloads_and_caches_when_not_in_catalog_or_cache(
     tmp_path, monkeypatch
 ):
-    """Resolve should download the missing schema, write it to the cache, and then resolve from the cached file."""
+    """Resolver uses existing cache entry before attempting a download.
+
+    Resolve should download the missing schema, write it to the cache,
+    and then resolve from the cached file.
+    """
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(["example.org"], cache_dir=str(cache_dir))
     url = "https://example.org/schema/new-schema.xsd"
 
-    # we fake the cache path to circumvent the hashing and ensure a predictable location for the test
+    # we fake the cache path to circumvent the hashing and ensure a predictable
+    # location for the test
     cached_file = cache_dir / "cached_downloaded.xsd"
     monkeypatch.setattr(resolver, "get_cache_path", lambda _url: str(cached_file))
     monkeypatch.setattr(resolver, "_resolve_catalog_path", lambda _url: None)
     monkeypatch.setattr(
-        resolver, "resolve_string", lambda content, ctx, base_url=None: "DOWNLOADED_RESULT"
+        resolver,
+        "resolve_string",
+        lambda content, ctx, base_url=None: "DOWNLOADED_RESULT",
     )
 
-    class FakeResponse:
+    class MockResponse:
+        "Mock a successful HTTP response with schema content for testing purposes."
         content = b"<xsd:schema/>"
 
         @staticmethod
         def raise_for_status():
+            "Mock requests.Response.raise_for_status()."
             return None
 
     monkeypatch.setattr(
-        combined_resolver_mod.requests, "get", lambda *_args, **_kwargs: FakeResponse()
+        combined_resolver_mod.requests, "get", lambda *_args, **_kwargs: MockResponse()
     )
 
     result = resolver.resolve(url, None, None)
@@ -233,8 +245,9 @@ def test_get_content_from_allowed_uri(tmp_path, lazy_shared_datadir, monkeypatch
     "Test the get_content method with an allowed http URI."
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(["foo.com"], cache_dir=str(cache_dir))
-    # monkeypatch the requests.get method to return a fake response with the content of the test schema,
-    # since we cannot rely on external network access in tests
+    # monkeypatch the requests.get method to return a fake response with the
+    # content of the test schema, since we cannot rely on external network
+    # access in tests
     expected_content = (lazy_shared_datadir / "schemas" / "simple.xsd").read_bytes()
     monkeypatch.setattr(
         combined_resolver_mod.requests,
@@ -251,12 +264,13 @@ def test_get_content_from_allowed_uri(tmp_path, lazy_shared_datadir, monkeypatch
     assert content == expected_content
 
 
-def test_get_content_from_allowed_uri_404(tmp_path, lazy_shared_datadir, monkeypatch):
+def test_get_content_from_allowed_uri_404(tmp_path, monkeypatch):
     "Test the get_content method with an allowed http URI which returns a 404 error."
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(["foo.com"], cache_dir=str(cache_dir))
-    # monkeypatch the requests.get method to return a fake response with the content of the test schema,
-    # since we cannot rely on external network access in tests
+    # monkeypatch the requests.get method to return a fake response with the
+    # content of the test schema, since we cannot rely on external network
+    # access in tests
     monkeypatch.setattr(
         combined_resolver_mod.requests,
         "get",
@@ -266,7 +280,7 @@ def test_get_content_from_allowed_uri_404(tmp_path, lazy_shared_datadir, monkeyp
         resolver.get_content("http://foo.com/schema/simple.xsd")
 
 
-def test_get_content_from_catalog_uri(tmp_path, lazy_shared_datadir):
+def test_get_content_from_catalog_uri(tmp_path):
     "Test the get_content method with a URI that can be resolved via the catalog."
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(cache_dir=str(cache_dir))
@@ -276,8 +290,10 @@ def test_get_content_from_catalog_uri(tmp_path, lazy_shared_datadir):
     assert content
 
 
-def test_get_content_from_disallowed_uri(tmp_path, lazy_shared_datadir):
-    "Test the get_content method with a URI that is not allowed and cannot be resolved via the catalog."
+def test_get_content_from_disallowed_uri(tmp_path):
+    """Test the get_content method with a URI that is not allowed and cannot "
+    "be resolved via the catalog.
+    """
     cache_dir = tmp_path / "schema_cache"
     resolver = CombinedCatalogResolver(cache_dir=str(cache_dir))
     with pytest.raises(Exception):

@@ -50,7 +50,6 @@ from pathlib import Path
 from ..projectconfiguration import MissingConfigurationException, get_configuration
 from .formatdetector import FormatDetector
 from .formatinfo import FormatInfo
-from .siegfrieddetector import SiegfriedDetector
 from .magikadetector import MagikaDetector
 from .minimaldetector import MinimalDetector
 from .siegfrieddetector import SiegfriedDetector

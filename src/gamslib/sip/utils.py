@@ -28,7 +28,7 @@ import zipfile
 
 import requests
 
-from gamslib.sip import RESOURCE_PATH, CURRENT_SIP_JSON_SCHEMA_URL, BagValidationError
+from gamslib.sip import RESOURCE_PATH, BagValidationError
 
 __all__ = [
     "count_bytes",

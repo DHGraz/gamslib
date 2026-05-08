@@ -1,6 +1,7 @@
-""" "This code is part of a test suite for validating the payload oxum of a bag directory structure.
-It includes tests for correct and incorrect formats, as well as checks for mismatches in expected and
-actual payload sizes and file counts.
+"""This code is part of a test suite for validating the payload oxum of a bag
+directory structure.
+It includes tests for correct and incorrect formats, as well as checks for
+mismatches in expected and actual payload sizes and file counts.
 """
 
 import pytest
@@ -11,14 +12,15 @@ from gamslib.sip.validation.baginfo import validate_payload_oxum
 
 
 class DummyUtils:
+    "A dummy utils class to mock some methods"
     @staticmethod
-    def count_bytes(path):
-        # Simulate payload size
+    def count_bytes(_):
+        "Simulate payload size"
         return 1234
 
     @staticmethod
-    def count_files(path):
-        # Simulate file count
+    def count_files(_):
+        "Simulate file count"
         return 5
 
 
@@ -28,8 +30,8 @@ def patch_utils(monkeypatch):
     monkeypatch.setattr(baginfo, "utils", DummyUtils)
 
 
-@pytest.fixture
-def tmp_bag_dir(tmp_path):
+@pytest.fixture(name="tmp_bag_dir")
+def tmp_bag_dir_fixture(tmp_path):
     """Create a temporary bag directory structure for testing."""
     # Create a data directory
     data_dir = tmp_path / "data"
@@ -70,7 +72,7 @@ def test_invalid_format(value, tmp_bag_dir):
 
 def test_wrong_size(tmp_bag_dir, monkeypatch):
     """Test the validate_payload_oxum function with a wrong size.
-    
+
     This simulates a mismatch between the expected and actual payload size.
     """
     # Patch count_bytes to return a different value
@@ -83,7 +85,7 @@ def test_wrong_size(tmp_bag_dir, monkeypatch):
 
 def test_wrong_file_count(tmp_bag_dir, monkeypatch):
     """Test the validate_payload_oxum function with a wrong file count.
-    
+
     This simulates a mismatch between the expected and actual file count.
     """
     # Patch count_files to return a different value

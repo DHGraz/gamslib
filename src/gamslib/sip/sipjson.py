@@ -15,6 +15,7 @@ from gamslib.sip.utils import md5hash, sha512hash
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ContentFile:
     "A dataclass for metadata of a datastream (used to create sip.json)."
@@ -59,11 +60,10 @@ class SipJson:
     funder: str = ""
     created_by = ""
 
-
-
-
     @classmethod
-    def from_objectcsvmanager(cls, created_by: str, csv_mgr: ObjectCSVManager) -> "SipJson":
+    def from_objectcsvmanager(
+        cls, created_by: str, csv_mgr: ObjectCSVManager
+    ) -> "SipJson":
         """Create a SIPJSON object from a ObjectCSVManager object."""
         objectdata = csv_mgr.get_object()
         # next(iter(object_csv.get_objectdata()))
@@ -81,29 +81,29 @@ class SipJson:
             lang=csv_mgr.get_languages(),
             tags=split_entry(objectdata.tags),
             funder=objectdata.funder,
-            created_by=created_by
+            created_by=created_by,
         )
         # This is not complete, because we do not have all data:
         # (file) size and bagpath must be added by the caller after creation
         for datastream in csv_mgr.get_datastreamdata():
             contentfile = ContentFile(
-                    dsid=datastream.dsid,
-                    mimetype=datastream.mimetype,
-                    title=datastream.title,
-                    description=datastream.description,
-                    creator=datastream.creator,
-                    rights=datastream.rights,
-                    lang=split_entry(datastream.lang),
-                    tags=split_entry(datastream.tags),
-                )
-            # formatdetect! 
+                dsid=datastream.dsid,
+                mimetype=datastream.mimetype,
+                title=datastream.title,
+                description=datastream.description,
+                creator=datastream.creator,
+                rights=datastream.rights,
+                lang=split_entry(datastream.lang),
+                tags=split_entry(datastream.tags),
+            )
+            # formatdetect!
             ds_path = csv_mgr.obj_dir / datastream.dspath
             ds_format = detect_format(ds_path)
             if ds_format:
                 contentfile.puid = ds_format.pronom_id
             contentfile.checksums = [
                 f"md5 {md5hash(ds_path)}",
-                f"sha512 {sha512hash(ds_path)}"
+                f"sha512 {sha512hash(ds_path)}",
             ]
             sip_json.contentFiles.append(contentfile)
         return sip_json

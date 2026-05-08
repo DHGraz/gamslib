@@ -36,16 +36,16 @@ from gamslib.projectconfiguration import (
     get_configuration,
 )
 
-# ruff: noqa: PLR0911
+# pylint: disable=c-extension-no-member, too-many-branches, too-many-return-statements, too-many-nested-blocks
 
 logger = logging.getLogger(__name__)
 
 
 class CombinedCatalogResolver(ET.Resolver):
     """Custom XML resource resolver.
-     
-    This resolver extends the `lxml.etree.Resolver` class and provides custom resolution logic 
-    for external XML resources that combines XML CATALOG resolution with host filtering 
+
+    This resolver extends the `lxml.etree.Resolver` class and provides custom resolution logic
+    for external XML resources that combines XML CATALOG resolution with host filtering
     and local caching.
     """
 
@@ -59,7 +59,7 @@ class CombinedCatalogResolver(ET.Resolver):
 
         Args:
             allowed_hosts (Optional[list[str]], optional): _description_. Defaults to None.
-            cache_dir (str | None, optional): _description_. 
+            cache_dir (str | None, optional): _description_.
                     Defaults to ".schema_cache". Set to None to disable caching.
         """
         gams_xml_catalog.activate_catalog()
@@ -87,7 +87,6 @@ class CombinedCatalogResolver(ET.Resolver):
         unique_id = hashlib.md5(url.encode("utf-8")).hexdigest()
         return os.path.join(self.cache_dir, f"cached{unique_id}{extension}")
 
-    
     def resolve(self, url: str, pubid: str | None, context):
         """Resolve a URL to an (XML) document.
 
@@ -102,44 +101,41 @@ class CombinedCatalogResolver(ET.Resolver):
         # resolve_filename(url, ...) is not a reliable existence check and may return
         # a resolver object even when URL is unresolved. Therefore we first ask the
         # catalog explicitly for a mapped local path.
+        result = None
+
         catalog_path = self._resolve_catalog_path(url)
         if catalog_path is not None:
             # Keep base_url=url so downstream relative imports remain URL-based
             # and avoid duplicate imports caused by mixed URL/file identities.
-            return self.resolve_string(catalog_path.read_bytes(), context, base_url=url)
+            result = self.resolve_string(catalog_path.read_bytes(), context, base_url=url)
+        else:
+            # Resolve local file paths/URIs directly.
+            parsed = urlparse(url)
+            local_path = url2pathname(parsed.path) if parsed.scheme == "file" else url
+            if os.path.isfile(local_path):
+                result = self.resolve_filename(local_path, context)
+            elif self._is_allowed_host(url):
+                cache_path = self.get_cache_path(url)
+                if cache_path is not None and Path(cache_path).is_file():
+                    result = self.resolve_string(
+                        Path(cache_path).read_bytes(), context, base_url=url
+                    )
+                else:
+                    try:
+                        response = requests.get(url, timeout=10)
+                        response.raise_for_status()
+                        if cache_path is not None:
+                            Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
+                            Path(cache_path).write_bytes(response.content)
+                        result = self.resolve_string(response.content, context, base_url=url)
+                    except Exception as exp:
+                        logger.warning(
+                            "Something unexpected happened while loading schema %s: %s",
+                            url,
+                            exp,
+                        )
 
-        # Resolve local file paths/URIs directly.
-        parsed = urlparse(url)
-        local_path = url2pathname(parsed.path) if parsed.scheme == "file" else url
-        if os.path.isfile(local_path):
-            return self.resolve_filename(local_path, context)
-
-        # 2. host filter
-        if not self._is_allowed_host(url):
-            return None
-
-        # 3. local cache
-        cache_path = self.get_cache_path(url)
-        if cache_path is not None and Path(cache_path).is_file():
-            return self.resolve_string(
-                Path(cache_path).read_bytes(), context, base_url=url
-            )
-
-        # 4. download
-        try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            if cache_path is not None:
-                Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
-                Path(cache_path).write_bytes(response.content)
-                return self.resolve_string(response.content, context, base_url=url)
-            return self.resolve_string(response.content, context, base_url=url)
-
-        except Exception as exp:
-            logger.warning(
-                "Something unexpected happened while loading schema %s: %s", url, exp
-            )
-            return None
+        return result
 
     def get_content(self, schema_uri: str) -> bytes:
         """Return content of URL.

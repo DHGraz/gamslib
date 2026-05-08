@@ -1,3 +1,4 @@
+"""Fixtures for testing sip.json validation."""
 
 import hashlib
 import json
@@ -9,14 +10,14 @@ import pytest
 from gamslib.sip import utils
 
 
-def make_contentfile_for_sip_json(file_path:Path):
+def make_contentfile_for_sip_json(file_path: Path):
     """Helper function for test data creation.
-    
+
     Return a dict describing a content file as expected by sip.json.
     """
     puid_map = {
-        'DC.xml': 'fmt/111',
-        'IMG.jpeg': 'fmt/43',
+        "DC.xml": "fmt/111",
+        "IMG.jpeg": "fmt/43",
     }
     return {
         "size": file_path.stat().st_size,
@@ -33,12 +34,12 @@ def make_contentfile_for_sip_json(file_path:Path):
         "checksums": [
             f"md5 {hashlib.md5(file_path.read_bytes()).hexdigest()}",
             f"sha256 {hashlib.sha256(file_path.read_bytes()).hexdigest()}",
-            f"sha512 {hashlib.sha512(file_path.read_bytes()).hexdigest()}"
-        ]
+            f"sha512 {hashlib.sha512(file_path.read_bytes()).hexdigest()}",
+        ],
     }
 
 
-def create_manifests(bag_dir:Path, *args:Path):
+def create_manifests(bag_dir: Path, *args: Path):
     """Create the needed manifest files in bag_dirfor each path in args.
 
     This is a helper function for valid_bag_dir fixture, which creates
@@ -52,7 +53,7 @@ def create_manifests(bag_dir:Path, *args:Path):
         if file_path.name == "sip.json":
             filename = "data/meta/sip.json"
         else:
-            filename = f"data/content/{file_path.name}" 
+            filename = f"data/content/{file_path.name}"
         file_bytes = file_path.read_bytes()
 
         md5sums.append((hashlib.md5(file_bytes).hexdigest(), filename))
@@ -60,52 +61,75 @@ def create_manifests(bag_dir:Path, *args:Path):
         sha512sums.append((hashlib.sha512(file_bytes).hexdigest(), filename))
 
     # sort by path/filename
-    md5data = "\n".join([f"{md5sum}  {filename}" for md5sum, filename in sorted(md5sums,key= lambda x: x[1])])
-    sha256_data = "\n".join([f"{sha256sum}  {filename}" for sha256sum, filename in sorted(sha256sums,key= lambda x: x[1])])
-    sha512_data = "\n".join([f"{sha512sum}  {filename}" for sha512sum, filename in sorted(sha512sums,key= lambda x: x[1])])
+    md5data = "\n".join(
+        [
+            f"{md5sum}  {filename}"
+            for md5sum, filename in sorted(md5sums, key=lambda x: x[1])
+        ]
+    )
+    sha256_data = "\n".join(
+        [
+            f"{sha256sum}  {filename}"
+            for sha256sum, filename in sorted(sha256sums, key=lambda x: x[1])
+        ]
+    )
+    sha512_data = "\n".join(
+        [
+            f"{sha512sum}  {filename}"
+            for sha512sum, filename in sorted(sha512sums, key=lambda x: x[1])
+        ]
+    )
 
     (bag_dir / "manifest-md5.txt").write_text(md5data)
     (bag_dir / "manifest-sha256.txt").write_text(sha256_data)
     (bag_dir / "manifest-sha512.txt").write_text(sha512_data)
 
 
-def update_sip_json(sipjson_path:Path, *content_paths:Path):
+def update_sip_json(sipjson_path: Path, *content_paths: Path):
     """Update sip.json with content files from content_paths.
 
     This is a helper function for valid_bag_dir fixture, which updates
     sip.json with content files from content_paths.
     """
     # read sip.json
-    with sipjson_path.open('r', encoding="utf-8", newline="") as sipjson_file:
-            sipjson = json.load(sipjson_file)
-    existing_content_files = [content_file["dsid"] for content_file in sipjson.get("contentFiles", [])]
+    with sipjson_path.open("r", encoding="utf-8", newline="") as sipjson_file:
+        sipjson = json.load(sipjson_file)
+    existing_content_files = [
+        content_file["dsid"] for content_file in sipjson.get("contentFiles", [])
+    ]
 
     # add new content files
     for content_file in content_paths:
         if content_file.name not in existing_content_files:
             sipjson["contentFiles"].append(make_contentfile_for_sip_json(content_file))
-    
+
     # write sip.json back to file
-    with open(sipjson_path, 'w', encoding="utf-8", newline="") as sipjson_file:
+    with open(sipjson_path, "w", encoding="utf-8", newline="") as sipjson_file:
         json.dump(sipjson, sipjson_file, ensure_ascii=False, indent=4)
-    
-def fix_payload_oxums(bag_dir:Path):
+
+
+def fix_payload_oxums(bag_dir: Path):
     """Helper function for test data creation.
-    
-    Set the correct payload oxums for the test data.    
+
+    Set the correct payload oxums for the test data.
     """
     total_bytes = utils.count_bytes(bag_dir / "data")
     num_of_files = utils.count_files(bag_dir / "data")
 
     fixed_lines = []
-    with (bag_dir / "bag-info.txt").open("r", encoding="utf-8", newline="") as baginfo_file:
+    with (bag_dir / "bag-info.txt").open(
+        "r", encoding="utf-8", newline=""
+    ) as baginfo_file:
         for line in baginfo_file:
             if "Payload-Oxum" in line:
                 fixed_lines.append(f"Payload-Oxum: {total_bytes}.{num_of_files}\n")
             else:
                 fixed_lines.append(line)
-    with (bag_dir / "bag-info.txt").open("w", encoding="utf-8", newline="") as baginfo_file:
+    with (bag_dir / "bag-info.txt").open(
+        "w", encoding="utf-8", newline=""
+    ) as baginfo_file:
         baginfo_file.writelines(fixed_lines)
+
 
 @pytest.fixture
 def valid_bag_dir(shared_datadir):
@@ -115,10 +139,8 @@ def valid_bag_dir(shared_datadir):
     """
     bag_dir = shared_datadir / "valid_bag"
     sipjson_path = bag_dir / "data" / "meta" / "sip.json"
-    content_files = list((bag_dir / "data" / "content").glob('*'))
-    update_sip_json(sipjson_path, *content_files)    
+    content_files = list((bag_dir / "data" / "content").glob("*"))
+    update_sip_json(sipjson_path, *content_files)
     fix_payload_oxums(bag_dir)
-    create_manifests(bag_dir, sipjson_path,  *content_files)
+    create_manifests(bag_dir, sipjson_path, *content_files)
     yield bag_dir
-    
-

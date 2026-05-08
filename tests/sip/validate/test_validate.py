@@ -1,3 +1,5 @@
+"Tests for the bag validation functions."
+
 from pathlib import Path
 import pytest
 from gamslib.sip.validation import validate_bag

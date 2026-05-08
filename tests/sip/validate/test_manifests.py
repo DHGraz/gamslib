@@ -31,7 +31,7 @@ def test_validate_valid_manifest(manifest_file, validation_function, valid_bag_d
 def test_manifest_empty(manifest_file, validation_function, valid_bag_dir):
     """Test if validation fails if manifest file is empty."""
     (valid_bag_dir / manifest_file).write_text("")
-    with pytest.raises(BagValidationError, match="is empty"):
+    with pytest.raises(BagValidationError, match=r"is empty"):
         validation_function(valid_bag_dir)
 
 

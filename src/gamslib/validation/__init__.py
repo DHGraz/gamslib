@@ -9,6 +9,7 @@ from gamslib.validation import xmlschemadetector
 from gamslib.validation.schemainfo import SchemaInfo
 from gamslib.validation.validator import ValidatorFactory
 
+
 # TODO: Check if including https://rda-fair4ml.github.io/FAIR4ML-schema/ makes sense
 #    and https://mlcommons.org/working-groups/data/croissant/
 def extract_referenced_schemas(
@@ -23,7 +24,8 @@ def extract_referenced_schemas(
         be expensive, you can pass the format information here if you have it already.
     :param use_default_schema: If True, a default schema is used for certain file types
         if no schema is referenced inside the document.
-        E.g.: If True, a TEI file without any referenced schema will be validated against tei_all.xsd
+        E.g.: If True, a TEI file without any referenced schema will be validated
+        against tei_all.xsd
     :return: A list of SchemaInfo objects
     """
     referenced_schemas = []

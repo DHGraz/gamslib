@@ -3,17 +3,7 @@
 import pytest
 from lxml import etree as ET
 
-from gamslib.validation.xmlvalidator import RelaxNGCompactValidator, RelaxNGValidator
-
-
-# @pytest.fixture(name="rng_validator")
-# def create_rng_validator(lazy_shared_datadir):
-#     """Create a RNGValidator object."""
-#     schema_path = lazy_shared_datadir / "schemas" / "simple.rng"
-#     assert schema_path.exists()
-#     schema_uri = schema_path.resolve().as_uri()
-#     validator = RelaxNGValidator(schema_uri)
-#     return validator
+from gamslib.validation.xmlvalidator import RelaxNGCompactValidator
 
 
 @pytest.fixture(name="rnc_validator")

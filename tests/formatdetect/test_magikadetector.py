@@ -1,13 +1,15 @@
 """Tests for the magika detector."""
+
 import shutil
 from pathlib import Path
 
 import pytest
-from conftest import get_testfiles
 
 from gamslib.formatdetect.magikadetector import MagikaDetector
+from conftest import get_testfiles
 
 
+# pylint: disable=protected-access
 @pytest.fixture(name="detector")
 def get_detector():
     """Return a FormatDetector instance for the format detector to be tested."""
@@ -27,10 +29,12 @@ def test_get_file_type(detector, testfile):
     else:
         result = detector.guess_file_type(testfile.filepath)
         assert result.mimetype == testfile.mimetype, (
-            f"{detector}: Expected '{testfile.mimetype}', got '{result.mimetype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.mimetype}', "
+            f"got '{result.mimetype}' for file {testfile.filepath.name}"
         )
         assert result.subtype == testfile.subtype, (
-            f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.subtype}', "
+            f"got '{result.subtype}' for file {testfile.filepath.name}"
         )
 
 
@@ -46,10 +50,12 @@ def test_get_common_filetypes_without_extension(detector, tmp_path, testfile):
         shutil.copy(testfile.filepath, tmp_path / "foo")
         result = detector.guess_file_type(tmp_path / "foo")
         assert result.mimetype == testfile.mimetype, (
-            f"{detector}: Expected '{testfile.mimetype}', got '{result.mimetype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.mimetype}', got "
+            f"'{result.mimetype}' for file {testfile.filepath.name}"
         )
         assert result.subtype == testfile.subtype, (
-            f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.subtype}', got "
+            f"'{result.subtype}' for file {testfile.filepath.name}"
         )
 
 
@@ -70,14 +76,17 @@ def test_get_common_filetypes_with_wrong_extension(detector, tmp_path, testfile)
         shutil.copy(testfile.filepath, file_to_test)
         result = detector.guess_file_type(file_to_test)
         assert result.mimetype == testfile.mimetype, (
-            f"{detector}: Expected '{testfile.mimetype}', got '{result.mimetype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.mimetype}', got "
+            f"'{result.mimetype}' for file {testfile.filepath.name}"
         )
         assert result.subtype == testfile.subtype, (
-            f"{detector}: Expected '{testfile.subtype}', got '{result.subtype}' for file {testfile.filepath.name}"
+            f"{detector}: Expected '{testfile.subtype}', got "
+            f"'{result.subtype}' for file {testfile.filepath.name}"
         )
 
 
 def test_guess_file_type_no_mimetype(detector, tmp_path, monkeypatch):
+    """Test that the detector can guess the file type of a file without mimetype."""
     file_to_test = tmp_path / "foo"
     monkeypatch.setattr(MagikaDetector, "_fix_result", lambda *args: ("", None))
     with pytest.warns(UserWarning):
@@ -89,19 +98,25 @@ def test_fix_result():
     """Test the _fix_result method."""
     # Test for javascript with .jsonld extension
     path = Path("/path/to/file.jsonld")
-    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    label, mime_type = MagikaDetector._fix_result(
+        path, "javascript", "application/javascript"
+    )
     assert label == "json"
     assert mime_type == "application/json"
 
     # Test for javascript with .json extension
     path = Path("/path/to/file.json")
-    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    label, mime_type = MagikaDetector._fix_result(
+        path, "javascript", "application/javascript"
+    )
     assert label == "json"
     assert mime_type == "application/json"
 
     # Test for javascript with other extension
     path = Path("/path/to/file.js")
-    label, mime_type = MagikaDetector._fix_result(path, "javascript", "application/javascript")
+    label, mime_type = MagikaDetector._fix_result(
+        path, "javascript", "application/javascript"
+    )
     assert label == "javascript"
     assert mime_type == "application/javascript"
 
@@ -116,5 +131,3 @@ def test_fix_result():
     label, mime_type = MagikaDetector._fix_result(path, "text", "text/plain")
     assert label == "text"
     assert mime_type == "text/plain"
-
-

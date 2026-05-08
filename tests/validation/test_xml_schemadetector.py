@@ -1,14 +1,13 @@
 "Tests for the schemadetector module."
 
+from unittest.mock import Mock
+
 import lxml.etree as ET
 import pytest
 
-# from gamslib.validation.xml import schemadetector
-# from gamslib.validation.xml.schemainfo import SchemaInfo, XMLSchemaType
-from gamslib.formatdetect.formatinfo import FormatInfo, SubType
+from gamslib.formatdetect.formatinfo import SubType
 from gamslib.validation import xmlschemadetector
 from gamslib.validation.schemainfo import SchemaType
-from unittest.mock import Mock
 
 # pylint: disable=c-extension-no-member
 
@@ -92,7 +91,8 @@ def test_find_schema_in_processing_instructions(shared_datadir):
 def test_find_schema_in_processing_instructions_url(shared_datadir):
     "Test find_schema_in_processing_instructions with URL referenced schemas."
     xml_file = shared_datadir / "simple_with_rng_and_sch_in_pi.xml"
-    # lxml does not allow to change PI attributes. So we have to change the PI attributes in the xml source
+    # lxml does not allow to change PI attributes. So we have to change
+    # the PI attributes in the xml source
     xml = xml_file.read_text()
     xml = xml.replace(
         'href="schemas/simple.sch"', 'href="http://example.com/simple.sch"'
@@ -195,6 +195,6 @@ def test_find_schemas_apply_default_schema(
 
     schemata = xmlschemadetector.detect_schemata(xml_file, format_info)
     assert len(schemata) == 1
-    
+
     assert schemata[0].schema_uri == expected_schema_uri
     assert schemata[0].schema_type == expected_schema_type

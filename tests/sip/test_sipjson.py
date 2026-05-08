@@ -1,23 +1,16 @@
 """Test for the sipjson module."""
 
-import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
-
 from freezegun import freeze_time
-import requests
 
-from gamslib.objectcsv.create_csv import DSData, ObjectCSVManager, ObjectData
-from gamslib.sip import BagValidationError, sipjson
 import gamslib.sip
+from gamslib.objectcsv.create_csv import DSData, ObjectCSVManager, ObjectData
 from gamslib.sip.sipjson import ContentFile, SipJson
 
-from gamslib.sip.utils import fetch_json_schema
-from gamslib.sip.utils import read_sip_schema_from_package
 
 @pytest.fixture(name="dummyobjectcsv")
 def get_dummyobjectcsv(tmpdir, datadir):
@@ -54,7 +47,7 @@ def get_dummyobjectcsv(tmpdir, datadir):
             creator="creator1",
             rights="rights1",
             lang="en; fr",
-            tags="footag; bartag"
+            tags="footag; bartag",
         )
     )
     csv_mgr.add_datastream(
@@ -67,10 +60,11 @@ def get_dummyobjectcsv(tmpdir, datadir):
             creator="creator2",
             rights="rights2",
             lang="de",
-            tags="tagfoo"
+            tags="tagfoo",
         )
     )
     return csv_mgr
+
 
 @pytest.fixture(name="sipjson_obj")
 def get_sipjson_obj():
@@ -87,10 +81,10 @@ def get_sipjson_obj():
         recid="recid",
         objectType="objectType",
         mainResource="mainResource",
-        lang = ["fr", "de"],
-        tags = ["tag1", "tag2"],
-        funder = "The project funder",
-        sip_creation_timestamp = 1777282176.7894132
+        lang=["fr", "de"],
+        tags=["tag1", "tag2"],
+        funder="The project funder",
+        sip_creation_timestamp=1777282176.7894132,
     )
     data.contentFiles.append(
         ContentFile(
@@ -107,7 +101,9 @@ def get_sipjson_obj():
             size=123,
             checksums=[
                 "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b",
-                "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
+                ("sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca4959"
+                "91b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7"
+                "ef51ad7f8fa6e7"),
             ],
         )
     )
@@ -117,7 +113,7 @@ def get_sipjson_obj():
             bagpath="data/content/bagpath2",
             mimetype="image/jpg",
             title="title2",
-            description="description2",                
+            description="description2",
             creator="creator2",
             rights="rights2",
             lang=["de"],
@@ -126,11 +122,14 @@ def get_sipjson_obj():
             size=456,
             checksums=[
                 "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b",
-                "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
+                ("sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca4959"
+                "91b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7"
+                "ef51ad7f8fa6e7"),
             ],
         )
-    )                   
+    )
     return data
+
 
 def test_contentfile():
     "Test creation of a ContentFile object."
@@ -148,7 +147,9 @@ def test_contentfile():
         puid="fmt/123",
         checksums=[
             "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b",
-            "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7",
+            ("sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca4959"
+            "91b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7"
+            "ef51ad7f8fa6e7"),
         ],
     )
     assert cf.dsid == "dsid"
@@ -163,7 +164,13 @@ def test_contentfile():
     assert cf.size == 123
     assert cf.bagpath == "data/content/dsid"
     assert cf.checksums[0] == "md5 8f7b2b4b4b4b4b4b4b4b4b4b4b4b4b4b"
-    assert cf.checksums[1] == "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7f8fa6e7"
+    assert (
+        cf.checksums[1] == (
+            "sha512 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7"
+            "852b855c0d16a5daee1436adad79d6c14c1b6a5fb5319723aabd7b7a7ef51ad7"
+            "f8fa6e7"
+        )
+    )
 
 
 def test_sipjson_init_explicit_values():
@@ -180,11 +187,11 @@ def test_sipjson_init_explicit_values():
         recid="recid",
         objectType="objectType",
         mainResource="mainResource",
-        lang = ["fr", "de"],
-        tags = ["tag1", "tag2"],
-        funder = "The project funder",
-        sip_creation_timestamp = 1777282176.7894132
-    )   
+        lang=["fr", "de"],
+        tags=["tag1", "tag2"],
+        funder="The project funder",
+        sip_creation_timestamp=1777282176.7894132,
+    )
     assert sip.title == "title"
     assert sip.project == "project"
     assert sip.description == "description"
@@ -200,6 +207,7 @@ def test_sipjson_init_explicit_values():
     assert sip.tags == ["tag1", "tag2"]
     assert sip.funder == "The project funder"
     assert sip.sip_creation_timestamp == 1777282176.7894132
+
 
 @freeze_time("2026-01-14 12:01:02")
 def test_sipjson_init_default_values():
@@ -221,8 +229,8 @@ def test_sipjson_init_default_values():
     expected_timestamp = int(datetime(2026, 1, 14, 12, 1, 2).timestamp())
     assert sip.sip_creation_timestamp == expected_timestamp
     assert sip.mainResource == ""
-    assert sip.lang == []
-    assert sip.tags == []
+    assert not sip.lang
+    assert not sip.tags
     assert sip.funder == ""
 
 
@@ -247,7 +255,7 @@ def test_from_metadata(dummyobjectcsv):
     assert sip.tags == ["tag1", "tag2"]
     assert sip.funder == "funder"
 
-    assert sip.contentFiles[0].dsid == "img1.png" 
+    assert sip.contentFiles[0].dsid == "img1.png"
     assert sip.contentFiles[0].mimetype == "image/png"
     assert sip.contentFiles[0].title == "title1"
     assert sip.contentFiles[0].description == "description1"
@@ -260,7 +268,6 @@ def test_from_metadata(dummyobjectcsv):
     assert sip.contentFiles[0].puid == "fmt/11"
     assert "md5" in sip.contentFiles[0].checksums[0]
     assert "sha512" in sip.contentFiles[0].checksums[1]
-
 
     assert sip.contentFiles[1].dsid == "img2.jpg"
     assert sip.contentFiles[1].mimetype == "image/jpg"
@@ -310,12 +317,13 @@ def test_get_json(sipjson_obj):
     assert jsondata["contentFiles"][1]["bagpath"] == "data/content/bagpath2"
     assert jsondata["created_by"] == "Test Creator"
     assert jsondata["$schema"] == gamslib.sip.CURRENT_SIP_JSON_SCHEMA_URL
-    assert jsondata["lang"] == ["fr", "de"] 
+    assert jsondata["lang"] == ["fr", "de"]
     assert jsondata["contentFiles"][1]["lang"] == ["de"]
     assert jsondata["contentFiles"][0]["tags"] == ["footag", "bartag"]
     assert jsondata["contentFiles"][1]["tags"] == ["tagfoo"]
     assert jsondata["contentFiles"][0]["puid"] == "fmt/11"
     assert jsondata["contentFiles"][1]["puid"] == "fmt/22"
+
 
 def test_validate_dsids_unique(dummyobjectcsv):
     "Test validate_dsids with unique dsids  (should not raise)."
@@ -330,4 +338,3 @@ def test_validate_recids_duplicate(dummyobjectcsv):
     sip.contentFiles[1].dsid = sip.contentFiles[0].dsid
     with pytest.raises(ValueError, match="Non-unique dsid:"):
         sip.validate_datastreams()
-

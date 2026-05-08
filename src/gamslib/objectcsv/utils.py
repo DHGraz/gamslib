@@ -60,9 +60,9 @@ def extract_title_from_lido(lido_file: Path | str) -> str:
         str: Title extracted from the LIDO file, or an empty string if not found.
     """
     lido = ET.parse(lido_file)
-    # pylint: disable=line-too-long
     title_node = lido.find(
-        "lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue",
+        "lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/" +
+        "lido:titleSet/lido:appellationValue",
         namespaces=NAMESPACES,
     )
     return title_node.text if title_node is not None else ""
@@ -70,7 +70,7 @@ def extract_title_from_lido(lido_file: Path | str) -> str:
 
 def find_object_root(start_path: Path) -> Path:
     """
-    Find the root folder of an object by looking a DC.XML file in the current and parent directories.
+    Find the root folder of an object by searching for DC.XML.
 
     Args:
         start_path (Path): The path to start searching from.
@@ -100,5 +100,3 @@ def distinctify(values: str) -> str:
         if val not in clean_values:
             clean_values.append(val)
     return "; ".join(clean_values)
-
-

@@ -37,15 +37,14 @@ class MinimalDetector(FormatDetector):
         super().__init__()
 
     @staticmethod
-    def _fix_mimetype(
-        file_to_validate: Path, encoding: str, mime_type: str
-    ) -> str:
+    def _fix_mimetype(file_to_validate: Path, encoding: str, mime_type: str) -> str:
         """
         Fix common misclassifications as far as we can.
 
         Args:
             file_to_validate (Path): Path to the file being validated.
-            encoding (str): Encoding returned by mimetypes. This is the name of the encoder (e.g. gzip) or None.
+            encoding (str): Encoding returned by mimetypes.
+                This is the name of the encoder (e.g. gzip) or None.
             mime_type (str): MIME type returned by Magika. Might be None, too
 
         Returns:
@@ -62,12 +61,12 @@ class MinimalDetector(FormatDetector):
             mime_type = "application/x-bzip2"
         elif encoding == "xz":
             mime_type = "application/x-xz"
-        elif str(file_to_validate).endswith('.tar.lzma'):
+        elif str(file_to_validate).endswith(".tar.lzma"):
             mime_type = "application/x-tar"
-        elif mime_type == "application/x-zip-compressed":  # Microsoft Windows often returns this for .zip files
+        # Windows often returns this for .zip files
+        elif mime_type == "application/x-zip-compressed":
             mime_type = "application/zip"
         return mime_type
-
 
     def guess_file_type(self, filepath: Path) -> FormatInfo:
         """

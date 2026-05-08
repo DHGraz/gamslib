@@ -1,13 +1,8 @@
 """Tests for the FormatInfo class."""
 
-import csv
-import io
-from importlib import resources
-from pathlib import Path
-from unittest.mock import MagicMock, mock_open, patch
-
 import pytest
 
+# pylint: disable=too-few-public-methods
 from gamslib.formatdetect.formatinfo import (
     FormatInfo,
     SubType,
@@ -17,7 +12,10 @@ from gamslib.formatdetect.formatinfo import (
 
 
 def test_load_subtypes_from_csv():
-    """Test that load_subtypes_from_csv returns a list of dictionaries with the expected structure."""
+    """Test load_subtypes_from_csv.
+
+    It should return a list of dictionaries with the expected structure.
+    """
     subtypes = load_subtypes_from_csv()
     assert isinstance(subtypes, list)
     assert len(subtypes) > 0
@@ -35,7 +33,10 @@ def test_load_subtypes_from_csv_whitespace_handling(tmp_path, monkeypatch):
     def mock_find_subtype_csv_files():
         return [tmp_path / "xml_subformats.csv"]
 
-    csv_content = " subformat , full name , ds name , mimetype \n SUBFORMAT , FULL NAME, DS NAME, MIMETYPE \n"
+    csv_content = (
+        " subformat , full name , ds name , mimetype \n SUBFORMAT , "
+        "FULL NAME, DS NAME, MIMETYPE \n"
+    )
     (tmp_path / "xml_subformats.csv").write_text(csv_content, encoding="utf-8")
     monkeypatch.setattr(
         "gamslib.formatdetect.formatinfo.find_subtype_csv_files",
@@ -137,9 +138,14 @@ def test_description():
 
 
 def test_is_xml_type_true(monkeypatch):
-    """Test is_xml_type returns True when subtype maintype is 'xml' and subformat matches."""
+    """Test is_xml_type
+    It should return True if maintype is 'xml'
+    and subformat matches.
+    """
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "TEIP5"
 
     # Mock _get_subtype_info to return xml maintype and matching subformat
@@ -154,6 +160,8 @@ def test_is_xml_type_false_wrong_maintype(monkeypatch):
     """Test is_xml_type returns False when maintype is not 'xml'."""
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "TEIP5"
 
     fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
@@ -167,6 +175,8 @@ def test_is_xml_type_false_wrong_subformat(monkeypatch):
     """Test is_xml_type returns False when subformat does not match subtype name."""
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "OTHER"
 
     fi = FormatInfo(detector="det", mimetype="application/xml", subtype=DummySubType())
@@ -175,17 +185,23 @@ def test_is_xml_type_false_wrong_subformat(monkeypatch):
     )
     assert fi.is_xml_type() is False
 
-@pytest.mark.parametrize("mimetype, expected", [
-    ("application/xml", True),
-    ("application/foo", False),
-    ])
+
+@pytest.mark.parametrize(
+    "mimetype, expected",
+    [
+        ("application/xml", True),
+        ("application/foo", False),
+    ],
+)
 def test_is_xml_type_no_subtype(mimetype, expected, monkeypatch):
     """Test is_xml_type() when subtype is None.
 
     This should return True if xml in mimetype, False otherwise
     """
+
     class DummySubType:
         "Only used in constructor. Value does not matter."
+
         name = "TEIP5"
 
     fi = FormatInfo(detector="det", mimetype=mimetype, subtype=DummySubType())
@@ -197,6 +213,8 @@ def test_is_json_type_true(monkeypatch):
     """Test is_json_type returns True when subtype maintype is 'json' and subformat matches."""
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "JSON"
 
     fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
@@ -210,6 +228,8 @@ def test_is_json_type_false_wrong_maintype(monkeypatch):
     """Test is_json_type returns False when maintype is not 'json'."""
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "JSON"
 
     fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
@@ -223,6 +243,8 @@ def test_is_json_type_false_wrong_subformat(monkeypatch):
     """Test is_json_type returns False when subformat does not match subtype name."""
 
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "OTHER"
 
     fi = FormatInfo(detector="det", mimetype="application/json", subtype=DummySubType())
@@ -231,17 +253,22 @@ def test_is_json_type_false_wrong_subformat(monkeypatch):
     )
     assert fi.is_json_type() is False
 
-@pytest.mark.parametrize("mimetype, expected", [
-    ("application/json", True),
-    ("application/foo", False),
-])
+
+@pytest.mark.parametrize(
+    "mimetype, expected",
+    [
+        ("application/json", True),
+        ("application/foo", False),
+    ],
+)
 def test_is_json_type_false_no_subtype_info(mimetype, expected, monkeypatch):
     """Test is_json_type returns False when _get_subtype_info returns None."""
+
     class DummySubType:
+        "A minimal fake SubType"
+
         name = "JSON"
 
     fi = FormatInfo(detector="det", mimetype=mimetype, subtype=DummySubType())
     monkeypatch.setattr(fi, "_get_subtype_info", lambda: None)
     assert fi.is_json_type() is expected
-
-

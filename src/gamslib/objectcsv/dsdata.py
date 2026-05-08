@@ -137,12 +137,14 @@ class DSData:
             raise ValueError(f"{self.dspath}: mimetype must not be empty")
         if not isinstance(self.rights, str) or not self.rights.strip():
             raise ValueError(f"{self.dspath}: rights must not be empty")
-        
+
         for tag in utils.split_entry(self.tags):
             try:
                 validate_tag(tag)
             except ValueError as e:
-                raise ValueError(f"Problem: 'tags' entry in 'datastreams.csv' for '{self.dspath}': {e}") from e
+                raise ValueError(
+                    f"Problem: 'tags' entry in 'datastreams.csv' for '{self.dspath}': {e}"
+                ) from e
 
     def guess_missing_values(self, object_path: Path):
         """

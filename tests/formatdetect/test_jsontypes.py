@@ -1,12 +1,16 @@
+"Tests for JSON format detection functions."
+
 import json
+
 import pytest
-from gamslib.formatdetect.jsontypes import is_json_type
-from gamslib.formatdetect.jsontypes import is_jsonl
-from pathlib import Path
-from gamslib.formatdetect.jsontypes import guess_json_format
-from gamslib.formatdetect.jsontypes import get_format_info
-from gamslib.formatdetect.formatinfo import FormatInfo
+
 from gamslib.formatdetect.formatinfo import SubType
+from gamslib.formatdetect.jsontypes import (
+    get_format_info,
+    guess_json_format,
+    is_json_type,
+    is_jsonl,
+)
 
 
 def test_is_json_type_with_known_json_mime_types():

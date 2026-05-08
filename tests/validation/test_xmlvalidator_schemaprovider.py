@@ -1,4 +1,5 @@
 "Tests for the SchemaProvider class in xmlvalidator.py"
+
 import pytest
 from gamslib.validation.xmlvalidator import SchemaProvider
 
@@ -17,11 +18,11 @@ from gamslib.validation.xmlvalidator import SchemaProvider
         ("simple_exslt.sch", "get_schematron"),
         ("simple_stx.sch", "get_schematron"),
         # TODO: these are not supported by lxml, switch to saxon?
-        #("simple.xpath2.sch", "get_schematron"),
-        #("simple.xpath3.sch", "get_schematron"),
-        #("simple.xslt.sch", "get_schematron"),
-        #("simple.xslt2.sch", "get_schematron"),
-        #("simple.xslt3.sch", "get_schematron"),
+        # ("simple.xpath2.sch", "get_schematron"),
+        # ("simple.xpath3.sch", "get_schematron"),
+        # ("simple.xslt.sch", "get_schematron"),
+        # ("simple.xslt2.sch", "get_schematron"),
+        # ("simple.xslt3.sch", "get_schematron"),
     ],
 )
 def test_get_simple_valid_schema(schema_uri, method_to_test, lazy_shared_datadir):
@@ -60,4 +61,3 @@ def test_get_simple_valid_schema(schema_uri, method_to_test, lazy_shared_datadir
 #     # Second call should return the cached schema (same object)
 #     schema2 = get_schema(uri)
 #     assert schema2 is schema
-

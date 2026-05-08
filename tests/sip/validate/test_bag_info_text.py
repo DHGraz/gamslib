@@ -133,10 +133,10 @@ def test_validate_contact_email():
     with pytest.raises(BagValidationError):
         validate_contact_email("foo@")
 
-    with pytest.raises(BagValidationError) as excinfo:
+    with pytest.raises(BagValidationError):
         validate_contact_email("fo/o@bar.nat")
 
-    with pytest.raises(BagValidationError) as excinfo:
+    with pytest.raises(BagValidationError):
         validate_contact_email("foo@bar.n-e-t")
 
 
@@ -164,12 +164,12 @@ def test_validate_bag_info_txt(valid_bag_dir):
 
     # Test entry with missing colon
     baginfo_file.write_text("Bagging-Date 2024-08-22")
-    with pytest.raises(BagValidationError, match="Invalid line") as excinfo:
+    with pytest.raises(BagValidationError, match="Invalid line"):
         validate_baginfo_text(valid_bag_dir)
 
     # Test missing bag-info.txt file
     baginfo_file.unlink()
     with pytest.raises(
-        BagValidationError, match="bag-info.txt file does not exist"
-    ) as excinfo:
+        BagValidationError, match=r"bag-info.txt file does not exist"
+    ):
         validate_baginfo_text(valid_bag_dir)
