@@ -1,18 +1,15 @@
-variables:
-  UV_VERSION: latest
-  PYTHON_BASE_VERSION: 3.12
-  BASE_LAYER: bookworm-slim
-
 stages:
   - test
   - lint
   - tag
   - publish
 
+default:
+  image: ghcr.io/astral-sh/uv:latest-python3.12-debian-slim
+
 # A hidden job template that can be used by different Python versions
 .test-template:
   stage: test
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
   script:
     - echo "uv environment version"
     - uv --version
@@ -79,7 +76,6 @@ nightly-test-py_3.13:
 
 lint:
   stage: lint
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER  
   script:
     - echo "uv environment version"
     - uv --version
@@ -96,7 +92,6 @@ lint:
 # already exist. Runs only on pushes to main (not on scheduled pipelines).
 auto-tag:
   stage: tag
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "schedule"
       when: always
@@ -120,7 +115,6 @@ auto-tag:
 # Requires a PYPI_TOKEN CI/CD variable set in the project's GitLab settings.
 publish-to-pypi:
   stage: publish
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
       when: always
