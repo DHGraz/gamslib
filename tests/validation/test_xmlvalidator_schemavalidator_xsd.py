@@ -118,7 +118,8 @@ def test_validate_invalid_document(xmlschema_validator, lazy_shared_datadir):
     [
         #        ("simple.xml", "simple.xsd"),
         ("lido.xml", "https://gams.uni-graz.at/lido/1.0/lido.xsd"),
-        #         ("lido.xml", "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
+        # TODO: Find matching lido files for these schemas
+        #("lido.xml", "http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd"),
         #        ("lido.xml", "http://www.lido-schema.org/schema/v1.1/lido-v1.1.xsd"),
     ],
 )
