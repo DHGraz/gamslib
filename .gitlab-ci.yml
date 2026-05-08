@@ -4,85 +4,64 @@ stages:
   - tag
   - publish
 
+variables:
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+
+cache:
+  key:
+    files:
+      - uv.lock
+  paths:
+    - .uv-cache
+
+# Common initialization for all jobs
 default:
   image: ghcr.io/astral-sh/uv:debian-slim
+  before_script:
+    - uv python install $PYTHON_VERSION
 
-# A hidden job template that can be used by different Python versions
-.test-template:
-  stage: test
+# Linting (Ruff normally only needs one python version)
+lint-ruff:
+  stage: lint
+  variables:
+    PYTHON_VERSION: "3.12"
   script:
-    - echo "uv environment version"
-    - uv --version
-    - echo "Pinning ${PYTHON_VERSION}"
-    - uv python pin ${PYTHON_VERSION}
-    - uv sync
-    - echo "Using python version:"
-    - python --version
-    - echo "Running tests with uv"
-    - uv run pytest tests
+    - uv run ruff check src
+
+# Testing with matrix for 3.11 to 3.13
+pytest:
+  stage: test
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
+  script:
+    - uv run --python $PYTHON_VERSION pytest
 
 
-test-py_3.11:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.11"
 
-test-py_3.12:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.12"    
-    
-test-py_3.13:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.13"    
-
-# Nightly jobs: force fresh environments and dependency upgrades
-.nightly-test-template:
-  extends: .test-template
+# Nightly matrix: force fresh environments and dependency upgrades
+nightly-pytest:
+  stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
     - when: never
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
   script:
     - echo "uv environment version"
     - uv --version
-    - echo "Pinning ${PYTHON_VERSION}"
-    - uv python pin ${PYTHON_VERSION}
     - echo "Forcing fresh install and upgraded dependencies"
     - rm -rf .venv
     - uv cache clean
-    - uv sync --upgrade
+    - uv sync --python $PYTHON_VERSION --upgrade
     - echo "Using python version:"
-    - python --version
+    - uv run --python $PYTHON_VERSION python --version
     - echo "Running tests with uv"
-    - uv run pytest tests
-
-nightly-test-py_3.11:
-  extends: .nightly-test-template
-  variables:
-    PYTHON_VERSION: "3.11"
-
-nightly-test-py_3.12:
-  extends: .nightly-test-template
-  variables:
-    PYTHON_VERSION: "3.12"
-
-nightly-test-py_3.13:
-  extends: .nightly-test-template
-  variables:
-    PYTHON_VERSION: "3.13"
+    - uv run --python $PYTHON_VERSION pytest tests
 
 
-lint:
-  stage: lint
-  script:
-    - echo "uv environment version"
-    - uv --version
-    - echo "Using python version:"
-    - python --version
-    - echo "Running uv check with ruff"
-    - uv run ruff check src
 
 .rules:
   - if: $CI_COMMIT_REF_NAME == "main" || $CI_COMMIT_REF_NAME == "develop"
