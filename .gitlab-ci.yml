@@ -71,7 +71,9 @@ nightly-pytest:
 # already exist. Runs only on pushes to main (not on scheduled pipelines).
 auto-tag:
   stage: tag
-  image: alpine/git:latest
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
   before_script: []
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "schedule"
