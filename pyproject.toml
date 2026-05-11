@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.8.1"
+version = "0.8.2"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -77,6 +77,14 @@ dev = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.build]
+exclude = [
+    ".uv-cache/**",
+    ".venv/**",
+    "build/**",
+    "dist/**",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gamslib"]
