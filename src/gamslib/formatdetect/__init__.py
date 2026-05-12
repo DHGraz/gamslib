@@ -13,12 +13,12 @@ Currently these Detectors are available:
     detector and should be used by default.
   - SiegfriedDetector: Uses the pygfried library to identify
     file formats based on file content.
-    
+
 All detectors implement the FormatDetector abstract base class
 and return FormatInfo objects with the detected format information.
 The FormatInfo object includes the MIME type, detector name, and the
 subformat name if applicable. The subformat is determined by heuristics
-based on the MIME type and file content. 
+based on the MIME type and file content.
 
 Currently supported subformats include:
 
@@ -50,12 +50,17 @@ from pathlib import Path
 from ..projectconfiguration import MissingConfigurationException, get_configuration
 from .formatdetector import FormatDetector
 from .formatinfo import FormatInfo
-from .magikadetector import MagikaDetector
 from .minimaldetector import MinimalDetector
 from .siegfrieddetector import SiegfriedDetector
 
-DEFAULT_DETECTOR_NAME = "siegfried"
+try:
+    from .magikadetector import MagikaDetector
 
+    _MAGIKA_AVAILABLE = True
+except ImportError:
+    _MAGIKA_AVAILABLE = False
+
+DEFAULT_DETECTOR_NAME = "siegfried"
 
 
 @lru_cache
@@ -85,7 +90,12 @@ def make_detector(detector_name: str, detector_url: str = "") -> FormatDetector:
     if detector_name == "base":
         detector = MinimalDetector()
     elif detector_name == "magika":
-        detector = MagikaDetector()
+        if _MAGIKA_AVAILABLE:
+            detector = MagikaDetector()
+        else:
+            raise ImportError(
+                "MagikaDetector requires the 'magika' library. Please install gamslib[magika]."
+            )
     elif detector_name == "siegfried":
         detector = SiegfriedDetector()
     if detector is None:
@@ -117,4 +127,4 @@ def detect_format(filepath: Path) -> FormatInfo:
     except MissingConfigurationException:
         # if no configuration is found, we use the default  detector
         detector = make_detector(DEFAULT_DETECTOR_NAME)
-        return  make_detector(DEFAULT_DETECTOR_NAME).guess_file_type(filepath)
+        return make_detector(DEFAULT_DETECTOR_NAME).guess_file_type(filepath)
