@@ -16,7 +16,7 @@ cache:
 
 # Common initialization for all jobs
 default:
-  image: ghcr.io/astral-sh/uv:debian-slim
+  # image: ghcr.io/astral-sh/uv:debian-slim
   before_script:
     - uv python install $PYTHON_VERSION
 
