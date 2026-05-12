@@ -42,6 +42,8 @@ or, if you prefer uv:
 uv install gamslib
 ```
 
+If you rely the (depricated) Magika Detector, use `uv install gamslib[magika]` instead.
+
 Normally an explicit installation only makes sense for developers. For normal users, gamslib should be
 set as depenency in the programs using the library.
 

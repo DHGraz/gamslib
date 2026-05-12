@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.8.3"
+version = "0.8.4"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -20,6 +20,7 @@ dependencies = [
     "pillow>=12.1.0",
     "pytest-datadir>=1.8.0",
     "gams-xml-catalog>=0.6.3",
+    "saxonche>=12.9.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -47,11 +48,8 @@ Changelog = "https://github.com/DHGraz/gamslib/blob/main/CHANGELOG.md"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# use install gamslib[saxon] to install saxon
+# use install gamslib[magika] to install saxon
 [project.optional-dependencies]
-saxon = [
-    "saxonche>=12.9.0",
-]
 magika = [
     "magika>=1.0.1",
 ]
