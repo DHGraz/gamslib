@@ -122,7 +122,7 @@ class CombinedCatalogResolver(ET.Resolver):
                     )
                 else:
                     try:
-                        response = requests.get(url, timeout=10)
+                        response = requests.get(url, timeout=30)
                         response.raise_for_status()
                         if cache_path is not None:
                             Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
@@ -164,7 +164,7 @@ class CombinedCatalogResolver(ET.Resolver):
         if self._is_allowed_host(
             schema_uri
         ):  # or self._is_allowed_remote_schema_uri(schema_uri):
-            resp = requests.get(schema_uri, timeout=10)
+            resp = requests.get(schema_uri, timeout=30)
             resp.raise_for_status()
             content = resp.content
             cache_path.parent.mkdir(parents=True, exist_ok=True)
