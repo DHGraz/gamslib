@@ -1,0 +1,131 @@
+#class DataCite:
+#    SCHEMA_URL = "https://schema.datacite.org/meta/kernel-4.3/metadata.xsd"
+
+# Datacite Elements
+
+This standard is huge! Here an (not finished) attempt to create anb overview
+
+- data
+  - id: str
+  - type: str
+    - attributes
+      - doi: str
+      - prefix: str
+      - suffix: str
+      - identifiers: array of
+        - identifier: str
+        - identifierType: str
+        - alternateIdentifiers array of
+          - alternateIdentifier: str
+          - alternateIdentifierType: str
+        - creators: array of
+          - name: str
+          - nameType: str
+          - givenName: str
+          - familyName: str
+          - affiliation: array of
+            - name: str
+            - schemeUri: URI
+            - affiliationIdentifier: str
+            - affiliationIdentifierScheme: str
+            - nameIdentifiers: array of
+              - schemeUri: URI
+              - nameIdentifier: str
+              - nameIdentifierScheme: str
+        - titles: array of
+          - title: str
+          - lang: str
+          - titleType: str
+        - publisher:
+          - lang: str
+          - name: str
+          - schemeUri: URI
+          - publisherIdentifier: str
+          - publisherIdentifierScheme: str
+        - container
+          - type: str
+          - identifier: str
+          - identifierType: str
+          - title: str
+        - publicationYear: int
+        -dates: array of
+          - date
+          - dateType
+        - language: str
+          - types:
+          - ris: str
+          - bibtex: str
+          - citeproc: str
+          - schemaOrg: str
+          - resourceType: str
+          - resourceTypeGeneral: str
+        - relatedIdentifiers: array of
+          - relationsType: str
+          - relatedIdentifier: str
+          - resourceTypeGeneral: str
+          - relatedIdentifierType: str
+        - relatedItems: array of
+          - issue: str
+          - number: str
+          - titles: array of
+            - title: str
+            - titleType: str
+            - volume: str
+            - edition: str
+            - creators: array of
+              - name: str
+              - nameType: str
+              - givenName: str
+              - familyName: str
+            - lastPage: str
+            - firstPage: str
+            - publisher: str
+            - numberType: str
+            contributors: array of
+              - name: str
+              - nameType: str
+              - givenName: str
+              - familyName: str
+              - contributionType: str
+            - container
+        - sizes
+        - formats
+        - version
+        - rightsList
+        - descriptions
+        - geoLocations
+        - fundingReferences
+        - xml
+        - url
+        - contentUrl
+        - metadataVersion
+        - schemaVersion
+        - source
+        - isActive
+        - state
+        - reason
+        - viewCount
+        - viewsOverTime
+        - downloadCount
+        - downloadsOverTime
+        - referencesCount
+        - citationsCount
+        - citationsOverTime
+        - partCount
+        - partOfCount
+        - versionCount
+        - versionOfCount
+        - created
+        - registered
+        - published
+        - upodated
+    - relationships
+      - client
+      - provider
+      - media
+      - references
+      - citations
+      - parts
+      - partOf
+      - versions
+      - versionOf
