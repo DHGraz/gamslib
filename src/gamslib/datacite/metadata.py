@@ -18,13 +18,17 @@ from gamslib.datacite.metadata_additional_titles import (
     AdditionalTitleLang,
     AdditionalTitleType,
 )
+from gamslib.datacite.metadata_funding import FundingReference
+from gamslib.datacite.metadata_identifiers import AlternateIdentifier, RelatedIdentifier
 from gamslib.datacite.metadata_common import (
-    Identifier,
+    Format,
+    MetadataIdentifier,
     Iso639ThreeLanguage,
     LocalizedTitle,
     _validate_edtf,
 )
 from gamslib.datacite.metadata_dates import Date, DateTitle, DateType
+from gamslib.datacite.metadata_location import Location
 from gamslib.datacite.metadata_people import (
     Affiliation,
     Contributor,
@@ -32,6 +36,7 @@ from gamslib.datacite.metadata_people import (
     PersonOrOrganization,
     PersonOrOrganizationIdentifier,
 )
+from gamslib.datacite.metadata_reference import GeneralReference
 from gamslib.datacite.metadata_rights import Rights, RightsDescription, RightsTitle
 from gamslib.datacite.metadata_subjects import Subject
 
@@ -42,7 +47,7 @@ Language = Iso639ThreeLanguage
 class Metadata(BaseModel):
     """Represents the metadata for a record."""
 
-    id: Identifier
+    id: MetadataIdentifier
     title: str
     publication_date: str
     creators: list[Creator]
@@ -55,6 +60,17 @@ class Metadata(BaseModel):
     subjects: list[Subject] = Field(default_factory=list)
     languages: list[Language] = Field(default_factory=list)
     dates: list[Date] = Field(default_factory=list)
+    version: str = ""
+    publisher: str = "GAMS"
+    identifiers: list[AlternateIdentifier] = Field(default_factory=list)
+    related_identifiers: list[RelatedIdentifier] = Field(default_factory=list)
+    sizes: list[str] = Field(default_factory=list)
+    formats: list[Format] = Field(
+        default_factory=list
+    )  # MIME type TODO: validate the values?
+    locations: list[Location] = Field(default_factory=list)
+    funding: list[FundingReference] = Field(default_factory=list)
+    references: list[GeneralReference] = Field(default_factory=list)
 
     @field_validator("publication_date")
     @classmethod
@@ -72,21 +88,21 @@ __all__ = [
     "AdditionalTitleType",
     "AddtionalDescriptionLang",
     "Affiliation",
+    "AlternateIdentifier",
     "Contributor",
     "Creator",
     "Date",
     "DateTitle",
     "DateType",
-    "Identifier",
     "Language",
     "LocalizedTitle",
     "Metadata",
+    "MetadataIdentifier",
     "PersonOrOrganization",
     "PersonOrOrganizationIdentifier",
+    "RelatedIdentifier",
     "Rights",
     "RightsDescription",
     "RightsTitle",
     "Subject",
 ]
-
-

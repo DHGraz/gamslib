@@ -8,7 +8,6 @@ from gamslib.datacite.metadata_common import (
     LocalizedTitle,
 )
 
-
 AdditionalDescriptionTitle = LocalizedTitle
 AddtionalDescriptionLang = Iso639ThreeLanguage
 
