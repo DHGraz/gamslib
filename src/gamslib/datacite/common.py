@@ -70,7 +70,7 @@ def _validate_edtf_single_date(value: str) -> None:
         pass
 
     month_match = re.match(r"^\d{4}-(\d{2})$", value)
-    if month_match and 1 <= int(month_match.group(1)) <= 12:
+    if month_match and 1 <= int(month_match.group(1)) <= 12:  # noqa: PLR2004
         return
 
     if re.match(r"^\d{4}$", value):
@@ -86,7 +86,7 @@ def _validate_edtf(value: str) -> str:
 
     if "/" in value:
         parts = value.split("/")
-        if len(parts) != 2 or not parts[0] or not parts[1]:
+        if len(parts) != 2 or not parts[0] or not parts[1]:  # noqa: PLR2004
             raise ValueError(
                 "Date ranges must contain exactly two dates separated by '/'."
             )
