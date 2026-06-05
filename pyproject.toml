@@ -1,6 +1,6 @@
 [project]
 name = "gamslib"
-version = "0.8.5"
+version = "0.8.6"
 description = "Modules and subpackages used in various GAMS5 related projects"
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" },
@@ -21,6 +21,7 @@ dependencies = [
     "pytest-datadir>=1.8.0",
     "gams-xml-catalog>=0.6.3",
     "saxonche>=12.9.0",
+    "pycountry>=26.2.16",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

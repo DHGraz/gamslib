@@ -68,6 +68,12 @@ NAMESPACES = {
 }
 
 
+class FormatDetectionWarning(UserWarning):
+    """Custom warning for format detection issues.
+    
+    This warning is typically raised when an XML file's namespace is not recognized during subtype detection.
+    """
+
 @dataclass
 class XMLSubFormat:
     "Represents a single entry in xml_subformats.csv"
@@ -187,7 +193,8 @@ def guess_xml_subtype(filepath: Path) -> str:
             return NAMESPACES[namespace]
         except KeyError:
             warnings.warn(
-                f"XML format detection failed due to unknown namespace: {namespace}"
+                f"XML format detection failed due to unknown namespace: {namespace}",
+                FormatDetectionWarning
             )
     return None
 
