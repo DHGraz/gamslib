@@ -35,3 +35,5 @@ tmp
 bar.py
 foo.py
 .vscode/launch.json
+/site/
+/docs/site/

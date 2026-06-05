@@ -49,6 +49,27 @@ nav = [
 {"Home" = "index.md"},
 {"Reference" = [
         "reference/index.md",
+        {"datacite" = [
+          "reference/datacite/index.md",
+          {"DataCite" = "reference/datacite/datacite.md"},
+          {"datacite_record" = "reference/datacite/datacite_record.md"},
+          {"metadata_models" = "reference/datacite/metadata_models.md"},
+          {"access" = "reference/datacite/access.md"},
+          {"files" = "reference/datacite/files.md"},
+          {"metadata" = "reference/datacite/metadata.md"},
+          {"metadata_people" = "reference/datacite/metadata_people.md"},
+          {"metadata_identifiers" = "reference/datacite/metadata_identifiers.md"},
+          {"metadata_dates" = "reference/datacite/metadata_dates.md"},
+          {"metadata_additional_titles" = "reference/datacite/metadata_additional_titles.md"},
+          {"metadata_additional_descriptions" = "reference/datacite/metadata_additional_descriptions.md"},
+          {"metadata_funding" = "reference/datacite/metadata_funding.md"},
+          {"metadata_location" = "reference/datacite/metadata_location.md"},
+          {"metadata_reference" = "reference/datacite/metadata_reference.md"},
+          {"metadata_rights" = "reference/datacite/metadata_rights.md"},
+          {"metadata_subjects" = "reference/datacite/metadata_subjects.md"},
+          {"tombstone" = "reference/datacite/tombstone.md"}
+
+        ]},
         {"formatdetect" = [
           "reference/formatdetect/index.md",
           {"SiegfriedDetector" = "reference/formatdetect/siegfrieddetector.md"},
