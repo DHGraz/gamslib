@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, model_validator
 
-from gamslib.datacite.metadata_common import LocalizedTitle, _require_exactly_one
+from gamslib.datacite.common import LocalizedTitle, require_exactly_one
 
 
 RightsDescription = LocalizedTitle
@@ -20,5 +20,5 @@ class Rights(BaseModel):
     @model_validator(mode="after")
     def validate_id_or_title_field(self):
         """Validate that exactly one of id or title is provided."""
-        _require_exactly_one({"id": self.id, "title": self.title}, "rights information")
+        require_exactly_one({"id": self.id, "title": self.title}, "rights information")
         return self

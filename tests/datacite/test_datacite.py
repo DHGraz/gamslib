@@ -1,6 +1,11 @@
 """Tests for the top-level DataCite record facade."""
 
-from gamslib.datacite import Access, DataCite, Metadata
+import gamslib.datacite as datacite_package
+
+from gamslib.datacite import DataCite
+from gamslib.datacite.access import Access
+from gamslib.datacite.metadata import Metadata
+from gamslib.datacite import datacite_record
 
 
 def test_datacite_can_be_created_from_package_exports():
@@ -35,3 +40,9 @@ def test_datacite_serializes_schema_using_alias():
     dumped = record.model_dump(by_alias=True)
 
     assert dumped["$schema"] == "local://records/record-v2.0.0.json"
+
+
+def test_datacite_package_facade_exports_datacite_model():
+    """The package facade keeps DataCite available from the package root."""
+    assert datacite_package.__all__ == ["DataCite"]
+    assert DataCite is datacite_record.DataCite

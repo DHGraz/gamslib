@@ -20,9 +20,7 @@ from gamslib.datacite.metadata_additional_titles import (
 )
 from gamslib.datacite.metadata_funding import FundingReference
 from gamslib.datacite.metadata_identifiers import AlternateIdentifier, RelatedIdentifier
-from gamslib.datacite.metadata_common import (
-    Format,
-    MetadataIdentifier,
+from gamslib.datacite.common import (
     Iso639ThreeLanguage,
     LocalizedTitle,
     _validate_edtf,
@@ -39,6 +37,7 @@ from gamslib.datacite.metadata_people import (
 from gamslib.datacite.metadata_reference import GeneralReference
 from gamslib.datacite.metadata_rights import Rights, RightsDescription, RightsTitle
 from gamslib.datacite.metadata_subjects import Subject
+from gamslib.datacite.vocabularies import Format, MetadataIdentifier
 
 
 Language = Iso639ThreeLanguage

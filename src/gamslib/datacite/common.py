@@ -9,42 +9,41 @@ LocalizedTitle and Iso639ThreeLanguage.
 import re
 from datetime import datetime
 from enum import StrEnum
-from typing import Literal
 
 from pycountry import languages
 from pydantic import BaseModel, field_validator
 
 
-def _lowercase_if_string(value):
+def lowercase_if_string(value):
     """Normalize string values to lowercase and leave other types unchanged."""
     if isinstance(value, str):
         return value.lower()
     return value
 
 
-def _normalize_iso_639_1(value):
+def normalize_iso_639_1(value):
     """Normalize and validate an ISO 639-1 language code.
 
     Raises a ValueError if the value is not a valid ISO 639-1 code.
     """
-    value = _lowercase_if_string(value)
+    value = lowercase_if_string(value)
     if isinstance(value, str) and languages.get(alpha_2=value) is None:
         raise ValueError(f"'{value}' is not a valid ISO 639-1 language code")
     return value
 
 
-def _normalize_iso_639_3(value):
+def normalize_iso_639_3(value):
     """Normalize and validate an ISO 639-3 language code.
 
     Raises a ValueError if the value is not a valid ISO 639-3 code.
     """
-    value = _lowercase_if_string(value)
+    value = lowercase_if_string(value)
     if isinstance(value, str) and languages.get(alpha_3=value) is None:
         raise ValueError(f"'{value}' is not a valid ISO 639-3 language code")
     return value
 
 
-def _require_exactly_one(values: dict[str, object], context: str) -> None:
+def require_exactly_one(values: dict[str, object], context: str) -> None:
     """Ensure exactly one of the provided optional values is set."""
     provided_names = [name for name, value in values.items() if value is not None]
     if len(provided_names) != 1:
@@ -54,10 +53,6 @@ def _require_exactly_one(values: dict[str, object], context: str) -> None:
         )
 
 
-MAX_MONTH = 12
-RANGE_PART_COUNT = 2
-
-
 def _validate_edtf_single_date(value: str) -> None:
     """Validate a single EDTF date token.
 
@@ -65,6 +60,8 @@ def _validate_edtf_single_date(value: str) -> None:
     - YYYY-MM-DD
     - YYYY-MM
     - YYYY
+
+    Raises a ValueError if the value does not match any of these formats.
     """
     try:
         datetime.strptime(value, "%Y-%m-%d")
@@ -73,7 +70,7 @@ def _validate_edtf_single_date(value: str) -> None:
         pass
 
     month_match = re.match(r"^\d{4}-(\d{2})$", value)
-    if month_match and 1 <= int(month_match.group(1)) <= MAX_MONTH:
+    if month_match and 1 <= int(month_match.group(1)) <= 12:
         return
 
     if re.match(r"^\d{4}$", value):
@@ -89,7 +86,7 @@ def _validate_edtf(value: str) -> str:
 
     if "/" in value:
         parts = value.split("/")
-        if len(parts) != RANGE_PART_COUNT or not parts[0] or not parts[1]:
+        if len(parts) != 2 or not parts[0] or not parts[1]:
             raise ValueError(
                 "Date ranges must contain exactly two dates separated by '/'."
             )
@@ -101,66 +98,17 @@ def _validate_edtf(value: str) -> str:
     return value
 
 
-# These are the allowed values for various fields in the metadata,
+# These are the allowed values for various fields,
 # defined as type aliases for better readability.
 
-IdentifierScheme = Literal["orcid", "gnd", "isni", "ror"]
-PersonOrOrganizationType = Literal["personal", "organizational"]
-AffiliationId = Literal["isni", "ror"]
-CreatorRole = Literal["creator", "contributor"]
-AdditionalTitleTypeId = Literal[
-    "subtitle",
-    "alternative-title",
-    "translated-title",
-    "other",
-]
-AdditionalDescriptionTypeId = Literal[
-    "abstract",
-    "methods",
-    "series-information",
-    "table-of-contents",
-    "technical-info",
-    "other",
-]
-ContributorRole = Literal[
-    "editor",
-    "funder",
-    "project_leader",
-    "project_manager",
-    "other",
-]
-DateTypeId = Literal[
-    "accepted",
-    "available",
-    "collected",
-    "copyrighted",
-    "created",
-    "issued",
-    "other",
-    "submitted",
-    "updated",
-    "valid",
-    "withdrawn",
-]
-
 # Add all accepted mimetypes
-Format = Literal[
-    "application/json",
-    "application/xml",
-    "text/csv",
-    "application/pdf",
-    "application/zip",
-    "image/jpeg",
-    "image/png",
-    "text/plain",
-    "image/tiff",
-]
+# TODO: extend this list with more mimetypes
 
 
 class MetadataIdentifier(StrEnum):
     """Identifies a metadata identifier as type-subtype."""
 
-    # TODO: Add other idenetifier types when decidesd on a final set.
+    # TODO: Add other identifier types when we've decided on a final set.
     IMAGE_PHOTO = "image-photo"
 
 
@@ -268,6 +216,8 @@ class RelationTypeVocabulary(StrEnum):
     OTHER = "other"
 
 
+# These classes are used in multiple places in the metadata,
+# so we define them here to avoid duplication.
 class LocalizedTitle(BaseModel):
     """Represents a localized title value serialized as {"en": "some title"}."""
 
@@ -278,7 +228,7 @@ class LocalizedTitle(BaseModel):
     @classmethod
     def validate_iso_639_1(cls, value):
         """Validate that the value is a valid ISO 639-1 language code."""
-        return _normalize_iso_639_1(value)
+        return normalize_iso_639_1(value)
 
 
 class Iso639ThreeLanguage(BaseModel):
@@ -290,4 +240,4 @@ class Iso639ThreeLanguage(BaseModel):
     @classmethod
     def validate_iso_639_3(cls, value):
         """Validate that the value is a valid ISO 639-3 language code."""
-        return _normalize_iso_639_3(value)
+        return normalize_iso_639_3(value)

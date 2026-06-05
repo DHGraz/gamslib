@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, model_validator
 
-from gamslib.datacite.metadata_common import _require_exactly_one
+from gamslib.datacite.common import require_exactly_one
 
 
 class Subject(BaseModel):
@@ -14,5 +14,5 @@ class Subject(BaseModel):
     @model_validator(mode="after")
     def validate_id_or_subject_field(self):
         """Validate that exactly one of id or subject is provided."""
-        _require_exactly_one({"id": self.id, "subject": self.subject}, "a subject")
+        require_exactly_one({"id": self.id, "subject": self.subject}, "a subject")
         return self

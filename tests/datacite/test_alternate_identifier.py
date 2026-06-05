@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from gamslib.datacite.metadata_identifiers import AlternateIdentifier
-from gamslib.datacite.metadata_common import AlternateIdentifierSchema
+from gamslib.datacite.vocabularies import AlternateIdentifierSchema
 
 
 def test_alternate_identifier_accepts_enum_scheme():

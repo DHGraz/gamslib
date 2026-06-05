@@ -1,7 +1,7 @@
 """Reference models for DataCite metadata.reference field."""
 from pydantic import BaseModel
 
-from gamslib.datacite.metadata_common import IdentifierScheme
+from gamslib.datacite.vocabularies import IdentifierScheme
 
 
 class GeneralReference(BaseModel):

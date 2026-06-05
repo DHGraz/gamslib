@@ -2,11 +2,11 @@
 
 from pydantic import BaseModel
 
-from gamslib.datacite.metadata_common import (
-    AdditionalTitleTypeId,
+from gamslib.datacite.common import (
     Iso639ThreeLanguage,
     LocalizedTitle,
 )
+from gamslib.datacite.vocabularies import AdditionalTitleTypeId
 
 AdditionalTitleLang = Iso639ThreeLanguage
 

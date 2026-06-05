@@ -2,7 +2,7 @@
 
 import pytest
 
-from gamslib.datacite.metadata_common import _validate_edtf
+from gamslib.datacite.common import _validate_edtf
 
 
 @pytest.mark.parametrize(

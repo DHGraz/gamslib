@@ -2,7 +2,8 @@
 
 from pydantic import BaseModel, field_validator
 
-from gamslib.datacite.metadata_common import DateTypeId, LocalizedTitle, _validate_edtf
+from gamslib.datacite.common import LocalizedTitle, _validate_edtf
+from gamslib.datacite.vocabularies import DateTypeId
 
 
 DateTitle = LocalizedTitle

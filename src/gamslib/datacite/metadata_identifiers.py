@@ -2,10 +2,10 @@
 
 from pydantic import BaseModel
 
-from gamslib.datacite.metadata_common import (
-    AlternateIdentifierSchema,
+from gamslib.datacite.vocabularies import (
     RelatedIdentifierSchema,
 )
+from gamslib.datacite.vocabularies import AlternateIdentifierSchema
 
 
 class AlternateIdentifier(BaseModel):

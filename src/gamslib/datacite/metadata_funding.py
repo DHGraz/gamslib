@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, field_validator
 
-from gamslib.datacite.metadata_common import LocalizedTitle
+from gamslib.datacite.common import LocalizedTitle
 
 
 class Funder(BaseModel):

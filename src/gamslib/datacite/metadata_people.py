@@ -6,14 +6,16 @@ contributors can be found quickly in one place.
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from gamslib.datacite.metadata_common import (
+from gamslib.datacite.common import (
+    lowercase_if_string,
+    require_exactly_one,
+)
+from gamslib.datacite.vocabularies import (
     AffiliationId,
     ContributorRole,
     CreatorRole,
     IdentifierScheme,
     PersonOrOrganizationType,
-    _lowercase_if_string,
-    _require_exactly_one,
 )
 
 
@@ -27,7 +29,7 @@ class PersonOrOrganizationIdentifier(BaseModel):
     @classmethod
     def normalize_scheme(cls, value):
         """Normalize identifier schemes to lowercase."""
-        return _lowercase_if_string(value)
+        return lowercase_if_string(value)
 
 
 class PersonOrOrganization(BaseModel):
@@ -68,7 +70,7 @@ class Affiliation(BaseModel):
     @model_validator(mode="after")
     def validate_exactly_one_field(self):
         """Validate that exactly one of id or name is provided."""
-        _require_exactly_one({"id": self.id, "name": self.name}, "an affiliation")
+        require_exactly_one({"id": self.id, "name": self.name}, "an affiliation")
         return self
 
 

@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 from gamslib.datacite.access import Access
 from gamslib.datacite.metadata import Metadata
+from gamslib.datacite.tombstone import Tombstone
 
 
 class DataCite(BaseModel):
@@ -27,9 +28,10 @@ class DataCite(BaseModel):
     parent: dict[str, Any] | None = None
     access: Access
     metadata: Metadata
-    custom_fields: dict[str, Any] = Field(default_factory=dict)
+    #Currently we do not support the (optional) custom_fields
+    #custom_fields: = Field(default_factory=dict)
     files: dict[str, Any] = Field(default_factory=dict)
-    tombstone: dict[str, Any] | None = None
+    tombstone: Tombstone | None = None
     created: datetime | None = None
     updated: datetime | None = None
 
